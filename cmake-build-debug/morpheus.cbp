@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="morpheus"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\thrust\;CMake Files\..\thrust\thrust\;CMake Files\..\thrust\thrust\cmake\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="morpheus">
+				<Option output="/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/morpheus" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DTHRUST_HOST_SYSTEM=THRUST_HOST_SYSTEM_CPP"/>
+					<Add option="-DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP"/>
+					<Add directory="/Users/cstyl/Desktop/Projects/cusplibrary-0.5.1"/>
+					<Add directory="/Users/cstyl/Desktop/Projects/morpheus/."/>
+					<Add directory="/Users/cstyl/Desktop/Projects/boost_1_73_0"/>
+					<Add directory="/Users/cstyl/Desktop/Projects/thrust"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 morpheus"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="morpheus/fast">
+				<Option output="/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/morpheus" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DTHRUST_HOST_SYSTEM=THRUST_HOST_SYSTEM_CPP"/>
+					<Add option="-DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP"/>
+					<Add directory="/Users/cstyl/Desktop/Projects/cusplibrary-0.5.1"/>
+					<Add directory="/Users/cstyl/Desktop/Projects/morpheus/."/>
+					<Add directory="/Users/cstyl/Desktop/Projects/boost_1_73_0"/>
+					<Add directory="/Users/cstyl/Desktop/Projects/thrust"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 morpheus/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/cstyl/Desktop/Projects/morpheus/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/cstyl/Desktop/Projects/morpheus/main.cpp">
+			<Option target="morpheus"/>
+		</Unit>
+		<Unit filename="/Users/cstyl/Desktop/Projects/morpheus/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/cstyl/Desktop/Projects/morpheus/../thrust/thrust/cmake/thrust-config-version.cmake">
+			<Option virtualFolder="CMake Files\..\thrust\thrust\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/cstyl/Desktop/Projects/morpheus/../thrust/thrust/cmake/thrust-config.cmake">
+			<Option virtualFolder="CMake Files\..\thrust\thrust\cmake\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
