@@ -37,6 +37,6 @@ namespace morpheus
 	using host_memory = cusp::host_memory;
 	using device_memory = cusp::device_memory;
 	using any_memory = cusp::any_memory;
-}
+}   // end namespace morpheus
 
 #endif //MORPHEUS_MEMORY_HPP

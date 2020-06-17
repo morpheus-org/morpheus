@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  matrix_market.hpp
+ *  matrix_market.inl
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,68 +23,66 @@
  *
  *****************************************************************************/
 
-/*! \file matrix_market.hpp
+/*! \file matrix_market.inl
  *  \brief Description
  */
 
-#ifndef MORPHEUS_DYNAMIC_IO_MATRIX_MARKET_HPP
-#define MORPHEUS_DYNAMIC_IO_MATRIX_MARKET_HPP
+#ifndef MORPHEUS_IO_DETAIL_MATRIX_MARKET_INL
+#define MORPHEUS_IO_DETAIL_MATRIX_MARKET_INL
 
-#include <string>
-
-#include <morpheus/dynamic/matrix.hpp>
-#include <morpheus/dynamic/apply_operation.hpp>
-
-#include <morpheus/io/matrix_market.hpp>
+#include <morpheus/matrix_formats/io/matrix_market.hpp>
 
 namespace morpheus
 {
 	namespace io
 	{
-
-		struct read_matrix_market_file_fn
+		namespace detail
 		{
-			read_matrix_market_file_fn(std::string const& filename) : filename_(filename) {}
-
-			using result_type = void;
-
-			template <typename T>
-			result_type operator()(T& mtx) const
+			struct read_matrix_market_file_fn
 			{
-				morpheus::io::read_matrix_market_file(mtx, filename_);
-			}
+				read_matrix_market_file_fn(std::string const& filename) : filename_(filename) {}
 
-			std::string filename_;
-		};
+				using result_type = void;
+
+				template <typename T>
+				result_type operator()(T& mtx) const
+				{
+					morpheus::io::read_matrix_market_file(mtx, filename_);
+				}
+
+				std::string filename_;
+			};
+
+			struct write_matrix_market_file_fn
+			{
+				write_matrix_market_file_fn(std::string const& filename) : filename_(filename) {}
+
+				using result_type = void;
+
+				template <typename T>
+				result_type operator()(T const& mtx) const
+				{
+					morpheus::io::write_matrix_market_file(mtx, filename_);
+				}
+
+				std::string filename_;
+			};
+
+		}   // end namespace detail
 
 		template <typename Types>
 		void read_matrix_market_file(matrix<Types>& mtx, const std::string& filename)
 		{
-			apply_operation(mtx, read_matrix_market_file_fn(filename));
+			apply_operation(mtx, detail::read_matrix_market_file_fn(filename));
 		}
-
-		struct write_matrix_market_file_fn
-		{
-			write_matrix_market_file_fn(std::string const& filename) : filename_(filename) {}
-
-			using result_type = void;
-
-			template <typename T>
-			result_type operator()(T const& mtx) const
-			{
-				morpheus::io::write_matrix_market_file(mtx, filename_);
-			}
-
-			std::string filename_;
-		};
 
 		template <typename Types>
 		void write_matrix_market_file(matrix<Types> const& mtx, const std::string& filename)
 		{
-			apply_operation(mtx, write_matrix_market_file_fn(filename));
+			apply_operation(mtx, detail::write_matrix_market_file_fn(filename));
 		}
-	}
 
-}
+	}   // end namespace io
+}   // end namespace morpheus
 
-#endif //MORPHEUS_DYNAMIC_IO_MATRIX_MARKET_HPP
+#endif //MORPHEUS_IO_DETAIL_MATRIX_MARKET_INL

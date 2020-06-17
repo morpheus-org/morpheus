@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  multiply.hpp
+ *  multiply.inl
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,34 +23,44 @@
  *
  *****************************************************************************/
 
-/*! \file multiply.hpp
+/*! \file multiply.inl
  *  \brief Description
  */
 
-#ifndef MORPHEUS_MULTIPLY_HPP
-#define MORPHEUS_MULTIPLY_HPP
+#ifndef MORPHEUS_MATRIX_FORMATS_DETAIL_MULTIPLY_INL
+#define MORPHEUS_MATRIX_FORMATS_DETAIL_MULTIPLY_INL
 
-#include <morpheus/matrix.hpp>
+#include <cusp/multiply.h>
 
 namespace morpheus
 {
+	namespace detail
+	{
+
+	}   // end namespace detail
 
 	template <typename DerivedPolicy,
-			typename Types,
-			typename Vector1,
-			typename Vector2>
+			typename LinearOperator,
+			typename MatrixOrVector1,
+			typename MatrixOrVector2>
 	void multiply(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-	              matrix<Types> const& A,
-	              Vector1 const& B,
-	              Vector2 &C);
+	              const LinearOperator&  A,
+	              const MatrixOrVector1& B,
+	              MatrixOrVector2& C)
+	{
+		cusp::multiply(exec, A, B, C);
+	}
 
-	template <typename Types, typename Vector1, typename Vector2>
-	void multiply(matrix<Types> const& A,
-				  Vector1 const& B,
-				  Vector2 &C);
+	template <typename LinearOperator,
+			typename MatrixOrVector1,
+			typename MatrixOrVector2>
+	void multiply(const LinearOperator&  A,
+	              const MatrixOrVector1& B,
+	              MatrixOrVector2& C)
+	{
+		cusp::multiply(A, B, C);
+	}
 
 }   // end namespace morpheus
 
-#include <morpheus/detail/multiply.inl>
-
-#endif //MORPHEUS_MULTIPLY_HPP
+#endif //MORPHEUS_MATRIX_FORMATS_DETAIL_MULTIPLY_INL

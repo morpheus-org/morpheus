@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  multiply.hpp
+ *  matrix_market.inl
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,34 +23,31 @@
  *
  *****************************************************************************/
 
-/*! \file multiply.hpp
+/*! \file matrix_market.inl
  *  \brief Description
  */
 
-#ifndef MORPHEUS_MULTIPLY_HPP
-#define MORPHEUS_MULTIPLY_HPP
+#ifndef MORPHEUS_MATRIX_FORMATS_IO_DETAIL_MATRIX_MARKET_INL
+#define MORPHEUS_MATRIX_FORMATS_IO_DETAIL_MATRIX_MARKET_INL
 
-#include <morpheus/matrix.hpp>
+#include <cusp/io/matrix_market.h>
 
 namespace morpheus
 {
+	namespace io
+	{
+		template <typename Matrix>
+		void read_matrix_market_file(Matrix& mtx, const std::string& filename)
+		{
+			cusp::io::read_matrix_market_file(mtx, filename);
+		}
 
-	template <typename DerivedPolicy,
-			typename Types,
-			typename Vector1,
-			typename Vector2>
-	void multiply(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-	              matrix<Types> const& A,
-	              Vector1 const& B,
-	              Vector2 &C);
-
-	template <typename Types, typename Vector1, typename Vector2>
-	void multiply(matrix<Types> const& A,
-				  Vector1 const& B,
-				  Vector2 &C);
-
+		template <typename Matrix>
+		void write_matrix_market_file(const Matrix& mtx, const std::string& filename)
+		{
+			cusp::io::write_matrix_market_file(mtx, filename);
+		}
+	}   // end namespace io
 }   // end namespace morpheus
 
-#include <morpheus/detail/multiply.inl>
-
-#endif //MORPHEUS_MULTIPLY_HPP
+#endif //MORPHEUS_MATRIX_FORMATS_IO_DETAIL_MATRIX_MARKET_INL

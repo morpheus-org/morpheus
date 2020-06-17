@@ -27,30 +27,31 @@
  *  \brief Description
  */
 
-#ifndef MORPHEUS_MULTIPLY_HPP
-#define MORPHEUS_MULTIPLY_HPP
+#ifndef MORPHEUS_MATRIX_FORMATS_MULTIPLY_HPP
+#define MORPHEUS_MATRIX_FORMATS_MULTIPLY_HPP
 
-#include <morpheus/matrix.hpp>
+#include <thrust/execution_policy.h>
 
 namespace morpheus
 {
-
 	template <typename DerivedPolicy,
-			typename Types,
-			typename Vector1,
-			typename Vector2>
+			typename LinearOperator,
+			typename MatrixOrVector1,
+			typename MatrixOrVector2>
 	void multiply(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-	              matrix<Types> const& A,
-	              Vector1 const& B,
-	              Vector2 &C);
+	              const LinearOperator&  A,
+	              const MatrixOrVector1& B,
+	              MatrixOrVector2& C);
 
-	template <typename Types, typename Vector1, typename Vector2>
-	void multiply(matrix<Types> const& A,
-				  Vector1 const& B,
-				  Vector2 &C);
+	template <typename LinearOperator,
+			typename MatrixOrVector1,
+			typename MatrixOrVector2>
+	void multiply(const LinearOperator&  A,
+	              const MatrixOrVector1& B,
+	              MatrixOrVector2& C);
 
 }   // end namespace morpheus
 
-#include <morpheus/detail/multiply.inl>
+#include <morpheus/matrix_formats/detail/multiply.inl>
 
-#endif //MORPHEUS_MULTIPLY_HPP
+#endif //MORPHEUS_MATRIX_FORMATS_MULTIPLY_HPP

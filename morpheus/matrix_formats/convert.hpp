@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  multiply.hpp
+ *  convert.hpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,34 +23,28 @@
  *
  *****************************************************************************/
 
-/*! \file multiply.hpp
+/*! \file convert.hpp
  *  \brief Description
  */
 
-#ifndef MORPHEUS_MULTIPLY_HPP
-#define MORPHEUS_MULTIPLY_HPP
+#ifndef MORPHEUS_MATRIX_FORMATS_CONVERT_HPP
+#define MORPHEUS_MATRIX_FORMATS_CONVERT_HPP
 
-#include <morpheus/matrix.hpp>
+#include <thrust/execution_policy.h>
 
 namespace morpheus
 {
 
-	template <typename DerivedPolicy,
-			typename Types,
-			typename Vector1,
-			typename Vector2>
-	void multiply(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-	              matrix<Types> const& A,
-	              Vector1 const& B,
-	              Vector2 &C);
+	template <typename DerivedPolicy, typename SourceType, typename DestinationType>
+	void convert(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
+	             const SourceType& src, DestinationType& dst);
 
-	template <typename Types, typename Vector1, typename Vector2>
-	void multiply(matrix<Types> const& A,
-				  Vector1 const& B,
-				  Vector2 &C);
+	template <typename SourceType, typename DestinationType>
+	void convert(const SourceType& src, DestinationType& dst);
+
 
 }   // end namespace morpheus
 
-#include <morpheus/detail/multiply.inl>
+#include <morpheus/matrix_formats/detail/convert.inl>
 
-#endif //MORPHEUS_MULTIPLY_HPP
+#endif //MORPHEUS_MATRIX_FORMATS_CONVERT_HPP

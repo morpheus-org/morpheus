@@ -30,26 +30,22 @@
 #ifndef MORPHEUS_CONVERT_HPP
 #define MORPHEUS_CONVERT_HPP
 
-#include <cusp/convert.h>
-#include <thrust/execution_policy.h>
+#include <morpheus/matrix.hpp>
 
 namespace morpheus
 {
 
-	template <typename DerivedPolicy, typename SourceType, typename DestinationType>
-	void convert(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-	             const SourceType& src, DestinationType& dst)
-	{
-		cusp::convert(exec, src, dst);
-	}
+	template <typename Types, typename Matrix>
+	void convert(matrix<Types> const& src, Matrix & dst);
 
-	template <typename SourceType, typename DestinationType>
-	void convert(const SourceType& src, DestinationType& dst)
-	{
-		cusp::convert(src, dst);
-	}
+	template <typename Types, typename Matrix>
+	void convert(Matrix const& src, matrix<Types> & dst);
 
+	template <typename Types1, typename Types2>
+	void convert(matrix<Types1> const& src, matrix<Types2> & dst);
 
-}
+}   // end namespace morpheus
+
+#include <morpheus/detail/convert.inl>
 
 #endif //MORPHEUS_CONVERT_HPP

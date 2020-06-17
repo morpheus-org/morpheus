@@ -30,17 +30,16 @@
 #ifndef MORPHEUS_PRINT_HPP
 #define MORPHEUS_PRINT_HPP
 
-#include <cusp/print.h>
+#include <morpheus/matrix.hpp>
 
 namespace morpheus
 {
 
-	template <typename Printable>
-	void print(const Printable& p)
-	{
-		cusp::print(p, std::cout);
-	}
+	template <typename Types>
+	void print(matrix<Types> const& mat);
 
-}
+}   // end namespace morpheus
+
+#include <morpheus/detail/print.inl>
 
 #endif //MORPHEUS_PRINT_HPP

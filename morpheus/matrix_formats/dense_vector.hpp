@@ -27,8 +27,8 @@
  *  \brief Description
  */
 
-#ifndef MORPHEUS_DENSE_VECTOR_HPP
-#define MORPHEUS_DENSE_VECTOR_HPP
+#ifndef MORPHEUS_MATRIX_FORMATS_DENSE_VECTOR_HPP
+#define MORPHEUS_MATRIX_FORMATS_DENSE_VECTOR_HPP
 
 #include <cusp/array1d.h>
 
@@ -45,6 +45,8 @@ namespace morpheus
 		using size_type = std::size_t;
 		using value_type = ValueType;
 
+
+		using reference = dense_vector&;
 //		using view = ...;
 //		using const_view = ...;
 
@@ -71,23 +73,17 @@ namespace morpheus
 		{}
 
 		template<typename OtherT, typename OtherMem>
-		dense_vector &operator=(const dense_vector<OtherT, OtherMem> &v)
-		{
-			parent_t::operator=(v);
-			return *this;
-		}
+		dense_vector::reference operator=(const dense_vector<OtherT, OtherMem> &v);
 
 		template<typename InputIterator>
 		dense_vector(InputIterator first, InputIterator last)
 		: parent_t(first, last)
 		{}
 
-//		template<typename InputIterator>
-//		dense_vector(const dense_vector_view<InputIterator> &v)
-//				: Parent(v.begin(), v.end()) {}
-
 	};
 
-}
+}   // end namespace morpheus
 
-#endif //MORPHEUS_DENSE_VECTOR_HPP
+#include <morpheus/matrix_formats/detail/dense_vector.inl>
+
+#endif //MORPHEUS_MATRIX_FORMATS_DENSE_VECTOR_HPP

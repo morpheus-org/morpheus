@@ -30,26 +30,22 @@
 #ifndef MORPHEUS_IO_BINARY_HPP
 #define MORPHEUS_IO_BINARY_HPP
 
-#include <cusp/io/binary.h>
-
-#include <string>
+#include <morpheus/matrix.hpp>
+#include <morpheus/apply_operation.hpp>
 
 namespace morpheus
 {
 	namespace io
 	{
-		template <typename Matrix>
-		void read_binary_file(Matrix& mtx, const std::string& filename)
-		{
-			cusp::io::read_binary_file(mtx, filename);
-		}
+		template <typename Types>
+		void read_binary_file(matrix<Types>& mtx, const std::string& filename);
 
-		template <typename Matrix>
-		void write_binary_file(const Matrix& mtx, const std::string& filename)
-		{
-			cusp::io::write_binary_file(mtx, filename);
-		}
-	}
-}
+		template <typename Types>
+		void write_binary_file(matrix<Types> const& mtx, const std::string& filename);
+
+	}   // end namespace io
+}   // end namespace morpheus
+
+#include <morpheus/io/detail/binary.inl>
 
 #endif //MORPHEUS_IO_BINARY_HPP

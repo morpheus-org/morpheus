@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  multiply.hpp
+ *  print.inl
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,34 +23,40 @@
  *
  *****************************************************************************/
 
-/*! \file multiply.hpp
+/*! \file print.inl
  *  \brief Description
  */
 
-#ifndef MORPHEUS_MULTIPLY_HPP
-#define MORPHEUS_MULTIPLY_HPP
+#ifndef MORPHEUS_DETAIL_PRINT_INL
+#define MORPHEUS_DETAIL_PRINT_INL
 
-#include <morpheus/matrix.hpp>
+#include <morpheus/apply_operation.hpp>
+
+#include <morpheus/matrix_formats/print.hpp>
 
 namespace morpheus
 {
+	namespace detail
+	{
+		struct print_fn
+		{
+			using result_type = void;
 
-	template <typename DerivedPolicy,
-			typename Types,
-			typename Vector1,
-			typename Vector2>
-	void multiply(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
-	              matrix<Types> const& A,
-	              Vector1 const& B,
-	              Vector2 &C);
+			template <typename T>
+			result_type operator()(const T& mat) const
+			{
+				morpheus::print(mat);
+			}
+		};
 
-	template <typename Types, typename Vector1, typename Vector2>
-	void multiply(matrix<Types> const& A,
-				  Vector1 const& B,
-				  Vector2 &C);
+	}   // end namespace detail
+
+	template <typename Types>
+	void print(matrix<Types> const& mat)
+	{
+		apply_operation(mat, detail::print_fn());
+	}
 
 }   // end namespace morpheus
 
-#include <morpheus/detail/multiply.inl>
-
-#endif //MORPHEUS_MULTIPLY_HPP
+#endif //MORPHEUS_DETAIL_PRINT_INL

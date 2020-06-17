@@ -27,58 +27,44 @@
  *  \brief Description
  */
 
-#ifndef MORPHEUS_DYNAMIC_APPLY_OPERATION_HPP
-#define MORPHEUS_DYNAMIC_APPLY_OPERATION_HPP
+#ifndef MORPHEUS_APPLY_OPERATION_HPP
+#define MORPHEUS_APPLY_OPERATION_HPP
 
-#include <boost/variant/apply_visitor.hpp>
+#include <morpheus/variant.hpp>
 
 namespace morpheus
 {
-
 	/// Invokes a generic mutable operation (represented as a unary function object) on a variant
 	template <typename Types, typename UnaryOp>
-	auto apply_operation(boost::variant<Types>& arg, UnaryOp op) -> typename UnaryOp::result_type
-	{
-		return apply_visitor(op, arg);
-	}
+	auto apply_operation(variant<Types>& arg, UnaryOp op) -> typename UnaryOp::result_type;
 
 	/// Invokes a generic constant operation (represented as a unary function object) on a variant
 	template <typename Types, typename UnaryOp>
-	auto apply_operation(boost::variant<Types> const& arg, UnaryOp op) -> typename UnaryOp::result_type
-	{
-		return apply_visitor(op, arg);
-	}
+	auto apply_operation(variant<Types> const& arg, UnaryOp op) -> typename UnaryOp::result_type;
 
 	/// Invokes a generic constant operation (represented as a binary function object) on two variants
 	template <typename Types1, typename Types2, typename BinaryOp>
 	auto apply_operation(
-			boost::variant<Types1> const& arg1,
-			boost::variant<Types2> const& arg2,
-			BinaryOp op) -> typename BinaryOp::result_type
-	{
-		return apply_visitor(op, arg1, arg2);
-	}
+			variant<Types1> const& arg1,
+			variant<Types2> const& arg2,
+			BinaryOp op) -> typename BinaryOp::result_type;
 
 	/// Invokes a generic mutable operation (represented as a binary function object) on the second variant
 	template <typename Types1, typename Types2, typename BinaryOp>
 	auto apply_operation(
-			boost::variant<Types1> const& arg1,
-			boost::variant<Types2> & arg2,
-			BinaryOp op) -> typename BinaryOp::result_type
-	{
-		return apply_visitor(op, arg1, arg2);
-	}
+			variant<Types1> const& arg1,
+			variant<Types2> & arg2,
+			BinaryOp op) -> typename BinaryOp::result_type;
 
 	/// Invokes a generic mutable operation (represented as a binary function object) on both variants
 	template <typename Types1, typename Types2, typename BinaryOp>
 	auto apply_operation(
-			boost::variant<Types1> & arg1,
-			boost::variant<Types2> & arg2,
-			BinaryOp op) -> typename BinaryOp::result_type
-	{
-		return apply_visitor(op, arg1, arg2);
-	}
+			variant<Types1> & arg1,
+			variant<Types2> & arg2,
+			BinaryOp op) -> typename BinaryOp::result_type;
 
-}
+}   // namespace end morpheus
 
-#endif //MORPHEUS_DYNAMIC_APPLY_OPERATION_HPP
+#include <morpheus/detail/apply_operation.inl>
+
+#endif //MORPHEUS_APPLY_OPERATION_HPP

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  convert.hpp
+ *  convert.inl
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,47 +23,50 @@
  *
  *****************************************************************************/
 
-/*! \file convert.hpp
+/*! \file convert.inl
  *  \brief Description
  */
 
-#ifndef MORPHEUS_DYNAMIC_CONVERT_HPP
-#define MORPHEUS_DYNAMIC_CONVERT_HPP
+#ifndef MORPHEUS_DETAIL_CONVERT_INL
+#define MORPHEUS_DETAIL_CONVERT_INL
 
-#include <morpheus/dynamic/matrix.hpp>
-#include <morpheus/dynamic/apply_operation.hpp>
-#include <morpheus/dynamic/binary_operation.hpp>
+#include <morpheus/apply_operation.hpp>
 
-#include <morpheus/convert.hpp>
+#include <morpheus/matrix_formats/convert.hpp>
 
 namespace morpheus
 {
-	struct convert_fn : binary_operation_obj<convert_fn>
+	namespace detail
 	{
-		template <typename T1, typename T2>
-		void apply_compatible(T1 const& src, T2& dst) const
+		struct convert_fn : binary_operation_obj<convert_fn>
 		{
-			morpheus::convert(src, dst);
-		}
-	};
+			template <typename T1, typename T2>
+			void apply_compatible(T1 const& src, T2& dst) const
+			{
+				morpheus::convert(src, dst);
+			}
+		};
+
+	}   // end namespace detail
 
 	template <typename Types, typename Matrix>
 	void convert(matrix<Types> const& src, Matrix & dst)
 	{
-		apply_operation(src, std::bind(convert_fn(), std::placeholders::_1, std::ref(dst)));
+		apply_operation(src, std::bind(detail::convert_fn(), std::placeholders::_1, std::ref(dst)));
 	}
 
 	template <typename Types, typename Matrix>
 	void convert(Matrix const& src, matrix<Types> & dst)
 	{
-		apply_operation(dst, std::bind(convert_fn(), std::cref(src), std::placeholders::_1));
+		apply_operation(dst, std::bind(detail::convert_fn(), std::cref(src), std::placeholders::_1));
 	}
 
 	template <typename Types1, typename Types2>
 	void convert(matrix<Types1> const& src, matrix<Types2> & dst)
 	{
-		apply_operation(src, dst, convert_fn());
+		apply_operation(src, dst, detail::convert_fn());
 	}
-}
 
-#endif //MORPHEUS_DYNAMIC_CONVERT_HPP
+}   // end namespace morpheus
+
+#endif //MORPHEUS_DETAIL_CONVERT_INL

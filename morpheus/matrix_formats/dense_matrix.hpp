@@ -27,8 +27,8 @@
  *  \brief Description
  */
 
-#ifndef MORPHEUS_DENSE_MATRIX_HPP
-#define MORPHEUS_DENSE_MATRIX_HPP
+#ifndef MORPHEUS_MATRIX_FORMATS_DENSE_MATRIX_HPP
+#define MORPHEUS_MATRIX_FORMATS_DENSE_MATRIX_HPP
 
 #include <cusp/array2d.h>
 
@@ -47,6 +47,8 @@ namespace morpheus
 		using size_type = std::size_t;
 		using value_type = ValueType;
 
+		using reference = dense_matrix&;
+
 //		using view = ...;
 //		using const_view = ...;
 
@@ -63,48 +65,29 @@ namespace morpheus
 		{}
 
 		template <typename MatrixType>
-		dense_matrix(const MatrixType& matrix);
+		dense_matrix(const MatrixType& matrix)
+		: parent_t(matrix)
+		{}
 
-		void resize(const size_t num_rows, const size_t num_cols)
-		{
-			parent_t::resize(num_rows, num_cols);
-		}
-
-		void swap(dense_matrix& matrix)
-		{
-			parent_t::swap(matrix);
-		}
-
-		dense_matrix& operator=(const dense_matrix& matrix)
-		{
-			parent_t::operator=(matrix);
-			return *this;
-		}
+		dense_matrix::reference operator=(const dense_matrix& matrix);
 
 		template <typename MatrixType>
-		dense_matrix& operator=(const MatrixType& matrix)
-		{
-			parent_t::operator=(matrix);
-			return *this;
-		}
+		dense_matrix::reference operator=(const MatrixType& matrix);
 
-		size_t nrows()
-		{
-			return parent_t::num_rows;
-		}
+		void resize(const size_t num_rows, const size_t num_cols);
 
-		size_t ncols()
-		{
-			return parent_t::num_cols;
-		}
+		void swap(dense_matrix& matrix);
 
-		size_t nnz()
-		{
-			return parent_t::num_entries;
-		}
+		size_t nrows();
+
+		size_t ncols();
+
+		size_t nnz();
 
 	};
 
-}
+}   // end namespace morpheus
 
-#endif //MORPHEUS_DENSE_MATRIX_HPP
+#include <morpheus/matrix_formats/detail/dense_matrix.inl>
+
+#endif //MORPHEUS_MATRIX_FORMATS_DENSE_MATRIX_HPP

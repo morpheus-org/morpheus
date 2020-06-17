@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  multiply.hpp
+ *  multiply.inl
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,36 +23,39 @@
  *
  *****************************************************************************/
 
-/*! \file multiply.hpp
+/*! \file multiply.inl
  *  \brief Description
  */
 
-#ifndef MORPHEUS_DYNAMIC_MULTIPLY_HPP
-#define MORPHEUS_DYNAMIC_MULTIPLY_HPP
+#ifndef MORPHEUS_DETAIL_MULTIPLY_INL
+#define MORPHEUS_DETAIL_MULTIPLY_INL
 
-#include <morpheus/dynamic/matrix.hpp>
-#include <morpheus/dynamic/apply_operation.hpp>
+#include <morpheus/apply_operation.hpp>
 
-#include <morpheus/multiply.hpp>
+#include <morpheus/matrix_formats/multiply.hpp>
 
 namespace morpheus
 {
-	struct multiply_fn
+	namespace detail
 	{
-		using result_type = void;
-
-		template <typename T1, typename T2, typename T3>
-		result_type operator()(T1 const& A, T2 const& B, T3 & C) const
+		struct multiply_fn
 		{
-			morpheus::multiply(A, B, C);
-		}
+			using result_type = void;
 
-		template <typename Policy, typename T1, typename T2, typename T3>
-		result_type operator()(Policy const& exec, T1 const& A, T2 const& B, T3 & C) const
-		{
-			morpheus::multiply(exec, A, B, C);
-		}
-	};
+			template <typename T1, typename T2, typename T3>
+			result_type operator()(T1 const& A, T2 const& B, T3 & C) const
+			{
+				morpheus::multiply(A, B, C);
+			}
+
+			template <typename Policy, typename T1, typename T2, typename T3>
+			result_type operator()(Policy const& exec, T1 const& A, T2 const& B, T3 & C) const
+			{
+				morpheus::multiply(exec, A, B, C);
+			}
+		};
+	}   // end namespace detail
+
 
 	template <typename DerivedPolicy,
 			typename Types,
@@ -63,17 +66,19 @@ namespace morpheus
 	              Vector1 const& B,
 	              Vector2 &C)
 	{
-		apply_operation(A, std::bind(multiply_fn(), std::cref(exec), std::placeholders::_1,
+		apply_operation(A, std::bind(detail::multiply_fn(), std::cref(exec), std::placeholders::_1,
 		                             std::cref(B), std::ref(C)));
 	}
 
 	template <typename Types, typename Vector1, typename Vector2>
 	void multiply(matrix<Types> const& A,
-				  Vector1 const& B,
-				  Vector2 &C)
+	Vector1 const& B,
+			Vector2 &C)
 	{
-		apply_operation(A, std::bind(multiply_fn(), std::placeholders::_1, std::cref(B), std::ref(C)));
+		apply_operation(A, std::bind(detail::multiply_fn(), std::placeholders::_1, std::cref(B), std::ref(C)));
 	}
 
-}
-#endif //MORPHEUS_DYNAMIC_MULTIPLY_HPP
+
+}   // end namespace morpheus
+
+#endif //MORPHEUS_DETAIL_MULTIPLY_INL

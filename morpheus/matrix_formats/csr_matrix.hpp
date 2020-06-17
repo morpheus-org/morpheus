@@ -27,8 +27,8 @@
  *  \brief Description
  */
 
-#ifndef MORPHEUS_CSR_MATRIX_HPP
-#define MORPHEUS_CSR_MATRIX_HPP
+#ifndef MORPHEUS_MATRIX_FORMATS_CSR_MATRIX_HPP
+#define MORPHEUS_MATRIX_FORMATS_CSR_MATRIX_HPP
 
 #include <cusp/csr_matrix.h>
 
@@ -45,6 +45,9 @@ namespace morpheus
 		using size_type = IndexType;
 		using value_type = ValueType;
 
+
+		using reference = csr_matrix&;
+
 //		using view = ...;
 //		using const_view = ...;
 
@@ -59,39 +62,22 @@ namespace morpheus
 		{}
 
 		template<typename MatrixType>
-		csr_matrix& operator = (const MatrixType& mat)
-		{
-			parent_t::operator=(mat);
-			return *this;
-		}
+		csr_matrix::reference operator = (const MatrixType& mat);
 
-		void swap(csr_matrix& mat)
-		{
-			parent_t::swap(mat);
-		}
+		void swap(csr_matrix& mat);
 
-		void resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz)
-		{
-			parent_t::resize(num_rows, num_cols, num_nnz);
-		}
+		void resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz);
 
-		size_t nrows()
-		{
-			return parent_t::num_rows;
-		}
+		size_t nrows();
 
-		size_t ncols()
-		{
-			return parent_t::num_cols;
-		}
+		size_t ncols();
 
-		size_t nnz()
-		{
-			return parent_t::num_entries;
-		}
+		size_t nnz();
 
 	};
 
-}
+}   // end namespace morpheus
 
-#endif //MORPHEUS_CSR_MATRIX_HPP
+#include <morpheus/matrix_formats/detail/csr_matrix.inl>
+
+#endif //MORPHEUS_MATRIX_FORMATS_CSR_MATRIX_HPP

@@ -30,26 +30,22 @@
 #ifndef MORPHEUS_IO_MATRIX_MARKET_HPP
 #define MORPHEUS_IO_MATRIX_MARKET_HPP
 
-#include <cusp/io/matrix_market.h>
-
-#include <string>
+#include <morpheus/matrix.hpp>
+#include <morpheus/apply_operation.hpp>
 
 namespace morpheus
 {
 	namespace io
 	{
-		template <typename Matrix>
-		void read_matrix_market_file(Matrix& mtx, const std::string& filename)
-		{
-			cusp::io::read_matrix_market_file(mtx, filename);
-		}
+		template <typename Types>
+		void read_matrix_market_file(matrix<Types>& mtx, const std::string& filename);
 
-		template <typename Matrix>
-		void write_matrix_market_file(const Matrix& mtx, const std::string& filename)
-		{
-			cusp::io::write_matrix_market_file(mtx, filename);
-		}
-	}
-}
+		template <typename Types>
+		void write_matrix_market_file(matrix<Types> const& mtx, const std::string& filename);
+
+	}   // end namespace io
+}   // end namespace morpheus
+
+#include <morpheus/io/detail/matrix_market.inl>
 
 #endif //MORPHEUS_IO_MATRIX_MARKET_HPP

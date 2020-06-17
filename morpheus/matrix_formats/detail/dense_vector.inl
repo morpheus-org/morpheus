@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  print.hpp
+ *  dense_vector.inl
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,36 +23,30 @@
  *
  *****************************************************************************/
 
-/*! \file print.hpp
+/*! \file dense_vector.inl
  *  \brief Description
  */
 
-#ifndef MORPHEUS_DYNAMIC_PRINT_HPP
-#define MORPHEUS_DYNAMIC_PRINT_HPP
-
-#include <morpheus/dynamic/matrix.hpp>
-#include <morpheus/dynamic/apply_operation.hpp>
-
-#include <morpheus/print.hpp>
+#ifndef MORPHEUS_MATRIX_FORMATS_DETAIL_DENSE_VECTOR_INL
+#define MORPHEUS_MATRIX_FORMATS_DETAIL_DENSE_VECTOR_INL
 
 namespace morpheus
 {
-	struct print_fn
+	namespace detail
 	{
-		using result_type = void;
 
-		template <typename T>
-		result_type operator()(const T& mat) const
-		{
-			morpheus::print(mat);
-		}
-	};
+	}   // end namespace detail
 
-	template <typename Types>
-	void print(matrix<Types> const& mat)
+	template<typename ValueType, typename MemorySpace>
+	template<typename OtherT, typename OtherMem>
+	typename dense_vector<ValueType, MemorySpace>::reference
+	dense_vector<ValueType, MemorySpace>
+    ::operator=(const dense_vector<OtherT, OtherMem> &v)
 	{
-		apply_operation(mat, print_fn());
+		parent_t::operator=(v);
+		return *this;
 	}
-}
 
-#endif //MORPHEUS_DYNAMIC_PRINT_HPP
+}   // end namespace morpheus
+
+#endif //MORPHEUS_MATRIX_FORMATS_DETAIL_DENSE_VECTOR_INL
