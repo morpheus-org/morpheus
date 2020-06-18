@@ -34,9 +34,10 @@
 
 namespace morpheus
 {
+
 	// Currently using the Cusp Interface
 	template <typename IndexType, typename ValueType, class MemorySpace>
-	class coo_matrix : public cusp::coo_matrix<IndexType,ValueType,MemorySpace>
+class coo_matrix : public cusp::coo_matrix<IndexType,ValueType,MemorySpace>
 	{
 	private:
 		using parent_t = cusp::coo_matrix<IndexType,ValueType,MemorySpace>;
@@ -46,9 +47,6 @@ namespace morpheus
 		using value_type = ValueType;
 
 		using reference = coo_matrix&;
-
-//		using view = ...;
-//		using const_view = ...;
 
 		coo_matrix() = default;
 

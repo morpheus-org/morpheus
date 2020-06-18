@@ -34,6 +34,11 @@
 
 namespace morpheus
 {
+	namespace detail
+	{
+
+	}   // end namespace detail
+
 	// TODO:: Allow change of type from a function using an index
 
 	template<typename Matrices>
@@ -72,6 +77,7 @@ namespace morpheus
 
 		size_t nnz();
 	};
+
 
 }   // end namespace morpheus
 

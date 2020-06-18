@@ -45,7 +45,6 @@ namespace morpheus
 		using size_type = std::size_t;
 		using value_type = ValueType;
 
-
 		using reference = dense_vector&;
 //		using view = ...;
 //		using const_view = ...;
