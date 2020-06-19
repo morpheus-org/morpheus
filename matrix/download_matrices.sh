@@ -55,4 +55,10 @@ do
 done
 
 # untar files and delete compressed files
-find . -type f -iname "*.tar.gz" -print -execdir tar xf {} \; -delete
+for i in *.tar.gz
+do
+  echo $i
+  pushd `dirname $i`
+  tar xf `basename $i` && rm `basename $i`
+  popd
+done
