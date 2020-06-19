@@ -5,15 +5,22 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_CXX_FLAGS "-O3")
 
-set(Thrust_DIR "/Users/cstyl/Desktop/Projects/thrust/thrust/cmake/")
-set(Cusp_DIR "/Users/cstyl/Desktop/Projects/cusplibrary-0.5.1/")
+
+# Local directories
+set(Local_DIR "/Users/cstyl/Desktop/Projects")
+# Archer directories
+#set(Local_DIR "/work/e609/e609/cstyl")
+
+set(Thrust_DIR "${Local_DIR}/thrust/thrust/cmake")
+set(Cusp_DIR "${Local_DIR}/cusplibrary-0.5.1")
+set(Morpheus_DIR "${Local_DIR}/morpheus")
+set(BOOST_ROOT "${Local_DIR}/boost_1_73_0")
+
 find_package(Thrust REQUIRED CONFIG)
 thrust_create_target(ThrustOMP HOST CPP DEVICE OMP)
 
 include_directories(${Cusp_DIR})
-include_directories(./)
-
-set(BOOST_ROOT "/Users/cstyl/Desktop/Projects/boost_1_73_0")
+include_directories(${Morpheus_DIR})
 
 find_package(Boost 1.73.0)
 if(Boost_FOUND)
