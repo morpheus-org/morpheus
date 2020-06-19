@@ -54,17 +54,18 @@ void spMv_bench(int argc, char** argv, std::string format, Matrix A)
 	{
 		Random_vector r(A.num_rows, i);
 		Dense_vector x(r.begin(), r.end());
-		spmv.start();
+		spmv.clear().start();
 		cusp::multiply(A, x, y);
 		spmv.stop();
+		std::cout << "Iteration " << i << ":\t" << spmv;
 	}
-
+	std::cout << std::endl;
 	total.stop();
 
 	// Stats
-	std::cout << format << std::endl;
+	std::cout << args.filename << "\t" << format << std::endl;
 	std::cout << args.filename << "\t" << A.num_rows  << "\t" << A.num_cols << "\t" << A.num_entries  << std::endl;
-	std::cout << total << io << spmv << std::endl;
+	std::cout << total << io << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -77,11 +78,6 @@ int main(int argc, char* argv[])
 	{
 		Csr_matrix A;
 		spMv_bench(argc, argv, "Csr", A);
-	}
-
-	{
-		Dense_matrix A;
-		spMv_bench(argc, argv, "Dense", A);
 	}
 
 	return 0;

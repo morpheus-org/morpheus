@@ -51,16 +51,17 @@ void spMv_bench(int argc, char** argv, std::string format, Matrix A)
 	{
 		Random_vector r(A.nrows(), i);
 		Dense_vector x(r.begin(), r.end());
-		spmv.start();
+		spmv.clear().start();
 		morpheus::multiply(A, x, y);
 		spmv.stop();
+		std::cout << "Iteration " << i << ":\t" << spmv;
 	}
 
 	total.stop();
 
 	// Stats
 	std::cout << args.filename << "\t" << A.nrows()   << "\t" << A.ncols() << "\t" << A.nnz()  << std::endl;
-	std::cout << total << io << spmv<< std::endl;
+	std::cout << total << io << std::endl;
 
 }
 
@@ -73,9 +74,6 @@ int main(int argc, char* argv[])
 
 	A = Csr_matrix();
 	spMv_bench(argc, argv, "Csr", A);
-
-	A = Dense_matrix();
-	spMv_bench(argc, argv, "Dense", A);
 
 	return 0;
 }
