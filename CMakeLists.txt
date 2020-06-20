@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_CXX_FLAGS "-O3")
 
+# Local directories
+#set(Local_DIR "/Users/cstyl/Desktop/Projects")
 # Archer directories
 set(Local_DIR "/work/e609/e609/cstyl")
 

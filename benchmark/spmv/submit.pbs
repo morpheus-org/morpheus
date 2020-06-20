@@ -1,0 +1,19 @@
+#!/bin/bash --login
+#
+#PBS -N spmv_bench
+#PBS -q long
+#PBS -l select=1:ncpus=24
+#PBS -l walltime=48:00:00
+#PBS -A e609
+
+module load cmake/3.16.0
+module unload gcc
+module load gcc/7.3.0
+
+cd $PBS_O_WORKDIR
+
+export OMP_NUM_THREADS=1
+
+chmod u+x ./bench_spmv.sh
+
+./bench_spmv.sh
