@@ -53,9 +53,10 @@ namespace morpheus
 					: elapsedTime(0.0), name(_name)
 			{}
 
-			void start()
+			timer& start()
 			{
 				time_start = sample::now();
+				return *this;
 			}
 
 			void stop()
@@ -65,9 +66,10 @@ namespace morpheus
 				elapsedTime += duration.count();
 			}
 
-			void reset()
+			timer& clear()
 			{
 				elapsedTime = 0.0;
+				return *this;
 			}
 		};
 
