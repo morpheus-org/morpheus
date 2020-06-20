@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  static_spmv_coo.cpp
+ *  coo.cpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,60 +23,59 @@
  *
  *****************************************************************************/
 
-/*! \file static_spmv_coo.cpp
+/*! \file coo.cpp
  *  \brief Description
  */
+
 #include <examples/include/parser.hpp>
 #include <examples/include/timer.hpp>
-#include <examples/include/static.hpp>
+#include <examples/include/dynamic.hpp>
 
 using namespace morpheus::examples;
 
-template<typename Matrix>
-void spMv_bench(int argc, char** argv, std::string format, Matrix A)
+int main(int argc, char* argv[])
 {
 	parser args;
 	args.get(argc, argv).print();
 
-	timer total("Static_Total"), io("Static_IO"), spmv("Static_spMv");
+	timer total("Dynamic_Total"), reader("Dynamic_Reader"), writer("Dynamic_Writer") , spmv("Dynamic_spMv");
 
 	total.start();
 
-	io.start();
-	morpheus::io::read_matrix_market_file(A, args.file);
-	io.stop();
+	Matrix A;
+	A = Coo_matrix();
+
+	reader.start();
+
+	morpheus::io::read_matrix_market_file(A, args.fin);
+
+	reader.stop();
 
 	Dense_vector y(A.nrows());
+	Dense_vector x;
 
 	for(int i = 0; i < args.iterations; i++)
 	{
 		Random_vector r(A.nrows(), i);
-		Dense_vector x(r.begin(), r.end());
-		spmv.clear().start();
+		x = Dense_vector(r.begin(), r.end());
+		spmv.start();
 		morpheus::multiply(A, x, y);
 		spmv.stop();
-		std::cout << "Iteration " << i << ":\t" << spmv;
 	}
+
+	writer.start();
+	morpheus::io::write_matrix_market_file(x, args.fx);
+	morpheus::io::write_matrix_market_file(y, args.fy);
+	writer.stop();
 
 	total.stop();
 
 	// Stats
-	std::cout << args.filename << "\t" << A.nrows()   << "\t" << A.ncols() << "\t" << A.nnz()  << std::endl;
-	std::cout << total << io << std::endl;
-}
-
-int main(int argc, char* argv[])
-{
-
-	{
-		Coo_matrix A;
-		spMv_bench(argc, argv, "Coo", A);
-	}
-
-	{
-		Csr_matrix A;
-		spMv_bench(argc, argv, "Csr", A);
-	}
+	std::cout << args.filename << "::\tMatrix Shape\t" << A.nrows()  << "\t" << A.ncols() << "\t" << A.nnz()  << std::endl;
+	std::cout << args.filename << "::\t" << total << std::endl;
+	std::cout << args.filename << "::\t" << reader << std::endl;
+	std::cout << args.filename << "::\t" << writer << std::endl;
+	std::cout << args.filename << "::\t" << spmv << std::endl;
 
 	return 0;
 }

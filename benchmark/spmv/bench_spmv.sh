@@ -3,32 +3,56 @@
 SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 MATRIX_DIR="$SCRIPT_PATH"/../../matrix
 
-BIN_DIR="$SCRIPT_PATH"/../../examples-build
-BIN=("cusp_spmv" "static_spmv" "dynamic_spmv")
+#BIN_DIR="$SCRIPT_PATH"/../../examples-build
+BIN_DIR="$SCRIPT_PATH"/../../examples-archer-build
+IMPLEMENTATIONS=("cusp" "static" "dynamic")
+FORMATS=("coo" "csr")
 
-ITER=5
+REPS=2
+SPMV_ITER=1
 
-ACCOUNT="e609"
-TIME="walltime=00:20:00"
-PLACE="place=scatter:excl"
-SELECT="select=1:ncpus=24"
-RESOURCES="$SELECT,$TIME,$PLACE"
-QSUB="qsub -A $ACCOUNT -l ${RESOURCES}"
-
-for i in "$MATRIX_DIR"/*/
+for matdir in "$MATRIX_DIR"/*/
 do
-  BASE=$(basename $i)
-  DIR=$(dirname $i)
+  BASE=$(basename $matdir)
+  DIR=$(dirname $matdir)
   MATRIX="$DIR/$BASE/$BASE.mtx"
 
-  outdir="$SCRIPT_PATH/$BASE"
-  mkdir "$outdir"
-
-  for prog in "${BIN[@]}"
+  for impl in "${IMPLEMENTATIONS[@]}"
   do
-    outfile="$outdir/$prog.txt"
-    $QSUB -N "$BASE"_"$prog" -v BIN="$BIN_DIR/$prog",MATRIX="$MATRIX",ITER="$ITER",OUTFILE="$outfile"
-#    "$BIN_DIR/$prog" "$MATRIX" $ITER > "$outfile"
-  done
 
+    for format in "${FORMATS[@]}"
+    do
+      outdir="$SCRIPT_PATH/$BASE/$impl/$format"
+      progress="$outdir/progress.txt"
+
+      mkdir -p "$outdir"
+      echo "Starting $BASE for $impl implementation and $format format" >&1 | tee "$progress"
+
+      BINARY="$BIN_DIR/$impl"_"$format"_"spmv"
+      for rep in `seq -w 1 $REPS`
+      do
+          fx="$outdir/fx_$rep.txt"
+          fy="$outdir/fy_$rep.txt"
+
+          "$BINARY" "$MATRIX" "$outdir" $SPMV_ITER "$rep" >&1 | tee -a "$progress"
+
+      done
+    done
+  done
 done
+#  outdir="$SCRIPT_PATH/$BASE"
+#  mkdir -p "$outdir"
+#
+#
+#
+#  for prog in "${BIN[@]}"
+#  do
+#    outfile="$outdir/$prog.txt"
+#    "$BIN_DIR/$prog" "$MATRIX" $ITER > "$outfile"
+#  done
+
+
+#for each matrix
+#  for each implementation
+#    for each format
+#      for each rep
