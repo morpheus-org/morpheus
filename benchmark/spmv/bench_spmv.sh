@@ -22,7 +22,7 @@ do
 
     for format in "${FORMATS[@]}"
     do
-      outdir="$SCRIPT_PATH/$BASE/$impl/$format"
+      outdir="$SCRIPT_PATH/results/$BASE/$impl/$format"
       progress="$outdir/progress.txt"
 
       mkdir -p "$outdir"
