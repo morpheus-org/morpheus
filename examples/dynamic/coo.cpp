@@ -29,7 +29,11 @@
 
 #include <examples/include/parser.hpp>
 #include <examples/include/timer.hpp>
-#include <examples/include/dynamic.hpp>
+
+#include <morpheus/dynamic_matrix.hpp>
+#include <morpheus/matrix_formats/dense_vector.hpp>
+#include <morpheus/io/matrix_market.hpp>
+#include <morpheus/multiply.hpp>
 
 using namespace morpheus::examples;
 
@@ -42,8 +46,8 @@ int main(int argc, char* argv[])
 
 	total.start();
 
-	Matrix A;
-	A = Coo_matrix();
+	morpheus::Matrix_i<double> A;
+	A = morpheus::coo_matrix<int, double, morpheus::host_memory>();
 
 	reader.start();
 
@@ -51,13 +55,12 @@ int main(int argc, char* argv[])
 
 	reader.stop();
 
-	Dense_vector y(A.nrows());
-	Dense_vector x;
+	morpheus::dense_vector<double, morpheus::host_memory> x, y(A.nrows());
 
 	for(int i = 0; i < args.iterations; i++)
 	{
-		Random_vector r(A.nrows(), i);
-		x = Dense_vector(r.begin(), r.end());
+		cusp::random_array<double> r(A.nrows(), i);
+		x = morpheus::dense_vector<double, morpheus::host_memory>(r.begin(), r.end());
 		spmv.start();
 		morpheus::multiply(A, x, y);
 		spmv.stop();

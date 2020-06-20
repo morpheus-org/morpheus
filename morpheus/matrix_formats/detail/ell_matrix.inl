@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  coo_matrix.inl
+ *  ell_matrix.inl
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,12 +23,12 @@
  *
  *****************************************************************************/
 
-/*! \file coo_matrix.inl
+/*! \file ell_matrix.inl
  *  \brief Description
  */
 
-#ifndef MORPHEUS_MATRIX_FORMATS_DETAIL_COO_MATRIX_INL
-#define MORPHEUS_MATRIX_FORMATS_DETAIL_COO_MATRIX_INL
+#ifndef MORPHEUS_MATRIX_FORMATS_DETAIL_ELL_MATRIX_INL
+#define MORPHEUS_MATRIX_FORMATS_DETAIL_ELL_MATRIX_INL
 
 namespace morpheus
 {
@@ -38,62 +38,75 @@ namespace morpheus
 	}   // end namespace detail
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
-	coo_matrix<IndexType, ValueType, MemorySpace>
-	::coo_matrix(const size_t num_rows, const size_t num_cols, const size_t num_nnz)
-			: parent_t(num_rows, num_cols, num_nnz)
+	ell_matrix<IndexType, ValueType, MemorySpace>
+	::ell_matrix(const size_t num_rows, const size_t num_cols, const size_t num_nnz,
+	           const size_t num_entries_per_row, const size_t alignment)
+	           : parent_t(num_rows, num_cols, num_nnz, num_entries_per_row, alignment)
 	{}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	template<typename MatrixType>
-	coo_matrix<IndexType, ValueType, MemorySpace>
-	::coo_matrix(const MatrixType& mat) : parent_t(mat)
+	ell_matrix<IndexType, ValueType, MemorySpace>
+	::ell_matrix(const MatrixType& matrix) : parent_t(matrix)
 	{}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	template<typename MatrixType>
-	typename coo_matrix<IndexType, ValueType, MemorySpace>::reference
-	coo_matrix<IndexType, ValueType, MemorySpace>
-    ::operator = (const MatrixType& mat)
+	typename ell_matrix<IndexType, ValueType, MemorySpace>::reference
+	ell_matrix<IndexType, ValueType, MemorySpace>
+	::operator = (const MatrixType& matrix)
 	{
-		parent_t::operator=(mat);
+		parent_t::operator=(matrix);
 		return *this;
 	}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	void
-	coo_matrix<IndexType, ValueType, MemorySpace>::swap(coo_matrix& mat)
+	ell_matrix<IndexType, ValueType, MemorySpace>
+	::resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz,
+	            const size_t num_entries_per_row)
 	{
-		parent_t::swap(mat);
+		parent_t::resize(num_rows, num_cols, num_nnz, num_entries_per_row);
 	}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	void
-	coo_matrix<IndexType, ValueType, MemorySpace>
-    ::resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz)
+	ell_matrix<IndexType, ValueType, MemorySpace>
+	::resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz,
+	            const size_t num_entries_per_row, const size_t alignment)
 	{
-		parent_t::resize(num_rows, num_cols, num_nnz);
+		parent_t::resize(num_rows, num_cols, num_nnz, num_entries_per_row, alignment);
+	}
+
+	template<typename IndexType, typename ValueType, class MemorySpace>
+	void
+	ell_matrix<IndexType, ValueType, MemorySpace>
+	::swap(ell_matrix& matrix)
+	{
+		parent_t::swap(matrix);
 	}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	size_t
-	coo_matrix<IndexType, ValueType, MemorySpace>::nrows()
+	ell_matrix<IndexType, ValueType, MemorySpace>::nrows()
 	{
 		return parent_t::num_rows;
 	}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	size_t
-	coo_matrix<IndexType, ValueType, MemorySpace>::ncols()
+	ell_matrix<IndexType, ValueType, MemorySpace>::ncols()
 	{
 		return parent_t::num_cols;
 	}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	size_t
-	coo_matrix<IndexType, ValueType, MemorySpace>::nnz()
+	ell_matrix<IndexType, ValueType, MemorySpace>::nnz()
 	{
 		return parent_t::num_entries;
 	}
+
 }   // end namespace morpheus
 
-#endif //MORPHEUS_MATRIX_FORMATS_DETAIL_COO_MATRIX_INL
+#endif //MORPHEUS_MATRIX_FORMATS_DETAIL_ELL_MATRIX_INL

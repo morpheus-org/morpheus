@@ -42,14 +42,13 @@ namespace morpheus
 		{
 			std::string program;
 			std::string fin, filename;
-			std::string outdir, fx, fy;
+			std::string fx, fy;
 			int iterations;
-			int rep;
 
 		private:
 			void check_args(int argc)
 			{
-				if(argc != 5)
+				if(argc != 4)
 				{
 					std::cerr << "Please specify the filename to be read and number of spmv iterations.";
 					exit(-1);
@@ -63,13 +62,12 @@ namespace morpheus
 
 				program = argv[0];
 				fin = argv[1];
-				outdir = argv[2];
+				std::string outdir = argv[2];
 				iterations = std::stoi(argv[3]);
-				rep = std::stoi(argv[4]);
 
 				filename = fin.substr(fin.find_last_of("/") + 1, fin.size());
-				fx = outdir + "/fx_" + std::to_string(rep) + ".txt";
-				fy = outdir + "/fy_" + std::to_string(rep) + ".txt";
+				fx = outdir + "/fx.txt";
+				fy = outdir + "/fy.txt";
 
 				return *this;
 			}
@@ -78,11 +76,9 @@ namespace morpheus
 			{
 				std::cout << filename << "::\tRunning " << program << std::endl;
 				std::cout << filename << "::\tInput File:\t" << fin << std::endl;
-				std::cout << filename << "::\tOutput Directory:\t" << outdir << std:: endl;
 				std::cout << filename << "::\tInput vector file(fx):\t" << fx << std::endl;
 				std::cout << filename << "::\tOutput vector file(fx):\t" << fy << std::endl;
 				std::cout << filename << "::\tRunning spMv for " << iterations << " iterations." << std::endl;
-				std::cout << filename << "::\tExperiment repetition:\t" << rep << std::endl << std::endl;
 
 				return *this;
 			}

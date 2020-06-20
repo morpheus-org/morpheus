@@ -29,7 +29,11 @@
 
 #include <examples/include/parser.hpp>
 #include <examples/include/timer.hpp>
-#include <examples/include/cusp.hpp>
+
+#include <cusp/coo_matrix.h>
+#include <cusp/array1d.h>
+#include <cusp/io/matrix_market.h>
+#include <cusp/multiply.h>
 
 using namespace morpheus::examples;
 
@@ -42,7 +46,7 @@ int main(int argc, char* argv[])
 
 	total.start();
 
-	Coo_matrix A;
+	cusp::coo_matrix<int, double, cusp::host_memory> A;
 
 	reader.start();
 
@@ -50,13 +54,12 @@ int main(int argc, char* argv[])
 
 	reader.stop();
 
-	Dense_vector y(A.num_rows);
-	Dense_vector x;
+	cusp::array1d<double, cusp::host_memory> x, y(A.num_rows);
 
 	for(int i = 0; i < args.iterations; i++)
 	{
-		Random_vector r(A.num_rows, i);
-		x = Dense_vector(r.begin(), r.end());
+		cusp::random_array<double> r(A.num_rows, i);
+		x = cusp::array1d<double, cusp::host_memory>(r.begin(), r.end());
 		spmv.start();
 		cusp::multiply(A, x, y);
 		spmv.stop();

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  coo_matrix.inl
+ *  dia_matrix.inl
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,12 +23,12 @@
  *
  *****************************************************************************/
 
-/*! \file coo_matrix.inl
+/*! \file dia_matrix.inl
  *  \brief Description
  */
 
-#ifndef MORPHEUS_MATRIX_FORMATS_DETAIL_COO_MATRIX_INL
-#define MORPHEUS_MATRIX_FORMATS_DETAIL_COO_MATRIX_INL
+#ifndef MORPHEUS_MATRIX_FORMATS_DETAIL_DIA_MATRIX_INL
+#define MORPHEUS_MATRIX_FORMATS_DETAIL_DIA_MATRIX_INL
 
 namespace morpheus
 {
@@ -38,62 +38,78 @@ namespace morpheus
 	}   // end namespace detail
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
-	coo_matrix<IndexType, ValueType, MemorySpace>
-	::coo_matrix(const size_t num_rows, const size_t num_cols, const size_t num_nnz)
-			: parent_t(num_rows, num_cols, num_nnz)
+	dia_matrix<IndexType, ValueType, MemorySpace>
+	::dia_matrix(const size_t num_rows, const size_t num_cols, const size_t num_nnz,
+	             const size_t num_diagonals, const size_t alignment)
+			: parent_t(num_rows, num_cols, num_nnz, num_diagonals, alignment)
 	{}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	template<typename MatrixType>
-	coo_matrix<IndexType, ValueType, MemorySpace>
-	::coo_matrix(const MatrixType& mat) : parent_t(mat)
+	dia_matrix<IndexType, ValueType, MemorySpace>
+	::dia_matrix(const MatrixType& matrix) : parent_t(matrix)
 	{}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	template<typename MatrixType>
-	typename coo_matrix<IndexType, ValueType, MemorySpace>::reference
-	coo_matrix<IndexType, ValueType, MemorySpace>
-    ::operator = (const MatrixType& mat)
+	typename dia_matrix<IndexType, ValueType, MemorySpace>::reference
+	dia_matrix<IndexType, ValueType, MemorySpace>
+	::operator = (const MatrixType& matrix)
 	{
-		parent_t::operator=(mat);
+		parent_t::operator=(matrix);
 		return *this;
 	}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	void
-	coo_matrix<IndexType, ValueType, MemorySpace>::swap(coo_matrix& mat)
+	dia_matrix<IndexType, ValueType, MemorySpace>
+	::resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz,
+	            const size_t num_diagonals)
 	{
-		parent_t::swap(mat);
+		parent_t::resize(num_rows, num_cols, num_nnz, num_diagonals);
 	}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	void
-	coo_matrix<IndexType, ValueType, MemorySpace>
-    ::resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz)
+	dia_matrix<IndexType, ValueType, MemorySpace>
+	::resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz,
+	            const size_t num_diagonals, const size_t alignment)
 	{
-		parent_t::resize(num_rows, num_cols, num_nnz);
+		parent_t::resize(num_rows, num_cols, num_nnz, num_diagonals, alignment);
+	}
+
+	template<typename IndexType, typename ValueType, class MemorySpace>
+	void
+	dia_matrix<IndexType, ValueType, MemorySpace>
+	::swap(dia_matrix& matrix)
+	{
+		parent_t::swap(matrix);
 	}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	size_t
-	coo_matrix<IndexType, ValueType, MemorySpace>::nrows()
+	dia_matrix<IndexType, ValueType, MemorySpace>
+	::nrows()
 	{
 		return parent_t::num_rows;
 	}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	size_t
-	coo_matrix<IndexType, ValueType, MemorySpace>::ncols()
+	dia_matrix<IndexType, ValueType, MemorySpace>
+	::ncols()
 	{
 		return parent_t::num_cols;
 	}
 
 	template<typename IndexType, typename ValueType, class MemorySpace>
 	size_t
-	coo_matrix<IndexType, ValueType, MemorySpace>::nnz()
+	dia_matrix<IndexType, ValueType, MemorySpace>
+	::nnz()
 	{
 		return parent_t::num_entries;
 	}
+
 }   // end namespace morpheus
 
-#endif //MORPHEUS_MATRIX_FORMATS_DETAIL_COO_MATRIX_INL
+#endif //MORPHEUS_MATRIX_FORMATS_DETAIL_DIA_MATRIX_INL

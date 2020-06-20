@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  csr.cpp
+ *  ell.cpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,17 +23,18 @@
  *
  *****************************************************************************/
 
-/*! \file csr.cpp
+/*! \file ell.cpp
  *  \brief Description
  */
 
 #include <examples/include/parser.hpp>
 #include <examples/include/timer.hpp>
 
-#include <cusp/csr_matrix.h>
-#include <cusp/array1d.h>
-#include <cusp/io/matrix_market.h>
-#include <cusp/multiply.h>
+#include <morpheus/matrix_formats/ell_matrix.hpp>
+#include <morpheus/matrix_formats/dense_vector.hpp>
+#include <morpheus/matrix_formats/io/matrix_market.hpp>
+#include <morpheus/matrix_formats/multiply.hpp>
+#include <morpheus/memory.hpp>
 
 using namespace morpheus::examples;
 
@@ -42,38 +43,38 @@ int main(int argc, char* argv[])
 	parser args;
 	args.get(argc, argv).print();
 
-	timer total("Cusp_Total"), reader("Cusp_Reader"), writer("Cusp_Writer") , spmv("Cusp_spMv");
+	timer total("Static_Total"), reader("Static_Reader"), writer("Static_Writer") , spmv("Static_spMv");
 
 	total.start();
 
-	cusp::csr_matrix<int, double, cusp::host_memory> A;
+	morpheus::ell_matrix<int, double, morpheus::host_memory> A;
 
 	reader.start();
 
-	cusp::io::read_matrix_market_file(A, args.fin);
+	morpheus::io::read_matrix_market_file(A, args.fin);
 
 	reader.stop();
 
-	cusp::array1d<double, cusp::host_memory> x, y(A.num_rows);
+	morpheus::dense_vector<double, morpheus::host_memory> x, y(A.nrows());
 
 	for(int i = 0; i < args.iterations; i++)
 	{
-		cusp::random_array<double> r(A.num_rows, i);
-		x = cusp::array1d<double, cusp::host_memory>(r.begin(), r.end());
+		cusp::random_array<double> r(A.nrows(), i);
+		x = morpheus::dense_vector<double, morpheus::host_memory>(r.begin(), r.end());
 		spmv.start();
-		cusp::multiply(A, x, y);
+		morpheus::multiply(A, x, y);
 		spmv.stop();
 	}
 
 	writer.start();
-	cusp::io::write_matrix_market_file(x, args.fx);
-	cusp::io::write_matrix_market_file(y, args.fy);
+	morpheus::io::write_matrix_market_file(x, args.fx);
+	morpheus::io::write_matrix_market_file(y, args.fy);
 	writer.stop();
 
 	total.stop();
 
 	// Stats
-	std::cout << args.filename << "::\tMatrix Shape\t" << A.num_rows  << "\t" << A.num_cols << "\t" << A.num_entries  << std::endl;
+	std::cout << args.filename << "::\tMatrix Shape\t" << A.nrows()  << "\t" << A.ncols() << "\t" << A.nnz()  << std::endl;
 	std::cout << args.filename << "::\t" << total << std::endl;
 	std::cout << args.filename << "::\t" << reader << std::endl;
 	std::cout << args.filename << "::\t" << writer << std::endl;

@@ -6,10 +6,10 @@ MATRIX_DIR="$SCRIPT_PATH"/../../matrix
 #BIN_DIR="$SCRIPT_PATH"/../../examples-build
 BIN_DIR="$SCRIPT_PATH"/../../examples-archer-build
 IMPLEMENTATIONS=("cusp" "static" "dynamic")
-FORMATS=("coo" "csr")
+FORMATS=("coo" "csr" "dia" "ell" "hyb")
 
-REPS=2
-SPMV_ITER=1
+REPS=5
+SPMV_ITER=100
 
 for matdir in "$MATRIX_DIR"/*/
 do
@@ -17,42 +17,25 @@ do
   DIR=$(dirname $matdir)
   MATRIX="$DIR/$BASE/$BASE.mtx"
 
+  mkdir -p "$SCRIPT_PATH/results"
+  progress="$SCRIPT_PATH/results/progress.txt"
   for impl in "${IMPLEMENTATIONS[@]}"
   do
+    echo "Starting $BASE:" >&1 | tee -a "$progress"
 
     for format in "${FORMATS[@]}"
     do
-      outdir="$SCRIPT_PATH/results/$BASE/$impl/$format"
-      progress="$outdir/progress.txt"
-
-      mkdir -p "$outdir"
-      echo "Starting $BASE for $impl implementation and $format format" >&1 | tee "$progress"
+      echo -e "\t$impl\t$format" >&1 | tee -a "$progress"
 
       BINARY="$BIN_DIR/$impl"_"$format"_"spmv"
       for rep in `seq -w 1 $REPS`
       do
-          fx="$outdir/fx_$rep.txt"
-          fy="$outdir/fy_$rep.txt"
-
-          "$BINARY" "$MATRIX" "$outdir" $SPMV_ITER "$rep" >&1 | tee -a "$progress"
+        echo -e "\t\t\t$rep" >&1 | tee -a "$progress"
+        outdir="$SCRIPT_PATH/results/$BASE/$impl/$format/$rep"
+        mkdir -p "$outdir"
+        "$BINARY" "$MATRIX" "$outdir" $SPMV_ITER >&1 | tee "$outdir/output.txt"
 
       done
     done
   done
 done
-#  outdir="$SCRIPT_PATH/$BASE"
-#  mkdir -p "$outdir"
-#
-#
-#
-#  for prog in "${BIN[@]}"
-#  do
-#    outfile="$outdir/$prog.txt"
-#    "$BIN_DIR/$prog" "$MATRIX" $ITER > "$outfile"
-#  done
-
-
-#for each matrix
-#  for each implementation
-#    for each format
-#      for each rep

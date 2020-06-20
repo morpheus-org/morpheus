@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  csr.cpp
+ *  dia.cpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,14 +23,14 @@
  *
  *****************************************************************************/
 
-/*! \file csr.cpp
+/*! \file dia.cpp
  *  \brief Description
  */
 
 #include <examples/include/parser.hpp>
 #include <examples/include/timer.hpp>
 
-#include <cusp/csr_matrix.h>
+#include <cusp/dia_matrix.h>
 #include <cusp/array1d.h>
 #include <cusp/io/matrix_market.h>
 #include <cusp/multiply.h>
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 
 	total.start();
 
-	cusp::csr_matrix<int, double, cusp::host_memory> A;
+	cusp::dia_matrix<int, double, cusp::host_memory> A;
 
 	reader.start();
 

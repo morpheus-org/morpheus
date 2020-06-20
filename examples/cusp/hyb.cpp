@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  csr.cpp
+ *  hyb.cpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,14 +23,14 @@
  *
  *****************************************************************************/
 
-/*! \file csr.cpp
+/*! \file hyb.cpp
  *  \brief Description
  */
 
 #include <examples/include/parser.hpp>
 #include <examples/include/timer.hpp>
 
-#include <cusp/csr_matrix.h>
+#include <cusp/hyb_matrix.h>
 #include <cusp/array1d.h>
 #include <cusp/io/matrix_market.h>
 #include <cusp/multiply.h>
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 
 	total.start();
 
-	cusp::csr_matrix<int, double, cusp::host_memory> A;
+	cusp::hyb_matrix<int, double, cusp::host_memory> A;
 
 	reader.start();
 
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 	total.stop();
 
 	// Stats
-	std::cout << args.filename << "::\tMatrix Shape\t" << A.num_rows  << "\t" << A.num_cols << "\t" << A.num_entries  << std::endl;
+	std::cout << args.filename << "::\tMatrix Shape\t" << A.num_rows  << "\t" << A.num_cols << "\t" << A.ell.num_entries + A.coo.num_entries  << std::endl;
 	std::cout << args.filename << "::\t" << total << std::endl;
 	std::cout << args.filename << "::\t" << reader << std::endl;
 	std::cout << args.filename << "::\t" << writer << std::endl;
