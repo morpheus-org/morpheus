@@ -22,7 +22,7 @@ elif [ "$MACHINE" = "cirrus" ]; then
   # Cirrus stuff
   ACCOUNT="dc111"
   TIME="06:00:00"
-  RESOURCES="--exclusive --nodes=1 --tasks-per-node=1 --cpus-per-node=36"
+  RESOURCES="--exclusive --nodes=1 --tasks-per-node=36 --cpus-per-task=1"
   SBATCH="sbatch --job-name=$ACCOUNT --time=$TIME $RESOURCES --partition=standard --qos=standard"
   SUBMIT_FILE="$SCRIPT_PATH/submit_cirrus.slurm"
 else
@@ -34,8 +34,7 @@ fi
 
 BUILD_PATH="$SCRIPT_PATH/../build"
 RESULTS_PATH="$SCRIPT_PATH/../results/$MACHINE"
-#VERSIONS=("cusp" "dynamic_1" "dynamic_6" "dynamic_12" "dynamic_20")
-VERSIONS=("cusp")
+VERSIONS=("cusp" "dynamic_1" "dynamic_6" "dynamic_12" "dynamic_20")
 REPS=5
 SPMV_ITER=100
 
@@ -47,7 +46,7 @@ do
   echo "Starting version $version" 2>&1 | tee "$progress"
 
   BINARY="$BUILD_PATH/$version"
-  if [ "$MACHINE" = "archer" ] || [ "$MACHINE" = "cirrus" ]; then
+  if [ "$MACHINE" = "archer" ]; then
     $QSUB -N "variant_$version" \
           -v SCRIPT_PATH="$SCRIPT_PATH",MATRIX_DIR="$MATRIX_DIR",RESULTS_PATH="$RESULTS_PATH",PROGRESS_FILE="$progress",VERSION="$version",BINARY="$BINARY",REPS="$REPS",SPMV_ITER="$SPMV_ITER" \
           $SUBMIT_FILE
