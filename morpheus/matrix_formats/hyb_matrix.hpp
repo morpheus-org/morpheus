@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  coo_matrix.hpp
+ *  hyb_matrix.hpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,55 +23,56 @@
  *
  *****************************************************************************/
 
-/*! \file coo_matrix.hpp
+/*! \file hyb_matrix.hpp
  *  \brief Description
  */
 
-#ifndef MORPHEUS_MATRIX_FORMATS_COO_MATRIX_HPP
-#define MORPHEUS_MATRIX_FORMATS_COO_MATRIX_HPP
+#ifndef MORPHEUS_MATRIX_FORMATS_HYB_MATRIX_HPP
+#define MORPHEUS_MATRIX_FORMATS_HYB_MATRIX_HPP
 
-#include <cusp/coo_matrix.h>
+#include <cusp/hyb_matrix.h>
 
 namespace morpheus
 {
-
 	// Currently using the Cusp Interface
 	template <typename IndexType, typename ValueType, class MemorySpace>
-class coo_matrix : public cusp::coo_matrix<IndexType,ValueType,MemorySpace>
+	class hyb_matrix : public cusp::hyb_matrix<IndexType,ValueType,MemorySpace>
 	{
 	private:
-		using parent_t = cusp::coo_matrix<IndexType,ValueType,MemorySpace>;
+		using parent_t = cusp::hyb_matrix<IndexType,ValueType,MemorySpace>;
 
 	public:
 		using size_type = IndexType;
 		using value_type = ValueType;
 
-		using reference = coo_matrix&;
+		using reference = hyb_matrix&;
 
-		coo_matrix() = default;
+		hyb_matrix() = default;
 
-		coo_matrix(const size_t num_rows, const size_t num_cols, const size_t num_nnz);
+		hyb_matrix(const size_t num_rows, const size_t num_cols,
+				   const size_t num_ell_entries, const size_t num_coo_entries,
+		           const size_t num_entries_per_row, const size_t alignment = 32);
 
 		template<typename MatrixType>
-		coo_matrix(const MatrixType& mat);
+		hyb_matrix(const MatrixType& matrix);
 
 		template<typename MatrixType>
-		coo_matrix::reference operator = (const MatrixType& mat);
+		hyb_matrix::reference operator = (const MatrixType& matrix);
 
-		void swap(coo_matrix& mat);
+		void resize(size_t num_rows, size_t num_cols,
+		            size_t num_ell_entries, size_t num_coo_entries,
+		            size_t num_entries_per_row, size_t alignment = 32);
 
-		void resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz);
+		void swap(hyb_matrix& matrix);
 
 		size_t nrows();
-
 		size_t ncols();
-
 		size_t nnz();
 
 	};
 
 }   // end namespace morpheus
 
-#include <morpheus/matrix_formats/detail/coo_matrix.inl>
+#include <morpheus/matrix_formats/detail/hyb_matrix.inl>
 
-#endif //MORPHEUS_MATRIX_FORMATS_COO_MATRIX_HPP
+#endif //MORPHEUS_MATRIX_FORMATS_HYB_MATRIX_HPP

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  coo_matrix.hpp
+ *  dia_matrix.hpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,44 +23,48 @@
  *
  *****************************************************************************/
 
-/*! \file coo_matrix.hpp
+/*! \file dia_matrix.hpp
  *  \brief Description
  */
 
-#ifndef MORPHEUS_MATRIX_FORMATS_COO_MATRIX_HPP
-#define MORPHEUS_MATRIX_FORMATS_COO_MATRIX_HPP
+#ifndef MORPHEUS_MATRIX_FORMATS_DIA_MATRIX_HPP
+#define MORPHEUS_MATRIX_FORMATS_DIA_MATRIX_HPP
 
-#include <cusp/coo_matrix.h>
+#include <cusp/dia_matrix.h>
 
 namespace morpheus
 {
-
 	// Currently using the Cusp Interface
 	template <typename IndexType, typename ValueType, class MemorySpace>
-class coo_matrix : public cusp::coo_matrix<IndexType,ValueType,MemorySpace>
+	class dia_matrix : public cusp::dia_matrix<IndexType,ValueType,MemorySpace>
 	{
 	private:
-		using parent_t = cusp::coo_matrix<IndexType,ValueType,MemorySpace>;
+		using parent_t = cusp::dia_matrix<IndexType,ValueType,MemorySpace>;
 
 	public:
 		using size_type = IndexType;
 		using value_type = ValueType;
 
-		using reference = coo_matrix&;
+		using reference = dia_matrix&;
 
-		coo_matrix() = default;
+		dia_matrix() = default;
 
-		coo_matrix(const size_t num_rows, const size_t num_cols, const size_t num_nnz);
-
-		template<typename MatrixType>
-		coo_matrix(const MatrixType& mat);
+		dia_matrix(const size_t num_rows, const size_t num_cols, const size_t num_nnz,
+				   const size_t num_diagonals, const size_t alignment = 32);
 
 		template<typename MatrixType>
-		coo_matrix::reference operator = (const MatrixType& mat);
+		dia_matrix(const MatrixType& matrix);
 
-		void swap(coo_matrix& mat);
+		template<typename MatrixType>
+		dia_matrix::reference operator = (const MatrixType& matrix);
 
-		void resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz);
+		void resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz,
+	                const size_t num_diagonals);
+
+		void resize(const size_t num_rows, const size_t num_cols, const size_t num_nnz,
+		            const size_t num_diagonals, const size_t alignment);
+
+		void swap(dia_matrix& matrix);
 
 		size_t nrows();
 
@@ -72,6 +76,6 @@ class coo_matrix : public cusp::coo_matrix<IndexType,ValueType,MemorySpace>
 
 }   // end namespace morpheus
 
-#include <morpheus/matrix_formats/detail/coo_matrix.inl>
+#include <morpheus/matrix_formats/detail/dia_matrix.inl>
 
-#endif //MORPHEUS_MATRIX_FORMATS_COO_MATRIX_HPP
+#endif //MORPHEUS_MATRIX_FORMATS_DIA_MATRIX_HPP
