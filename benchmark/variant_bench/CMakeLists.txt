@@ -3,10 +3,22 @@ project(morpheus)
 
 set(CMAKE_CXX_STANDARD 14)
 
-# Local directories
-set(Local_DIR "/Users/cstyl/Desktop/Projects")
-# Archer directories
-#set(Local_DIR "/work/e609/e609/cstyl")
+option(LOCAL "Compiling locally" OFF)
+option(ARCHER "Compiling on archer" OFF)
+option(CIRRUS "Compiling on cirrus" OFF)
+
+if(LOCAL)
+    # Local directories
+    set(Local_DIR "/Users/cstyl/Desktop/Projects")
+elseif(ARCHER)
+    # Archer directories
+    set(Local_DIR "/work/e609/e609/cstyl")
+elseif(CIRRUS)
+    # Cirrus directories
+    set(Local_DIR "/lustre/home/dc111/cstyl")
+else()
+    message(FATAL_ERROR "Local Directory not found")
+endif()
 
 set(Thrust_DIR "${Local_DIR}/thrust/thrust/cmake")
 set(Cusp_DIR "${Local_DIR}/cusplibrary-0.5.1")
