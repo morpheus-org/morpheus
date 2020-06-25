@@ -4,9 +4,9 @@ project(morpheus)
 set(CMAKE_CXX_STANDARD 14)
 
 # Local directories
-set(Local_DIR "/Users/cstyl/Desktop/Projects")
+#set(Local_DIR "/Users/cstyl/Desktop/Projects")
 # Archer directories
-#set(Local_DIR "/work/e609/e609/cstyl")
+set(Local_DIR "/work/e609/e609/cstyl")
 
 set(Thrust_DIR "${Local_DIR}/thrust/thrust/cmake")
 set(Cusp_DIR "${Local_DIR}/cusplibrary-0.5.1")

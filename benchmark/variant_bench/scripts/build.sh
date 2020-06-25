@@ -14,7 +14,7 @@ module load gcc/7.3.0
 # Create build directory and compile code to generate the binaries
 mkdir -p "$BUILD_PATH"
 cd "$BUILD_PATH"
-CC="$CCOMP" CXX="CPPCOMP" cmake "$BUILD_PATH/.."
+CC="$CCOMP" CXX="$CPPCOMP" cmake "$BUILD_PATH/.."
 make
 
 # Print information about binaries

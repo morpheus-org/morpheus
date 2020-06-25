@@ -6,7 +6,8 @@ MATRIX_DIR="$SCRIPT_PATH"/../../../matrix
 BUILD_PATH="$SCRIPT_PATH/../build"
 RESULTS_PATH="$SCRIPT_PATH/../results"
 SUBMIT_FILE="$SCRIPT_PATH/submit.pbs"
-VERSIONS=("cusp" "dynamic_1" "dynamic_6" "dynamic_12" "dynamic_20")
+#VERSIONS=("cusp" "dynamic_1" "dynamic_6" "dynamic_12" "dynamic_20")
+VERSIONS=("cusp")
 REPS=5
 SPMV_ITER=10
 
@@ -15,7 +16,8 @@ ACCOUNT="e609"
 TIME="walltime=06:00:00"
 SELECT="select=1:ncpus=24"
 RESOURCES="$SELECT,$TIME"
-QSUB="qsub -A $ACCOUNT -l ${RESOURCES}"
+QUEUE="long"
+QSUB="qsub -q $QUEUE -A $ACCOUNT -l ${RESOURCES}"
 
 
 mkdir -p "$RESULTS_PATH"
