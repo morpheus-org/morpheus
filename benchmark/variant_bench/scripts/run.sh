@@ -22,7 +22,7 @@ elif [ "$MACHINE" = "cirrus" ]; then
   # Cirrus stuff
   ACCOUNT="dc111"
   TIME="walltime=06:00:00"
-  PLACE="place=scatter:excl"
+  PLACE="--exclusive"
   SELECT="select=1:ncpus=36"
   RESOURCES="$SELECT,$TIME,$PLACE"
   QSUB="qsub -A $ACCOUNT -l ${RESOURCES}"
