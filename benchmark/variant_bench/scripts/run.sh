@@ -21,12 +21,10 @@ elif [ "$MACHINE" = "cirrus" ]; then
   echo "Running on CIRRUS"
   # Cirrus stuff
   ACCOUNT="dc111"
-  TIME="walltime=06:00:00"
-  PLACE="--exclusive"
-  SELECT="select=1:ncpus=36"
-  RESOURCES="$SELECT,$TIME,$PLACE"
-  QSUB="qsub -A $ACCOUNT -l ${RESOURCES}"
-  SUBMIT_FILE="$SCRIPT_PATH/submit_cirrus.pbs"
+  TIME="06:00:00"
+  RESOURCES="--exclusive --nodes=1 --tasks-per-node=1 --cpus-per-node=36"
+  SBATCH="sbatch --job-name=$ACCOUNT --time=$TIME $RESOURCES --partition=standard --qos=standard"
+  SUBMIT_FILE="$SCRIPT_PATH/submit_cirrus.slurm"
 else
   echo "Invalid inpug argument."
   echo "Usage:"
@@ -53,6 +51,8 @@ do
     $QSUB -N "variant_$version" \
           -v SCRIPT_PATH="$SCRIPT_PATH",MATRIX_DIR="$MATRIX_DIR",RESULTS_PATH="$RESULTS_PATH",PROGRESS_FILE="$progress",VERSION="$version",BINARY="$BINARY",REPS="$REPS",SPMV_ITER="$SPMV_ITER" \
           $SUBMIT_FILE
+  elif [ "$MACHINE" = "cirrus" ]; then
+    $SBATCH $SUBMIT_FILE "$SCRIPT_PATH" "$MATRIX_DIR" "$RESULTS_PATH" "$progress" "$version" "$BINARY" "$REPS" "$SPMV_ITER"
   else
     $SUBMIT_FILE "$SCRIPT_PATH" "$MATRIX_DIR" "$RESULTS_PATH" "$progress" "$version" "$BINARY" "$REPS" "$SPMV_ITER"
   fi

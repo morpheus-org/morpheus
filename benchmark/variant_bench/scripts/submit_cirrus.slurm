@@ -1,11 +1,18 @@
-#!/bin/bash --login
+#!/bin/bash
 
 module load gcc/8.2.0
 module load cmake/3.17.3
 
-cd $PBS_O_WORKDIR
-
 export OMP_NUM_THREADS=1
+
+SCRIPT_PATH="$1"
+MATRIX_DIR="$2"
+RESULTS_PATH="$3"
+PROGRESS_FILE="$4"
+VERSION="$5"
+BINARY="$6"
+REPS="$7"
+SPMV_ITER="$8"
 
 for matdir in "$MATRIX_DIR"/*/
 do
@@ -20,7 +27,9 @@ do
       echo -e "\t\t$rep" 2>&1 | tee -a "$PROGRESS_FILE"
       outdir="$RESULTS_PATH/$BASE/$VERSION/$rep"
       mkdir -p "$outdir"
-      aprun -n 1 "$BINARY" "$MATRIX" "$outdir" "$SPMV_ITER" 2> >(tee -a "$PROGRESS_FILE") 1> >(tee "$outdir/output.txt")
+      "$BINARY" "$MATRIX" "$outdir" "$SPMV_ITER" 2> >(tee -a "$PROGRESS_FILE") 1> >(tee "$outdir/output.txt")
     done
 
 done
+
+
