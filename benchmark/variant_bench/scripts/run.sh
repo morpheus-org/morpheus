@@ -26,7 +26,9 @@ elif [ "$MACHINE" = "cirrus" ]; then
   # Cirrus stuff
   ACCOUNT="dc111"
   TIME="06:00:00"
-  RESOURCES="--exclusive --nodes=1 --tasks-per-node=36 --cpus-per-task=1"
+#  RESOURCES="--exclusive --nodes=1 --tasks-per-node=36 --cpus-per-task=1"
+  RESOURCES="--exclusive --nodes=1 --cpus-per-task=1"
+  echo "RESOURCES = $RESOURCES"
   SBATCH="sbatch --job-name=$ACCOUNT --time=$TIME $RESOURCES --partition=standard --qos=standard"
   SUBMIT_FILE="$SCRIPT_PATH/submit_cirrus.slurm"
 else

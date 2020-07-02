@@ -17,7 +17,8 @@ RESULTS_FILE="$SCRIPT_PATH/../results/processed_data_$MACHINE.csv"
 OUTPUT_PATH="$SCRIPT_PATH/../results/$MACHINE"
 
 # CSV Header
-echo "Machine,Matrix,Version,Repetition,Rows,Columns,Nnz,Total,Reader,Writer,SpMv" 2>&1 | tee "$RESULTS_FILE"
+#echo "Machine,Matrix,Version,Repetition,Rows,Columns,Nnz,Total,Reader,Writer,SpMv" 2>&1 | tee "$RESULTS_FILE"
+echo "Machine,Matrix,Version,Repetition,Rows,Columns,Nnz,Total,Reader,SpMv" 2>&1 | tee "$RESULTS_FILE"
 
 for MATRIX_DIR in "$OUTPUT_PATH"/*/
 do
@@ -39,7 +40,8 @@ do
 #      writer=$(awk '/I\/O Write/ {printf "%s",$4}' "$FILE")
       spmv=$(awk '/SpMv/ {printf "%s",$4}' "$FILE")
 
-      echo "$MACHINE,$MATRIX,$VERSION,$REP,$rows,$columns,$nnz,$total,$reader,$writer,$spmv" 2>&1 | tee -a "$RESULTS_FILE"
+#      echo "$MACHINE,$MATRIX,$VERSION,$REP,$rows,$columns,$nnz,$total,$reader,$writer,$spmv" 2>&1 | tee -a "$RESULTS_FILE"
+      echo "$MACHINE,$MATRIX,$VERSION,$REP,$rows,$columns,$nnz,$total,$reader,$spmv" 2>&1 | tee -a "$RESULTS_FILE"
     done
   done
 done

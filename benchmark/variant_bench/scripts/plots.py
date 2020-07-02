@@ -3,7 +3,8 @@ from data_processing import metrics
 from data_processing import cmd_line_parser as parser
 from data_processing import plot
 
-timers = ['Total', 'Reader', 'Writer', 'SpMv']
+# timers = ['Total', 'Reader', 'Writer', 'SpMv']
+timers = ['Total', 'Reader', 'SpMv']
 group = ['Matrix', 'Version']
 
 args = parser.get_args()
