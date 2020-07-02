@@ -44,6 +44,7 @@ namespace morpheus
 		std::string fin, filename;
 		std::string fx, fy;
 		int iterations;
+		int format;
 
 		CommandLineParser() = default;
 

@@ -48,6 +48,7 @@ namespace morpheus
 		fin = argv[1];
 		std::string outdir = argv[2];
 		iterations = std::stoi(argv[3]);
+		format = std::stoi(argv[4]);
 
 		filename = fin.substr(fin.find_last_of("/") + 1, fin.size());
 		fx = outdir + "/fx.txt";
@@ -63,15 +64,16 @@ namespace morpheus
 		std::cout << filename << "::\tInput vector file(fx):\t" << fx << std::endl;
 		std::cout << filename << "::\tOutput vector file(fx):\t" << fy << std::endl;
 		std::cout << filename << "::\tRunning spMv for " << iterations << " iterations." << std::endl;
+		std::cout << filename << "::\tSelected Format " << format << "." << std::endl;
 
 		return *this;
 	}
 
 	void CommandLineParser::check_args(int argc)
 	{
-		if(argc != 4)
+		if(argc > 5)
 		{
-			std::cerr << "Please specify the filename to be read and number of spmv iterations.";
+			std::cerr << "Please specify the filename to be read, the output directory, the number of spmv iterations and the format to select.";
 			exit(-1);
 		}
 	}
