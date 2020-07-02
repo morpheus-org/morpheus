@@ -36,7 +36,7 @@ do
       nnz=$(awk '/Matrix Shape/ {printf "%s",$5}' "$FILE")
       total=$(awk '/Total/ {printf "%s",$4}' "$FILE")
       reader=$(awk '/I\/O Read/ {printf "%s",$4}' "$FILE")
-      writer=$(awk '/I\/O Write/ {printf "%s",$4}' "$FILE")
+#      writer=$(awk '/I\/O Write/ {printf "%s",$4}' "$FILE")
       spmv=$(awk '/SpMv/ {printf "%s",$4}' "$FILE")
 
       echo "$MACHINE,$MATRIX,$VERSION,$REP,$rows,$columns,$nnz,$total,$reader,$writer,$spmv" 2>&1 | tee -a "$RESULTS_FILE"

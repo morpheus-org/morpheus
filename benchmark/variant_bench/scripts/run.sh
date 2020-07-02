@@ -4,6 +4,10 @@ SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 MATRIX_DIR="$SCRIPT_PATH"/../../../matrix
 
 MACHINE="$1"
+COMPILER="$2"
+COMP_VERSION="$3"
+REPS="$4"
+SPMV_ITER="$5"
 
 if [ "$MACHINE" = "local" ]; then
   echo "Running locally"
@@ -26,17 +30,44 @@ elif [ "$MACHINE" = "cirrus" ]; then
   SBATCH="sbatch --job-name=$ACCOUNT --time=$TIME $RESOURCES --partition=standard --qos=standard"
   SUBMIT_FILE="$SCRIPT_PATH/submit_cirrus.slurm"
 else
-  echo "Invalid inpug argument."
+  echo "Invalid input argument."
   echo "Usage:"
-  echo -e "\t/path/to/script/build.sh [local|archer|cirrus]"
+  echo -e "\t/path/to/script/run.sh [local|archer|cirrus] [compiler] [version] [reps] [iter]\n\n"
+  echo -e "\t\t local|archer|cirrus: Select at which machine the code is running on."
+  echo -e "\t\t compiler: Compiler used (default is gcc)."
+  echo -e "\t\t version: Version of the compiler (default is 6.3.0)."
+  echo -e "\t\t reps: Number of experiment repetitons (default is 20)."
+  echo -e "\t\t iter: Number of repetitions the spMv multiplication is repeated (default is 100)."
   exit -1
 fi
 
-BUILD_PATH="$SCRIPT_PATH/../build"
+if [ "$COMPILER" == "" ]; then
+  COMPILER="gcc"
+fi
+
+if [ "$SPMV_ITER" == "" ]; then
+  COMP_VERSION="6.3.0"
+fi
+
+if [ "$REPS" == "" ]; then
+  REPS=20
+fi
+
+if [ "$SPMV_ITER" == "" ]; then
+  SPMV_ITER=100
+fi
+
+echo "Parameters:"
+echo -e "\t MACHINE = $MACHINE"
+echo -e "\t REPETITIONS = $REPS"
+echo -e "\t SPMV Iterations = $SPMV_ITER"
+echo -e "\t COMPILER = $COMPILER"
+echo -e "\t VERSION = $COMP_VERSION"
+
+
+BUILD_PATH="$SCRIPT_PATH/../build/$COMPILER/$COMP_VERSION"
 RESULTS_PATH="$SCRIPT_PATH/../results/$MACHINE"
 VERSIONS=("cusp" "dynamic_1" "dynamic_6" "dynamic_12" "dynamic_20")
-REPS=5
-SPMV_ITER=100
 
 mkdir -p "$RESULTS_PATH"
 

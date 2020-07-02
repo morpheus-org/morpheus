@@ -12,6 +12,9 @@ def get_args():
     parser.add_argument('--filename', '-f', type=str, required=True,
                         help='CSV file to read the data from (absolute path to file)')
 
+    parser.add_argument('--outdir', '-o', type=str, required=True,
+                        help='Absolute path of the output directory to write the plot files in.')
+
     args = parser.parse_args()
 
     return args

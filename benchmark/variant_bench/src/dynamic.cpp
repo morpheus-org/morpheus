@@ -64,10 +64,10 @@ int main(int argc, char* argv[])
 		timer.stop(morpheus::TimerPool::timer_id::SPMV);
 	}
 
-	timer.start(morpheus::TimerPool::timer_id::IO_WRITE);
-	morpheus::io::write_matrix_market_file(x, args.fx);
-	morpheus::io::write_matrix_market_file(y, args.fy);
-	timer.stop(morpheus::TimerPool::timer_id::IO_WRITE);
+//	timer.start(morpheus::TimerPool::timer_id::IO_WRITE);
+//	morpheus::io::write_matrix_market_file(x, args.fx);
+//	morpheus::io::write_matrix_market_file(y, args.fy);
+//	timer.stop(morpheus::TimerPool::timer_id::IO_WRITE);
 
 	timer.stop(morpheus::TimerPool::timer_id::TOTAL);
 
