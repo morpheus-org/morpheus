@@ -47,7 +47,7 @@ if [ "$COMPILER" == "" ]; then
   COMPILER="gcc"
 fi
 
-if [ "$SPMV_ITER" == "" ]; then
+if [ "$COMP_VERSION" == "" ]; then
   COMP_VERSION="6.3.0"
 fi
 
@@ -68,7 +68,7 @@ echo -e "\t VERSION = $COMP_VERSION"
 
 
 BUILD_PATH="$SCRIPT_PATH/../build/$COMPILER/$COMP_VERSION"
-RESULTS_PATH="$SCRIPT_PATH/../results/$MACHINE"
+RESULTS_PATH="$SCRIPT_PATH/../results/$MACHINE/$COMPILER/$COMP_VERSION"
 VERSIONS=("cusp" "dynamic_1" "dynamic_6" "dynamic_12" "dynamic_20")
 
 mkdir -p "$RESULTS_PATH"

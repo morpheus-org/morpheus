@@ -10,7 +10,7 @@ if [ "$COMPILER" == "" ]; then
   COMPILER="gcc"
 fi
 
-if [ "$SPMV_ITER" == "" ]; then
+if [ "$COMP_VERSION" == "" ]; then
   COMP_VERSION="6.3.0"
 fi
 
