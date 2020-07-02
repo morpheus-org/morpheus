@@ -82,9 +82,11 @@ int main(int argc, char* argv[])
 	morpheus::CommandLineParser args;
 	args.get(argc, argv).print();
 
-	int format = morpheus::FMT_COO;  // Default
+	int format;
 
-	if(args.format == 1){
+	if(args.format == 0){
+		format = morpheus::FMT_COO
+	}else if(args.format == 1){
 		format = morpheus::FMT_CSR;
 	}else if(args.format == 2){
 		format = morpheus::FMT_DIA;
