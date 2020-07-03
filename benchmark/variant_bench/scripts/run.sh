@@ -69,7 +69,7 @@ echo -e "\t VERSION = $COMP_VERSION"
 
 BUILD_PATH="$SCRIPT_PATH/../build/$COMPILER/$COMP_VERSION"
 RESULTS_PATH="$SCRIPT_PATH/../results/$MACHINE/$COMPILER/$COMP_VERSION"
-VERSIONS=("cusp" "dynamic_1" "dynamic_6" "dynamic_12" "dynamic_20")
+VERSIONS=("cusp" "dynamic_01" "dynamic_06" "dynamic_12" "dynamic_20")
 
 mkdir -p "$RESULTS_PATH"
 

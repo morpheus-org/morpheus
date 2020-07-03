@@ -44,7 +44,7 @@ echo -e "\t COMPILER = $COMPILER"
 echo -e "\t VERSION = $COMP_VERSION"
 
 BUILD_PATH="$SCRIPT_PATH/../build/$COMPILER/$COMP_VERSION"
-VERSIONS=("cusp" "dynamic_1" "dynamic_6" "dynamic_12" "dynamic_20")
+VERSIONS=("cusp" "dynamic_01" "dynamic_06" "dynamic_12" "dynamic_20")
 CCOMP="gcc"
 CPPCOMP="g++"
 
