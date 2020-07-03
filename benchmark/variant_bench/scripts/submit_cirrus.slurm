@@ -27,7 +27,7 @@ do
       echo -e "\t\t$rep" 2>&1 | tee -a "$PROGRESS_FILE"
       outdir="$RESULTS_PATH/$BASE/$VERSION/$rep"
       mkdir -p "$outdir"
-      "$BINARY" "$MATRIX" "$outdir" "$SPMV_ITER" 2> >(tee -a "$PROGRESS_FILE") 1> >(tee "$outdir/output.txt")
+      "$BINARY" "$MATRIX" "$outdir" "$SPMV_ITER" 0 2> >(tee -a "$PROGRESS_FILE") 1> >(tee "$outdir/output.txt")
     done
 
 done
