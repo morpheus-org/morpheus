@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 	int format;
 
 	if(args.format == 0){
-		format = morpheus::FMT_COO
+		format = morpheus::FMT_COO;
 	}else if(args.format == 1){
 		format = morpheus::FMT_CSR;
 	}else if(args.format == 2){
