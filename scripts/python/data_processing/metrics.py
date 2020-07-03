@@ -54,7 +54,7 @@ def get_std_error(dataframe, group, timers):
 
 def get_speedup(dataframe, group, timers, column, ref):
 
-    ref_df, exp_df = get_dataframes(dataframe, 'Version', 'cusp', True)
+    ref_df, exp_df = get_dataframes(dataframe, column, ref, True)
 
     ref_mu = get_mean(ref_df, group, timers)
     exp_mu = get_mean(exp_df, group, timers)
@@ -87,7 +87,7 @@ def get_speedup(dataframe, group, timers, column, ref):
 
 def get_normalized_runtime(dataframe, group, timers, column, ref):
 
-    ref, exp = get_dataframes(dataframe, 'Version', 'cusp', False)
+    ref, exp = get_dataframes(dataframe, column, ref, False)
 
     ref_mu = get_mean(ref, group, timers)
     exp_mu = get_mean(exp, group, timers)

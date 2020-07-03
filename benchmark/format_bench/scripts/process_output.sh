@@ -31,26 +31,26 @@ echo -e "\t MACHINE = $MACHINE"
 echo -e "\t COMPILER = $COMPILER"
 echo -e "\t VERSION = $COMP_VERSION"
 
-RESULTS_FILE="$SCRIPT_PATH/../results/processed_data/$MACHINE"_""$COMPILER"_"$COMP_VERSION.csv"
+RESULTS_FILE="$SCRIPT_PATH/../results/processed_data/$MACHINE"_"$COMPILER"_"$COMP_VERSION.csv"
 OUTPUT_PATH="$SCRIPT_PATH/../results/$MACHINE/$COMPILER/$COMP_VERSION"
 
 mkdir -p $(dirname "RESULTS_FILE")
 
 # CSV Header
-#echo "Machine,Matrix,Version,Repetition,Rows,Columns,Nnz,Total,Reader,Writer,SpMv" 2>&1 | tee "$RESULTS_FILE"
-echo "Machine,Matrix,Version,Repetition,Rows,Columns,Nnz,Total,Reader,SpMv" 2>&1 | tee "$RESULTS_FILE"
+#echo "Machine,Matrix,Format,Repetition,Rows,Columns,Nnz,Total,Reader,Writer,SpMv" 2>&1 | tee "$RESULTS_FILE"
+echo "Machine,Matrix,Format,Repetition,Rows,Columns,Nnz,Total,Reader,SpMv" 2>&1 | tee "$RESULTS_FILE"
 
 for MATRIX_DIR in "$OUTPUT_PATH"/*/
 do
   MATRIX=$(basename "$MATRIX_DIR")
   MACHINE_DIR=$(dirname "$MATRIX_DIR")
-  for VERSION_DIR in "$MATRIX_DIR"*
+  for FORMAT_DIR in "$MATRIX_DIR"*
   do
-    VERSION=$(basename "$VERSION_DIR")
-    for REP_DIR in "$VERSION_DIR"/*
+    FORMAT=$(basename "$FORMAT_DIR")
+    for REP_DIR in "$FORMAT_DIR"/*
     do
       REP=$(basename "$REP_DIR")
-      FILE="$VERSION_DIR/$REP/output.txt"
+      FILE="$FORMAT_DIR/$REP/output.txt"
       # parse input file
       rows=$(awk '/Matrix Shape/ {printf "%s",$3}' "$FILE")
       columns=$(awk '/Matrix Shape/ {printf "%s",$4}' "$FILE")
@@ -60,8 +60,8 @@ do
 #      writer=$(awk '/I\/O Write/ {printf "%s",$4}' "$FILE")
       spmv=$(awk '/SpMv/ {printf "%s",$4}' "$FILE")
 
-#      echo "$MACHINE,$MATRIX,$VERSION,$REP,$rows,$columns,$nnz,$total,$reader,$writer,$spmv" 2>&1 | tee -a "$RESULTS_FILE"
-      echo "$MACHINE,$MATRIX,$VERSION,$REP,$rows,$columns,$nnz,$total,$reader,$spmv" 2>&1 | tee -a "$RESULTS_FILE"
+#      echo "$MACHINE,$MATRIX,$FORMAT,$REP,$rows,$columns,$nnz,$total,$reader,$writer,$spmv" 2>&1 | tee -a "$RESULTS_FILE"
+      echo "$MACHINE,$MATRIX,$FORMAT,$REP,$rows,$columns,$nnz,$total,$reader,$spmv" 2>&1 | tee -a "$RESULTS_FILE"
     done
   done
 done

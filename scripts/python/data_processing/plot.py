@@ -31,8 +31,9 @@ def speedup(dataframe, case, timers, columns, outdir):
 
         fig, ax = plt.subplots(tight_layout=True)
         speedup_table.plot(kind='line', yerr = error_table, marker='*', ax=ax)
-        ax.set_xticks(np.arange(len(xlabels)))
-        ax.set_xticklabels(xlabels, rotation = 90)
+        if type(xlabels[0]) is not int:
+            ax.set_xticks(np.arange(len(xlabels)))
+            ax.set_xticklabels(xlabels, rotation = 90)
         ax.set_ylabel('Speed Up ' + r'$\frac{T_{1}}{T_{p}}$' + ' (Times)')
         ax.grid(True)
         fig.savefig(outdir + '/speedup_' + timer + '.eps', format='eps', dpi=1000)
