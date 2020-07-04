@@ -81,7 +81,7 @@ do
   BINARY="$BUILD_PATH/dynamic_selection"
   if [ "$MACHINE" = "archer" ]; then
     $QSUB -N "dynamic_selection" \
-          -v SCRIPT_PATH="$SCRIPT_PATH",MATRIX_DIR="$MATRIX_DIR",RESULTS_PATH="$RESULTS_PATH",PROGRESS_FILE="$progress",BINARY="$BINARY",REPS="$REPS",SPMV_ITER="$SPMV_ITER",FORMATS="$FORMATS" \
+          -v SCRIPT_PATH="$SCRIPT_PATH",MATRIX_DIR="$MATRIX_DIR",RESULTS_PATH="$RESULTS_PATH",PROGRESS_FILE="$progress",BINARY="$BINARY",REPS="$REPS",SPMV_ITER="$SPMV_ITER",FORMAT="$format" \
           $SUBMIT_FILE
   elif [ "$MACHINE" = "cirrus" ]; then
     $SBATCH $SUBMIT_FILE "$SCRIPT_PATH" "$MATRIX_DIR" "$RESULTS_PATH" "$progress" "$BINARY" "$REPS" "$SPMV_ITER" "$format"
