@@ -55,14 +55,14 @@ int main(int argc, char* argv[])
 
 	morpheus::dense_vector<double, morpheus::host_memory> x, y(A.nrows());
 
+	timer.start(morpheus::TimerPool::timer_id::SPMV);
 	for(int i = 0; i < args.iterations; i++)
 	{
 		cusp::random_array<double> r(A.nrows(), i);
 		x = morpheus::dense_vector<double, morpheus::host_memory>(r.begin(), r.end());
-		timer.start(morpheus::TimerPool::timer_id::SPMV);
 		morpheus::multiply(A, x, y);
-		timer.stop(morpheus::TimerPool::timer_id::SPMV);
 	}
+	timer.stop(morpheus::TimerPool::timer_id::SPMV);
 
 //	timer.start(morpheus::TimerPool::timer_id::IO_WRITE);
 //	morpheus::io::write_matrix_market_file(x, args.fx);

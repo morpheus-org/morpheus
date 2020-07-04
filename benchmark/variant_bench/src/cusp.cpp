@@ -52,14 +52,14 @@ int main(int argc, char* argv[])
 
 	cusp::array1d<double, cusp::host_memory> x, y(A.num_rows);
 
+	timer.start(morpheus::TimerPool::timer_id::SPMV);
 	for(int i = 0; i < args.iterations; i++)
 	{
 		cusp::random_array<double> r(A.num_rows, i);
 		x = cusp::array1d<double, cusp::host_memory>(r.begin(), r.end());
-		timer.start(morpheus::TimerPool::timer_id::SPMV);
 		cusp::multiply(A, x, y);
-		timer.stop(morpheus::TimerPool::timer_id::SPMV);
 	}
+	timer.stop(morpheus::TimerPool::timer_id::SPMV);
 
 //	timer.start(morpheus::TimerPool::timer_id::IO_WRITE);
 //	cusp::io::write_matrix_market_file(x, args.fx);
