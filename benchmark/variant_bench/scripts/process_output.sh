@@ -34,7 +34,7 @@ echo -e "\t VERSION = $COMP_VERSION"
 RESULTS_FILE="$SCRIPT_PATH/../results/processed_data/$MACHINE"_""$COMPILER"_"$COMP_VERSION.csv"
 OUTPUT_PATH="$SCRIPT_PATH/../results/$MACHINE/$COMPILER/$COMP_VERSION"
 
-mkdir -p $(dirname "RESULTS_FILE")
+mkdir -p $(dirname "$RESULTS_FILE")
 
 # CSV Header
 #echo "Machine,Matrix,Version,Repetition,Rows,Columns,Nnz,Total,Reader,Writer,SpMv" 2>&1 | tee "$RESULTS_FILE"
