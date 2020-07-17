@@ -44,9 +44,9 @@ else()
 endif()
 
 
-add_executable(cusp src/cusp.cpp)
-target_compile_options(cusp PUBLIC -O3)
-target_link_libraries(cusp ThrustOMP)
+add_executable(static src/static.cpp)
+target_compile_options(static PUBLIC -O3)
+target_link_libraries(static ThrustOMP)
 
 add_executable(dynamic_01 src/dynamic.cpp)
 target_compile_definitions(dynamic_01 PUBLIC -DNUM_TYPES=1)

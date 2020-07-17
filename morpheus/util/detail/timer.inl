@@ -50,7 +50,7 @@ namespace morpheus
 				          << std::setw(10) << std::setprecision(7) << t_min << "\t"
 				          << std::setw(10) << std::setprecision(7) << t_max << "\t"
 				          << std::setw(10) << std::setprecision(7) << t_sum << "\t"
-				          << std::setw(20) << std::setprecision(14) << t_sum/ static_cast<double>(nsteps)  << "\t"
+				          << std::setw(20) << std::setprecision(10) << t_sum/ static_cast<double>(nsteps)  << "\t"
 				          << "(" << nsteps << "calls)"
 				          << std::endl;
 			}
@@ -100,7 +100,7 @@ namespace morpheus
 		std::cout << std::setw(20) << "Section" << "\t"
 		          << std::setw(10) << "tmin" << "\t"
 		          << std::setw(10) << "tmax" << "\t"
-		          << std::setw(20) << "total" << std::endl;
+		          << std::setw(10) << "total" << std::endl;
 
 		for(int n = 0; n < timer_id::NTIMERS; n++)
 		{
