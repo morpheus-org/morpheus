@@ -18,19 +18,19 @@ check_supported_machines()
 
 configure_scheduler_serial()
 {
-    local __MACHINE=$1
-    local __TIME=$2
-    local __NAME=$3
-    local __FILE=$4
+    local __MORPHEUS_PATH=$1
+    local __MACHINE=$2
+    local __TIME=$3
+    local __NAME=$4
+    local __FILE=$5
     
     local __FILE_ARGS=""
 
-    for i in "${@:5}"; do
+    for i in "${@:6}"; do
         __FILE_ARGS="$__FILE_ARGS $i"
     done
     
-    local __PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-    . $__PATH/$__MACHINE/machine.sh
+    . $__MORPHEUS_PATH/scripts/bash/$__MACHINE/machine.sh
 
     local __SCHEDULER=$(configure_scheduler_serial_$__MACHINE $__TIME $__NAME $__FILE $__FILE_ARGS)
     
@@ -39,11 +39,11 @@ configure_scheduler_serial()
 
 launch_cmd_serial()
 {
-    local __MACHINE=$1
-    local __EXECUTABLE=$2
+    local __MORPHEUS_PATH=$1
+    local __MACHINE=$2
+    local __EXECUTABLE=$3
 
-    local __PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-    . $__PATH/$__MACHINE/machine.sh
+    . $__MORPHEUS_PATH/scripts/bash/$__MACHINE/machine.sh
 
     local __LAUNCH_CMD=$(launch_cmd_serial_$__MACHINE $__EXECUTABLE)
 

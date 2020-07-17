@@ -1,9 +1,10 @@
 #!/bin/bash
 
 SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+MORPHEUS_PATH="$SCRIPT_PATH/../../.."
 
-. $SCRIPT_PATH/../../../scripts/bash/machine.sh
-. $SCRIPT_PATH/../../../scripts/bash/parser.sh
+. $MORPHEUS_PATH/scripts/bash/machine.sh
+. $MORPHEUS_PATH/scripts/bash/parser.sh
 
 MACHINE=$(parse_arg $(echo $1 | tr A-Z a-z) "local")
 COMPILER=$(parse_arg $(echo $2 | tr A-Z a-z) "gcc")
@@ -37,29 +38,18 @@ mkdir -p "$RESULTS_PATH"
 
 for version in "${VERSIONS[@]}"
 do
-  progress="$RESULTS_PATH/progress"_"$version.txt"
-  echo "Starting version $version" 2>&1 | tee "$progress"
+  PROGRESS="$RESULTS_PATH/progress"_"$version.txt"
+  echo "Starting version $version" 2>&1 | tee "$PROGRESS"
 
-  for mat in "$MATRIX_PATH"/*/
-  do
-    BASE=$(basename $mat)
-    DIR=$(dirname $mat)
-    MATRIX="$DIR/$BASE/$BASE.mtx"
-    
-    echo -e "\t$BASE" 2>&1 | tee -a "$progress"
+  BINARY="$BUILD_PATH/$version"
+  NAME="variant_$version"
+  OUTDIR="$RESULTS_PATH/$version"
 
-    for rep in `seq -w 1 $REPS`
-    do
-      echo -e "\t\t$rep" 2>&1 | tee -a "$progress"
-      outdir="$RESULTS_PATH/$BASE/$version/$rep"
-      mkdir -p "$outdir"
-      BINARY="$BUILD_PATH/$version"
-      NAME="variant_$version"
-      FILE="$SCRIPT_PATH/submit.sh"
-      FILE_ARGS="$MACHINE $COMPILER $COMP_VERSION $BINARY \
-                 $MATRIX $outdir $SPMV_ITER $FORMAT $progress"
-      SCHEDULED_JOB=$(configure_scheduler_serial $MACHINE $TIME $NAME $FILE $FILE_ARGS)
-      $SCHEDULED_JOB
-    done
-  done
+  FILE="$SCRIPT_PATH/submit.sh"
+  FILE_ARGS="$MORPHEUS_PATH $MACHINE $COMPILER $COMP_VERSION \
+              $BINARY $MATRIX_PATH $OUTDIR $SPMV_ITER $FORMAT $REPS \
+              $PROGRESS"
+  
+  SCHEDULED_JOB=$(configure_scheduler_serial $MORPHEUS_PATH $MACHINE $TIME $NAME $FILE $FILE_ARGS)
+  $SCHEDULED_JOB
 done

@@ -1,10 +1,11 @@
 #!/bin/bash
 
 SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+MORPHEUS_PATH="$SCRIPT_PATH/../../.."
 
-. $SCRIPT_PATH/../../../scripts/bash/machine.sh
-. $SCRIPT_PATH/../../../scripts/bash/cmake.sh
-. $SCRIPT_PATH/../../../scripts/bash/compilers.sh
+. $MORPHEUS_PATH/scripts/bash/machine.sh
+. $MORPHEUS_PATH/scripts/bash/cmake.sh
+. $MORPHEUS_PATH/scripts/bash/compilers.sh
 
 MACHINE=$(echo $1 | tr A-Z a-z)
 COMPILER=$(echo $2 | tr A-Z a-z)
@@ -22,8 +23,8 @@ else
   exit -1
 fi
 
-load_cmake $MACHINE
-load_compiler $MACHINE $COMPILER $COMP_VERSION
+load_cmake $MORPHEUS_PATH $MACHINE
+load_compiler $MORPHEUS_PATH $MACHINE $COMPILER $COMP_VERSION
 
 BUILD_PATH="$SCRIPT_PATH/../build/$COMPILER/$COMP_VERSION"
 BUILD_FLAGS="-D$(echo $MACHINE | tr a-z A-Z)=ON"

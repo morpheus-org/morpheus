@@ -19,10 +19,8 @@ load_compiler_cirrus()
             exit -1
         fi
     elif [ "$__COMPILER" == "intel" ]; then
-        if [ "$__VERSION" == "18" ]; then
-            module load "intel-compilers-$__VERSION/$__VERSION.05.274"
-        elif [ "$__VERSION" == "19" ]; then
-            module load "intel-compilers-$__VERSION/$__VERSION.0.0.117"
+        if [ "$__VERSION" == "19.5" ] || [ "$__VERSION" == "20.1" ]; then
+            load_intel "$__VERSION"
         else
             echo "Intel $__VERSION is not supported."
             exit -1

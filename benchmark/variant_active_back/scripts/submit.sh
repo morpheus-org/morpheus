@@ -1,21 +1,41 @@
 #!/bin/bash --login
 
-__PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-. $__PATH/../../../scripts/bash/machine.sh
-. $__PATH/../../../scripts/bash/compilers.sh
+MORPHEUS_PATH=$1
+MACHINE=$2
+COMPILER=$3
+COMP_VERSION=$4
+BINARY=$5
+MATRIX_PATH=$6
+OUTDIR=$7
+SPMV_ITER=$8
+FORMAT=$9
+REPS=${10}
+PROGRESS=${11}
 
-MACHINE=$1
-COMPILER=$2
-COMP_VERSION=$3
-BINARY=$4
-MATRIX=$5
-OUTDIR=$6
-SPMV_ITER=$7
-FORMAT=$8
-PROGRESS=$9
+. $MORPHEUS_PATH/scripts/bash/machine.sh
+. $MORPHEUS_PATH/scripts/bash/compilers.sh
 
-load_compiler $MACHINE $COMPILER $COMP_VERSION
-LAUNCH_CMD=$(launch_cmd_serial $MACHINE $BINARY)
-LAUNCH_ARGS="$MATRIX $OUTDIR $SPMV_ITER $FORMAT"
+load_compiler $MORPHEUS_PATH $MACHINE $COMPILER $COMP_VERSION
 
-$LAUNCH_CMD $LAUNCH_ARGS 2> >(tee -a "$PROGRESS") 1> >(tee "$OUTDIR/output.txt")
+for mat in "$MATRIX_PATH"/*/
+  do
+    BASE=$(basename $mat)
+    DIR=$(dirname $mat)
+    MATRIX="$DIR/$BASE/$BASE.mtx"
+    
+    echo -e "\t$BASE" 2>&1 | tee -a "$PROGRESS"
+
+    for rep in `seq -w 1 $REPS`
+    do
+        echo -e "\t\t$rep" 2>&1 | tee -a "$PROGRESS"
+        OUTDIR="$OUTDIR/$BASE/$rep"
+        mkdir -p "$OUTDIR"
+        
+        LAUNCH_CMD=$(launch_cmd_serial $MORPHEUS_PATH $MACHINE $BINARY)
+        LAUNCH_ARGS="$MATRIX $OUTDIR $SPMV_ITER $FORMAT"
+    
+        $LAUNCH_CMD $LAUNCH_ARGS 2> >(tee -a "$PROGRESS") 1> >(tee "$OUTDIR/output.txt")    
+    done
+  done
+
+

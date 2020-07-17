@@ -28,12 +28,12 @@ set_CXX()
 
 load_compiler()
 {
-    local __MACHINE=$1
-    local __COMPILER=$2
-    local __VERSION=$3
-    local __PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+    local __MORPHEUS_PATH=$1
+    local __MACHINE=$2
+    local __COMPILER=$3
+    local __VERSION=$4
     
-    . $__PATH/$__MACHINE/compilers.sh
+    . $__MORPHEUS_PATH/scripts/bash/$__MACHINE/compilers.sh
 
     if [ "$__COMPILER" == "" ]; then
         __COMPILER="gcc"
