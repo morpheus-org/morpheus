@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  cusp.cpp
+ *  dynamic_1.cpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,17 +23,19 @@
  *
  *****************************************************************************/
 
-/*! \file cusp.cpp
+/*! \file dynamic_1.cpp
  *  \brief Description
  */
 
 #include <morpheus/util/parser.hpp>
 #include <morpheus/util/timer.hpp>
 
-#include <cusp/coo_matrix.h>
-#include <cusp/array1d.h>
-#include <cusp/io/matrix_market.h>
-#include <cusp/multiply.h>
+#include <morpheus/dynamic_matrix.hpp>
+#include <morpheus/matrix_formats/dense_vector.hpp>
+#include <morpheus/io/matrix_market.hpp>
+#include <morpheus/multiply.hpp>
+
+#include <benchmark/variant_active_front/src/dynamic.hpp>
 
 int main(int argc, char* argv[])
 {
@@ -44,32 +46,28 @@ int main(int argc, char* argv[])
 
 	timer.start(morpheus::TimerPool::timer_id::TOTAL);
 
-	cusp::coo_matrix<int, double, cusp::host_memory> A;
+	Matrix A;
+	A = morpheus::coo_matrix<int, double, morpheus::host_memory>();
 
 	timer.start(morpheus::TimerPool::timer_id::IO_READ);
-	cusp::io::read_matrix_market_file(A, args.fin);
+	morpheus::io::read_matrix_market_file(A, args.fin);
 	timer.stop(morpheus::TimerPool::timer_id::IO_READ);
 
-	cusp::array1d<double, cusp::host_memory> x, y(A.num_rows);
+	morpheus::dense_vector<double, morpheus::host_memory> x, y(A.nrows());
 
 	timer.start(morpheus::TimerPool::timer_id::SPMV);
 	for(int i = 0; i < args.iterations; i++)
 	{
-		cusp::random_array<double> r(A.num_rows, i);
-		x = cusp::array1d<double, cusp::host_memory>(r.begin(), r.end());
-		cusp::multiply(A, x, y);
+		cusp::random_array<double> r(A.nrows(), i);
+		x = morpheus::dense_vector<double, morpheus::host_memory>(r.begin(), r.end());
+		morpheus::multiply(A, x, y);
 	}
 	timer.stop(morpheus::TimerPool::timer_id::SPMV);
-
-//	timer.start(morpheus::TimerPool::timer_id::IO_WRITE);
-//	cusp::io::write_matrix_market_file(x, args.fx);
-//	cusp::io::write_matrix_market_file(y, args.fy);
-//	timer.stop(morpheus::TimerPool::timer_id::IO_WRITE);
 
 	timer.stop(morpheus::TimerPool::timer_id::TOTAL);
 
 	// Stats
-	std::cout << "Matrix Shape\t" << A.num_rows  << "\t" << A.num_cols << "\t" << A.num_entries  << std::endl;
+	std::cout << "Matrix Shape\t" <<  A.nrows() << "\t" << A.ncols() << "\t" << A.nnz()  << std::endl;
 	timer.statistics();
 
 	return 0;

@@ -35,7 +35,7 @@
 #include <morpheus/io/matrix_market.hpp>
 #include <morpheus/multiply.hpp>
 
-#include <benchmark/variant_bench/src/dynamic.hpp>
+#include <benchmark/variant_active_front/src/dynamic.hpp>
 
 int main(int argc, char* argv[])
 {
@@ -63,11 +63,6 @@ int main(int argc, char* argv[])
 		morpheus::multiply(A, x, y);
 	}
 	timer.stop(morpheus::TimerPool::timer_id::SPMV);
-
-//	timer.start(morpheus::TimerPool::timer_id::IO_WRITE);
-//	morpheus::io::write_matrix_market_file(x, args.fx);
-//	morpheus::io::write_matrix_market_file(y, args.fy);
-//	timer.stop(morpheus::TimerPool::timer_id::IO_WRITE);
 
 	timer.stop(morpheus::TimerPool::timer_id::TOTAL);
 
