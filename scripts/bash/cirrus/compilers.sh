@@ -10,9 +10,9 @@ load_compiler_cirrus()
     fi
 
     if [ "$__COMPILER" == "gcc" ]; then
-        if [ "$__VERSION" == "6.3.0" ] | [ "$__VERSION" == "8.2.0" ]; then
+        if [ "$__VERSION" == "6.3.0" ] || [ "$__VERSION" == "8.2.0" ]; then
             module load "$__COMPILER/$__VERSION"
-        elif [ "$__VERSION" == "8.3.0" ] | [ "$__VERSION" == "9.3.0" ] | [ "$__VERSION" == "10.1.0" ]; then
+        elif [ "$__VERSION" == "8.3.0" ] || [ "$__VERSION" == "9.3.0" ] || [ "$__VERSION" == "10.1.0" ]; then
             load_gcc $__VERSION
         else
             echo "GCC $__VERSION is not supported."
