@@ -4,9 +4,9 @@ set_CC()
 {
     local __COMPILER=$1
 
-    if [ "$__COMPILER" = "gcc" ]; then
+    if [ "$__COMPILER" == "gcc" ]; then
         local __CC="gcc"
-    elif [ "$__COMPILER" = "intel" ]; then
+    elif [ "$__COMPILER" == "intel" ]; then
         local __CC="icc"
     fi
 
@@ -17,9 +17,9 @@ set_CXX()
 {
     local __COMPILER=$1
 
-    if [ "$__COMPILER" = "gcc" ]; then
+    if [ "$__COMPILER" == "gcc" ]; then
         local __CXX="g++"
-    elif [ "$__COMPILER" = "intel" ]; then
+    elif [ "$__COMPILER" == "intel" ]; then
         local __CXX="icpc"
     fi
 
