@@ -8,7 +8,11 @@ load_compiler_archer()
     if [ -f $HOME/.bashrc ]; then
         . $HOME/.bashrc
     fi
-
+    
+    if [ "$(gcc -dumpversion)" == "6.3.0" ]; then
+	module unload gcc
+    fi
+    
     if [ "$__COMPILER" == "gcc" ]; then
         if [ "$__VERSION" == "6.3.0" ] || [ "$__VERSION" == "7.3.0" ]; then
             module load "$__COMPILER/$__VERSION"
@@ -19,9 +23,9 @@ load_compiler_archer()
             exit -1
         fi
     elif [ "$__COMPILER" == "intel" ]; then
-        if [ "$__VERSION" == "17" ]; then
-            module load "intel/$__VERSION.0.3.191"
-        else
+        if [ "$__VERSION" == "19.5" ]; then
+            load_intel "$__VERSION"
+	else
             echo "Intel $__VERSION is not supported."
             exit -1
         fi
