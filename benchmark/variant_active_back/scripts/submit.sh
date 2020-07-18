@@ -6,7 +6,7 @@ COMPILER=$3
 COMP_VERSION=$4
 BINARY=$5
 MATRIX_PATH=$6
-OUTDIR=$7
+REF_OUTDIR=$7
 SPMV_ITER=$8
 FORMAT=$9
 REPS=${10}
@@ -28,7 +28,7 @@ for mat in "$MATRIX_PATH"/*/
     for rep in `seq -w 1 $REPS`
     do
         echo -e "\t\t$rep" 2>&1 | tee -a "$PROGRESS"
-        OUTDIR="$OUTDIR/$BASE/$rep"
+        OUTDIR="$REF_OUTDIR/$BASE/$rep"
         mkdir -p "$OUTDIR"
         
         LAUNCH_CMD=$(launch_cmd_serial $MORPHEUS_PATH $MACHINE $BINARY)
