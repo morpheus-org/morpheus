@@ -45,5 +45,4 @@ do
             $LAUNCH_CMD $LAUNCH_ARGS 2> >(tee -a "$PROGRESS") 1> >(tee "$OUTDIR/output.txt")    
     done
   done
-
 done

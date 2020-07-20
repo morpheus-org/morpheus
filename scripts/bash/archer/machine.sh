@@ -2,8 +2,8 @@
 
 configure_scheduler_serial_archer()
 {
-    local __TIME=$1
-    local __QUEUE=$2
+    local __QUEUE=$1
+    local __TIME=$2
     local __NAME=$3
     local __FILE=$4
     local __FILE_ARGS=""

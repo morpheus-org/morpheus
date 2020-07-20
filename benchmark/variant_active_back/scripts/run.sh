@@ -19,7 +19,7 @@ if $(check_supported_machines $MACHINE); then
 else
   echo "Invalid input argument."
   echo "Usage:"
-  echo -e "\t/path/to/script/run.sh [local|archer|cirrus] [compiler] [version] [reps] [iter] [time]\n\n"
+  echo -e "\t/path/to/script/run.sh [local|archer|cirrus] [compiler] [version] [reps] [iter] [time] [queue]\n\n"
   echo -e "\t\t local|archer|cirrus: Select at which machine the code is running on."
   echo -e "\t\t compiler: Compiler used (default is gcc)."
   echo -e "\t\t version: Version of the compiler (default is 6.3.0)."

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-MORPHEUS_PATH="$SCRIPT_PATH/../../.."
+MORPHEUS_PATH="$SCRIPT_PATH/../../../.."
 
 . $MORPHEUS_PATH/scripts/bash/machine.sh
 . $MORPHEUS_PATH/scripts/bash/parser.sh
@@ -37,7 +37,7 @@ FORMAT="0" # COO FORMAT
 
 mkdir -p "$RESULTS_PATH"
 
-NAME="variant_back"
+NAME="variant_front"
 
 FILE="$SCRIPT_PATH/submit.sh"
 FILE_ARGS="$MORPHEUS_PATH $MACHINE $COMPILER $COMP_VERSION \
@@ -45,21 +45,3 @@ FILE_ARGS="$MORPHEUS_PATH $MACHINE $COMPILER $COMP_VERSION \
 
 SCHEDULED_JOB=$(configure_scheduler_serial $MORPHEUS_PATH $MACHINE $QUEUE $TIME $NAME $FILE $FILE_ARGS)
 $SCHEDULED_JOB
-
-for version in "${VERSIONS[@]}"
-do
-  PROGRESS="$RESULTS_PATH/progress"_"$version.txt"
-  echo "Starting version $version" 2>&1 | tee "$PROGRESS"
-
-  BINARY="$BUILD_PATH/$version"
-  NAME="variant_$version"
-  OUTDIR="$RESULTS_PATH/$version"
-
-  FILE="$SCRIPT_PATH/submit.sh"
-  FILE_ARGS="$MORPHEUS_PATH $MACHINE $COMPILER $COMP_VERSION \
-              $BINARY $MATRIX_PATH $OUTDIR $SPMV_ITER $FORMAT $REPS \
-              $PROGRESS"
-  
-  SCHEDULED_JOB=$(configure_scheduler_serial $MORPHEUS_PATH $MACHINE $QUEUE $TIME $NAME $FILE $FILE_ARGS)
-  $SCHEDULED_JOB
-done
