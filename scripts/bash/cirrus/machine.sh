@@ -3,18 +3,19 @@
 configure_scheduler_serial_cirrus()
 {
     local __TIME=$1
-    local __NAME=$2
-    local __FILE=$3
+    local __QUEUE=$2
+    local __NAME=$3
+    local __FILE=$4
     
     local __FILE_ARGS=""
 
-    for i in "${@:4}"; do
+    for i in "${@:5}"; do
         __FILE_ARGS="$__FILE_ARGS $i"
     done
 
     local __ACCOUNT="dc111"
     local __RESOURCES="--time=$__TIME --exclusive --nodes=1 --cpus-per-task=1"
-    local __SYSTEM="--partition=standard --qos=standard"
+    local __SYSTEM="--partition=standard --qos=$__QUEUE"
 
     local __SCHEDULER="sbatch"
     local __SCHEDULER_ARGS="--account=$__ACCOUNT --job-name=$__NAME $__RESOURCES $__SYSTEM"
