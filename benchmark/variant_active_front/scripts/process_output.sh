@@ -41,7 +41,7 @@ do
   for MATRIX_DIR in "$VERSION_DIR"*
   do
     MATRIX=$(basename "$MATRIX_DIR")
-    for REP_DIR in "$VERSION_DIR"/*
+    for REP_DIR in "$MATRIX_DIR"/*
     do
       REP=$(basename "$REP_DIR")
       FILE="$MATRIX_DIR/$REP/output.txt"
