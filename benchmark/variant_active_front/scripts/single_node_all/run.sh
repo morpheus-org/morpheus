@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-MORPHEUS_PATH="$SCRIPT_PATH/../../.."
+MORPHEUS_PATH="$SCRIPT_PATH/../../../.."
 
 . $MORPHEUS_PATH/scripts/bash/machine.sh
 . $MORPHEUS_PATH/scripts/bash/parser.sh
@@ -19,7 +19,7 @@ if $(check_supported_machines $MACHINE); then
 else
   echo "Invalid input argument."
   echo "Usage:"
-  echo -e "\t/path/to/script/run.sh [local|archer|cirrus] [compiler] [version] [reps] [iter] [time] [queue]\n\n"
+  echo -e "\t/path/to/script/run.sh [local|archer|cirrus] [compiler] [version] [reps] [iter] [time]\n\n"
   echo -e "\t\t local|archer|cirrus: Select at which machine the code is running on."
   echo -e "\t\t compiler: Compiler used (default is gcc)."
   echo -e "\t\t version: Version of the compiler (default is 6.3.0)."
@@ -30,28 +30,18 @@ else
   exit -1
 fi
 
-BUILD_PATH="$SCRIPT_PATH/../build/$COMPILER/$COMP_VERSION"
-RESULTS_PATH="$SCRIPT_PATH/../results/$MACHINE/$COMPILER/$COMP_VERSION"
-MATRIX_PATH="$SCRIPT_PATH/../../../matrix"
-VERSIONS=("static" "dynamic_01" "dynamic_06" "dynamic_12" "dynamic_20")
+BUILD_PATH="$SCRIPT_PATH/../../build/$COMPILER/$COMP_VERSION"
+RESULTS_PATH="$SCRIPT_PATH/../../results/$MACHINE/$COMPILER/$COMP_VERSION"
+MATRIX_PATH="$SCRIPT_PATH/../../../../matrix"
 FORMAT="0" # COO FORMAT
 
 mkdir -p "$RESULTS_PATH"
 
-for version in "${VERSIONS[@]}"
-do
-  PROGRESS="$RESULTS_PATH/progress"_"$version.txt"
-  echo "Starting version $version" 2>&1 | tee "$PROGRESS"
+NAME="variant_front"
 
-  BINARY="$BUILD_PATH/$version"
-  NAME="variant_$version"
-  OUTDIR="$RESULTS_PATH/$version"
+FILE="$SCRIPT_PATH/submit.sh"
+FILE_ARGS="$MORPHEUS_PATH $MACHINE $COMPILER $COMP_VERSION \
+           $BUILD_PATH $MATRIX_PATH $RESULTS_PATH $SPMV_ITER $FORMAT $REPS"
 
-  FILE="$SCRIPT_PATH/submit.sh"
-  FILE_ARGS="$MORPHEUS_PATH $MACHINE $COMPILER $COMP_VERSION \
-              $BINARY $MATRIX_PATH $OUTDIR $SPMV_ITER $FORMAT $REPS \
-              $PROGRESS"
-  
-  SCHEDULED_JOB=$(configure_scheduler_serial $MORPHEUS_PATH $MACHINE $QUEUE $TIME $NAME $FILE $FILE_ARGS)
-  $SCHEDULED_JOB
-done
+SCHEDULED_JOB=$(configure_scheduler_serial $MORPHEUS_PATH $MACHINE $QUEUE $TIME $NAME $FILE $FILE_ARGS)
+$SCHEDULED_JOB

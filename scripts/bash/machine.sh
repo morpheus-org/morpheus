@@ -20,9 +20,10 @@ configure_scheduler_serial()
 {
     local __MORPHEUS_PATH=$1
     local __MACHINE=$2
-    local __TIME=$3
-    local __NAME=$4
-    local __FILE=$5
+    local __QUEUE=$3
+    local __TIME=$4
+    local __NAME=$5
+    local __FILE=$6
     
     local __FILE_ARGS=""
 
@@ -32,7 +33,7 @@ configure_scheduler_serial()
     
     . $__MORPHEUS_PATH/scripts/bash/$__MACHINE/machine.sh
 
-    local __SCHEDULER=$(configure_scheduler_serial_$__MACHINE $__TIME $__NAME $__FILE $__FILE_ARGS)
+    local __SCHEDULER=$(configure_scheduler_serial_$__MACHINE $__QUEUE $__TIME $__NAME $__FILE $__FILE_ARGS)
     
     echo "$__SCHEDULER"
 }

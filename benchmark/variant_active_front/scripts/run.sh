@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-MORPHEUS_PATH="$SCRIPT_PATH/../../.."
+MORPHEUS_PATH="$SCRIPT_PATH/../../../.."
 
 . $MORPHEUS_PATH/scripts/bash/machine.sh
 . $MORPHEUS_PATH/scripts/bash/parser.sh
@@ -12,19 +12,21 @@ COMP_VERSION=$(parse_arg $3 "10.1.0")
 REPS=$(parse_arg $4 "5")
 SPMV_ITER=$(parse_arg $5 "100")
 TIME=$(parse_arg $6 "00:20:00")
+QUEUE=$(parse_arg $7 "standard")
 
 if $(check_supported_machines $MACHINE); then
   echo "Running on $MACHINE"
 else
   echo "Invalid input argument."
   echo "Usage:"
-  echo -e "\t/path/to/script/run.sh [local|archer|cirrus] [compiler] [version] [reps] [iter] [time]\n\n"
+  echo -e "\t/path/to/script/run.sh [local|archer|cirrus] [compiler] [version] [reps] [iter] [time] [queue]\n\n"
   echo -e "\t\t local|archer|cirrus: Select at which machine the code is running on."
   echo -e "\t\t compiler: Compiler used (default is gcc)."
   echo -e "\t\t version: Version of the compiler (default is 6.3.0)."
   echo -e "\t\t reps: Number of experiment repetitons (default is 20)."
   echo -e "\t\t iter: Number of repetitions the spMv multiplication is repeated (default is 100)."
   echo -e "\t\t time: Requested time for each run."
+  echo -e "\t\t queue: Requested queue to run."
   exit -1
 fi
 
@@ -50,6 +52,6 @@ do
               $BINARY $MATRIX_PATH $OUTDIR $SPMV_ITER $FORMAT $REPS \
               $PROGRESS"
   
-  SCHEDULED_JOB=$(configure_scheduler_serial $MORPHEUS_PATH $MACHINE $TIME $NAME $FILE $FILE_ARGS)
+  SCHEDULED_JOB=$(configure_scheduler_serial $MORPHEUS_PATH $MACHINE $QUEUE $TIME $NAME $FILE $FILE_ARGS)
   $SCHEDULED_JOB
 done
