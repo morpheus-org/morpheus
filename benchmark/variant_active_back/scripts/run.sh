@@ -32,7 +32,7 @@ fi
 
 BUILD_PATH="$SCRIPT_PATH/../build/$COMPILER/$COMP_VERSION"
 RESULTS_PATH="$SCRIPT_PATH/../results/$MACHINE/$COMPILER/$COMP_VERSION"
-MATRIX_PATH="$SCRIPT_PATH/../../../matrix"
+MATRIX_PATH="$SCRIPT_PATH/../../../matrix/variant_bench"
 VERSIONS=("static" "dynamic_01" "dynamic_06" "dynamic_12" "dynamic_20")
 FORMAT="0" # COO FORMAT
 

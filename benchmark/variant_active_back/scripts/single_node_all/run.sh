@@ -32,7 +32,7 @@ fi
 
 BUILD_PATH="$SCRIPT_PATH/../../build/$COMPILER/$COMP_VERSION"
 RESULTS_PATH="$SCRIPT_PATH/../../results/$MACHINE/$COMPILER/$COMP_VERSION"
-MATRIX_PATH="$SCRIPT_PATH/../../../../matrix"
+MATRIX_PATH="$SCRIPT_PATH/../../../../matrix/variant_bench"
 FORMAT="0" # COO FORMAT
 
 mkdir -p "$RESULTS_PATH"

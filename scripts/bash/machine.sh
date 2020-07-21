@@ -27,7 +27,7 @@ configure_scheduler_serial()
     
     local __FILE_ARGS=""
 
-    for i in "${@:6}"; do
+    for i in "${@:7}"; do
         __FILE_ARGS="$__FILE_ARGS $i"
     done
     
