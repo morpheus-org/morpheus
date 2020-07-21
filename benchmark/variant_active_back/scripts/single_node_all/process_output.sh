@@ -26,21 +26,21 @@ else
   exit -1
 fi
 
-RESULTS_FILE="$SCRIPT_PATH/../results/processed_data/$MACHINE"_"$COMPILER"_"$COMP_VERSION.csv"
-OUTPUT_PATH="$SCRIPT_PATH/../results/$MACHINE/$COMPILER/$COMP_VERSION"
+RESULTS_FILE="$SCRIPT_PATH/../results/processed_data/single_node_all/$MACHINE"_"$COMPILER"_"$COMP_VERSION.csv"
+OUTPUT_PATH="$SCRIPT_PATH/../results/single_node_all/$MACHINE/$COMPILER/$COMP_VERSION"
 
 mkdir -p $(dirname "$RESULTS_FILE")
 
 # CSV Header
-echo "Machine,Matrix,Format,Repetition,Rows,Columns,Nnz,Total,Reader,SpMv,Convert" 2>&1 | tee "$RESULTS_FILE"
+echo "Machine,Matrix,Version,Repetition,Rows,Columns,Nnz,Total,Reader,SpMv" 2>&1 | tee "$RESULTS_FILE"
 
-for FORMAT_DIR in "$OUTPUT_PATH"/*/
+for VERSION_DIR in "$OUTPUT_PATH"/*/
 do
-  FORMAT=$(basename "$FORMAT_DIR")
-  MACHINE_DIR=$(dirname "$FORMAT_DIR")
-  for MATRIX_DIR in "$FORMAT_DIR"*
+  VERSION=$(basename "$VERSION_DIR")
+  MACHINE_DIR=$(dirname "$VERSION_DIR")
+  for MATRIX_DIR in "$VERSION_DIR"*
   do
-    MATRIX=$(basename "$FORMAT_DIR")
+    MATRIX=$(basename "$MATRIX_DIR")
     for REP_DIR in "$MATRIX_DIR"/*
     do
       REP=$(basename "$REP_DIR")
@@ -51,10 +51,9 @@ do
       nnz=$(awk '/Matrix Shape/ {printf "%s",$5}' "$FILE")
       total=$(awk '/Total/ {printf "%s",$4}' "$FILE")
       reader=$(awk '/I\/O Read/ {printf "%s",$4}' "$FILE")
-      convert=$(awk '/Convert/ {printf "%s",$4}' "$FILE")
       spmv=$(awk '/SpMv/ {printf "%s",$4}' "$FILE")
 
-      echo "$MACHINE,$MATRIX,$FORMAT,$REP,$rows,$columns,$nnz,$total,$reader,$spmv,$convert" 2>&1 | tee -a "$RESULTS_FILE"
+      echo "$MACHINE,$MATRIX,$VERSION,$REP,$rows,$columns,$nnz,$total,$reader,$spmv" 2>&1 | tee -a "$RESULTS_FILE"
     done
   done
 done

@@ -8,22 +8,30 @@ BUILD_PATH=$5
 MATRIX_PATH=$6
 RESULTS_PATH=$7
 SPMV_ITER=$8
-FORMAT=$9
-REPS=${10}
+REPS=$9
 
-VERSIONS=("static" "dynamic_01" "dynamic_06" "dynamic_12" "dynamic_20")
+#FORMATS=("coo", "csr", "dia", "ell", "hyb")
+FORMATS=("coo" "csr" "hyb") # for now these do not require fill in
 
 . $MORPHEUS_PATH/scripts/bash/machine.sh
 . $MORPHEUS_PATH/scripts/bash/compilers.sh
 
 load_compiler $MORPHEUS_PATH $MACHINE $COMPILER $COMP_VERSION
 
-for version in "${VERSIONS[@]}"
+for FORMAT in "${FORMATS[@]}"
 do
-    PROGRESS="$RESULTS_PATH/progress"_"$version.txt"
-    echo "Starting version $version" 2>&1 | tee "$PROGRESS"
+    PROGRESS="$RESULTS_PATH/progress"_"$FORMAT.txt"
+    echo "Starting format $FORMAT" 2>&1 | tee "$PROGRESS"
 
-    BINARY="$BUILD_PATH/$version"
+    if [ "$FORMAT" == "coo" ];then fmt=0
+    elif [ "$FORMAT" == "csr" ]; then fmt=1
+    elif [ "$FORMAT" == "dia" ]; then fmt=2
+    elif [ "$FORMAT" == "ell" ]; then fmt=3
+    elif [ "$FORMAT" == "hyb" ]; then fmt=4
+    elif [ "$FORMAT" == "dense" ]; then fmt=5
+    fi
+
+    BINARY="$BUILD_PATH/dynamic_selection"
 
     for mat in "$MATRIX_PATH"/*/
     do
@@ -36,11 +44,11 @@ do
         for rep in `seq -w 1 $REPS`
         do
             echo -e "\t\t$rep" 2>&1 | tee -a "$PROGRESS"
-            OUTDIR="$RESULTS_PATH/$version/$BASE/$rep"
+            OUTDIR="$RESULTS_PATH/$FORMAT/$BASE/$rep"
             mkdir -p "$OUTDIR"
             
             LAUNCH_CMD=$(launch_cmd_serial $MORPHEUS_PATH $MACHINE $BINARY)
-            LAUNCH_ARGS="$MATRIX $OUTDIR $SPMV_ITER $FORMAT"
+            LAUNCH_ARGS="$MATRIX $OUTDIR $SPMV_ITER $fmt"
 
             $LAUNCH_CMD $LAUNCH_ARGS 2> >(tee -a "$PROGRESS") 1> >(tee "$OUTDIR/output.txt")    
     done

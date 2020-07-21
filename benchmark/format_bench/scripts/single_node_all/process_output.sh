@@ -26,8 +26,8 @@ else
   exit -1
 fi
 
-RESULTS_FILE="$SCRIPT_PATH/../results/processed_data/$MACHINE"_"$COMPILER"_"$COMP_VERSION.csv"
-OUTPUT_PATH="$SCRIPT_PATH/../results/$MACHINE/$COMPILER/$COMP_VERSION"
+RESULTS_FILE="$SCRIPT_PATH/../results/processed_data/single_node_all/$MACHINE"_"$COMPILER"_"$COMP_VERSION.csv"
+OUTPUT_PATH="$SCRIPT_PATH/../results/single_node_all/$MACHINE/$COMPILER/$COMP_VERSION"
 
 mkdir -p $(dirname "$RESULTS_FILE")
 
