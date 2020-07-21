@@ -30,7 +30,7 @@ do
         BASE=$(basename $mat)
         DIR=$(dirname $mat)
         MATRIX="$DIR/$BASE/$BASE.mtx"
-        
+
         echo -e "\t$BASE" 2>&1 | tee -a "$PROGRESS"
 
         for rep in `seq -w 1 $REPS`
@@ -41,7 +41,7 @@ do
             
             LAUNCH_CMD=$(launch_cmd_serial $MORPHEUS_PATH $MACHINE $BINARY)
             LAUNCH_ARGS="$MATRIX $OUTDIR $SPMV_ITER $FORMAT"
-        
+
             $LAUNCH_CMD $LAUNCH_ARGS 2> >(tee -a "$PROGRESS") 1> >(tee "$OUTDIR/output.txt")    
     done
   done

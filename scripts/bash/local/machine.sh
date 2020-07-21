@@ -2,13 +2,14 @@
 
 configure_scheduler_serial_local()
 {
-    local __TIME=$1
-    local __NAME=$2
-    local __FILE=$3
+    local __QUEUE=$1
+    local __TIME=$2
+    local __NAME=$3
+    local __FILE=$4
     
     local __FILE_ARGS=""
 
-    for i in "${@:4}"; do
+    for i in "${@:5}"; do
         __FILE_ARGS="$__FILE_ARGS $i"
     done
 
