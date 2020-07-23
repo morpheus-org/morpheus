@@ -10,8 +10,8 @@ RESULTS_PATH=$7
 SPMV_ITER=$8
 REPS=$9
 
-#FORMATS=("coo", "csr", "dia", "ell", "hyb")
-FORMATS=("coo" "csr" "hyb") # for now these do not require fill in
+FORMATS=("coo" "csr" "dia" "ell" "hyb")
+#FORMATS=("coo" "csr" "hyb") # for now these do not require fill in
 
 . $MORPHEUS_PATH/scripts/bash/machine.sh
 . $MORPHEUS_PATH/scripts/bash/compilers.sh

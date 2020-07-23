@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-MORPHEUS_PATH="$SCRIPT_PATH/../../.."
+MORPHEUS_PATH="$SCRIPT_PATH/../../../.."
 
 . $MORPHEUS_PATH/scripts/bash/machine.sh
 . $MORPHEUS_PATH/scripts/bash/parser.sh
@@ -26,8 +26,8 @@ else
   exit -1
 fi
 
-RESULTS_FILE="$SCRIPT_PATH/../results/processed_data/single_node_all/$MACHINE"_"$COMPILER"_"$COMP_VERSION.csv"
-OUTPUT_PATH="$SCRIPT_PATH/../results/single_node_all/$MACHINE/$COMPILER/$COMP_VERSION"
+RESULTS_FILE="$SCRIPT_PATH/../../results/processed_data/single_node_all/$MACHINE"_"$COMPILER"_"$COMP_VERSION.csv"
+OUTPUT_PATH="$SCRIPT_PATH/../../results/single_node_all/$MACHINE/$COMPILER/$COMP_VERSION"
 
 mkdir -p $(dirname "$RESULTS_FILE")
 
