@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 option(LOCAL "Compiling locally" OFF)
 option(ARCHER "Compiling on archer" OFF)
 option(CIRRUS "Compiling on cirrus" OFF)
+option(FULHAME "Compiling on fulhame" OFF)
 
 if(LOCAL)
     # Local directories
@@ -16,6 +17,9 @@ elseif(ARCHER)
 elseif(CIRRUS)
     # Cirrus directories
     set(Local_DIR "/lustre/home/dc111/cstyl")
+elseif(FULHAME)
+    # Fulhame directories
+    set(Local_DIR "/home/fh01/fh01/cstyl")
 else()
     message(FATAL_ERROR "Local Directory not found")
 endif()

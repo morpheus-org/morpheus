@@ -8,6 +8,8 @@ set_CC()
         local __CC="gcc"
     elif [ "$__COMPILER" == "intel" ]; then
         local __CC="icc"
+    elif [ "$__COMPILER" == "arm" ]; then
+        local __CC="armclang"
     fi
 
     echo "$__CC"
@@ -21,6 +23,8 @@ set_CXX()
         local __CXX="g++"
     elif [ "$__COMPILER" == "intel" ]; then
         local __CXX="icpc"
+    elif [ "$__COMPILER" == "arm" ]; then
+        local __CC="armclang++"
     fi
 
     echo "$__CXX"
