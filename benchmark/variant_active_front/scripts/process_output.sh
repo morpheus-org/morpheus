@@ -2,7 +2,7 @@
 
 SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 MORPHEUS_PATH="$SCRIPT_PATH/../../.."
-
+echo $SCRIPT_PATH
 . $MORPHEUS_PATH/scripts/bash/machine.sh
 . $MORPHEUS_PATH/scripts/bash/parser.sh
 

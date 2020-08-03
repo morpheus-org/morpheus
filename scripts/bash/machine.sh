@@ -5,7 +5,7 @@ check_supported_machines()
     local __MACHINE=$1
     local __SUPPORTED=false
     
-    MACHINES=("local" "archer" "cirrus" "fulhame")
+    MACHINES=("local" "archer" "cirrus" "fulhame" "nextgenio")
 
     for machine in "${MACHINES[@]}"; do
         if [ "$__MACHINE" == "$machine" ]; then

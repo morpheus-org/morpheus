@@ -7,6 +7,7 @@ option(LOCAL "Compiling locally" OFF)
 option(ARCHER "Compiling on archer" OFF)
 option(CIRRUS "Compiling on cirrus" OFF)
 option(FULHAME "Compiling on fulhame" OFF)
+option(NEXTGENIO "Compiling on NextGenIO" OFF)
 
 if(LOCAL)
     # Local directories
@@ -20,6 +21,9 @@ elseif(CIRRUS)
 elseif(FULHAME)
     # Fulhame directories
     set(Local_DIR "/home/fh01/fh01/cstyl")
+elseif(NEXTGENIO)
+    # NextgenIO directories
+    set(Local_DIR "/home/nx01/nx01/cstyl")
 else()
     message(FATAL_ERROR "Local Directory not found")
 endif()
