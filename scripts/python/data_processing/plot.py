@@ -20,6 +20,22 @@ def runtime(dataframe, case, timers, columns, outdir):
         ax.legend(bbox_to_anchor=(1.04,0.5), loc="center left", borderaxespad=0)
         fig.savefig(outdir + '/runtime_' + timer + '.eps', format='eps', dpi=1000)
 
+def unit(dataframe, case, counters, columns, ylabel, outdir, fout):
+
+    Path(outdir).mkdir(parents=True, exist_ok=True)
+
+    for counter in counters:
+        counter_table = pd.pivot_table(dataframe, index=case, columns=columns, values=counter+'_mean')
+        error_table = pd.pivot_table(dataframe, index=case, columns=columns, values=counter+'_stderror')
+
+        fig, ax = plt.subplots(tight_layout=True)
+        counter_table.plot(kind='bar', yerr=error_table, ax=ax)
+        ax.set_ylabel(ylabel)
+        ax.grid(True)
+        ax.legend(bbox_to_anchor=(1.04,0.5), loc="center left", borderaxespad=0)
+ 
+        fig.savefig(outdir + '/' + fout, format='eps', dpi=1000)
+
 
 def speedup(dataframe, case, timers, columns, outdir):
 
