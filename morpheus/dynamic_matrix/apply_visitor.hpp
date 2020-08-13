@@ -27,46 +27,32 @@
  *  \brief Description
  */
 
-#ifndef MORPHEUS_APPLY_VISITOR_HPP
-#define MORPHEUS_APPLY_VISITOR_HPP
+#ifndef MORPHEUS_DYNAMIC_MATRIX_APPLY_VISITOR_HPP
+#define MORPHEUS_DYNAMIC_MATRIX_APPLY_VISITOR_HPP
 
 namespace morpheus
 {
-	template <typename Visitor, typename Visitable>
-	inline typename Visitor::result_type
+    template <typename Visitor, typename Visitable>
+	typename Visitor::result_type
 	apply_visitor(Visitor& visitor, Visitable&& visitable);
 
 	template <typename Visitor, typename Visitable>
-	inline typename Visitor::result_type
+	typename Visitor::result_type
 	apply_visitor(const Visitor& visitor, Visitable&& visitable);
 
 	template <typename Visitor, typename Visitable1, typename Visitable2>
-	inline typename Visitor::result_type
+	typename Visitor::result_type
 	apply_visitor( Visitor& visitor, Visitable1&& visitable1, Visitable2&& visitable2);
 
 	template <typename Visitor, typename Visitable1, typename Visitable2>
-	inline typename Visitor::result_type
+	typename Visitor::result_type
 	apply_visitor( const Visitor& visitor , Visitable1&& visitable1 , Visitable2&& visitable2);
+}
 
-	/// TODO:: Fallback in case move semantics not supported
-//	template <typename Visitor, typename Visitable>
-//	inline typename Visitor::result_type
-//	apply_visitor(Visitor& visitor, Visitable& visitable);
-//
-//	template <typename Visitor, typename Visitable>
-//	inline typename Visitor::result_type
-//	apply_visitor(const Visitor& visitor, Visitable& visitable);
-//
-//	template <typename Visitor, typename Visitable1, typename Visitable2>
-//	inline typename Visitor::result_type
-//	apply_visitor( Visitor& visitor, Visitable1& visitable1, Visitable2& visitable2);
-//
-//	template <typename Visitor, typename Visitable1, typename Visitable2>
-//	inline typename Visitor::result_type
-//	apply_visitor( const Visitor& visitor , Visitable1& visitable1 , Visitable2& visitable2);
+#ifdef BOOST_VARIANT
+#include <morpheus/dynamic_matrix/detail/apply_visitor_boost.inl>
+#else
+#include <morpheus/dynamic_matrix/detail/apply_visitor.inl>
+#endif
 
-}   // end namespace morpheus
-
-#include <morpheus/detail/apply_visitor.inl>
-
-#endif //MORPHEUS_APPLY_VISITOR_HPP
+#endif	//MORPHEUS_DYNAMIC_MATRIX_APPLY_VISITOR_HPP

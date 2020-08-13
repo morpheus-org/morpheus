@@ -27,11 +27,10 @@
  *  \brief Description
  */
 
-#ifndef MORPHEUS_DETAIL_CONVERT_INL
-#define MORPHEUS_DETAIL_CONVERT_INL
+#ifndef MORPHEUS_DYNAMIC_MATRIX_DETAIL_CONVERT_INL
+#define MORPHEUS_DYNAMIC_MATRIX_DETAIL_CONVERT_INL
 
-#include <morpheus/apply_operation.hpp>
-
+#include <morpheus/config.hpp>
 #include <morpheus/matrix_formats/convert.hpp>
 
 namespace morpheus
@@ -41,6 +40,7 @@ namespace morpheus
 		struct convert_fn : binary_operation_obj<convert_fn>
 		{
 			template <typename T1, typename T2>
+			MORPHEUS_INLINE
 			void apply_compatible(T1 const& src, T2& dst) const
 			{
 				morpheus::convert(src, dst);
@@ -49,24 +49,27 @@ namespace morpheus
 
 	}   // end namespace detail
 
-	template <typename Types, typename Matrix>
-	void convert(matrix<Types> const& src, Matrix & dst)
+    template <typename VariantFormats1, typename Matrix>
+	MORPHEUS_INLINE
+	void convert(matrix<VariantFormats1> const& src, Matrix & dst)
 	{
-		apply_operation(src, std::bind(detail::convert_fn(), std::placeholders::_1, std::ref(dst)));
+		apply_operation(src.types(), std::bind(detail::convert_fn(), std::placeholders::_1, std::ref(dst)));
 	}
 
-	template <typename Types, typename Matrix>
-	void convert(Matrix const& src, matrix<Types> & dst)
+	template <typename VariantFormats1, typename Matrix>
+	MORPHEUS_INLINE
+	void convert(Matrix const& src, matrix<VariantFormats1> & dst)
 	{
-		apply_operation(dst, std::bind(detail::convert_fn(), std::cref(src), std::placeholders::_1));
+		apply_operation(dst.types(), std::bind(detail::convert_fn(), std::cref(src), std::placeholders::_1));
 	}
 
-	template <typename Types1, typename Types2>
-	void convert(matrix<Types1> const& src, matrix<Types2> & dst)
+	template <typename VariantFormats1, typename VariantFormats2>
+	MORPHEUS_INLINE
+	void convert(matrix<VariantFormats1> const& src, matrix<VariantFormats2> & dst)
 	{
-		apply_operation(src, dst, detail::convert_fn());
+		apply_operation(src.types(), dst.types(), detail::convert_fn());
 	}
 
 }   // end namespace morpheus
 
-#endif //MORPHEUS_DETAIL_CONVERT_INL
+#endif  //MORPHEUS_DYNAMIC_MATRIX_DETAIL_CONVERT_INL

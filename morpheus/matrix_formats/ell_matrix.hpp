@@ -31,7 +31,7 @@
 #define MORPHEUS_MATRIX_FORMATS_ELL_MATRIX_HPP
 
 #include <cusp/ell_matrix.h>
-
+// #include <string>
 namespace morpheus
 {
 	// Currently using the Cusp Interface
@@ -71,6 +71,8 @@ namespace morpheus
 		size_t ncols();
 
 		size_t nnz();
+
+		// std::string type(){ return std::string("ell format");}
 
 	};
 

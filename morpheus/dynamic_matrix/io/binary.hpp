@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  print.hpp
+ *  binary.hpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,23 +23,30 @@
  *
  *****************************************************************************/
 
-/*! \file print.hpp
+/*! \file binary.hpp
  *  \brief Description
  */
 
-#ifndef MORPHEUS_PRINT_HPP
-#define MORPHEUS_PRINT_HPP
+#ifndef MORPHEUS_DYNAMIC_MATRIX_IO_BINARY_HPP
+#define MORPHEUS_DYNAMIC_MATRIX_IO_BINARY_HPP
 
-#include <morpheus/matrix.hpp>
+#include <morpheus/dynamic_matrix/matrix.hpp>
+#include <string>
 
 namespace morpheus
 {
+	namespace io
+	{
 
-	template <typename Types>
-	void print(matrix<Types> const& mat);
+		template <typename VariantFormats>
+		void read_binary_file(matrix<VariantFormats>& mtx, const std::string& filename);
 
+		template <typename VariantFormats>
+		void write_binary_file(matrix<VariantFormats> const& mtx, const std::string& filename);
+
+	}   // end namespace io
 }   // end namespace morpheus
 
-#include <morpheus/detail/print.inl>
+#include <morpheus/dynamic_matrix/io/detail/binary.inl>
 
-#endif //MORPHEUS_PRINT_HPP
+#endif //MORPHEUS_DYNAMIC_MATRIX_IO_BINARY_HPP

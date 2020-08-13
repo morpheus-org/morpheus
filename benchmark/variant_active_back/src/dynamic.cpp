@@ -23,19 +23,18 @@
  *
  *****************************************************************************/
 
-/*! \file dynamic_1.cpp
+/*! \file dynamic.cpp
  *  \brief Description
  */
 
 #include <morpheus/util/parser.hpp>
 #include <morpheus/util/timer.hpp>
 
-#include <morpheus/dynamic_matrix.hpp>
 #include <morpheus/matrix_formats/dense_vector.hpp>
-#include <morpheus/io/matrix_market.hpp>
-#include <morpheus/multiply.hpp>
+#include <morpheus/dynamic_matrix/io/matrix_market.hpp>
+#include <morpheus/dynamic_matrix/multiply.hpp>
 
-#include <benchmark/variant_active_front/src/dynamic.hpp>
+#include <benchmark/variant_active_back/src/dynamic.hpp>
 
 int main(int argc, char* argv[])
 {
@@ -46,8 +45,7 @@ int main(int argc, char* argv[])
 
 	timer.start(morpheus::TimerPool::timer_id::TOTAL);
 
-	Matrix A;
-	A = morpheus::coo_matrix<int, double, morpheus::host_memory>();
+	Matrix A{morpheus::coo_matrix<int, double, morpheus::host_memory>{}};
 
 	timer.start(morpheus::TimerPool::timer_id::IO_READ);
 	morpheus::io::read_matrix_market_file(A, args.fin);

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  variant.hpp
+ *  config.hpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,24 +23,28 @@
  *
  *****************************************************************************/
 
-/*! \file variant.hpp
+/*! \file config.hpp
  *  \brief Description
  */
 
-#ifndef MORPHEUS_VARIANT_HPP
-#define MORPHEUS_VARIANT_HPP
 
-#include <boost/variant/variant.hpp>
+#ifndef MORPHEUS_CONFIG_HPP
+#define MORPHEUS_CONFIG_HPP
 
-namespace morpheus
-{
+// Enable performance options in RELEASE mode
+#if defined (NDEBUG)
 
-	template<typename Types>
-	using variant = boost::variant<Types>;
+#ifndef MORPHEUS_INLINE
+#define MORPHEUS_INLINE inline
+#endif
 
-	template<typename Matrices>
-	using make_variant_over = boost::make_variant_over<Matrices>;
+// Disable performance options in DEBUG mode
+#else
 
-}   // end namespace morpheus
+#ifndef MORPHEUS_INLINE
+#define MORPHEUS_INLINE
+#endif
 
-#endif //MORPHEUS_VARIANT_HPP
+#endif
+
+#endif  //MORPHEUS_CONFIG_HPP

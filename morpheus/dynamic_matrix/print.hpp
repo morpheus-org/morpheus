@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  matrix_market.hpp
+ *  print.hpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,29 +23,23 @@
  *
  *****************************************************************************/
 
-/*! \file matrix_market.hpp
+/*! \file print.hpp
  *  \brief Description
  */
 
-#ifndef MORPHEUS_IO_MATRIX_MARKET_HPP
-#define MORPHEUS_IO_MATRIX_MARKET_HPP
+#ifndef MORPHEUS_DYNAMIC_MATRIX_PRINT_HPP
+#define MORPHEUS_DYNAMIC_MATRIX_PRINT_HPP
 
-#include <morpheus/matrix.hpp>
-#include <morpheus/apply_operation.hpp>
+#include <morpheus/dynamic_matrix/matrix.hpp>
 
 namespace morpheus
 {
-	namespace io
-	{
-		template <typename Types>
-		void read_matrix_market_file(matrix<Types>& mtx, const std::string& filename);
 
-		template <typename Types>
-		void write_matrix_market_file(matrix<Types> const& mtx, const std::string& filename);
+	template <typename VariantFormats>
+	void print(matrix<VariantFormats> const& mat);
 
-	}   // end namespace io
 }   // end namespace morpheus
 
-#include <morpheus/io/detail/matrix_market.inl>
+#include <morpheus/dynamic_matrix/detail/print.inl>
 
-#endif //MORPHEUS_IO_MATRIX_MARKET_HPP
+#endif //MORPHEUS_DYNAMIC_MATRIX_PRINT_HPP

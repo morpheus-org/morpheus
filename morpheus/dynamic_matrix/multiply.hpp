@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  binary.hpp
+ *  multiply.hpp
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,29 +23,34 @@
  *
  *****************************************************************************/
 
-/*! \file binary.hpp
+/*! \file multiply.hpp
  *  \brief Description
  */
 
-#ifndef MORPHEUS_IO_BINARY_HPP
-#define MORPHEUS_IO_BINARY_HPP
+#ifndef MORPHEUS_DYNAMIC_MATRIX_MULTIPLY_HPP
+#define MORPHEUS_DYNAMIC_MATRIX_MULTIPLY_HPP
 
-#include <morpheus/matrix.hpp>
-#include <morpheus/apply_operation.hpp>
+#include <morpheus/dynamic_matrix/matrix.hpp>
 
 namespace morpheus
 {
-	namespace io
-	{
-		template <typename Types>
-		void read_binary_file(matrix<Types>& mtx, const std::string& filename);
 
-		template <typename Types>
-		void write_binary_file(matrix<Types> const& mtx, const std::string& filename);
+	// template <typename DerivedPolicy,
+	// 		typename VariantFormats,
+	// 		typename Vector1,
+	// 		typename Vector2>
+	// void multiply(const thrust::detail::execution_policy_base<DerivedPolicy> &exec,
+	//               matrix<VariantFormats> const& A,
+	//               Vector1 const& B,
+	//               Vector2 &C);
 
-	}   // end namespace io
+	template <typename VariantFormats, typename Vector1, typename Vector2>
+	void multiply(matrix<VariantFormats> const& A,
+				  Vector1 const& B,
+				  Vector2 &C);
+
 }   // end namespace morpheus
 
-#include <morpheus/io/detail/binary.inl>
+#include <morpheus/dynamic_matrix/detail/multiply.inl>
 
-#endif //MORPHEUS_IO_BINARY_HPP
+#endif //MORPHEUS_DYNAMIC_MATRIX_MULTIPLY_HPP

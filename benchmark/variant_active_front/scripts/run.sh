@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-MORPHEUS_PATH="$SCRIPT_PATH/../../../.."
+MORPHEUS_PATH="$SCRIPT_PATH/../../.."
 
 . $MORPHEUS_PATH/scripts/bash/machine.sh
 . $MORPHEUS_PATH/scripts/bash/parser.sh
@@ -33,7 +33,9 @@ fi
 BUILD_PATH="$SCRIPT_PATH/../build/$COMPILER/$COMP_VERSION"
 RESULTS_PATH="$SCRIPT_PATH/../results/$MACHINE/$COMPILER/$COMP_VERSION"
 MATRIX_PATH="$SCRIPT_PATH/../../../matrix/variant_bench"
-VERSIONS=("static" "dynamic_01" "dynamic_06" "dynamic_12" "dynamic_20")
+VERSIONS=("static" "dynamic_01" "dynamic_06" "dynamic_12" "dynamic_20"
+          "dynamic_01_boost" "dynamic_06_boost" "dynamic_12_boost" "dynamic_20_boost"
+          "static_O2" "dynamic_01_O2" "dynamic_06_O2" "dynamic_12_O2" "dynamic_20_O2")
 FORMAT="0" # COO FORMAT
 
 mkdir -p "$RESULTS_PATH"

@@ -27,25 +27,23 @@
  *  \brief Description
  */
 
-#ifndef MORPHEUS_CONVERT_HPP
-#define MORPHEUS_CONVERT_HPP
+#ifndef MORPHEUS_DYNAMIC_MATRIX_CONVERT_HPP
+#define MORPHEUS_DYNAMIC_MATRIX_CONVERT_HPP
 
-#include <morpheus/matrix.hpp>
+#include <morpheus/dynamic_matrix/matrix.hpp>
 
 namespace morpheus
 {
 
-	template <typename Types, typename Matrix>
-	void convert(matrix<Types> const& src, Matrix & dst);
+    template <typename VariantFormats1, typename Matrix>
+	void convert(matrix<VariantFormats1> const& src, Matrix & dst);
 
-	template <typename Types, typename Matrix>
-	void convert(Matrix const& src, matrix<Types> & dst);
+	template <typename VariantFormats1, typename Matrix>
+	void convert(Matrix const& src, matrix<VariantFormats1> & dst);
 
-	template <typename Types1, typename Types2>
-	void convert(matrix<Types1> const& src, matrix<Types2> & dst);
+	template <typename VariantFormats1, typename VariantFormats2>
+	void convert(matrix<VariantFormats1> const& src, matrix<VariantFormats2> & dst);
 
 }   // end namespace morpheus
 
-#include <morpheus/detail/convert.inl>
-
-#endif //MORPHEUS_CONVERT_HPP
+#endif //MORPHEUS_DYNAMIC_MATRIX_CONVERT_HPP

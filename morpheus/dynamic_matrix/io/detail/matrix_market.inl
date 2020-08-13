@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  binary.inl
+ *  matrix_market.inl
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,14 +23,15 @@
  *
  *****************************************************************************/
 
-/*! \file binary.inl
+/*! \file matrix_market.inl
  *  \brief Description
  */
 
-#ifndef MORPHEUS_IO_DETAIL_BINARY_INL
-#define MORPHEUS_IO_DETAIL_BINARY_INL
+#ifndef MORPHEUS_DYNAMIC_MATRIX_IO_DETAIL_MATRIX_MARKET_INL
+#define MORPHEUS_DYNAMIC_MATRIX_IO_DETAIL_MATRIX_MARKET_INL
 
-#include <morpheus/matrix_formats/io/binary.hpp>
+#include <morpheus/config.hpp>
+#include <morpheus/matrix_formats/io/matrix_market.hpp>
 
 namespace morpheus
 {
@@ -38,50 +39,55 @@ namespace morpheus
 	{
 		namespace detail
 		{
-			struct read_binary_file_fn
+			struct read_matrix_market_file_fn
 			{
-				read_binary_file_fn(std::string const& filename) : filename_(filename) {}
+				read_matrix_market_file_fn(std::string const& filename) : filename_(filename) {}
 
 				using result_type = void;
 
 				template <typename T>
+                MORPHEUS_INLINE
 				result_type operator()(T& mtx) const
 				{
-					morpheus::io::read_binary_file(mtx, filename_);
+					morpheus::io::read_matrix_market_file(mtx, filename_);
 				}
 
 				std::string filename_;
 			};
 
-			struct write_binary_file_fn
+			struct write_matrix_market_file_fn
 			{
-				write_binary_file_fn(std::string const& filename) : filename_(filename) {}
+				write_matrix_market_file_fn(std::string const& filename) : filename_(filename) {}
 
 				using result_type = void;
 
 				template <typename T>
+                MORPHEUS_INLINE
 				result_type operator()(T const& mtx) const
 				{
-					morpheus::io::write_binary_file(mtx, filename_);
+					morpheus::io::write_matrix_market_file(mtx, filename_);
 				}
 
 				std::string filename_;
 			};
-		}   // end namespace detail
 
-		template <typename Types>
-		void read_binary_file(matrix<Types>& mtx, const std::string& filename)
+		}   // end namespace detail
+		
+		template <typename VariantFormats>
+        MORPHEUS_INLINE
+		void read_matrix_market_file(matrix<VariantFormats>& mtx, const std::string& filename)
 		{
-			apply_operation(mtx, detail::read_binary_file_fn(filename));
+			apply_operation(mtx.types(), detail::read_matrix_market_file_fn(filename));
 		}
 
-		template <typename Types>
-		void write_binary_file(matrix<Types> const& mtx, const std::string& filename)
+		template <typename VariantFormats>
+        MORPHEUS_INLINE
+		void write_matrix_market_file(matrix<VariantFormats> const& mtx, const std::string& filename)
 		{
-			apply_operation(mtx, detail::write_binary_file_fn(filename));
+			apply_operation(mtx.types(), detail::write_matrix_market_file_fn(filename));
 		}
 
 	}   // end namespace io
 }   // end namespace morpheus
 
-#endif //MORPHEUS_IO_DETAIL_BINARY_INL
+#endif  //MORPHEUS_DYNAMIC_MATRIX_IO_DETAIL_MATRIX_MARKET_INL

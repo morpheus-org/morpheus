@@ -27,60 +27,47 @@
  *  \brief Description
  */
 
-#ifndef MORPHEUS_MATRIX_HPP
-#define MORPHEUS_MATRIX_HPP
+#ifndef MORPHEUS_DYNAMIC_MATRIX_MATRIX_HPP
+#define MORPHEUS_DYNAMIC_MATRIX_MATRIX_HPP
 
-#include <morpheus/variant.hpp>
-
+// #include <string>
 namespace morpheus
 {
-	namespace detail
-	{
 
-	}   // end namespace detail
-
-	// TODO:: Allow change of type from a function using an index
-
-	template<typename Matrices>
-	class matrix : public make_variant_over<Matrices>::type
-	{
-		using parent_t = typename make_variant_over<Matrices>::type;
-
-	public:
+	template<typename VariantFormats>
+    class matrix{
+        VariantFormats formats_;
+    
+    public:
 
 		using reference = matrix&;
+        using const_reference = const matrix&;
 
-		matrix() = default;
-		matrix(matrix const& mat) : parent_t((parent_t const&) mat)
+        matrix() = default;
+		
+		matrix(matrix const& mat) : formats_(mat.types())
 		{}
 
-		template <typename Matrix>
-		explicit matrix(Matrix const& mat) : parent_t(mat)
+		template <typename Format>
+		explicit matrix(Format const& mat) : formats_(mat)
 		{}
 
-		template <typename OtherMatrices>
-		matrix(matrix<OtherMatrices> const& mat)
-				: parent_t((typename make_variant_over<OtherMatrices>::type const&)mat)
-		{}
+		reference operator=(matrix const& mat);
 
-		matrix& operator=(matrix const& mat);
+        template <typename Format>
+		reference operator=(Format const& mat);
 
-		template <typename Matrix>
-		matrix& operator=(Matrix const& mat);
+        VariantFormats& types();
+        const VariantFormats& types() const;
 
-		template <typename OtherMatrices>
-		matrix& operator=(matrix<OtherMatrices> const& mat);
-
-		size_t nrows();
-
+        size_t nrows();
 		size_t ncols();
-
 		size_t nnz();
-	};
-
+        // std::string type();
+    };
 
 }   // end namespace morpheus
 
-#include <morpheus/detail/matrix.inl>
+#include <morpheus/dynamic_matrix/detail/matrix.inl>
 
-#endif //MORPHEUS_MATRIX_HPP
+#endif //MORPHEUS_DYNAMIC_MATRIX_MATRIX_HPP

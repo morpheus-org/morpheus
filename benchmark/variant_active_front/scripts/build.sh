@@ -28,7 +28,10 @@ load_compiler $MORPHEUS_PATH $MACHINE $COMPILER $COMP_VERSION
 
 BUILD_PATH="$SCRIPT_PATH/../build/$COMPILER/$COMP_VERSION"
 BUILD_FLAGS="-D$(echo $MACHINE | tr a-z A-Z)=ON"
-VERSIONS=("static" "dynamic_01" "dynamic_06" "dynamic_12" "dynamic_20")
+# VERSIONS=("static" "dynamic_01" "dynamic_06" "dynamic_12" "dynamic_20")
+VERSIONS=("static" "dynamic_01" "dynamic_06" "dynamic_12" "dynamic_20"
+          "dynamic_01_boost" "dynamic_06_boost" "dynamic_12_boost" "dynamic_20_boost"
+          "static_O2" "dynamic_01_O2" "dynamic_06_O2" "dynamic_12_O2" "dynamic_20_O2")
 
 # Create build directory and compile code to generate the binaries
 mkdir -p "$BUILD_PATH"

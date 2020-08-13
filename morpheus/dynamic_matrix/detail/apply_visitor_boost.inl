@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  apply_visitor.inl
+ *  apply_visitor_boost.inl
  *
  *  Edinburgh Parallel Computing Centre (EPCC)
  *
@@ -23,79 +23,49 @@
  *
  *****************************************************************************/
 
-/*! \file apply_visitor.inl
+/*! \file apply_visitor_boost.inl
  *  \brief Description
  */
 
-#ifndef MORPHEUS_DETAIL_APPLY_VISITOR_INL
-#define MORPHEUS_DETAIL_APPLY_VISITOR_INL
+#ifndef MORPHEUS_DYNAMIC_MATRIX_DETAIL_APPLY_VISITOR_BOOST_INL
+#define MORPHEUS_DYNAMIC_MATRIX_DETAIL_APPLY_VISITOR_BOOST_INL
 
+#include <morpheus/config.hpp>
 #include <boost/variant/apply_visitor.hpp>
 
 namespace morpheus
 {
-	namespace detail
-	{
-
-	}   // end namespace detail
-
-	template <typename Visitor, typename Visitable>
-	inline typename Visitor::result_type
+    template <typename Visitor, typename Visitable>
+	MORPHEUS_INLINE
+	typename Visitor::result_type
 	apply_visitor(Visitor& visitor, Visitable&& visitable)
 	{
 		return boost::apply_visitor(visitor, visitable);
 	}
 
 	template <typename Visitor, typename Visitable>
-	inline typename Visitor::result_type
+	MORPHEUS_INLINE
+	typename Visitor::result_type
 	apply_visitor(const Visitor& visitor, Visitable&& visitable)
 	{
 		return boost::apply_visitor(visitor, visitable);
 	}
 
 	template <typename Visitor, typename Visitable1, typename Visitable2>
-	inline typename Visitor::result_type
+	MORPHEUS_INLINE
+	typename Visitor::result_type
 	apply_visitor( Visitor& visitor, Visitable1&& visitable1, Visitable2&& visitable2)
 	{
 		return boost::apply_visitor(visitor, visitable1, visitable2);
 	}
 
 	template <typename Visitor, typename Visitable1, typename Visitable2>
-	inline typename Visitor::result_type
+	MORPHEUS_INLINE
+	typename Visitor::result_type
 	apply_visitor( const Visitor& visitor , Visitable1&& visitable1 , Visitable2&& visitable2)
 	{
 		return boost::apply_visitor(visitor, visitable1, visitable2);
 	}
+}
 
-	/// TODO:: Fallback in case move semantics not supported
-//	template <typename Visitor, typename Visitable>
-//	inline typename Visitor::result_type
-//	apply_visitor(Visitor& visitor, Visitable& visitable)
-//	{
-//		return boost::apply_visitor(visitor, visitable);
-//	}
-//
-//	template <typename Visitor, typename Visitable>
-//	inline typename Visitor::result_type
-//	apply_visitor(const Visitor& visitor, Visitable& visitable)
-//	{
-//		return boost::apply_visitor(visitor, visitable);
-//	}
-//
-//	template <typename Visitor, typename Visitable1, typename Visitable2>
-//	inline typename Visitor::result_type
-//	apply_visitor( Visitor& visitor, Visitable1& visitable1, Visitable2& visitable2)
-//	{
-//		return boost::apply_visitor(visitor, visitable1, visitable2);
-//	}
-//
-//	template <typename Visitor, typename Visitable1, typename Visitable2>
-//	inline typename Visitor::result_type
-//	apply_visitor( const Visitor& visitor , Visitable1& visitable1 , Visitable2& visitable2)
-//	{
-//		return boost::apply_visitor(visitor, visitable1, visitable2);
-//	}
-
-}   // end namespace morpheus
-
-#endif //MORPHEUS_DETAIL_APPLY_VISITOR_INL
+#endif  //MORPHEUS_DYNAMIC_MATRIX_DETAIL_APPLY_VISITOR_BOOST_INL

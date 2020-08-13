@@ -27,22 +27,23 @@
  *  \brief Description
  */
 
-#ifndef MORPHEUS_DETAIL_PRINT_INL
-#define MORPHEUS_DETAIL_PRINT_INL
+#ifndef MORPHEUS_DYNAMIC_MATRIX_DETAIL_PRINT_INL
+#define MORPHEUS_DYNAMIC_MATRIX_DETAIL_PRINT_INL
 
-#include <morpheus/apply_operation.hpp>
-
+#include <morpheus/config.hpp>
 #include <morpheus/matrix_formats/print.hpp>
 
 namespace morpheus
 {
 	namespace detail
 	{
-		struct print_fn
+
+        struct print_fn
 		{
 			using result_type = void;
 
 			template <typename T>
+			MORPHEUS_INLINE
 			result_type operator()(const T& mat) const
 			{
 				morpheus::print(mat);
@@ -51,12 +52,13 @@ namespace morpheus
 
 	}   // end namespace detail
 
-	template <typename Types>
-	void print(matrix<Types> const& mat)
+	template <typename VariantFormats>
+	MORPHEUS_INLINE
+	void print(matrix<VariantFormats> const& mat)
 	{
-		apply_operation(mat, detail::print_fn());
+		apply_operation(mat.types(), detail::print_fn());
 	}
 
 }   // end namespace morpheus
 
-#endif //MORPHEUS_DETAIL_PRINT_INL
+#endif  //MORPHEUS_DYNAMIC_MATRIX_DETAIL_PRINT_INL

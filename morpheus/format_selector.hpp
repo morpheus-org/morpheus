@@ -30,14 +30,22 @@
 #ifndef MORPHEUS_FORMAT_SELECTOR_HPP
 #define MORPHEUS_FORMAT_SELECTOR_HPP
 
-#include <morpheus/dynamic_matrix.hpp>
+#include <morpheus/dynamic_matrix/matrix.hpp>
+
+#include <morpheus/memory.hpp>
+#include <morpheus/matrix_formats/coo_matrix.hpp>
+#include <morpheus/matrix_formats/csr_matrix.hpp>
+// #include <morpheus/matrix_formats/dia_matrix.hpp>
+#include <morpheus/matrix_formats/ell_matrix.hpp>
+// #include <morpheus/matrix_formats/hyb_matrix.hpp>
+// #include <morpheus/matrix_formats/dense_matrix.hpp>
 
 namespace morpheus
 {
 	enum FormatPool { FMT_COO = 0, FMT_CSR, FMT_DIA, FMT_ELL, FMT_HYB, FMT_DENSE };
 
-	template <typename Types>
-	void select_format(const int format, matrix<Types>& mat)
+	template <typename VariantFormats>
+	void select_format(const int format, matrix<VariantFormats>& mat)
 	{
 
 		switch(format) {
@@ -47,17 +55,17 @@ namespace morpheus
 			case FMT_CSR :
 				mat = morpheus::csr_matrix<int, double, morpheus::host_memory>();
 				break;
-			case FMT_DIA :
-				mat = morpheus::dia_matrix<int, double, morpheus::host_memory>();
-				break;
+			// case FMT_DIA :
+			// 	mat = morpheus::dia_matrix<int, double, morpheus::host_memory>();
+			// 	break;
 			case FMT_ELL :
 				mat = morpheus::ell_matrix<int, double, morpheus::host_memory>();
 				break;
-			case FMT_HYB :
-				mat = morpheus::hyb_matrix<int, double, morpheus::host_memory>();
-				break;
-			case FMT_DENSE :
-				mat = morpheus::dense_matrix<double, morpheus::host_memory>();
+			// case FMT_HYB :
+			// 	mat = morpheus::hyb_matrix<int, double, morpheus::host_memory>();
+			// 	break;
+			// case FMT_DENSE :
+			// 	mat = morpheus::dense_matrix<double, morpheus::host_memory>();
 				break;
 			default :
 				mat = morpheus::coo_matrix<int, double, morpheus::host_memory>();

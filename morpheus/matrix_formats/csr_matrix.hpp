@@ -74,6 +74,7 @@ namespace morpheus
 
 		size_t nnz();
 
+		// std::string type(){ return std::string("csr format");}
 	};
 
 }   // end namespace morpheus

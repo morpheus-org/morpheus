@@ -37,7 +37,7 @@ namespace morpheus
 
 	// Currently using the Cusp Interface
 	template <typename IndexType, typename ValueType, class MemorySpace>
-class coo_matrix : public cusp::coo_matrix<IndexType,ValueType,MemorySpace>
+	class coo_matrix : public cusp::coo_matrix<IndexType,ValueType,MemorySpace>
 	{
 	private:
 		using parent_t = cusp::coo_matrix<IndexType,ValueType,MemorySpace>;
@@ -67,6 +67,8 @@ class coo_matrix : public cusp::coo_matrix<IndexType,ValueType,MemorySpace>
 		size_t ncols();
 
 		size_t nnz();
+
+		// std::string type(){ return std::string("coo format");}
 
 	};
 
