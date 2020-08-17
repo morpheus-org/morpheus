@@ -60,6 +60,7 @@ namespace morpheus
         VariantFormats& types();
         const VariantFormats& types() const;
 
+        // void activate(int format);
         size_t nrows();
 		size_t ncols();
 		size_t nnz();

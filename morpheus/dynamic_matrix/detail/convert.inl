@@ -39,9 +39,11 @@ namespace morpheus
 	{
 		struct convert_fn : binary_operation_obj<convert_fn>
 		{
+			using result_type = void;
+
 			template <typename T1, typename T2>
 			MORPHEUS_INLINE
-			void apply_compatible(T1 const& src, T2& dst) const
+			result_type apply_compatible(T1 const& src, T2& dst) const
 			{
 				morpheus::convert(src, dst);
 			}
