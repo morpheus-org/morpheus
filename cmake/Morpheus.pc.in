@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/include
+
+Name: Morpheus
+Description: A modern, C++ dynamic matrix type and algorithms for sparse matrices
+URL: https://github.com/cstyl/morpheus
+Version: @Morpheus_VERSION@
+Cflags: -I${includedir}
+Libs: -L${libdir} -lmorpheus
