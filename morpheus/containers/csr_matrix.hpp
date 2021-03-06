@@ -33,11 +33,6 @@
 
 namespace Morpheus
 {
-    namespace Impl
-    {
-        struct CsrFormat : public MatrixTag {};
-    }
-
     template<class... Properties>
     class CsrMatrix : public Impl::MatrixTraits<FormatType<Impl::CsrFormat>, Properties...>
     {

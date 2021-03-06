@@ -33,11 +33,6 @@
 
 namespace Morpheus
 {
-    namespace Impl
-    {
-        struct DiaFormat : public MatrixTag {};
-    }
-
     template<class... Properties>
     class DiaMatrix : public Impl::MatrixTraits<FormatType<Impl::DiaFormat>, Properties...>
     {
@@ -107,7 +102,7 @@ namespace Morpheus
         // Assignment from another matrix type
         template <typename MatrixType>
         DiaMatrix& operator=(const MatrixType& matrix)
-        {{ 
+        {
             // TODO: DiaMatrix.operator=(const MatrixType& matrix)
             Morpheus::NotImplementedException("DiaMatrix.operator=(const MatrixType& matrix)"); 
         }

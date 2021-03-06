@@ -33,11 +33,6 @@
 
 namespace Morpheus
 {
-    namespace Impl
-    {
-        struct CooFormat : public MatrixTag {};
-    }
-
     template<class... Properties>
     class CooMatrix : public Impl::MatrixTraits<FormatType<Impl::CooFormat>, Properties...>
     {

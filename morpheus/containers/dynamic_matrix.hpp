@@ -36,8 +36,6 @@ namespace Morpheus
 {
     namespace Impl
     {   
-        struct DynamicFormat : public MatrixTag {};
-        
         template<typename IndexType, typename ValueType>
         struct any_type_resize
         {
@@ -114,11 +112,11 @@ namespace Morpheus
     // DynamicMatrix<int, double, memspace, formatspace>;
     // where formatspace = std::variant<CooMatrix<int,double>,CsrMatrix<int,double>...>
     template<class... Properties>
-    class DynamicMatrix : public Impl::MatrixTraits<FormatType<DynamicFormat>, Properties...>
+    class DynamicMatrix : public Impl::MatrixTraits<FormatType<Impl::DynamicFormat>, Properties...>
     {
     public:
         using type = DynamicMatrix<Properties...>;
-        using traits = Impl::MatrixTraits<FormatType<DynamicFormat>, Properties...>;
+        using traits = Impl::MatrixTraits<FormatType<Impl::DynamicFormat>, Properties...>;
         using index_type = typename traits::index_type;
         using value_type = typename traits::value_type;
         using format_type = typename traits::format_type;

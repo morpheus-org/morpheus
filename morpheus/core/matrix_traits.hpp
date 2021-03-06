@@ -25,21 +25,21 @@
 #define MORPHEUS_CORE_MATRIX_TRAITS_HPP
 
 #include <morpheus/core/concepts.hpp>
+#include <morpheus/core/matrix_tags.hpp>
 
 namespace Morpheus{
     
-    struct MatrixTag {};
-
     // Format Wrapper Type
     template <class T>
     struct FormatType {
-        static_assert(std::is_base_of<MatrixTag, T>::value,
+        static_assert(std::is_base_of<Morpheus::Impl::MatrixTag, T>::value,
                     "Morpheus: Invalid Format<> type.");
         using format_type = FormatType;
         using type        = T;
     };
 
-    namespace Impl{
+    namespace Impl
+    {
         template <typename IndexType = void, typename ValueType = void,
                   typename FormatType = void, typename MemorySpace = void>
         struct MatrixTraitsBase{
@@ -148,8 +148,11 @@ namespace Morpheus{
             // TODO
             using format_type = 
                 typename std::conditional<std::is_void<typename Base::format_type>::value,
-                                            FormatType<Morpheus::CooFormat>::format_type,
+                                            FormatType<CooFormat>::format_type,
                                             typename Base::format_type>::type;
+            // static_assert(std::is_void<typename Base::format_type>::value,
+            //                 "Morpheus Error: Matrix format_type is not specified.");
+            // using format_type = typename Base::format_type;
 
             using type =
                 MatrixTraitsBase<index_type, value_type, format_type, memory_space>;
