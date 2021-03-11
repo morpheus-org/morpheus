@@ -1,19 +1,19 @@
 /**
  * dynamic_matrix.hpp
- * 
+ *
  * EPCC, The University of Edinburgh
- * 
+ *
  * (c) 2021 The University of Edinburgh
- * 
+ *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * 	http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,8 @@
 
 namespace Morpheus {
 namespace Impl {
-template <typename IndexType, typename ValueType> struct any_type_resize {
+template <typename IndexType, typename ValueType>
+struct any_type_resize {
   using result_type = void;
 
   // Specialization for Coo resize with three arguments
@@ -80,29 +81,33 @@ template <typename IndexType, typename ValueType> struct any_type_resize {
 
 struct any_type_get_name {
   using result_type = std::string;
-  template <typename T> result_type operator()(T &mat) const {
+  template <typename T>
+  result_type operator()(T &mat) const {
     return mat.name();
   }
 };
 
 struct any_type_get_nrows {
-  template <typename T> typename T::index_type operator()(T &mat) const {
+  template <typename T>
+  typename T::index_type operator()(T &mat) const {
     return mat.nrows();
   }
 };
 
 struct any_type_get_ncols {
-  template <typename T> typename T::index_type operator()(T &mat) const {
+  template <typename T>
+  typename T::index_type operator()(T &mat) const {
     return mat.ncols();
   }
 };
 
 struct any_type_get_nnnz {
-  template <typename T> typename T::index_type operator()(T &mat) const {
+  template <typename T>
+  typename T::index_type operator()(T &mat) const {
     return mat.nnnz();
   }
 };
-} // namespace Impl
+}  // namespace Impl
 
 // example:
 // DynamicMatrix<int, double, memspace, formatspace>;
@@ -111,23 +116,23 @@ struct any_type_get_nnnz {
 template <class... Properties>
 class DynamicMatrix : public Impl::MatrixTraits<FormatType<Impl::DynamicFormat>,
                                                 Properties...> {
-public:
+ public:
   using type = DynamicMatrix<Properties...>;
   using traits =
       Impl::MatrixTraits<FormatType<Impl::DynamicFormat>, Properties...>;
-  using index_type = typename traits::index_type;
-  using value_type = typename traits::value_type;
+  using index_type  = typename traits::index_type;
+  using value_type  = typename traits::value_type;
   using format_type = typename traits::format_type;
 
-  using reference = DynamicMatrix &;
+  using reference       = DynamicMatrix &;
   using const_reference = const DynamicMatrix &;
 
-private:
+ private:
   using MatrixFormats = std::variant<
       Morpheus::CooMatrix<int, double>, Morpheus::CsrMatrix<int, double>,
       Morpheus::DiaMatrix<int, double>, Morpheus::CooMatrix<int, double>>;
 
-public:
+ public:
   inline DynamicMatrix() = default;
 
   template <typename Format>
@@ -163,10 +168,10 @@ public:
 
   // inline MatrixFormats& formats(){ return _formats; }
 
-private:
+ private:
   std::string _name = "DynamicMatrix";
   MatrixFormats _formats;
 };
-} // namespace Morpheus
+}  // namespace Morpheus
 
-#endif // MORPHEUS_CONTAINERS_DYNAMIC_MATRIX_HPP
+#endif  // MORPHEUS_CONTAINERS_DYNAMIC_MATRIX_HPP

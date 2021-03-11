@@ -1,19 +1,19 @@
 /**
  * matrix_traits.hpp
- * 
+ *
  * EPCC, The University of Edinburgh
- * 
+ *
  * (c) 2021 The University of Edinburgh
- * 
+ *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * 	http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,11 +30,12 @@
 namespace Morpheus {
 
 // Format Wrapper Type
-template <class T> struct FormatType {
+template <class T>
+struct FormatType {
   static_assert(std::is_base_of<Morpheus::Impl::MatrixTag, T>::value,
                 "Morpheus: Invalid Format<> type.");
   using format_type = FormatType;
-  using type = T;
+  using type        = T;
 };
 
 namespace Impl {
@@ -42,13 +43,14 @@ template <typename IndexType = void, typename ValueType = void,
           typename FormatType = void, typename MemorySpace = void>
 struct MatrixTraitsBase {
   using type = MatrixTraitsBase<IndexType, ValueType, FormatType, MemorySpace>;
-  using index_type = IndexType;
-  using value_type = ValueType;
+  using index_type   = IndexType;
+  using value_type   = ValueType;
   using memory_space = MemorySpace;
-  using format_type = FormatType;
+  using format_type  = FormatType;
 };
 
-template <typename MatrixBase, typename IndexType> struct SetIndexType {
+template <typename MatrixBase, typename IndexType>
+struct SetIndexType {
   static_assert(std::is_void<typename MatrixBase::index_type>::value,
                 "Morpheus Error: More than one index types given");
   using type = MatrixTraitsBase<IndexType, typename MatrixBase::value_type,
@@ -56,7 +58,8 @@ template <typename MatrixBase, typename IndexType> struct SetIndexType {
                                 typename MatrixBase::format_type>;
 };
 
-template <typename MatrixBase, typename ValueType> struct SetValueType {
+template <typename MatrixBase, typename ValueType>
+struct SetValueType {
   static_assert(std::is_void<typename MatrixBase::value_type>::value,
                 "Morpheus Error: More than one value types given");
   using type = MatrixTraitsBase<typename MatrixBase::index_type, ValueType,
@@ -64,7 +67,8 @@ template <typename MatrixBase, typename ValueType> struct SetValueType {
                                 typename MatrixBase::format_type>;
 };
 
-template <typename MatrixBase, typename FormatType> struct SetFormatType {
+template <typename MatrixBase, typename FormatType>
+struct SetFormatType {
   static_assert(std::is_void<typename MatrixBase::format_type>::value,
                 "Morpheus Error: More than one formats given");
   using type = MatrixTraitsBase<typename MatrixBase::index_type,
@@ -72,7 +76,8 @@ template <typename MatrixBase, typename FormatType> struct SetFormatType {
                                 typename MatrixBase::memory_space>;
 };
 
-template <typename MatrixBase, typename MemorySpace> struct SetMemorySpace {
+template <typename MatrixBase, typename MemorySpace>
+struct SetMemorySpace {
   static_assert(std::is_void<typename MatrixBase::memory_space>::value,
                 "Morpheus Error: More than one memory spaces given");
   using type = MatrixTraitsBase<typename MatrixBase::index_type,
@@ -80,7 +85,8 @@ template <typename MatrixBase, typename MemorySpace> struct SetMemorySpace {
                                 typename MatrixBase::format_type, MemorySpace>;
 };
 
-template <typename Base, typename... Traits> struct AnalyzeMatrix;
+template <typename Base, typename... Traits>
+struct AnalyzeMatrix;
 
 // FIXME: Should work when both index and value types are ints
 template <typename Base, typename T, typename... Traits>
@@ -103,7 +109,8 @@ struct AnalyzeMatrix<Base, T, Traits...>
                                                  Base>>>>>>::type,
           Traits...> {};
 
-template <typename Base> struct AnalyzeMatrix<Base> {
+template <typename Base>
+struct AnalyzeMatrix<Base> {
   // static constexpr auto execution_space_is_defaulted =
   //     std::is_void<typename Base::execution_space>::value;
 
@@ -148,6 +155,6 @@ struct MatrixTraits : AnalyzeMatrix<MatrixTraitsBase<>, Traits...>::type {
   MatrixTraits(MatrixTraits<Args...> const &p) : base_t(p) {}
   MatrixTraits() = default;
 };
-} // namespace Impl
-} // namespace Morpheus
-#endif // MORPHEUS_CORE_MATRIX_TRAITS_HPP
+}  // namespace Impl
+}  // namespace Morpheus
+#endif  // MORPHEUS_CORE_MATRIX_TRAITS_HPP
