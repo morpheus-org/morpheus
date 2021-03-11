@@ -1,7 +1,7 @@
 /**
  * version.hpp
  * 
- * Edinburgh Parallel Computing Centre (EPCC)
+ * EPCC, The University of Edinburgh
  * 
  * (c) 2021 The University of Edinburgh
  * 
