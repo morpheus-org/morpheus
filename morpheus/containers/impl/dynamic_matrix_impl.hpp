@@ -25,13 +25,27 @@
 #define MORPHEUS_CONTAINERS_DYNAMIC_MATRIX_IMPL_HPP
 
 #include <string>
-#include <variant>
+
+#include <morpheus/core/matrix_proxy.hpp>
 
 #include <morpheus/containers/coo_matrix.hpp>
 #include <morpheus/containers/csr_matrix.hpp>
 #include <morpheus/containers/dia_matrix.hpp>
 
 namespace Morpheus {
+
+template <class... Properties>
+struct MatrixFormats {
+  using formats_proxy =
+      typename MatrixFormatsProxy<CooMatrix<Properties...>,
+                                  CsrMatrix<Properties...>,
+                                  DiaMatrix<Properties...>>::type;
+  using variant   = typename formats_proxy::variant;
+  using type_list = typename formats_proxy::type_list;
+};
+// Enums should be in the same order as types in MatrixFormatsProxy
+enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT };
+
 namespace Impl {
 template <typename IndexType, typename ValueType>
 struct any_type_resize {
@@ -103,15 +117,33 @@ struct any_type_get_nnnz {
     return mat.nnnz();
   }
 };
+
+template <size_t I, typename... Properties>
+struct activate_impl {
+  using variant   = typename MatrixFormats<Properties...>::variant;
+  using type_list = typename MatrixFormats<Properties...>::type_list;
+
+  static void activate(variant &A, size_t idx) {
+    if (idx == I - 1) {
+      A = typename type_list::template type<I - 1>{};
+    } else {
+      activate_impl<I - 1, Properties...>::activate(A, idx);
+    }
+  }
+};
+
+// Base case, activate to the first type in the variant
+template <typename... Properties>
+struct activate_impl<0, Properties...> {
+  using variant   = typename MatrixFormats<Properties...>::variant;
+  using type_list = typename MatrixFormats<Properties...>::type_list;
+
+  static void activate(variant &A, size_t idx) {
+    activate_impl<1, Properties...>::activate(A, 0);
+  }
+};
+
 }  // namespace Impl
-
-template <class... Properties>
-using MatrixFormats =
-    std::variant<CooMatrix<Properties...>, CsrMatrix<Properties...>,
-                 DiaMatrix<Properties...>>;
-
-enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT };
-
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_CONTAINERS_DYNAMIC_MATRIX_IMPL_HPP

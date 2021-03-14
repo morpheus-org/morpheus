@@ -26,6 +26,7 @@ endfunction()
 set( SOURCES_IDIOMATIC_EXAMPLES
     version.cpp
     dynamic_resize.cpp
+    switch_interface.cpp
 )
 
 string( REPLACE ".cpp" "" BASENAMES_IDIOMATIC_EXAMPLES "${SOURCES_IDIOMATIC_EXAMPLES}" )

@@ -84,22 +84,19 @@ class DynamicMatrix : public Impl::MatrixTraits<FormatType<Impl::DynamicFormat>,
   inline int active_index() { return _formats.index(); }
 
   inline void activate(formats_e index) {
-    switch (index) {
-      case COO_FORMAT: _formats = CooMatrix<Properties...>{}; break;
-      case CSR_FORMAT: _formats = CsrMatrix<Properties...>{}; break;
-      case DIA_FORMAT: _formats = DiaMatrix<Properties...>{}; break;
+    const int size =
+        std::variant_size_v<typename MatrixFormats<Properties...>::variant>;
 
-      default:
-        std::cout << "Warning: Invalid Index (" << index << ")" << std::endl;
-        break;
-    }
+    Impl::activate_impl<size, Properties...>::activate(_formats,
+                                                       static_cast<int>(index));
   }
+
   // Enable switching through direct integer indexing
   inline void activate(int index) { activate(static_cast<formats_e>(index)); }
 
  private:
   std::string _name = "DynamicMatrix";
-  MatrixFormats<Properties...> _formats;
+  typename MatrixFormats<Properties...>::variant _formats;
 };
 }  // namespace Morpheus
 
