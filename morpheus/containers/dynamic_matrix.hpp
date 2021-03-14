@@ -27,87 +27,10 @@
 #include <string>
 #include <variant>
 
-#include <morpheus/containers/coo_matrix.hpp>
-#include <morpheus/containers/csr_matrix.hpp>
-#include <morpheus/containers/dia_matrix.hpp>
+#include <morpheus/containers/impl/dynamic_matrix_impl.hpp>
 #include <morpheus/core/matrix_traits.hpp>
 
 namespace Morpheus {
-namespace Impl {
-template <typename IndexType, typename ValueType>
-struct any_type_resize {
-  using result_type = void;
-
-  // Specialization for Coo resize with three arguments
-  template <typename... Args>
-  result_type operator()(CooMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz) {
-    mat.resize(nrows, ncols, nnnz);
-  }
-
-  // Specialization for Csr resize with three arguments
-  template <typename... Args>
-  result_type operator()(CsrMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz) {
-    mat.resize(nrows, ncols, nnnz);
-  }
-
-  // Specialization for Dia resize with four arguments
-  template <typename... Args>
-  result_type operator()(DiaMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz, IndexType ndiag) {
-    mat.resize(nrows, ncols, nnnz, ndiag);
-  }
-
-  // Specialization for Dia resize with five arguments
-  template <typename... Args>
-  result_type operator()(DiaMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz, IndexType ndiag,
-                         IndexType alignment) {
-    mat.resize(nrows, ncols, nnnz, ndiag, alignment);
-  }
-  // Specialization for any other case and dummy overlads
-  // eg Resize with four arguments is not supported by Coo
-  //    though needed for compiling dynamic matrix interface
-  template <typename T, typename... Args>
-  result_type operator()(T &mat, Args &&...args) {
-    // TODO: Find another way to disable the execution of those overloads
-    //       preferably at compile time.
-
-    throw std::runtime_error(
-        "Error::Invalid use of the dynamic resize interface");
-  }
-};
-
-struct any_type_get_name {
-  using result_type = std::string;
-  template <typename T>
-  result_type operator()(T &mat) const {
-    return mat.name();
-  }
-};
-
-struct any_type_get_nrows {
-  template <typename T>
-  typename T::index_type operator()(T &mat) const {
-    return mat.nrows();
-  }
-};
-
-struct any_type_get_ncols {
-  template <typename T>
-  typename T::index_type operator()(T &mat) const {
-    return mat.ncols();
-  }
-};
-
-struct any_type_get_nnnz {
-  template <typename T>
-  typename T::index_type operator()(T &mat) const {
-    return mat.nnnz();
-  }
-};
-}  // namespace Impl
 
 // example:
 // DynamicMatrix<int, double, memspace, formatspace>;
@@ -127,12 +50,6 @@ class DynamicMatrix : public Impl::MatrixTraits<FormatType<Impl::DynamicFormat>,
   using reference       = DynamicMatrix &;
   using const_reference = const DynamicMatrix &;
 
- private:
-  using MatrixFormats = std::variant<
-      Morpheus::CooMatrix<int, double>, Morpheus::CsrMatrix<int, double>,
-      Morpheus::DiaMatrix<int, double>, Morpheus::CooMatrix<int, double>>;
-
- public:
   inline DynamicMatrix() = default;
 
   template <typename Format>
@@ -166,11 +83,23 @@ class DynamicMatrix : public Impl::MatrixTraits<FormatType<Impl::DynamicFormat>,
 
   inline int active_index() { return _formats.index(); }
 
-  // inline MatrixFormats& formats(){ return _formats; }
+  inline void activate(formats_e index) {
+    switch (index) {
+      case COO_FORMAT: _formats = CooMatrix<Properties...>{}; break;
+      case CSR_FORMAT: _formats = CsrMatrix<Properties...>{}; break;
+      case DIA_FORMAT: _formats = DiaMatrix<Properties...>{}; break;
+
+      default:
+        std::cout << "Warning: Invalid Index (" << index << ")" << std::endl;
+        break;
+    }
+  }
+  // Enable switching through direct integer indexing
+  inline void activate(int index) { activate(static_cast<formats_e>(index)); }
 
  private:
   std::string _name = "DynamicMatrix";
-  MatrixFormats _formats;
+  MatrixFormats<Properties...> _formats;
 };
 }  // namespace Morpheus
 
