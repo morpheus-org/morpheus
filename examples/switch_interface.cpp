@@ -2,7 +2,7 @@
 #include <morpheus/containers/dynamic_matrix.hpp>
 
 int main() {
-  Morpheus::DynamicMatrix<int, double> A;
+  Morpheus::DynamicMatrix<double, int> A;
   std::cout << "Active Index: " << A.active_index() << std::endl;
 
   // Switch through available enums
