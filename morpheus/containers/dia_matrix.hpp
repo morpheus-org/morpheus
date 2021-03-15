@@ -45,14 +45,6 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   using value_type = typename traits::value_type;
   using tag        = typename FormatTag<DiaTag>::tag;
 
-  // TODO: Use Morpheus::array instead of std::vector
-  using index_array_type = std::vector<index_type>;
-  // TODO: Use Morpheus::dense_matrix instead of std::vector
-  using value_array_type = std::vector<value_type>;
-
-  index_array_type diagonal_offsets;
-  value_array_type values;
-
   // Construct an empty DiaMatrix
   inline DiaMatrix() {}
 
@@ -67,7 +59,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
       : _m(num_rows),
         _n(num_cols),
         _nnz(num_entries),
-        diagonal_offsets(num_diagonals) {
+        _diagonal_offsets(num_diagonals) {
     // TODO: DiaMatrix(...)
     Morpheus::NotImplementedException("DiaMatrix(...)");
   }
@@ -110,7 +102,14 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
     Morpheus::NotImplementedException(
         "DiaMatrix.operator=(const MatrixType& matrix)");
   }
+  // Accessors
+  inline const index_type doff(const index_type idx) const {
+    return _diagonal_offsets[idx];
+  }
 
+  inline value_type val(const index_type idx) const { return _values[idx]; }
+
+  // Unified routines across all formats
   inline std::string name() const { return _name; }
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
@@ -119,6 +118,14 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
  private:
   std::string _name = "DiaMatrix";
   index_type _m, _n, _nnz;
+
+  // TODO: Use Morpheus::array instead of std::vector
+  using index_array_type = std::vector<index_type>;
+  // TODO: Use Morpheus::dense_matrix instead of std::vector
+  using value_array_type = std::vector<value_type>;
+
+  index_array_type _diagonal_offsets;
+  value_array_type _values;
 };
 }  // namespace Morpheus
 

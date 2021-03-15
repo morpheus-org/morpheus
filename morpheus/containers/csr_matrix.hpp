@@ -45,14 +45,6 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
   using value_type = typename traits::value_type;
   using tag        = typename FormatTag<CsrTag>::tag;
 
-  // TODO: Use Morpheus::array instead of std::vector
-  using index_array_type = std::vector<index_type>;
-  using value_array_type = std::vector<value_type>;
-
-  // TODO: Make arrays private
-  index_array_type row_offsets, column_indices;
-  value_array_type values;
-
   // Construct an empty CsrMatrix
   inline CsrMatrix() {}
 
@@ -62,9 +54,9 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
       : _m(num_rows),
         _n(num_cols),
         _nnz(num_entries),
-        row_offsets(num_rows + 1),
-        column_indices(num_entries),
-        values(num_entries) {}
+        _row_offsets(num_rows + 1),
+        _column_indices(num_entries),
+        _values(num_entries) {}
 
   // Construct from another matrix type
   template <typename MatrixType>
@@ -79,9 +71,9 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
     _m   = num_rows;
     _n   = num_cols;
     _nnz = num_entries;
-    row_offsets.resize(_m + 1);
-    column_indices.resize(_nnz);
-    values.resize(_nnz);
+    _row_offsets.resize(_m + 1);
+    _column_indices.resize(_nnz);
+    _values.resize(_nnz);
   }
 
   // Swap the contents of two CsrMatrix objects.
@@ -99,6 +91,18 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
         "CsrMatrix.operator=(const MatrixType& matrix)");
   }
 
+  // Accessors
+  inline const index_type roff(const index_type idx) const {
+    return _row_offsets[idx];
+  }
+
+  inline const index_type cind(const index_type idx) const {
+    return _column_indices[idx];
+  }
+
+  inline value_type val(const index_type idx) const { return _values[idx]; }
+
+  // Unified routines across all formats
   inline std::string name() const { return _name; }
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
@@ -107,6 +111,13 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
  private:
   std::string _name = "CsrMatrix";
   index_type _m, _n, _nnz;
+
+  // TODO: Use Morpheus::array instead of std::vector
+  using index_array_type = std::vector<index_type>;
+  using value_array_type = std::vector<value_type>;
+
+  index_array_type _row_offsets, _column_indices;
+  value_array_type _values;
 };
 }  // namespace Morpheus
 
