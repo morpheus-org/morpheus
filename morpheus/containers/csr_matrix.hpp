@@ -34,7 +34,7 @@
 
 namespace Morpheus {
 
-struct CsrTag : public Impl::MatrixTag {};
+struct CsrTag : public Impl::SparseMatTag {};
 
 template <class... Properties>
 class CsrMatrix : public Impl::MatrixTraits<Properties...> {

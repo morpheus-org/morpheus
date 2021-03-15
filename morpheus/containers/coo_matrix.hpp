@@ -34,7 +34,7 @@
 
 namespace Morpheus {
 
-struct CooTag : public Impl::MatrixTag {};
+struct CooTag : public Impl::SparseMatTag {};
 
 template <class... Properties>
 class CooMatrix : public Impl::MatrixTraits<Properties...> {

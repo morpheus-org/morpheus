@@ -34,7 +34,7 @@
 
 namespace Morpheus {
 
-struct DiaTag : public Impl::MatrixTag {};
+struct DiaTag : public Impl::SparseMatTag {};
 
 template <class... Properties>
 class DiaMatrix : public Impl::MatrixTraits<Properties...> {

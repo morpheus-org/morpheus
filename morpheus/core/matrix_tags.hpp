@@ -28,6 +28,9 @@ namespace Morpheus {
 
 namespace Impl {
 struct MatrixTag {};
+
+struct SparseMatTag : public Impl::MatrixTag {};
+struct DenseMatTag : public Impl::MatrixTag {};
 }  // namespace Impl
 
 // Format Tag Wrapper
