@@ -24,100 +24,105 @@
 #ifndef MORPHEUS_CORE_MATRIX_TRAITS_HPP
 #define MORPHEUS_CORE_MATRIX_TRAITS_HPP
 
-#include <morpheus/core/concepts.hpp>
+#include <type_traits>
 
 namespace Morpheus {
 
 namespace Impl {
-template <typename IndexType = void, typename ValueType = void,
-          typename MemorySpace = void>
-struct MatrixTraitsBase {
-  using type         = MatrixTraitsBase<IndexType, ValueType, MemorySpace>;
-  using index_type   = IndexType;
-  using value_type   = ValueType;
-  using memory_space = MemorySpace;
+
+/** @class MatrixTraits
+ * @brief Traits class for accessing attributes of a Matrix
+ *
+ * Template argument options:
+ *  - MatrixTraits<ValueType>
+ *  - MatrixTraits<ValueType, IndexType>
+ * TODO: - MatrixTraits<ValueType, IndexType, Space>
+ * TODO: - MatrixTraits<ValueType, Space>
+ */
+template <typename ValueType, class... Properties>
+struct MatrixTraits;
+
+template <>
+struct MatrixTraits<void> {
+  using index_type      = void;
+  using execution_space = void;
+  using memory_space    = void;
 };
 
-template <typename MatrixBase, typename IndexType>
-struct SetIndexType {
-  static_assert(std::is_void<typename MatrixBase::index_type>::value,
-                "Morpheus Error: More than one index types given");
-  using type = MatrixTraitsBase<IndexType, typename MatrixBase::value_type,
-                                typename MatrixBase::memory_space>;
+template <class... Prop>
+struct MatrixTraits<void, void, Prop...> {
+  // Ignore an extraneous 'void'
+
+  using index_type      = typename MatrixTraits<void, Prop...>::index_type;
+  using execution_space = typename MatrixTraits<void, Prop...>::execution_space;
+  using memory_space    = typename MatrixTraits<void, Prop...>::memory_space;
 };
 
-template <typename MatrixBase, typename ValueType>
-struct SetValueType {
-  static_assert(std::is_void<typename MatrixBase::value_type>::value,
-                "Morpheus Error: More than one value types given");
-  using type = MatrixTraitsBase<typename MatrixBase::index_type, ValueType,
-                                typename MatrixBase::memory_space>;
+template <typename IndexType, class... Prop>
+struct MatrixTraits<
+    typename std::enable_if_t<std::is_integral<IndexType>::value>, IndexType,
+    Prop...> {
+  // Specify index type, keep subsequent memory space arguments
+
+  using index_type      = IndexType;
+  using execution_space = typename MatrixTraits<void, Prop...>::execution_space;
+  using memory_space    = typename MatrixTraits<void, Prop...>::memory_space;
 };
 
-template <typename MatrixBase, typename MemorySpace>
-struct SetMemorySpace {
-  static_assert(std::is_void<typename MatrixBase::memory_space>::value,
-                "Morpheus Error: More than one memory spaces given");
-  using type = MatrixTraitsBase<typename MatrixBase::index_type,
-                                typename MatrixBase::value_type, MemorySpace>;
-};
+// TODO: Use with Kokkos spaces
+// template <class Space, class... Prop>
+// struct MatrixTraits<
+//     typename std::enable_if<Kokkos::Impl::is_space<Space>::value>::type,
+//     Space, Prop...> {
+//   // Specify Space, there should not be any other subsequent arguments.
 
-template <typename Base, typename... Traits>
-struct AnalyzeMatrix;
+//   static_assert(
+//       std::is_same_v<typename MatrixTraits<void, Prop...>::execution_space,
+//                      void> &&
+//           std::is_same_v<typename MatrixTraits<void, Prop...>::memory_space,
+//                          void>,
+//       "Only one Matrix Execution or Memory Space template argument");
 
-// FIXME: Should work when both index and value types are ints
-template <typename Base, typename T, typename... Traits>
-struct AnalyzeMatrix<Base, T, Traits...>
-    : public AnalyzeMatrix<
-          typename std::conditional_t<
-              is_index_type<T>::value, SetIndexType<Base, T>,
-              std::conditional_t<
-                  std::is_integral<T>::value, SetIndexType<Base, IndexType<T>>,
-                  std::conditional_t<
-                      is_value_type<T>::value, SetValueType<Base, T>,
-                      std::conditional_t<
-                          std::is_floating_point<T>::value ||
-                              std::is_integral<T>::value,
-                          SetValueType<Base, ValueType<T>>,
-                          std::conditional_t<is_memory_space<T>::value,
-                                             SetMemorySpace<Base, T>,
-                                             Base>>>>>::type,
-          Traits...> {};
+//   using index_type      = void;
+//   using execution_space = typename Space::execution_space;
+//   using memory_space    = typename Space::memory_space;
+// };
 
-template <typename Base>
-struct AnalyzeMatrix<Base> {
-  // static constexpr auto execution_space_is_defaulted =
-  //     std::is_void<typename Base::execution_space>::value;
+template <class ValueType, class... Properties>
+struct MatrixTraits {
+ private:
+  // Unpack first the properties arguments
+  using prop = MatrixTraits<void, Properties...>;
 
-  using index_type = typename std::conditional<
-      std::is_void<typename Base::index_type>::value, IndexType<int>,
-      // nasty hack to make index_type into an integral_type
-      // instead of the wrapped IndexType<T> for backwards compatibility
-      typename Base::index_type>::type::type;
+  using IndexType = typename std::conditional_t<
+      !std::is_same_v<typename prop::index_type, void>,
+      typename prop::index_type, int>;
 
-  using value_type = typename std::conditional<
-      std::is_void<typename Base::value_type>::value, ValueType<double>,
-      // nasty hack to make value_type into an integral_type
-      // instead of the wrapped ValueType<T> for backwards compatibility
-      typename Base::value_type>::type::type;
+  // TODO: Use with Kokkos spaces
+  // using ExecutionSpace = typename std::conditional_t<
+  //     !std::is_same_v<typename prop::execution_space, void>,
+  //     typename prop::execution_space, Kokkos::DefaultExecutionSpace>;
+  using ExecutionSpace = void;  // Set to void for now
 
-  using memory_space = typename Base::memory_space;
-  // TODO
-  // using memory_space =
-  //     typename std::conditional<is_void<typename Base::memory_space>::value,
-  //                                 DefaultMemorySpace,
-  //                                 typename Base::memory_space>::type;
+  // TODO: Use with Kokkos spaces
+  // using MemorySpace = typename std::conditional_t<
+  //     !std::is_same_v<typename prop::memory_space, void>,
+  //     typename prop::memory_space, typename
+  //     ExecutionSpace::memory_space>;
+  using MemorySpace = void;  // Set to void for now
 
-  using type = MatrixTraitsBase<index_type, value_type, memory_space>;
-};
+  // Check the validity of ValueType
+  static_assert(std::is_arithmetic_v<ValueType>,
+                "ValueType must be an arithmetic type such as int or double");
 
-template <typename... Traits>
-struct MatrixTraits : AnalyzeMatrix<MatrixTraitsBase<>, Traits...>::type {
-  using base_t = typename AnalyzeMatrix<MatrixTraitsBase<>, Traits...>::type;
+ public:
+  using value_type = ValueType;
+  using index_type = IndexType;
 
-  template <class... Args>
-  MatrixTraits(MatrixTraits<Args...> const &p) : base_t(p) {}
-  MatrixTraits() = default;
+  using execution_space = ExecutionSpace;
+  using memory_space    = MemorySpace;
+  // TODO: Use with Kokkos Device
+  // using device_type       = Kokkos::Device<ExecutionSpace, MemorySpace>;
 };
 }  // namespace Impl
 }  // namespace Morpheus
