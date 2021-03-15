@@ -111,10 +111,10 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
         "DiaMatrix.operator=(const MatrixType& matrix)");
   }
 
-  inline std::string name() { return _name; }
-  inline index_type nrows() { return _m; }
-  inline index_type ncols() { return _n; }
-  inline index_type nnnz() { return _nnz; }
+  inline std::string name() const { return _name; }
+  inline index_type nrows() const { return _m; }
+  inline index_type ncols() const { return _n; }
+  inline index_type nnnz() const { return _nnz; }
 
  private:
   std::string _name = "DiaMatrix";

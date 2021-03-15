@@ -27,6 +27,7 @@
 #include <string>
 
 #include <morpheus/core/matrix_proxy.hpp>
+#include <morpheus/core/matrix_traits.hpp>
 
 #include <morpheus/containers/coo_matrix.hpp>
 #include <morpheus/containers/csr_matrix.hpp>
@@ -47,40 +48,41 @@ struct MatrixFormats {
 enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT };
 
 namespace Impl {
-template <typename IndexType, typename ValueType>
-struct any_type_resize {
+
+template <class... Properties>
+struct any_type_resize : public Impl::MatrixTraits<Properties...> {
+  using traits      = Impl::MatrixTraits<Properties...>;
+  using index_type  = typename traits::index_type;
+  using value_type  = typename traits::value_type;
   using result_type = void;
 
   // Specialization for Coo resize with three arguments
   template <typename... Args>
-  result_type operator()(CooMatrix<IndexType, ValueType> &mat,
-                         const IndexType nrows, const IndexType ncols,
-                         const IndexType nnnz) {
+  result_type operator()(CooMatrix<Properties...> &mat, const index_type nrows,
+                         const index_type ncols, const index_type nnnz) {
     mat.resize(nrows, ncols, nnnz);
   }
 
   // Specialization for Csr resize with three arguments
   template <typename... Args>
-  result_type operator()(CsrMatrix<IndexType, ValueType> &mat,
-                         const IndexType nrows, const IndexType ncols,
-                         const IndexType nnnz) {
+  result_type operator()(CsrMatrix<Properties...> &mat, const index_type nrows,
+                         const index_type ncols, const index_type nnnz) {
     mat.resize(nrows, ncols, nnnz);
   }
 
   // Specialization for Dia resize with four arguments
   template <typename... Args>
-  result_type operator()(DiaMatrix<IndexType, ValueType> &mat,
-                         const IndexType nrows, const IndexType ncols,
-                         const IndexType nnnz, const IndexType ndiag) {
+  result_type operator()(DiaMatrix<Properties...> &mat, const index_type nrows,
+                         const index_type ncols, const index_type nnnz,
+                         const index_type ndiag) {
     mat.resize(nrows, ncols, nnnz, ndiag);
   }
 
   // Specialization for Dia resize with five arguments
   template <typename... Args>
-  result_type operator()(DiaMatrix<IndexType, ValueType> &mat,
-                         const IndexType nrows, const IndexType ncols,
-                         const IndexType nnnz, const IndexType ndiag,
-                         const IndexType alignment) {
+  result_type operator()(DiaMatrix<Properties...> &mat, const index_type nrows,
+                         const index_type ncols, const index_type nnnz,
+                         const index_type ndiag, const index_type alignment) {
     mat.resize(nrows, ncols, nnnz, ndiag, alignment);
   }
   // Specialization for any other case and dummy overlads
@@ -96,28 +98,28 @@ struct any_type_resize {
 struct any_type_get_name {
   using result_type = std::string;
   template <typename T>
-  result_type operator()(T &mat) const {
+  result_type operator()(const T &mat) const {
     return mat.name();
   }
 };
 
 struct any_type_get_nrows {
   template <typename T>
-  typename T::index_type const operator()(const T &mat) const {
+  typename T::index_type operator()(const T &mat) const {
     return mat.nrows();
   }
 };
 
 struct any_type_get_ncols {
   template <typename T>
-  typename T::index_type const operator()(const T &mat) const {
+  typename T::index_type operator()(const T &mat) const {
     return mat.ncols();
   }
 };
 
 struct any_type_get_nnnz {
   template <typename T>
-  typename T::index_type const operator()(const T &mat) const {
+  typename T::index_type operator()(const T &mat) const {
     return mat.nnnz();
   }
 };

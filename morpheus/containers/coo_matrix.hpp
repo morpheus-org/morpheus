@@ -90,11 +90,15 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   }
 
   // Accessors
-  inline index_type rind(const index_type idx) { return _row_indices[idx]; }
+  inline const index_type rind(const index_type idx) const {
+    return _row_indices[idx];
+  }
 
-  inline index_type cind(const index_type idx) { return _column_indices[idx]; }
+  inline const index_type cind(const index_type idx) const {
+    return _column_indices[idx];
+  }
 
-  inline value_type val(const index_type idx) { return _values[idx]; }
+  inline value_type val(const index_type idx) const { return _values[idx]; }
 
   // Operations specific to COO format
 
@@ -125,10 +129,10 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
 
   // Unified routines across all formats
 
-  inline std::string name() { return _name; }
-  inline const index_type nrows() { return _m; }
-  inline const index_type ncols() { return _n; }
-  inline const index_type nnnz() { return _nnz; }
+  inline std::string name() const { return _name; }
+  inline index_type nrows() const { return _m; }
+  inline index_type ncols() const { return _n; }
+  inline index_type nnnz() const { return _nnz; }
 
  private:
   std::string _name = "CooMatrix";

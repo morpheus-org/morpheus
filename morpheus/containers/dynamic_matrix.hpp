@@ -57,34 +57,35 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   inline DynamicMatrix(const Format &mat) : _formats(mat) {}
 
   template <typename... Args>
-  inline void resize(int m, int n, int nnz, Args &&...args) {
-    return std::visit(std::bind(Impl::any_type_resize<index_type, value_type>(),
-                                std::placeholders::_1, m, n, nnz,
-                                std::forward<Args>(args)...),
-                      _formats);
+  inline void resize(const index_type m, const index_type n,
+                     const index_type nnz, Args &&...args) {
+    return std::visit(
+        std::bind(Impl::any_type_resize<Properties...>(), std::placeholders::_1,
+                  m, n, nnz, std::forward<Args>(args)...),
+        _formats);
   }
 
-  inline std::string name() { return _name; }
+  inline std::string name() const { return _name; }
 
-  inline const index_type nrows() {
+  inline index_type nrows() const {
     return std::visit(Impl::any_type_get_nrows(), _formats);
   }
 
-  inline const index_type ncols() {
+  inline index_type ncols() const {
     return std::visit(Impl::any_type_get_ncols(), _formats);
   }
 
-  inline const index_type nnnz() {
+  inline index_type nnnz() const {
     return std::visit(Impl::any_type_get_nnnz(), _formats);
   }
 
-  inline std::string active_name() {
+  inline std::string active_name() const {
     return std::visit(Impl::any_type_get_name(), _formats);
   }
 
-  inline int active_index() { return _formats.index(); }
+  inline int active_index() const { return _formats.index(); }
 
-  inline void activate(formats_e index) {
+  inline void activate(const formats_e index) {
     const int size =
         std::variant_size_v<typename MatrixFormats<Properties...>::variant>;
 
@@ -93,7 +94,9 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   }
 
   // Enable switching through direct integer indexing
-  inline void activate(int index) { activate(static_cast<formats_e>(index)); }
+  inline void activate(const int index) {
+    activate(static_cast<formats_e>(index));
+  }
 
  private:
   std::string _name = "DynamicMatrix";
