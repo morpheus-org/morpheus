@@ -30,17 +30,20 @@
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
+#include <morpheus/core/matrix_tags.hpp>
 
 namespace Morpheus {
+
+struct DiaTag : public Impl::MatrixTag {};
+
 template <class... Properties>
-class DiaMatrix
-    : public Impl::MatrixTraits<FormatType<Impl::DiaFormat>, Properties...> {
+class DiaMatrix : public Impl::MatrixTraits<Properties...> {
  public:
-  using type   = DiaMatrix<Properties...>;
-  using traits = Impl::MatrixTraits<FormatType<Impl::DiaFormat>, Properties...>;
-  using index_type  = typename traits::index_type;
-  using value_type  = typename traits::value_type;
-  using format_type = typename traits::format_type;
+  using type       = DiaMatrix<Properties...>;
+  using traits     = Impl::MatrixTraits<Properties...>;
+  using index_type = typename traits::index_type;
+  using value_type = typename traits::value_type;
+  using tag        = typename FormatTag<DiaTag>::tag;
 
   // TODO: Use Morpheus::array instead of std::vector
   using index_array_type = std::vector<index_type>;

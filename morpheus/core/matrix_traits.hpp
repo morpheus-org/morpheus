@@ -25,28 +25,17 @@
 #define MORPHEUS_CORE_MATRIX_TRAITS_HPP
 
 #include <morpheus/core/concepts.hpp>
-#include <morpheus/core/matrix_tags.hpp>
 
 namespace Morpheus {
 
-// Format Wrapper Type
-template <class T>
-struct FormatType {
-  static_assert(std::is_base_of<Morpheus::Impl::MatrixTag, T>::value,
-                "Morpheus: Invalid Format<> type.");
-  using format_type = FormatType;
-  using type        = T;
-};
-
 namespace Impl {
 template <typename IndexType = void, typename ValueType = void,
-          typename FormatType = void, typename MemorySpace = void>
+          typename MemorySpace = void>
 struct MatrixTraitsBase {
-  using type = MatrixTraitsBase<IndexType, ValueType, FormatType, MemorySpace>;
+  using type         = MatrixTraitsBase<IndexType, ValueType, MemorySpace>;
   using index_type   = IndexType;
   using value_type   = ValueType;
   using memory_space = MemorySpace;
-  using format_type  = FormatType;
 };
 
 template <typename MatrixBase, typename IndexType>
@@ -54,8 +43,7 @@ struct SetIndexType {
   static_assert(std::is_void<typename MatrixBase::index_type>::value,
                 "Morpheus Error: More than one index types given");
   using type = MatrixTraitsBase<IndexType, typename MatrixBase::value_type,
-                                typename MatrixBase::memory_space,
-                                typename MatrixBase::format_type>;
+                                typename MatrixBase::memory_space>;
 };
 
 template <typename MatrixBase, typename ValueType>
@@ -63,16 +51,6 @@ struct SetValueType {
   static_assert(std::is_void<typename MatrixBase::value_type>::value,
                 "Morpheus Error: More than one value types given");
   using type = MatrixTraitsBase<typename MatrixBase::index_type, ValueType,
-                                typename MatrixBase::memory_space,
-                                typename MatrixBase::format_type>;
-};
-
-template <typename MatrixBase, typename FormatType>
-struct SetFormatType {
-  static_assert(std::is_void<typename MatrixBase::format_type>::value,
-                "Morpheus Error: More than one formats given");
-  using type = MatrixTraitsBase<typename MatrixBase::index_type,
-                                typename MatrixBase::value_type, FormatType,
                                 typename MatrixBase::memory_space>;
 };
 
@@ -81,8 +59,7 @@ struct SetMemorySpace {
   static_assert(std::is_void<typename MatrixBase::memory_space>::value,
                 "Morpheus Error: More than one memory spaces given");
   using type = MatrixTraitsBase<typename MatrixBase::index_type,
-                                typename MatrixBase::value_type,
-                                typename MatrixBase::format_type, MemorySpace>;
+                                typename MatrixBase::value_type, MemorySpace>;
 };
 
 template <typename Base, typename... Traits>
@@ -102,11 +79,9 @@ struct AnalyzeMatrix<Base, T, Traits...>
                           std::is_floating_point<T>::value ||
                               std::is_integral<T>::value,
                           SetValueType<Base, ValueType<T>>,
-                          std::conditional_t<
-                              is_format_type<T>::value, SetFormatType<Base, T>,
-                              std::conditional_t<is_memory_space<T>::value,
-                                                 SetMemorySpace<Base, T>,
-                                                 Base>>>>>>::type,
+                          std::conditional_t<is_memory_space<T>::value,
+                                             SetMemorySpace<Base, T>,
+                                             Base>>>>>::type,
           Traits...> {};
 
 template <typename Base>
@@ -133,18 +108,7 @@ struct AnalyzeMatrix<Base> {
   //                                 DefaultMemorySpace,
   //                                 typename Base::memory_space>::type;
 
-  // using format_type = typename Base::format_type;
-  // TODO
-  using format_type =
-      typename std::conditional<std::is_void<typename Base::format_type>::value,
-                                FormatType<CooFormat>::format_type,
-                                typename Base::format_type>::type;
-  // static_assert(std::is_void<typename Base::format_type>::value,
-  //                 "Morpheus Error: Matrix format_type is not specified.");
-  // using format_type = typename Base::format_type;
-
-  using type =
-      MatrixTraitsBase<index_type, value_type, format_type, memory_space>;
+  using type = MatrixTraitsBase<index_type, value_type, memory_space>;
 };
 
 template <typename... Traits>

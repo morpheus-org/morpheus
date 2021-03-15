@@ -53,30 +53,34 @@ struct any_type_resize {
 
   // Specialization for Coo resize with three arguments
   template <typename... Args>
-  result_type operator()(CooMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz) {
+  result_type operator()(CooMatrix<IndexType, ValueType> &mat,
+                         const IndexType nrows, const IndexType ncols,
+                         const IndexType nnnz) {
     mat.resize(nrows, ncols, nnnz);
   }
 
   // Specialization for Csr resize with three arguments
   template <typename... Args>
-  result_type operator()(CsrMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz) {
+  result_type operator()(CsrMatrix<IndexType, ValueType> &mat,
+                         const IndexType nrows, const IndexType ncols,
+                         const IndexType nnnz) {
     mat.resize(nrows, ncols, nnnz);
   }
 
   // Specialization for Dia resize with four arguments
   template <typename... Args>
-  result_type operator()(DiaMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz, IndexType ndiag) {
+  result_type operator()(DiaMatrix<IndexType, ValueType> &mat,
+                         const IndexType nrows, const IndexType ncols,
+                         const IndexType nnnz, const IndexType ndiag) {
     mat.resize(nrows, ncols, nnnz, ndiag);
   }
 
   // Specialization for Dia resize with five arguments
   template <typename... Args>
-  result_type operator()(DiaMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz, IndexType ndiag,
-                         IndexType alignment) {
+  result_type operator()(DiaMatrix<IndexType, ValueType> &mat,
+                         const IndexType nrows, const IndexType ncols,
+                         const IndexType nnnz, const IndexType ndiag,
+                         const IndexType alignment) {
     mat.resize(nrows, ncols, nnnz, ndiag, alignment);
   }
   // Specialization for any other case and dummy overlads
@@ -99,21 +103,21 @@ struct any_type_get_name {
 
 struct any_type_get_nrows {
   template <typename T>
-  typename T::index_type operator()(T &mat) const {
+  typename T::index_type const operator()(const T &mat) const {
     return mat.nrows();
   }
 };
 
 struct any_type_get_ncols {
   template <typename T>
-  typename T::index_type operator()(T &mat) const {
+  typename T::index_type const operator()(const T &mat) const {
     return mat.ncols();
   }
 };
 
 struct any_type_get_nnnz {
   template <typename T>
-  typename T::index_type operator()(T &mat) const {
+  typename T::index_type const operator()(const T &mat) const {
     return mat.nnnz();
   }
 };

@@ -30,17 +30,20 @@
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
+#include <morpheus/core/matrix_tags.hpp>
 
 namespace Morpheus {
+
+struct CsrTag : public Impl::MatrixTag {};
+
 template <class... Properties>
-class CsrMatrix
-    : public Impl::MatrixTraits<FormatType<Impl::CsrFormat>, Properties...> {
+class CsrMatrix : public Impl::MatrixTraits<Properties...> {
  public:
-  using type   = CsrMatrix<Properties...>;
-  using traits = Impl::MatrixTraits<FormatType<Impl::CsrFormat>, Properties...>;
-  using index_type  = typename traits::index_type;
-  using value_type  = typename traits::value_type;
-  using format_type = typename traits::format_type;
+  using type       = CsrMatrix<Properties...>;
+  using traits     = Impl::MatrixTraits<Properties...>;
+  using index_type = typename traits::index_type;
+  using value_type = typename traits::value_type;
+  using tag        = typename FormatTag<CsrTag>::tag;
 
   // TODO: Use Morpheus::array instead of std::vector
   using index_array_type = std::vector<index_type>;

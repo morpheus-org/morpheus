@@ -25,14 +25,18 @@
 #define MORPHEUS_CORE_MATRIX_TAGS_HPP
 
 namespace Morpheus {
+
 namespace Impl {
 struct MatrixTag {};
-// TODO: Move each format to its file
-struct CooFormat : public MatrixTag {};
-struct CsrFormat : public MatrixTag {};
-struct DiaFormat : public MatrixTag {};
-struct DynamicFormat : public MatrixTag {};
 }  // namespace Impl
 
+// Format Tag Wrapper
+template <class T>
+struct FormatTag {
+  static_assert(std::is_base_of<Impl::MatrixTag, T>::value,
+                "Morpheus: Invalid tag.");
+  using format_tag = FormatTag;
+  using tag        = T;
+};
 }  // namespace Morpheus
 #endif  // MORPHEUS_CORE_MATRIX_TAGS_HPP

@@ -29,23 +29,24 @@
 
 #include <morpheus/containers/impl/dynamic_matrix_impl.hpp>
 #include <morpheus/core/matrix_traits.hpp>
+#include <morpheus/core/matrix_tags.hpp>
 
 namespace Morpheus {
+
+struct DynamicTag : public Impl::MatrixTag {};
 
 // example:
 // DynamicMatrix<int, double, memspace, formatspace>;
 // where formatspace =
 // std::variant<CooMatrix<int,double>,CsrMatrix<int,double>...>
 template <class... Properties>
-class DynamicMatrix : public Impl::MatrixTraits<FormatType<Impl::DynamicFormat>,
-                                                Properties...> {
+class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
  public:
-  using type = DynamicMatrix<Properties...>;
-  using traits =
-      Impl::MatrixTraits<FormatType<Impl::DynamicFormat>, Properties...>;
-  using index_type  = typename traits::index_type;
-  using value_type  = typename traits::value_type;
-  using format_type = typename traits::format_type;
+  using type       = DynamicMatrix<Properties...>;
+  using traits     = Impl::MatrixTraits<Properties...>;
+  using index_type = typename traits::index_type;
+  using value_type = typename traits::value_type;
+  using tag        = typename FormatTag<DynamicTag>::tag;
 
   using reference       = DynamicMatrix &;
   using const_reference = const DynamicMatrix &;
@@ -65,15 +66,15 @@ class DynamicMatrix : public Impl::MatrixTraits<FormatType<Impl::DynamicFormat>,
 
   inline std::string name() { return _name; }
 
-  inline index_type nrows() {
+  inline const index_type nrows() {
     return std::visit(Impl::any_type_get_nrows(), _formats);
   }
 
-  inline index_type ncols() {
+  inline const index_type ncols() {
     return std::visit(Impl::any_type_get_ncols(), _formats);
   }
 
-  inline index_type nnnz() {
+  inline const index_type nnnz() {
     return std::visit(Impl::any_type_get_nnnz(), _formats);
   }
 
