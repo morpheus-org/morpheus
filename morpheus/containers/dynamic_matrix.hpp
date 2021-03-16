@@ -46,7 +46,7 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   using traits     = Impl::MatrixTraits<Properties...>;
   using index_type = typename traits::index_type;
   using value_type = typename traits::value_type;
-  using tag        = typename FormatTag<DynamicTag>::tag;
+  using tag        = typename MatrixFormatTag<DynamicTag>::tag;
 
   using reference       = DynamicMatrix &;
   using const_reference = const DynamicMatrix &;

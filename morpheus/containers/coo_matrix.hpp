@@ -43,7 +43,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   using traits     = Impl::MatrixTraits<Properties...>;
   using index_type = typename traits::index_type;
   using value_type = typename traits::value_type;
-  using tag        = typename FormatTag<CooTag>::tag;
+  using tag        = typename MatrixFormatTag<CooTag>::tag;
 
   // Construct an empty CooMatrix
   inline CooMatrix() {}

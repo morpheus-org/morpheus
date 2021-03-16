@@ -33,13 +33,14 @@ struct SparseMatTag : public Impl::MatrixTag {};
 struct DenseMatTag : public Impl::MatrixTag {};
 }  // namespace Impl
 
-// Format Tag Wrapper
+// Matrix Format Tag Wrapper
 template <class T>
-struct FormatTag {
+struct MatrixFormatTag {
   static_assert(std::is_base_of<Impl::MatrixTag, T>::value,
-                "Morpheus: Invalid tag.");
+                "Morpheus: Invalid Matrix Format tag.");
   using format_tag = FormatTag;
   using tag        = T;
 };
+
 }  // namespace Morpheus
 #endif  // MORPHEUS_CORE_MATRIX_TAGS_HPP

@@ -43,7 +43,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   using traits     = Impl::MatrixTraits<Properties...>;
   using index_type = typename traits::index_type;
   using value_type = typename traits::value_type;
-  using tag        = typename FormatTag<DiaTag>::tag;
+  using tag        = typename MatrixFormatTag<DiaTag>::tag;
 
   // Construct an empty DiaMatrix
   inline DiaMatrix() {}
