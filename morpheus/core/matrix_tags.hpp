@@ -38,7 +38,7 @@ template <class T>
 struct MatrixFormatTag {
   static_assert(std::is_base_of<Impl::MatrixTag, T>::value,
                 "Morpheus: Invalid Matrix Format tag.");
-  using format_tag = FormatTag;
+  using format_tag = MatrixFormatTag;
   using tag        = T;
 };
 

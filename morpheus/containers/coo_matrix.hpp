@@ -118,6 +118,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   bool is_sorted_by_row(void) {
     // TODO: CooMatrix.is_sorted_by_row
     Morpheus::NotImplementedException("CooMatrix.is_sorted_by_row()");
+    return true;
   }
 
   // Determine whether matrix elements are sorted by row and column index
@@ -125,6 +126,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
     // TODO: CooMatrix.is_sorted_by_row_and_column
     Morpheus::NotImplementedException(
         "CooMatrix.is_sorted_by_row_and_column()");
+    return true;
   }
 
   // Unified routines across all formats

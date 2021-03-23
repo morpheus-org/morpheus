@@ -1,11 +1,10 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.12)
 
 project(Morpheus
         VERSION 0.1.0)
 
 include(cmake/Modules/MorpheusVersion.cmake)
 include(cmake/Modules/MorpheusDependenciesConfigure.cmake)
-include(cmake/Modules/MorpheusOptionsCheck.cmake)
 
 enable_language(CXX)
 
@@ -30,30 +29,16 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
                                                "RelWithDebInfo")
 endif()
 
+IF(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+  MESSAGE(STATUS "Setting policy CMP0074 to use <Package>_ROOT variables")
+  CMAKE_POLICY(SET CMP0074 NEW)
+ENDIF()
+
 # Build options
 option(Morpheus_BUILD_TESTS "Configure CMake to build unit tests using CATCH2" OFF)
 option(Morpheus_BUILD_BENCHMARKS "Configure CMake to build benchmarks" OFF)
 option(Morpheus_BUILD_EXAMPLES "Configure CMake to build examples" OFF)
 option(Morpheus_INSTALL "Enable CMake install commands" ON)
-
-# set(Morpheus_PROGRAMMING_MODEL "THRUST" CACHE STRING "Programming model")
-# set_property(CACHE Morpheus_PROGRAMMING_MODEL PROPERTY STRINGS
-# 	"THRUST" "KOKKOS" "SYCL"
-#   )
-
-# set(Morpheus_BACKEND "CPP" CACHE STRING "Selected backend")
-# set_property(CACHE Morpheus_BACKEND PROPERTY STRINGS
-#   "CPP" "OMP" "CUDA" "ROCM"
-#   )
-
-# set(Morpheus_BLAS_LIB "AUTO" CACHE STRING "Library providing a BLAS interface")
-# set_property(CACHE Morpheus_BLAS_LIB PROPERTY STRINGS
-# 	"AUTO" "OPENBLAS" "MKL" "ACML" "ARMPL"
-#   )
-
-# Validate programming model and backend
-# morpheus_select_programming_model(${Morpheus_PROGRAMMING_MODEL})
-# morpheus_select_backend(${Morpheus_BACKEND})
 
 # Source files
 add_subdirectory(morpheus)

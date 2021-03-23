@@ -26,6 +26,7 @@
 
 #include <string>
 #include <variant>
+#include <functional>
 
 #include <morpheus/containers/impl/dynamic_matrix_impl.hpp>
 #include <morpheus/core/matrix_traits.hpp>
