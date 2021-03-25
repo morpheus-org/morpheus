@@ -25,7 +25,7 @@
 #define MORPHEUS_CORE_MATRIX_TRAITS_HPP
 
 #include <type_traits>
-#include <Kokkos_Core.hpp>
+#include <morpheus/core/core.hpp>
 
 namespace Morpheus {
 
