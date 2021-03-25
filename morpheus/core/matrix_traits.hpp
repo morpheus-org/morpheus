@@ -25,6 +25,7 @@
 #define MORPHEUS_CORE_MATRIX_TRAITS_HPP
 
 #include <type_traits>
+#include <Kokkos_Core.hpp>
 
 namespace Morpheus {
 
@@ -36,8 +37,8 @@ namespace Impl {
  * Template argument options:
  *  - MatrixTraits<ValueType>
  *  - MatrixTraits<ValueType, IndexType>
- * TODO: - MatrixTraits<ValueType, IndexType, Space>
- * TODO: - MatrixTraits<ValueType, Space>
+ *  - MatrixTraits<ValueType, IndexType, Space>
+ *  - MatrixTraits<ValueType, Space>
  */
 template <typename ValueType, class... Properties>
 struct MatrixTraits;
@@ -69,24 +70,23 @@ struct MatrixTraits<
   using memory_space    = typename MatrixTraits<void, Prop...>::memory_space;
 };
 
-// TODO: Use with Kokkos spaces
-// template <class Space, class... Prop>
-// struct MatrixTraits<
-//     typename std::enable_if<Kokkos::Impl::is_space<Space>::value>::type,
-//     Space, Prop...> {
-//   // Specify Space, there should not be any other subsequent arguments.
+template <class Space, class... Prop>
+struct MatrixTraits<
+    typename std::enable_if<Kokkos::Impl::is_space<Space>::value>::type, Space,
+    Prop...> {
+  // Specify Space, there should not be any other subsequent arguments.
 
-//   static_assert(
-//       std::is_same_v<typename MatrixTraits<void, Prop...>::execution_space,
-//                      void> &&
-//           std::is_same_v<typename MatrixTraits<void, Prop...>::memory_space,
-//                          void>,
-//       "Only one Matrix Execution or Memory Space template argument");
+  static_assert(
+      std::is_same_v<typename MatrixTraits<void, Prop...>::execution_space,
+                     void> &&
+          std::is_same_v<typename MatrixTraits<void, Prop...>::memory_space,
+                         void>,
+      "Only one Matrix Execution or Memory Space template argument");
 
-//   using index_type      = void;
-//   using execution_space = typename Space::execution_space;
-//   using memory_space    = typename Space::memory_space;
-// };
+  using index_type      = void;
+  using execution_space = typename Space::execution_space;
+  using memory_space    = typename Space::memory_space;
+};
 
 template <class ValueType, class... Properties>
 struct MatrixTraits {
@@ -98,18 +98,13 @@ struct MatrixTraits {
       !std::is_same_v<typename prop::index_type, void>,
       typename prop::index_type, int>;
 
-  // TODO: Use with Kokkos spaces
-  // using ExecutionSpace = typename std::conditional_t<
-  //     !std::is_same_v<typename prop::execution_space, void>,
-  //     typename prop::execution_space, Kokkos::DefaultExecutionSpace>;
-  using ExecutionSpace = void;  // Set to void for now
+  using ExecutionSpace = typename std::conditional_t<
+      !std::is_same_v<typename prop::execution_space, void>,
+      typename prop::execution_space, Kokkos::DefaultExecutionSpace>;
 
-  // TODO: Use with Kokkos spaces
-  // using MemorySpace = typename std::conditional_t<
-  //     !std::is_same_v<typename prop::memory_space, void>,
-  //     typename prop::memory_space, typename
-  //     ExecutionSpace::memory_space>;
-  using MemorySpace = void;  // Set to void for now
+  using MemorySpace = typename std::conditional_t<
+      !std::is_same_v<typename prop::memory_space, void>,
+      typename prop::memory_space, typename ExecutionSpace::memory_space>;
 
   // Check the validity of ValueType
   static_assert(std::is_arithmetic_v<ValueType>,
@@ -121,8 +116,7 @@ struct MatrixTraits {
 
   using execution_space = ExecutionSpace;
   using memory_space    = MemorySpace;
-  // TODO: Use with Kokkos Device
-  // using device_type       = Kokkos::Device<ExecutionSpace, MemorySpace>;
+  using device_type     = Kokkos::Device<ExecutionSpace, MemorySpace>;
 };
 }  // namespace Impl
 }  // namespace Morpheus

@@ -28,8 +28,8 @@
 // Template argument options:
 // - MatrixTraits<ValueType>
 // - MatrixTraits<ValueType, IndexType>
-// //- MatrixTraits<ValueType, IndexType, Space>
-// //- MatrixTraits<ValueType, Space>
+//- MatrixTraits<ValueType, IndexType, Space>
+//- MatrixTraits<ValueType, Space>
 
 using traits_d = Morpheus::Impl::MatrixTraits<double>;
 static_assert(std::is_same_v<traits_d::value_type, double>);
@@ -43,10 +43,20 @@ using traits_l = Morpheus::Impl::MatrixTraits<long>;
 static_assert(std::is_same_v<traits_l::value_type, long>);
 static_assert(std::is_same_v<traits_l::index_type, int>);
 
-using traits_flv = Morpheus::Impl::MatrixTraits<float, long, void>;
+using traits_flv = Morpheus::Impl::MatrixTraits<float, long>;
 static_assert(std::is_same_v<traits_flv::value_type, float>);
 static_assert(std::is_same_v<traits_flv::index_type, long>);
-static_assert(std::is_same_v<traits_flv::memory_space, void>);
-static_assert(std::is_same_v<traits_flv::execution_space, void>);
+static_assert(
+    std::is_same_v<traits_flv::memory_space, Kokkos::HostSpace::memory_space>);
+static_assert(
+    std::is_same_v<traits_flv::execution_space, Kokkos::DefaultExecutionSpace>);
 
-int main() { std::puts("All checks are passed."); };
+using traits_sp = Morpheus::Impl::MatrixTraits<float, long, Kokkos::HostSpace>;
+static_assert(std::is_same_v<traits_sp::value_type, float>);
+static_assert(std::is_same_v<traits_sp::index_type, long>);
+static_assert(
+    std::is_same_v<traits_sp::memory_space, Kokkos::HostSpace::memory_space>);
+static_assert(std::is_same_v<traits_sp::execution_space,
+                             Kokkos::HostSpace::execution_space>);
+
+int main() { std::puts("All checks are passed."); }
