@@ -28,6 +28,7 @@ set( SOURCES_IDIOMATIC_EXAMPLES
     dynamic_resize.cpp
     switch_interface.cpp
     matrix_traits.cpp
+    vector_traits.cpp
 )
 
 string( REPLACE ".cpp" "" BASENAMES_IDIOMATIC_EXAMPLES "${SOURCES_IDIOMATIC_EXAMPLES}" )
