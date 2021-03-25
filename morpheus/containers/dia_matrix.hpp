@@ -76,7 +76,9 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
                      const index_type num_entries,
                      const index_type num_diagonals) {
     // TODO: resize(...)
-    Morpheus::NotImplementedException("DiaMatrix.resize(...)");
+    std::string str_args =
+        Morpheus::append_str(num_rows, num_cols, num_entries, num_diagonals);
+    Morpheus::NotImplementedException("DiaMatrix.resize(" + str_args + ")");
   }
 
   // Resize matrix dimensions and underlying storage
@@ -85,7 +87,9 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
                      const index_type num_diagonals,
                      const index_type alignment) {
     // TODO: resize(...)
-    Morpheus::NotImplementedException("DiaMatrix.resize(...)");
+    std::string str_args = Morpheus::append_str(num_rows, num_cols, num_entries,
+                                                num_diagonals, alignment);
+    Morpheus::NotImplementedException("DiaMatrix.resize(" + str_args + ")");
   }
 
   // Swap the contents of two DiaMatrix objects.

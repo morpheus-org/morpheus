@@ -25,7 +25,7 @@
 #define MORPHEUS_CONTAINERS_DYNAMIC_MATRIX_IMPL_HPP
 
 #include <string>
-
+#include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_proxy.hpp>
 #include <morpheus/core/matrix_traits.hpp>
 
@@ -90,8 +90,11 @@ struct any_type_resize : public Impl::MatrixTraits<Properties...> {
   //    though needed for compiling dynamic matrix interface
   template <typename T, typename... Args>
   result_type operator()(T &mat, Args &&...args) {
+    std::string str_args = Morpheus::append_str(args...);
     throw std::runtime_error(
-        "Error::Invalid use of the dynamic resize interface");
+        "Invalid use of the dynamic resize interface.\n\
+                mat.resize(" +
+        str_args + ") for " + mat.name() + " format.");
   }
 };
 
@@ -145,7 +148,8 @@ struct activate_impl<0, Properties...> {
   using type_list = typename MatrixFormats<Properties...>::type_list;
 
   static void activate(variant &A, size_t idx) {
-    activate_impl<1, Properties...>::activate(A, 0);
+    idx = 0;
+    activate_impl<1, Properties...>::activate(A, idx);
   }
 };
 

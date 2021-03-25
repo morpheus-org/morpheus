@@ -25,6 +25,7 @@
 #define MORPHEUS_CORE_EXCEPTIONS_HPP
 
 #include <string>
+#include <stdexcept>
 
 namespace Morpheus {
 class NotImplementedException : public std::logic_error {
@@ -33,6 +34,16 @@ class NotImplementedException : public std::logic_error {
       : std::logic_error{"NotImplemented: " + fn_name +
                          " not yet implemented."} {}
 };
+
+template <typename T, typename... Ts>
+constexpr std::string append_str(T&& first, Ts&&... rest) {
+  if constexpr (sizeof...(Ts) == 0) {
+    return std::to_string(first);  // for only 1-arguments
+  } else {
+    return std::to_string(first) + "," +
+           append_str(std::forward<Ts>(rest)...);  // pass the rest further
+  }
+}
 
 }  // namespace Morpheus
 
