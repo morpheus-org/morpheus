@@ -89,20 +89,35 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
 
   inline reference operator[](int i) const { return _data(i); }
 
-  size_type size() const { return _size; }
+  inline size_type size() const { return _size; }
 
-  pointer data() const { return _data.data(); }
+  inline pointer data() const { return _data.data(); }
 
   // Iterators
-  iterator begin() { return _data.data(); }
+  inline iterator begin() { return _data.data(); }
 
-  iterator end() { return _size > 0 ? _data.data() + _size : _data.data(); }
-
-  const_iterator cbegin() const { return _data.data(); }
-
-  const_iterator cend() const {
+  inline iterator end() {
     return _size > 0 ? _data.data() + _size : _data.data();
   }
+
+  inline const_iterator cbegin() const { return _data.data(); }
+
+  inline const_iterator cend() const {
+    return _size > 0 ? _data.data() + _size : _data.data();
+  }
+
+  // Capacity
+  inline void reserve(size_t n) { /*TODO*/
+  }
+
+  // Modifiers
+  inline void resize(size_t n) { /*TODO*/
+  }
+
+  inline void resize(size_t n, const_reference val) { /*TODO*/
+  }
+
+  // TODO: Data management routines for copying to and from a space
 
  private:
   size_t _size;
