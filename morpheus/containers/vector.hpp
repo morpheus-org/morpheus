@@ -61,11 +61,15 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
  public:
   //   Member functions
   ~DenseVector()                  = default;
-  DenseVector()                   = default;
   DenseVector(const DenseVector&) = default;
   DenseVector(DenseVector&&)      = default;
   DenseVector& operator=(const DenseVector&) = default;
   DenseVector& operator=(DenseVector&&) = default;
+
+  inline DenseVector() : _data() {
+    _size          = 0;
+    _extra_storage = 1.1;
+  }
 
   inline DenseVector(int n, value_type val = 0)
       : _size(n), _extra_storage(1.1), _data("Vector", size_t(n * 1.1)) {
@@ -107,21 +111,24 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   }
 
   // Capacity
-  inline void reserve(size_t n) { /*TODO*/
-  }
+  //   TODO: reserve should be enabled when push_back methods etc are developed
+  //   inline void reserve(size_t n) {
+  //     Kokkos::resize(_data, size_t(n * _extra_storage));
+  //   }
 
   // Modifiers
-  inline void resize(size_t n) { /*TODO*/
+  inline void resize(size_t n) {
+    if (n > _data.span()) Kokkos::resize(_data, size_t(n * _extra_storage));
+    _size = n;
   }
 
-  inline void resize(size_t n, const_reference val) { /*TODO*/
-  }
+  inline void resize(size_t n, const_reference val) { assign(n, val); }
 
   // TODO: Data management routines for copying to and from a space
 
  private:
   size_t _size;
-  float _extra_storage = 1.1;
+  float _extra_storage;
   array_type _data;
 };
 }  // namespace Morpheus

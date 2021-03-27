@@ -30,6 +30,7 @@ set( SOURCES_IDIOMATIC_EXAMPLES
     matrix_traits.cpp
     vector_traits.cpp
     morpheus_init.cpp
+    vector.cpp
 )
 
 string( REPLACE ".cpp" "" BASENAMES_IDIOMATIC_EXAMPLES "${SOURCES_IDIOMATIC_EXAMPLES}" )
