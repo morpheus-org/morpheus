@@ -49,11 +49,16 @@ struct DynamicTag : public Impl::MatrixTag {};
 template <class... Properties>
 class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
  public:
-  using type       = DynamicMatrix<Properties...>;
-  using traits     = Impl::MatrixTraits<Properties...>;
+  using type   = DynamicMatrix<Properties...>;
+  using traits = Impl::MatrixTraits<Properties...>;
+
   using index_type = typename traits::index_type;
   using value_type = typename traits::value_type;
-  using tag        = typename MatrixFormatTag<DynamicTag>::tag;
+
+  using memory_space    = typename traits::memory_space;
+  using execution_space = typename traits::execution_space;
+  using device_type     = typename traits::device_type;
+  using tag             = typename MatrixFormatTag<DynamicTag>::tag;
 
   using reference       = DynamicMatrix &;
   using const_reference = const DynamicMatrix &;
