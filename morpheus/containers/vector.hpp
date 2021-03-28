@@ -23,6 +23,8 @@
 #ifndef MORPHEUS_CONTAINERS_DENSE_VECTOR_HPP
 #define MORPHEUS_CONTAINERS_DENSE_VECTOR_HPP
 
+#include <string>
+
 #include <morpheus/core/core.hpp>
 #include <morpheus/core/vector_traits.hpp>
 #include <morpheus/core/vector_tags.hpp>
@@ -74,8 +76,19 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
     _extra_storage = 1.1;
   }
 
+  inline DenseVector(std::string name, int n, value_type val = 0)
+      : _size(n),
+        _extra_storage(1.1),
+        _data(name, size_t(n * 1.1)),
+        _name(name) {
+    assign(n, val);
+  }
+
   inline DenseVector(int n, value_type val = 0)
-      : _size(n), _extra_storage(1.1), _data("Vector", size_t(n * 1.1)) {
+      : _size(n),
+        _extra_storage(1.1),
+        _data("Vector", size_t(n * 1.1)),
+        _name("Vector") {
     assign(n, val);
   }
 
@@ -129,10 +142,14 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
 
   // TODO: Data management routines for copying to and from a space
 
+  // Other
+  inline std::string name() const { return _name; }
+
  private:
   size_t _size;
   float _extra_storage;
   array_type _data;
+  std::string _name = "Vector";
 };
 }  // namespace Morpheus
 

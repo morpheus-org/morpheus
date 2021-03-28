@@ -185,6 +185,14 @@ int main(int argc, char* argv[]) {
     // std::cout << "\tx(4) = " << x(4) << std::endl;
   }
 
+  {
+    std::cout << "Checking vector naming:" << std::endl;
+    vector x("DenseVector", 5, 2.0);
+
+    std::cout << "\tx.name() = " << x.name() << std::endl;
+    std::cout << "\tx.size() = " << x.size() << std::endl;
+  }
+
   Morpheus::finalize();
 
   return 0;
