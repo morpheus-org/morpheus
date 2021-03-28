@@ -20,3 +20,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef MORPHEUS_ALGORITHMS_MULTIPLY_HPP
+#define MORPHEUS_ALGORITHMS_MULTIPLY_HPP
+
+namespace Morpheus {
+
+template <typename Matrix, typename Vector>
+void multiply(Matrix const& A, Vector const& x, Vector& y);
+
+}  // namespace Morpheus
+
+#include <morpheus/algorithms/impl/multiply.inl>
+
+#endif  // MORPHEUS_ALGORITHMS_MULTIPLY_HPP
