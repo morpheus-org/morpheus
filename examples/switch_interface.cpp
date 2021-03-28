@@ -22,27 +22,31 @@
  */
 
 #include <iostream>
+#include <morpheus/core/core.hpp>
 #include <morpheus/containers/dynamic_matrix.hpp>
 
 int main() {
-  Morpheus::DynamicMatrix<double, int> A;
-  std::cout << "Active Index: " << A.active_index() << std::endl;
+  Morpheus::initialize();
+  {
+    Morpheus::DynamicMatrix<double, int> A;
+    std::cout << "Active Index: " << A.active_index() << std::endl;
 
-  // Switch through available enums
-  A.activate(Morpheus::CSR_FORMAT);
-  std::cout << "Active Index: " << A.active_index() << std::endl;
+    // Switch through available enums
+    A.activate(Morpheus::CSR_FORMAT);
+    std::cout << "Active Index: " << A.active_index() << std::endl;
 
-  A.activate(Morpheus::DIA_FORMAT);
-  std::cout << "Active Index: " << A.active_index() << std::endl;
+    A.activate(Morpheus::DIA_FORMAT);
+    std::cout << "Active Index: " << A.active_index() << std::endl;
 
-  // Switch using integer indexing
-  A.activate(0);
-  std::cout << "Active Index: " << A.active_index() << std::endl;
+    // Switch using integer indexing
+    A.activate(0);
+    std::cout << "Active Index: " << A.active_index() << std::endl;
 
-  // In case indexing exceeds the size of available types in the underlying
-  // variant, we default to the first entry
-  A.activate(5);
-  std::cout << "Active Index: " << A.active_index() << std::endl;
-
+    // In case indexing exceeds the size of available types in the underlying
+    // variant, we default to the first entry
+    A.activate(5);
+    std::cout << "Active Index: " << A.active_index() << std::endl;
+  }
+  Morpheus::finalize();
   return 0;
 }

@@ -22,6 +22,7 @@
  */
 
 #include <iostream>
+#include <morpheus/core/core.hpp>
 #include <morpheus/containers/dynamic_matrix.hpp>
 
 template <typename... Properties>
@@ -35,27 +36,30 @@ void stats(Morpheus::DynamicMatrix<Properties...>& mat, std::string name,
 }
 
 int main() {
-  Morpheus::DynamicMatrix<double, int> A;
+  Morpheus::initialize();
+  {
+    Morpheus::DynamicMatrix<double, int> A;
 
-  stats(A, "A", "resize(5, 10, 15)");
-  A.resize(5, 10, 15);
+    stats(A, "A", "resize(5, 10, 15)");
+    A.resize(5, 10, 15);
 
-  try {
+    try {
+      A.resize(5, 10, 15, 20);
+    } catch (std::runtime_error& e) {
+      std::cerr << "Exception Raised:: " << e.what() << std::endl;
+    }
+    stats(A, "A", "resize(5, 10, 15, 20)");
+
+    A = Morpheus::CsrMatrix<double, int>();
+    stats(A, "A", "resize(5, 10, 15)");
+    A.resize(5, 10, 15);
+
+    A = Morpheus::DiaMatrix<double, int>();
+    stats(A, "A", "resize(5, 10, 15, 20)");
     A.resize(5, 10, 15, 20);
-  } catch (std::runtime_error& e) {
-    std::cerr << "Exception Raised:: " << e.what() << std::endl;
+    A.resize(5, 10, 15, 20, 35);
+    stats(A, "A", "resize(5, 10, 15, 20, 35)");
   }
-  stats(A, "A", "resize(5, 10, 15, 20)");
-
-  A = Morpheus::CsrMatrix<double, int>();
-  stats(A, "A", "resize(5, 10, 15)");
-  A.resize(5, 10, 15);
-
-  A = Morpheus::DiaMatrix<double, int>();
-  stats(A, "A", "resize(5, 10, 15, 20)");
-  A.resize(5, 10, 15, 20);
-  A.resize(5, 10, 15, 20, 35);
-  stats(A, "A", "resize(5, 10, 15, 20, 35)");
-
+  Morpheus::finalize();
   return 0;
 }
