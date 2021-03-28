@@ -31,6 +31,7 @@
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
 #include <morpheus/core/matrix_tags.hpp>
+#include <morpheus/containers/vector.hpp>
 
 namespace Morpheus {
 
@@ -39,24 +40,36 @@ struct CooTag : public Impl::SparseMatTag {};
 template <class... Properties>
 class CooMatrix : public Impl::MatrixTraits<Properties...> {
  public:
-  using type       = CooMatrix<Properties...>;
-  using traits     = Impl::MatrixTraits<Properties...>;
+  using type   = CooMatrix<Properties...>;
+  using traits = Impl::MatrixTraits<Properties...>;
+
   using index_type = typename traits::index_type;
   using value_type = typename traits::value_type;
-  using tag        = typename MatrixFormatTag<CooTag>::tag;
+
+  using memory_space    = typename traits::memory_space;
+  using execution_space = typename traits::execution_space;
+  using device_type     = typename traits::device_type;
+  using tag             = typename MatrixFormatTag<CooTag>::tag;
+
+  using index_array_type = Morpheus::vector<index_type, device_type>;
+  using value_array_type = Morpheus::vector<value_type, device_type>;
+
+  index_array_type row_indices, column_indices;
+  value_array_type values;
 
   // Construct an empty CooMatrix
-  inline CooMatrix() {}
+  inline CooMatrix()
+      : row_indices(0), column_indices(0), values(0), _m(0), _n(0), _nnz(0) {}
 
   // Construct a CooMatrix with a specific shape and number of non-zero entries
   inline CooMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries)
-      : _m(num_rows),
+      : row_indices(num_entries),
+        column_indices(num_entries),
+        values(num_entries),
+        _m(num_rows),
         _n(num_cols),
-        _nnz(num_entries),
-        _row_indices(num_entries),
-        _column_indices(num_entries),
-        _values(num_entries) {}
+        _nnz(num_entries) {}
 
   // Construct from another matrix type
   template <typename MatrixType>
@@ -71,9 +84,9 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
     _m   = num_rows;
     _n   = num_cols;
     _nnz = num_entries;
-    _row_indices.resize(_nnz);
-    _column_indices.resize(_nnz);
-    _values.resize(_nnz);
+    row_indices.resize(_nnz);
+    column_indices.resize(_nnz);
+    values.resize(_nnz);
   }
 
   // Swap the contents of two CooMatrix objects.
@@ -88,17 +101,6 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   CooMatrix &operator=(const MatrixType &matrix) {
     std::cout << "CooMatrix.operator=(const MatrixType& matrix)" << std::endl;
   }
-
-  // Accessors
-  inline const index_type rind(const index_type idx) const {
-    return _row_indices[idx];
-  }
-
-  inline const index_type cind(const index_type idx) const {
-    return _column_indices[idx];
-  }
-
-  inline value_type val(const index_type idx) const { return _values[idx]; }
 
   // Operations specific to COO format
 
@@ -139,14 +141,6 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
  private:
   std::string _name = "CooMatrix";
   index_type _m, _n, _nnz;
-
-  // TODO: Use Morpheus::array instead of std::vector
-  using index_array_type = std::vector<index_type>;
-  using value_array_type = std::vector<value_type>;
-
-  // TODO: Make arrays private
-  index_array_type _row_indices, _column_indices;
-  value_array_type _values;
 };
 }  // namespace Morpheus
 

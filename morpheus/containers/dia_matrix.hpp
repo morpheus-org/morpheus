@@ -39,14 +39,25 @@ struct DiaTag : public Impl::SparseMatTag {};
 template <class... Properties>
 class DiaMatrix : public Impl::MatrixTraits<Properties...> {
  public:
-  using type       = DiaMatrix<Properties...>;
-  using traits     = Impl::MatrixTraits<Properties...>;
+  using type   = DiaMatrix<Properties...>;
+  using traits = Impl::MatrixTraits<Properties...>;
+
   using index_type = typename traits::index_type;
   using value_type = typename traits::value_type;
-  using tag        = typename MatrixFormatTag<DiaTag>::tag;
 
+  using memory_space    = typename traits::memory_space;
+  using execution_space = typename traits::execution_space;
+  using device_type     = typename traits::device_type;
+  using tag             = typename MatrixFormatTag<DiaTag>::tag;
+
+  using index_array_type = Morpheus::vector<index_type>;
+  // TODO: Use Morpheus::dense_matrix instead of Morpheus::vector
+  using value_array_type = Morpheus::vector<value_type>;
+
+  index_array_type diagonal_offsets;
+  value_array_type values;
   // Construct an empty DiaMatrix
-  inline DiaMatrix() {}
+  inline DiaMatrix() : diagonal_offsets(0), values(0), _m(0), _n(0), _nnz(0) {}
 
   // Construct a DiaMatrix with:
   //      a specific shape
@@ -56,10 +67,11 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   inline DiaMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries, const index_type num_diagonals,
                    const index_type alignment = 32)
-      : _m(num_rows),
+      : diagonal_offsets(num_diagonals),
+        values(0),
+        _m(num_rows),
         _n(num_cols),
-        _nnz(num_entries),
-        _diagonal_offsets(num_diagonals) {
+        _nnz(num_entries) {
     // TODO: DiaMatrix(...)
     Morpheus::NotImplementedException("DiaMatrix(...)");
   }
@@ -106,12 +118,6 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
     Morpheus::NotImplementedException(
         "DiaMatrix.operator=(const MatrixType& matrix)");
   }
-  // Accessors
-  inline const index_type doff(const index_type idx) const {
-    return _diagonal_offsets[idx];
-  }
-
-  inline value_type val(const index_type idx) const { return _values[idx]; }
 
   // Unified routines across all formats
   inline std::string name() const { return _name; }
@@ -122,14 +128,6 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
  private:
   std::string _name = "DiaMatrix";
   index_type _m, _n, _nnz;
-
-  // TODO: Use Morpheus::array instead of std::vector
-  using index_array_type = std::vector<index_type>;
-  // TODO: Use Morpheus::dense_matrix instead of std::vector
-  using value_array_type = std::vector<value_type>;
-
-  index_array_type _diagonal_offsets;
-  value_array_type _values;
 };
 }  // namespace Morpheus
 

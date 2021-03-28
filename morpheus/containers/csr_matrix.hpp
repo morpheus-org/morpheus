@@ -31,6 +31,7 @@
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
 #include <morpheus/core/matrix_tags.hpp>
+#include <morpheus/containers/vector.hpp>
 
 namespace Morpheus {
 
@@ -39,24 +40,36 @@ struct CsrTag : public Impl::SparseMatTag {};
 template <class... Properties>
 class CsrMatrix : public Impl::MatrixTraits<Properties...> {
  public:
-  using type       = CsrMatrix<Properties...>;
-  using traits     = Impl::MatrixTraits<Properties...>;
+  using type   = CsrMatrix<Properties...>;
+  using traits = Impl::MatrixTraits<Properties...>;
+
   using index_type = typename traits::index_type;
   using value_type = typename traits::value_type;
-  using tag        = typename MatrixFormatTag<CsrTag>::tag;
+
+  using memory_space    = typename traits::memory_space;
+  using execution_space = typename traits::execution_space;
+  using device_type     = typename traits::device_type;
+  using tag             = typename MatrixFormatTag<CsrTag>::tag;
+
+  using index_array_type = Morpheus::vector<index_type>;
+  using value_array_type = Morpheus::vector<value_type>;
+
+  index_array_type row_offsets, column_indices;
+  value_array_type values;
 
   // Construct an empty CsrMatrix
-  inline CsrMatrix() {}
+  inline CsrMatrix()
+      : row_offsets(1), column_indices(0), values(0), _m(0), _n(0), _nnz(0) {}
 
   // Construct a CsrMatrix with a specific shape and number of non-zero entries
   inline CsrMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries)
-      : _m(num_rows),
+      : row_offsets(num_rows + 1),
+        column_indices(num_entries),
+        values(num_entries),
+        _m(num_rows),
         _n(num_cols),
-        _nnz(num_entries),
-        _row_offsets(num_rows + 1),
-        _column_indices(num_entries),
-        _values(num_entries) {}
+        _nnz(num_entries) {}
 
   // Construct from another matrix type
   template <typename MatrixType>
@@ -71,9 +84,9 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
     _m   = num_rows;
     _n   = num_cols;
     _nnz = num_entries;
-    _row_offsets.resize(_m + 1);
-    _column_indices.resize(_nnz);
-    _values.resize(_nnz);
+    row_offsets.resize(_m + 1);
+    column_indices.resize(_nnz);
+    values.resize(_nnz);
   }
 
   // Swap the contents of two CsrMatrix objects.
@@ -91,17 +104,6 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
         "CsrMatrix.operator=(const MatrixType& matrix)");
   }
 
-  // Accessors
-  inline const index_type roff(const index_type idx) const {
-    return _row_offsets[idx];
-  }
-
-  inline const index_type cind(const index_type idx) const {
-    return _column_indices[idx];
-  }
-
-  inline value_type val(const index_type idx) const { return _values[idx]; }
-
   // Unified routines across all formats
   inline std::string name() const { return _name; }
   inline index_type nrows() const { return _m; }
@@ -111,13 +113,6 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
  private:
   std::string _name = "CsrMatrix";
   index_type _m, _n, _nnz;
-
-  // TODO: Use Morpheus::array instead of std::vector
-  using index_array_type = std::vector<index_type>;
-  using value_array_type = std::vector<value_type>;
-
-  index_array_type _row_offsets, _column_indices;
-  value_array_type _values;
 };
 }  // namespace Morpheus
 
