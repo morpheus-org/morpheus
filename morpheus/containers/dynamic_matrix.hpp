@@ -36,10 +36,16 @@ namespace Morpheus {
 
 struct DynamicTag : public Impl::MatrixTag {};
 
-// example:
-// DynamicMatrix<int, double, memspace, formatspace>;
-// where formatspace =
-// std::variant<CooMatrix<int,double>,CsrMatrix<int,double>...>
+/** @class DynamicMatrix
+ * @brief Dynamic Matrix class that acts as a sum type of all the supporting
+ * Matrix Storage Formats.
+ *
+ * Template argument options:
+ *  - DynamicMatrix<ValueType>
+ *  - DynamicMatrix<ValueType, IndexType>
+ *  - DynamicMatrix<ValueType, IndexType, Space>
+ *  - DynamicMatrix<ValueType, Space>
+ */
 template <class... Properties>
 class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
  public:
@@ -87,11 +93,17 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   inline int active_index() const { return _formats.index(); }
 
   inline void activate(const formats_e index) {
-    const int size =
+    constexpr int size =
         std::variant_size_v<typename MatrixFormats<Properties...>::variant>;
+    const int idx = static_cast<int>(index);
 
-    Impl::activate_impl<size, Properties...>::activate(_formats,
-                                                       static_cast<int>(index));
+    if (idx > size) {
+      std::cout << "Warning: There are " << size
+                << " available formats to switch to. "
+                << "Selecting to switch to format with index " << idx
+                << " will default to the format with index 0." << std::endl;
+    }
+    Impl::activate_impl<size, Properties...>::activate(_formats, idx);
   }
 
   // Enable switching through direct integer indexing
