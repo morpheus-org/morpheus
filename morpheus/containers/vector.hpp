@@ -32,6 +32,9 @@ namespace Morpheus {
 /* Forward declaration */
 template <class... Properties>
 class DenseVector;
+
+struct DenseVectorTag : public Impl::VectorTag {};
+
 /* Alias type to match std::vector */
 template <class... Properties>
 using vector = DenseVector<Properties...>;
@@ -41,7 +44,7 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
  public:
   using type   = DenseVector<Properties...>;
   using traits = Impl::VectorTraits<Properties...>;
-  using tag    = typename VectorFormatTag<Impl::DenseVectorTag>::tag;
+  using tag    = typename VectorFormatTag<DenseVectorTag>::tag;
 
   using value_type      = typename traits::value_type;
   using memory_space    = typename traits::memory_space;

@@ -28,7 +28,6 @@ namespace Morpheus {
 
 namespace Impl {
 struct VectorTag {};
-struct DenseVectorTag : public Impl::VectorTag {};
 }  // namespace Impl
 
 // Matrix Format Tag Wrapper
