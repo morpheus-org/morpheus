@@ -52,8 +52,9 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   using type   = DynamicMatrix<Properties...>;
   using traits = Impl::MatrixTraits<Properties...>;
 
-  using index_type = typename traits::index_type;
-  using value_type = typename traits::value_type;
+  using variant_type = typename MatrixFormats<Properties...>::variant;
+  using index_type   = typename traits::index_type;
+  using value_type   = typename traits::value_type;
 
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
@@ -63,10 +64,15 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   using reference       = DynamicMatrix &;
   using const_reference = const DynamicMatrix &;
 
-  inline DynamicMatrix() = default;
+  inline DynamicMatrix() : _name("DynamicMatrix"), _formats() {}
 
   template <typename Format>
-  inline DynamicMatrix(const Format &mat) : _formats(mat) {}
+  inline DynamicMatrix(const Format &mat)
+      : _name("DynamicMatrix"), _formats(mat) {}
+
+  template <typename Format>
+  inline DynamicMatrix(std::string name, const Format &mat)
+      : _name(name), _formats(mat) {}
 
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
@@ -116,8 +122,10 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
     activate(static_cast<formats_e>(index));
   }
 
+  inline const variant_type &formats() const { return _formats; }
+
  private:
-  std::string _name = "DynamicMatrix";
+  std::string _name;
   typename MatrixFormats<Properties...>::variant _formats;
 };
 }  // namespace Morpheus
