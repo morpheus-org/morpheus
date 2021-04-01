@@ -1,5 +1,5 @@
 /**
- * multiply.inl
+ * multiply_serial.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,32 +21,18 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_INL
-#define MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_INL
+#ifndef MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
 
-#include <morpheus/core/exceptions.hpp>
 #include <morpheus/containers/dynamic_matrix.hpp>
 #include <morpheus/containers/vector.hpp>
 
 namespace Morpheus {
+// forward decl
+template <typename Matrix, typename Vector>
+void multiply(Matrix const& A, Vector const& x, Vector& y);
 
 namespace Impl {
-
-template <typename Matrix, typename Vector>
-void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::CooTag) {
-  using index_type = typename Matrix::index_type;
-  for (index_type n = 0; n < A.nnnz(); n++) {
-    y[A.row_indices[n]] += A.values[n] * x[A.column_indices[n]];
-  }
-}
-
-template <typename Matrix, typename Vector>
-void multiply(const Matrix& A, const Vector& x, Vector& y,
-              Morpheus::Impl::SparseMatTag) {
-  Morpheus::NotImplementedException(
-      "void multiply(const " + A.name() + "& A, const " + x.name() + "& x, " +
-      y.name() + "& y," + "Morpheus::Impl::SparseMatTag)");
-}
 
 struct multiply_fn {
   using result_type = void;
@@ -66,12 +52,6 @@ void multiply(const Matrix& A, const Vector& x, Vector& y,
 }
 
 }  // namespace Impl
-
-template <typename Matrix, typename Vector>
-void multiply(Matrix const& A, Vector const& x, Vector& y) {
-  Impl::multiply(A, x, y, typename Matrix::tag());
-}
-
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_INL
+#endif  // MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_MULTIPLY_IMPL_SERIAL_HPP

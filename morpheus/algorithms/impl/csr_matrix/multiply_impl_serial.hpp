@@ -1,5 +1,5 @@
 /**
- * print.hpp
+ * multiply_serial.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,23 +21,29 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_PRINT_HPP
-#define MORPHEUS_ALGORITHMS_PRINT_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
 
-#include <morpheus/algorithms/impl/print_impl.hpp>
+#include <morpheus/containers/csr_matrix.hpp>
+#include <morpheus/containers/vector.hpp>
 
 namespace Morpheus {
+namespace Impl {
 
-template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s) {
-  Morpheus::Impl::print(p, s, typename Printable::tag());
+template <typename Matrix, typename Vector>
+void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::CsrTag) {
+  using I = typename Matrix::index_type;
+  using T = typename Matrix::value_type;
+  for (I i = 0; i < A.nrows(); i++) {
+    T sum = y[i];
+    for (I jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
+      sum += A.values[jj] * x[A.column_indices[jj]];
+    }
+    y[i] = sum;
+  }
 }
 
-template <typename Printable>
-void print(const Printable& p) {
-  Morpheus::print(p, std::cout);
-}
-
+}  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_PRINT_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_MULTIPLY_IMPL_SERIAL_HPP

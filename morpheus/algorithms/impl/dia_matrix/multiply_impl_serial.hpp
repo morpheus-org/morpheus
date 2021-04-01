@@ -1,5 +1,5 @@
 /**
- * print.hpp
+ * multiply_serial.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,23 +21,24 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_PRINT_HPP
-#define MORPHEUS_ALGORITHMS_PRINT_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
 
-#include <morpheus/algorithms/impl/print_impl.hpp>
+#include <morpheus/containers/dia_matrix.hpp>
+#include <morpheus/containers/vector.hpp>
+#include <morpheus/core/exceptions.hpp>
 
 namespace Morpheus {
+namespace Impl {
 
-template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s) {
-  Morpheus::Impl::print(p, s, typename Printable::tag());
+template <typename Matrix, typename Vector>
+void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::DiaTag) {
+  Morpheus::NotImplementedException(
+      "void multiply(const " + A.name() + "& A, const " + x.name() + "& x, " +
+      y.name() + "& y," + "Morpheus::Impl::SparseMatTag)");
 }
 
-template <typename Printable>
-void print(const Printable& p) {
-  Morpheus::print(p, std::cout);
-}
-
+}  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_PRINT_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_SERIAL_HPP

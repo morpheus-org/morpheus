@@ -1,5 +1,5 @@
 /**
- * print.hpp
+ * print_impl_serial.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,23 +21,29 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_PRINT_HPP
-#define MORPHEUS_ALGORITHMS_PRINT_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_PRINT_IMPL_SERIAL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_PRINT_IMPL_SERIAL_HPP
 
-#include <morpheus/algorithms/impl/print_impl.hpp>
+#include <iostream>
+#include <iomanip>
+
+#include <morpheus/containers/dia_matrix.hpp>
+#include <morpheus/containers/vector.hpp>
+#include <morpheus/core/exceptions.hpp>
 
 namespace Morpheus {
+namespace Impl {
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s) {
-  Morpheus::Impl::print(p, s, typename Printable::tag());
+void print(const Printable& p, Stream& s, Morpheus::DiaTag) {
+  s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
+    << p.nnnz() << " entries\n";
+  Morpheus::NotImplementedException(
+      "void print(const Printable& p, Stream& s, "
+      "Morpheus::Impl::SparseMatTag)");
 }
 
-template <typename Printable>
-void print(const Printable& p) {
-  Morpheus::print(p, std::cout);
-}
-
+}  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_PRINT_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_PRINT_IMPL_SERIAL_HPP

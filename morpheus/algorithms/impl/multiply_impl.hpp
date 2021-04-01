@@ -1,5 +1,5 @@
 /**
- * print.hpp
+ * multiply_impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,23 +21,12 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_PRINT_HPP
-#define MORPHEUS_ALGORITHMS_PRINT_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
 
-#include <morpheus/algorithms/impl/print_impl.hpp>
+#include <morpheus/algorithms/impl/coo_matrix/multiply_impl_serial.hpp>
+#include <morpheus/algorithms/impl/csr_matrix/multiply_impl_serial.hpp>
+#include <morpheus/algorithms/impl/dia_matrix/multiply_impl_serial.hpp>
+#include <morpheus/algorithms/impl/dynamic_matrix/multiply_impl_serial.hpp>
 
-namespace Morpheus {
-
-template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s) {
-  Morpheus::Impl::print(p, s, typename Printable::tag());
-}
-
-template <typename Printable>
-void print(const Printable& p) {
-  Morpheus::print(p, std::cout);
-}
-
-}  // namespace Morpheus
-
-#endif  // MORPHEUS_ALGORITHMS_PRINT_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP

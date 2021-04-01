@@ -1,5 +1,5 @@
 /**
- * print.hpp
+ * print_impl_serial.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,23 +21,29 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_PRINT_HPP
-#define MORPHEUS_ALGORITHMS_PRINT_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_VECTOR_PRINT_IMPL_SERIAL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_VECTOR_PRINT_IMPL_SERIAL_HPP
 
-#include <morpheus/algorithms/impl/print_impl.hpp>
+#include <iostream>
+#include <iomanip>
+
+#include <morpheus/containers/vector.hpp>
 
 namespace Morpheus {
+namespace Impl {
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s) {
-  Morpheus::Impl::print(p, s, typename Printable::tag());
+void print(const Printable& p, Stream& s, Morpheus::DenseVectorTag) {
+  using index_type = typename Printable::size_type;
+  s << p.name() << "<" << p.size() << "> with " << p.size() << " entries\n";
+
+  for (index_type n = 0; n < p.size(); n++) {
+    s << " " << std::setw(14) << n;
+    s << " " << std::setprecision(4) << std::setw(8) << "(" << p[n] << ")\n";
+  }
 }
 
-template <typename Printable>
-void print(const Printable& p) {
-  Morpheus::print(p, std::cout);
-}
-
+}  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_PRINT_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_VECTOR_PRINT_IMPL_SERIAL_HPP

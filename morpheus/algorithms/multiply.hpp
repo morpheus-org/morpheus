@@ -24,13 +24,15 @@
 #ifndef MORPHEUS_ALGORITHMS_MULTIPLY_HPP
 #define MORPHEUS_ALGORITHMS_MULTIPLY_HPP
 
+#include <morpheus/algorithms/impl/multiply_impl.hpp>
+
 namespace Morpheus {
 
 template <typename Matrix, typename Vector>
-void multiply(Matrix const& A, Vector const& x, Vector& y);
+void multiply(Matrix const& A, Vector const& x, Vector& y) {
+  Impl::multiply(A, x, y, typename Matrix::tag());
+}
 
 }  // namespace Morpheus
-
-#include <morpheus/algorithms/impl/multiply.inl>
 
 #endif  // MORPHEUS_ALGORITHMS_MULTIPLY_HPP
