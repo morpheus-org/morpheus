@@ -125,13 +125,6 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
     Morpheus::NotImplementedException("DiaMatrix.resize(" + str_args + ")");
   }
 
-  // Swap the contents of two DiaMatrix objects.
-  void swap(DiaMatrix &matrix) {
-    // TODO: swap(DiaMatrix& matrix)
-    Morpheus::NotImplementedException(
-        "DiaMatrix.swap(const DiaMatrix& matrix)");
-  }
-
   // Assignment from another matrix type
   template <typename MatrixType>
   DiaMatrix &operator=(const MatrixType &matrix) {

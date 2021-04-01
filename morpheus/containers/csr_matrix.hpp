@@ -106,13 +106,6 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
     values.resize(_nnz);
   }
 
-  // Swap the contents of two CsrMatrix objects.
-  void swap(CsrMatrix &matrix) {
-    // TODO: swap(CsrMatrix& matrix)
-    Morpheus::NotImplementedException(
-        "CsrMatrix.swap(const CsrMatrix& matrix)");
-  }
-
   // Assignment from another matrix type
   template <typename MatrixType>
   CsrMatrix &operator=(const MatrixType &matrix) {

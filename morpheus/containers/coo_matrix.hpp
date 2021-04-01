@@ -106,13 +106,6 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
     values.resize(_nnz);
   }
 
-  // Swap the contents of two CooMatrix objects.
-  void swap(CooMatrix &matrix) {
-    // TODO: CooMatrix.swap
-    Morpheus::NotImplementedException(
-        "CooMatrix.swap(const MatrixType& matrix)");
-  }
-
   // Assignment from another matrix type
   template <typename MatrixType>
   CooMatrix &operator=(const MatrixType &matrix) {
