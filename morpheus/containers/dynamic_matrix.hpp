@@ -64,6 +64,12 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   using reference       = DynamicMatrix &;
   using const_reference = const DynamicMatrix &;
 
+  ~DynamicMatrix()                     = default;
+  DynamicMatrix(const DynamicMatrix &) = default;
+  DynamicMatrix(DynamicMatrix &&)      = default;
+  DynamicMatrix &operator=(const DynamicMatrix &) = default;
+  DynamicMatrix &operator=(DynamicMatrix &&) = default;
+
   inline DynamicMatrix() : _name("DynamicMatrix"), _formats() {}
 
   template <typename Format>

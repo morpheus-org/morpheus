@@ -56,6 +56,13 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
 
   index_array_type diagonal_offsets;
   value_array_type values;
+
+  ~DiaMatrix()                 = default;
+  DiaMatrix(const DiaMatrix &) = default;
+  DiaMatrix(DiaMatrix &&)      = default;
+  DiaMatrix &operator=(const DiaMatrix &) = default;
+  DiaMatrix &operator=(DiaMatrix &&) = default;
+
   // Construct an empty DiaMatrix
   inline DiaMatrix()
       : diagonal_offsets(0),

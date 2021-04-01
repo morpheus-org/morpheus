@@ -57,6 +57,12 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
   index_array_type row_offsets, column_indices;
   value_array_type values;
 
+  ~CsrMatrix()                 = default;
+  CsrMatrix(const CsrMatrix &) = default;
+  CsrMatrix(CsrMatrix &&)      = default;
+  CsrMatrix &operator=(const CsrMatrix &) = default;
+  CsrMatrix &operator=(CsrMatrix &&) = default;
+
   // Construct an empty CsrMatrix
   inline CsrMatrix()
       : row_offsets(1),

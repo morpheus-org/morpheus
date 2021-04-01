@@ -57,6 +57,12 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   index_array_type row_indices, column_indices;
   value_array_type values;
 
+  ~CooMatrix()                 = default;
+  CooMatrix(const CooMatrix &) = default;
+  CooMatrix(CooMatrix &&)      = default;
+  CooMatrix &operator=(const CooMatrix &) = default;
+  CooMatrix &operator=(CooMatrix &&) = default;
+
   // Construct an empty CooMatrix
   inline CooMatrix()
       : row_indices(0),
