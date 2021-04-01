@@ -33,6 +33,8 @@ set( SOURCES_IDIOMATIC_EXAMPLES
     vector.cpp
     CooMatrix.cpp
     multiply.cpp
+    CsrMatrix.cpp
+    omp.cpp
 )
 
 string( REPLACE ".cpp" "" BASENAMES_IDIOMATIC_EXAMPLES "${SOURCES_IDIOMATIC_EXAMPLES}" )

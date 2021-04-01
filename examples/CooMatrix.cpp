@@ -126,5 +126,37 @@ int main() {
 
     Morpheus::print(B);
   }
+
+  {
+    Morpheus::CooMatrix<double, int> A("A", 4, 3, 6);
+    Morpheus::CooMatrix<double, int> B(A);   // Copy constructor (shallow)
+    Morpheus::CooMatrix<double, int> C = B;  // Copy assignment (shallow)
+
+    // initialize matrix entries
+    A.row_indices[0]    = 0;
+    A.column_indices[0] = 0;
+    A.values[0]         = 10;
+    A.row_indices[1]    = 0;
+    A.column_indices[1] = 2;
+    A.values[1]         = 20;
+    A.row_indices[2]    = 2;
+    A.column_indices[2] = 2;
+    A.values[2]         = 30;
+    A.row_indices[3]    = 3;
+    A.column_indices[3] = 0;
+    A.values[3]         = 40;
+    A.row_indices[4]    = 3;
+    A.column_indices[4] = 1;
+    A.values[4]         = 50;
+    A.row_indices[5]    = 3;
+    A.column_indices[5] = 2;
+    A.values[5]         = 60;
+
+    Morpheus::print(A);
+    Morpheus::print(B);
+    Morpheus::print(C);
+
+    std::cout << A.name() << "\n" << B.name() << "\n" << C.name() << std::endl;
+  }
   Morpheus::finalize();
 }
