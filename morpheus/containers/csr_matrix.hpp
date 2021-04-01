@@ -59,7 +59,13 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
 
   // Construct an empty CsrMatrix
   inline CsrMatrix()
-      : row_offsets(1), column_indices(0), values(0), _m(0), _n(0), _nnz(0) {}
+      : row_offsets(1),
+        column_indices(0),
+        values(0),
+        _name("CsrMatrix"),
+        _m(0),
+        _n(0),
+        _nnz(0) {}
 
   // Construct a CsrMatrix with a specific shape and number of non-zero entries
   inline CsrMatrix(const index_type num_rows, const index_type num_cols,
@@ -67,6 +73,17 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
       : row_offsets(num_rows + 1),
         column_indices(num_entries),
         values(num_entries),
+        _name("CsrMatrix"),
+        _m(num_rows),
+        _n(num_cols),
+        _nnz(num_entries) {}
+
+  inline CsrMatrix(const std::string name, const index_type num_rows,
+                   const index_type num_cols, const index_type num_entries)
+      : row_offsets(num_rows + 1),
+        column_indices(num_entries),
+        values(num_entries),
+        _name(name),
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {}
@@ -111,7 +128,7 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
   inline index_type nnnz() const { return _nnz; }
 
  private:
-  std::string _name = "CsrMatrix";
+  std::string _name;
   index_type _m, _n, _nnz;
 };
 }  // namespace Morpheus

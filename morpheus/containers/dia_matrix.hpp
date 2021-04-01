@@ -57,7 +57,13 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   index_array_type diagonal_offsets;
   value_array_type values;
   // Construct an empty DiaMatrix
-  inline DiaMatrix() : diagonal_offsets(0), values(0), _m(0), _n(0), _nnz(0) {}
+  inline DiaMatrix()
+      : diagonal_offsets(0),
+        values(0),
+        _name("DiaMatrix"),
+        _m(0),
+        _n(0),
+        _nnz(0) {}
 
   // Construct a DiaMatrix with:
   //      a specific shape
@@ -69,6 +75,21 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
                    const index_type alignment = 32)
       : diagonal_offsets(num_diagonals),
         values(0),
+        _name("DiaMatrix"),
+        _m(num_rows),
+        _n(num_cols),
+        _nnz(num_entries) {
+    // TODO: DiaMatrix(...)
+    Morpheus::NotImplementedException("DiaMatrix(...)");
+  }
+
+  inline DiaMatrix(const std::string name, const index_type num_rows,
+                   const index_type num_cols, const index_type num_entries,
+                   const index_type num_diagonals,
+                   const index_type alignment = 32)
+      : diagonal_offsets(num_diagonals),
+        values(0),
+        _name(name),
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {
@@ -126,7 +147,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   inline index_type nnnz() const { return _nnz; }
 
  private:
-  std::string _name = "DiaMatrix";
+  std::string _name;
   index_type _m, _n, _nnz;
 };
 }  // namespace Morpheus

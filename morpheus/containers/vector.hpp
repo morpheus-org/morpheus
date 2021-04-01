@@ -76,7 +76,7 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
     _extra_storage = 1.1;
   }
 
-  inline DenseVector(std::string name, int n, value_type val = 0)
+  inline DenseVector(const std::string name, int n, value_type val = 0)
       : _size(n),
         _extra_storage(1.1),
         _data(name, size_t(n * 1.1)),
@@ -149,7 +149,7 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   size_t _size;
   float _extra_storage;
   array_type _data;
-  std::string _name = "Vector";
+  std::string _name;
 };
 }  // namespace Morpheus
 

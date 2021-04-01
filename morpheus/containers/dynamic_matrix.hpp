@@ -71,7 +71,7 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
       : _name("DynamicMatrix"), _formats(mat) {}
 
   template <typename Format>
-  inline DynamicMatrix(std::string name, const Format &mat)
+  inline DynamicMatrix(const std::string name, const Format &mat)
       : _name(name), _formats(mat) {}
 
   template <typename... Args>
