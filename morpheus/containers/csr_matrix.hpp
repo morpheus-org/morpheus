@@ -98,7 +98,8 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
   template <typename MatrixType>
   CsrMatrix(const MatrixType &matrix) {
     // TODO: CsrMatrix(const MatrixType& matrix)
-    Morpheus::NotImplementedException("CsrMatrix(const MatrixType& matrix)");
+    throw Morpheus::NotImplementedException(
+        "CsrMatrix(const MatrixType& matrix)");
   }
 
   // Resize matrix dimensions and underlying storage
@@ -116,7 +117,7 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
   template <typename MatrixType>
   CsrMatrix &operator=(const MatrixType &matrix) {
     // TODO: operator=(const MatrixType& matrix)
-    Morpheus::NotImplementedException(
+    throw Morpheus::NotImplementedException(
         "CsrMatrix.operator=(const MatrixType& matrix)");
   }
 

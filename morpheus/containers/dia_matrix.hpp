@@ -101,14 +101,15 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
         _n(num_cols),
         _nnz(num_entries) {
     // TODO: DiaMatrix(...)
-    Morpheus::NotImplementedException("DiaMatrix(...)");
+    throw Morpheus::NotImplementedException("DiaMatrix(...)");
   }
 
   // Construct from another matrix type
   template <typename MatrixType>
   DiaMatrix(const MatrixType &matrix) {
     // TODO: DiaMatrix(const MatrixType& matrix)
-    Morpheus::NotImplementedException("DiaMatrix(const MatrixType& matrix)");
+    throw Morpheus::NotImplementedException(
+        "DiaMatrix(const MatrixType& matrix)");
   }
 
   // Resize matrix dimensions and underlying storage
@@ -118,7 +119,8 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
     // TODO: resize(...)
     std::string str_args =
         Morpheus::append_str(num_rows, num_cols, num_entries, num_diagonals);
-    Morpheus::NotImplementedException("DiaMatrix.resize(" + str_args + ")");
+    throw Morpheus::NotImplementedException("DiaMatrix.resize(" + str_args +
+                                            ")");
   }
 
   // Resize matrix dimensions and underlying storage
@@ -129,14 +131,15 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
     // TODO: resize(...)
     std::string str_args = Morpheus::append_str(num_rows, num_cols, num_entries,
                                                 num_diagonals, alignment);
-    Morpheus::NotImplementedException("DiaMatrix.resize(" + str_args + ")");
+    throw Morpheus::NotImplementedException("DiaMatrix.resize(" + str_args +
+                                            ")");
   }
 
   // Assignment from another matrix type
   template <typename MatrixType>
   DiaMatrix &operator=(const MatrixType &matrix) {
     // TODO: DiaMatrix.operator=(const MatrixType& matrix)
-    Morpheus::NotImplementedException(
+    throw Morpheus::NotImplementedException(
         "DiaMatrix.operator=(const MatrixType& matrix)");
   }
 

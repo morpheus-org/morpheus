@@ -98,7 +98,8 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   template <typename MatrixType>
   CooMatrix(const MatrixType &matrix) {
     // TODO: CooMatrix(const MatrixType& matrix)
-    Morpheus::NotImplementedException("CooMatrix(const MatrixType& matrix)");
+    throw Morpheus::NotImplementedException(
+        "CooMatrix(const MatrixType& matrix)");
   }
 
   // Resize matrix dimensions and underlying storage
@@ -115,7 +116,8 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   // Assignment from another matrix type
   template <typename MatrixType>
   CooMatrix &operator=(const MatrixType &matrix) {
-    std::cout << "CooMatrix.operator=(const MatrixType& matrix)" << std::endl;
+    throw std::cout << "CooMatrix.operator=(const MatrixType& matrix)"
+                    << std::endl;
   }
 
   // Operations specific to COO format
@@ -123,26 +125,27 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   // Sort matrix elements by row index
   void sort_by_row(void) {
     // TODO: CooMatrix.sort_by_row
-    Morpheus::NotImplementedException("CooMatrix.sort_by_row()");
+    throw Morpheus::NotImplementedException("CooMatrix.sort_by_row()");
   }
 
   // Sort matrix elements by row and column index
   void sort_by_row_and_column(void) {
     // TODO: CooMatrix.sort_by_row_and_column
-    Morpheus::NotImplementedException("CooMatrix.sort_by_row_and_column()");
+    throw Morpheus::NotImplementedException(
+        "CooMatrix.sort_by_row_and_column()");
   }
 
   // Determine whether matrix elements are sorted by row index
   bool is_sorted_by_row(void) {
     // TODO: CooMatrix.is_sorted_by_row
-    Morpheus::NotImplementedException("CooMatrix.is_sorted_by_row()");
+    throw Morpheus::NotImplementedException("CooMatrix.is_sorted_by_row()");
     return true;
   }
 
   // Determine whether matrix elements are sorted by row and column index
   bool is_sorted_by_row_and_column(void) {
     // TODO: CooMatrix.is_sorted_by_row_and_column
-    Morpheus::NotImplementedException(
+    throw Morpheus::NotImplementedException(
         "CooMatrix.is_sorted_by_row_and_column()");
     return true;
   }
