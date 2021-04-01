@@ -32,10 +32,14 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename Matrix, typename Vector>
-void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::DiaTag) {
-  Morpheus::NotImplementedException(
+void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::DiaTag,
+              typename std::enable_if<
+                  std::is_same<typename Matrix::execution_space,
+                               Kokkos::Serial::execution_space>::value,
+                  Kokkos::Serial::execution_space>::type* = nullptr) {
+  throw Morpheus::NotImplementedException(
       "void multiply(const " + A.name() + "& A, const " + x.name() + "& x, " +
-      y.name() + "& y," + "Morpheus::Impl::SparseMatTag)");
+      y.name() + "& y," + "Morpheus::DiaTag, Kokkos::Serial)");
 }
 
 }  // namespace Impl

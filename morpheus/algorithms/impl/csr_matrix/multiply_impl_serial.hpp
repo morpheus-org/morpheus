@@ -31,9 +31,14 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename Matrix, typename Vector>
-void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::CsrTag) {
+void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::CsrTag,
+              typename std::enable_if<
+                  std::is_same<typename Matrix::execution_space,
+                               Kokkos::Serial::execution_space>::value,
+                  Kokkos::Serial::execution_space>::type* = nullptr) {
   using I = typename Matrix::index_type;
   using T = typename Matrix::value_type;
+
   for (I i = 0; i < A.nrows(); i++) {
     T sum = y[i];
     for (I jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {

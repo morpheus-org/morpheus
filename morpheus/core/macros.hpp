@@ -1,5 +1,5 @@
 /**
- * multiply_impl.hpp
+ * macros.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,17 +21,15 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
+#ifndef MORPHEUS_CORE_MACROS_HPP
+#define MORPHEUS_CORE_MACROS_HPP
 
-#include <morpheus/algorithms/impl/coo_matrix/multiply_impl_serial.hpp>
-#include <morpheus/algorithms/impl/csr_matrix/multiply_impl_serial.hpp>
-#include <morpheus/algorithms/impl/dia_matrix/multiply_impl_serial.hpp>
+#ifdef KOKKOS_ENABLE_CUDA
+#define MORPHEUS_ENABLE_CUDA  // Kokkos::Cuda execution and memory spaces
+#endif
 
-#include <morpheus/algorithms/impl/coo_matrix/multiply_impl_openmp.hpp>
-#include <morpheus/algorithms/impl/csr_matrix/multiply_impl_openmp.hpp>
-#include <morpheus/algorithms/impl/dia_matrix/multiply_impl_openmp.hpp>
+#ifdef KOKKOS_ENABLE_OPENMP
+#define MORPHEUS_ENABLE_OPENMP  // Kokkos::OpenMP execution and memory spaces
+#endif
 
-#include <morpheus/algorithms/impl/dynamic_matrix/multiply_impl.hpp>
-
-#endif  // MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
+#endif  // MORPHEUS_CORE_MACROS_HPP

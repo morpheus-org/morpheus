@@ -1,5 +1,5 @@
 /**
- * multiply_serial.hpp
+ * multiply_impl_openmp.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,29 +21,32 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_OPENMP_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_OPENMP_HPP
 
-#include <morpheus/containers/coo_matrix.hpp>
+#include <morpheus/core/macros.hpp>
+#if defined(MORPHEUS_ENABLE_OPENMP)
+
+#include <morpheus/containers/dia_matrix.hpp>
 #include <morpheus/containers/vector.hpp>
+#include <morpheus/core/exceptions.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename Matrix, typename Vector>
-void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::CooTag,
+void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::DiaTag,
               typename std::enable_if<
                   std::is_same<typename Matrix::execution_space,
-                               Kokkos::Serial::execution_space>::value,
-                  Kokkos::Serial::execution_space>::type* = nullptr) {
-  using I = typename Matrix::index_type;
-
-  for (I n = 0; n < A.nnnz(); n++) {
-    y[A.row_indices[n]] += A.values[n] * x[A.column_indices[n]];
-  }
+                               Kokkos::OpenMP::execution_space>::value,
+                  Kokkos::OpenMP::execution_space>::type* = nullptr) {
+  throw Morpheus::NotImplementedException(
+      "void multiply(const " + A.name() + "& A, const " + x.name() + "& x, " +
+      y.name() + "& y," + "Morpheus::DiaTag, Kokkos::OpenMP)");
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
+#endif  // MORPHEUS_ENABLE_OPENMP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_OPENMP_HPP
