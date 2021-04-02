@@ -24,6 +24,7 @@
 #ifndef MORPHEUS_CONTAINERS_DYNAMIC_MATRIX_HPP
 #define MORPHEUS_CONTAINERS_DYNAMIC_MATRIX_HPP
 
+#include <iostream>
 #include <string>
 #include <variant>
 #include <functional>

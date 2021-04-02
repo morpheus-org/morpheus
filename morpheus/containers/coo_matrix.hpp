@@ -24,9 +24,7 @@
 #ifndef MORPHEUS_CONTAINERS_COO_MATRIX_HPP
 #define MORPHEUS_CONTAINERS_COO_MATRIX_HPP
 
-#include <iostream>
 #include <string>
-#include <vector>
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
@@ -116,8 +114,8 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   // Assignment from another matrix type
   template <typename MatrixType>
   CooMatrix &operator=(const MatrixType &matrix) {
-    throw std::cout << "CooMatrix.operator=(const MatrixType& matrix)"
-                    << std::endl;
+    throw Morpheus::NotImplementedException(
+        "CooMatrix.operator=(const MatrixType& matrix)");
   }
 
   // Operations specific to COO format

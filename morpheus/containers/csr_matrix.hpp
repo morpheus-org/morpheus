@@ -24,9 +24,7 @@
 #ifndef MORPHEUS_CONTAINERS_CSR_MATRIX_HPP
 #define MORPHEUS_CONTAINERS_CSR_MATRIX_HPP
 
-#include <iostream>
 #include <string>
-#include <vector>
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
