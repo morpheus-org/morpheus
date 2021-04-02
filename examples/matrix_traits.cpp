@@ -45,7 +45,8 @@
 using case1 = Morpheus::Impl::MatrixTraits<double>;
 static_assert(std::is_same_v<case1::value_type, double>);
 static_assert(std::is_same_v<case1::index_type, int>);
-static_assert(std::is_same_v<case1::array_layout, Kokkos::LayoutRight>);
+static_assert(std::is_same_v<case1::array_layout,
+                             Kokkos::DefaultExecutionSpace::array_layout>);
 static_assert(
     std::is_same_v<case1::execution_space, Kokkos::DefaultExecutionSpace>);
 static_assert(std::is_same_v<case1::memory_space,
@@ -71,7 +72,8 @@ static_assert(
 using case3 = Morpheus::Impl::MatrixTraits<double, long, Kokkos::Serial>;
 static_assert(std::is_same_v<case3::value_type, double>);
 static_assert(std::is_same_v<case3::index_type, long>);
-static_assert(std::is_same_v<case3::array_layout, Kokkos::LayoutRight>);
+static_assert(
+    std::is_same_v<case3::array_layout, Kokkos::Serial::array_layout>);
 static_assert(
     std::is_same_v<case3::execution_space, Kokkos::Serial::execution_space>);
 static_assert(

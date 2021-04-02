@@ -116,13 +116,13 @@ struct MatrixTraits {
       !std::is_same_v<typename prop::index_type, void>,
       typename prop::index_type, int>;
 
-  using ArrayLayout = typename std::conditional_t<
-      !std::is_same_v<typename prop::array_layout, void>,
-      typename prop::array_layout, Kokkos::LayoutRight>;
-
   using ExecutionSpace = typename std::conditional_t<
       !std::is_same_v<typename prop::execution_space, void>,
       typename prop::execution_space, Kokkos::DefaultExecutionSpace>;
+
+  using ArrayLayout = typename std::conditional_t<
+      !std::is_same_v<typename prop::array_layout, void>,
+      typename prop::array_layout, typename ExecutionSpace::array_layout>;
 
   using MemorySpace = typename std::conditional_t<
       !std::is_same_v<typename prop::memory_space, void>,
