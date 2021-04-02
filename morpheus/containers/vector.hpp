@@ -71,10 +71,8 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   DenseVector& operator=(const DenseVector&) = default;
   DenseVector& operator=(DenseVector&&) = default;
 
-  inline DenseVector() : _data() {
-    _size          = 0;
-    _extra_storage = 1.1;
-  }
+  inline DenseVector()
+      : _size(0), _extra_storage(1.1), _data(), _name("Vector") {}
 
   inline DenseVector(const std::string name, int n, value_type val = 0)
       : _size(n),
