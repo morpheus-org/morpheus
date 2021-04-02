@@ -48,7 +48,9 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   using traits = Impl::VectorTraits<Properties...>;
   using tag    = typename VectorFormatTag<DenseVectorTag>::tag;
 
-  using value_type      = typename traits::value_type;
+  using value_type = typename traits::value_type;
+  using index_type = size_t;
+
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
@@ -57,11 +59,14 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   using const_pointer   = const value_type*;
   using reference       = value_type&;
   using const_reference = const value_type&;
-  using iterator        = value_type*;
-  using const_iterator  = const value_type*;
-  using size_type       = size_t;  // should that be IndexType as in matrices ?
 
-  using array_type = Kokkos::View<pointer, Kokkos::LayoutRight, memory_space>;
+  using iterator       = value_type*;
+  using const_iterator = const value_type*;
+
+  using value_array_type =
+      Kokkos::View<value_type*, Kokkos::LayoutRight, device_type>;
+  using value_array_pointer   = typename value_array_type::pointer_type;
+  using value_array_reference = typename value_array_type::reference_type;
 
  public:
   //   Member functions
@@ -72,71 +77,75 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   DenseVector& operator=(DenseVector&&) = default;
 
   inline DenseVector()
-      : _size(0), _extra_storage(1.1), _data(), _name("Vector") {}
+      : _name("Vector"), _size(0), _extra_storage(1.1), _values() {}
 
   inline DenseVector(const std::string name, int n, value_type val = 0)
-      : _size(n),
+      : _name(name),
+        _size(n),
         _extra_storage(1.1),
-        _data(name, size_t(n * 1.1)),
-        _name(name) {
+        _values(name, size_t(n * 1.1)) {
     assign(n, val);
   }
 
   inline DenseVector(int n, value_type val = 0)
-      : _size(n),
+      : _name("Vector"),
+        _size(n),
         _extra_storage(1.1),
-        _data("Vector", size_t(n * 1.1)),
-        _name("Vector") {
+        _values("Vector", size_t(n * 1.1)) {
     assign(n, val);
   }
 
-  inline void assign(size_t n, const_reference val) {
+  inline void assign(const index_type n, const value_type val) {
     /* Resize if necessary (behavior of std:vector) */
+    this->resize(n);
 
-    if (n > _data.span()) Kokkos::resize(_data, size_t(n * _extra_storage));
-    _size = n;
-
-    Kokkos::RangePolicy<execution_space, size_type> range(0, n);
+    Kokkos::RangePolicy<execution_space, index_type> range(0, n);
     Kokkos::parallel_for(
         "Morpheus::DenseVector::assign", range,
-        KOKKOS_LAMBDA(const int i) { _data(i) = val; });
+        KOKKOS_LAMBDA(const int i) { _values(i) = val; });
   }
 
   // Element access
-  inline reference operator()(int i) const { return _data(i); }
-
-  inline reference operator[](int i) const { return _data(i); }
-
-  inline size_type size() const { return _size; }
-
-  inline pointer data() const { return _data.data(); }
-
-  // Iterators
-  inline iterator begin() { return _data.data(); }
-
-  inline iterator end() {
-    return _size > 0 ? _data.data() + _size : _data.data();
+  inline value_array_reference operator()(index_type i) const {
+    return _values(i);
   }
 
-  inline const_iterator cbegin() const { return _data.data(); }
+  inline value_array_reference operator[](index_type i) const {
+    return _values(i);
+  }
+
+  inline index_type size() const { return _size; }
+
+  inline value_array_pointer data() const { return _values.data(); }
+
+  // Iterators
+  inline iterator begin() { return _values.data(); }
+
+  inline iterator end() {
+    return _size > 0 ? _values.data() + _size : _values.data();
+  }
+
+  inline const_iterator cbegin() const { return _values.data(); }
 
   inline const_iterator cend() const {
-    return _size > 0 ? _data.data() + _size : _data.data();
+    return _size > 0 ? _values.data() + _size : _values.data();
   }
 
   // Capacity
   //   TODO: reserve should be enabled when push_back methods etc are developed
   //   inline void reserve(size_t n) {
-  //     Kokkos::resize(_data, size_t(n * _extra_storage));
+  //     Kokkos::resize(_values, size_t(n * _extra_storage));
   //   }
 
   // Modifiers
-  inline void resize(size_t n) {
-    if (n > _data.span()) Kokkos::resize(_data, size_t(n * _extra_storage));
+  inline void resize(index_type n) {
+    if (n > _values.span()) Kokkos::resize(_values, size_t(n * _extra_storage));
     _size = n;
   }
 
-  inline void resize(size_t n, const_reference val) { assign(n, val); }
+  inline void resize(const index_type n, const index_type val) {
+    assign(n, val);
+  }
 
   // TODO: Data management routines for copying to and from a space
 
@@ -144,10 +153,10 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   inline std::string name() const { return _name; }
 
  private:
-  size_t _size;
-  float _extra_storage;
-  array_type _data;
   std::string _name;
+  index_type _size;
+  float _extra_storage;
+  value_array_type _values;
 };
 }  // namespace Morpheus
 

@@ -40,17 +40,25 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
  public:
   using type   = CsrMatrix<Properties...>;
   using traits = Impl::MatrixTraits<Properties...>;
+  using tag    = typename MatrixFormatTag<CsrTag>::tag;
 
-  using index_type = typename traits::index_type;
   using value_type = typename traits::value_type;
+  using index_type = typename traits::index_type;
+  using size_type  = typename traits::index_type;
 
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
-  using tag             = typename MatrixFormatTag<CsrTag>::tag;
 
-  using index_array_type = Morpheus::vector<index_type>;
-  using value_array_type = Morpheus::vector<value_type>;
+  using pointer         = CsrMatrix *;
+  using const_pointer   = const CsrMatrix *;
+  using reference       = CsrMatrix &;
+  using const_reference = const CsrMatrix &;
+
+  using index_array_type      = Morpheus::vector<index_type, device_type>;
+  using value_array_type      = Morpheus::vector<value_type, device_type>;
+  using value_array_pointer   = typename value_array_type::pointer;
+  using value_array_reference = typename value_array_type::reference;
 
   index_array_type row_offsets, column_indices;
   value_array_type values;
@@ -58,8 +66,8 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
   ~CsrMatrix()                 = default;
   CsrMatrix(const CsrMatrix &) = default;
   CsrMatrix(CsrMatrix &&)      = default;
-  CsrMatrix &operator=(const CsrMatrix &) = default;
-  CsrMatrix &operator=(CsrMatrix &&) = default;
+  reference operator=(const CsrMatrix &) = default;
+  reference operator=(CsrMatrix &&) = default;
 
   // Construct an empty CsrMatrix
   inline CsrMatrix()
@@ -113,7 +121,7 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
 
   // Assignment from another matrix type
   template <typename MatrixType>
-  CsrMatrix &operator=(const MatrixType &matrix) {
+  reference operator=(const MatrixType &matrix) {
     // TODO: operator=(const MatrixType& matrix)
     throw Morpheus::NotImplementedException(
         "CsrMatrix.operator=(const MatrixType& matrix)");

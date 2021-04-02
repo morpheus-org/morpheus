@@ -40,17 +40,25 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
  public:
   using type   = CooMatrix<Properties...>;
   using traits = Impl::MatrixTraits<Properties...>;
+  using tag    = typename MatrixFormatTag<CooTag>::tag;
 
-  using index_type = typename traits::index_type;
   using value_type = typename traits::value_type;
+  using index_type = typename traits::index_type;
+  using size_type  = typename traits::index_type;
 
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
-  using tag             = typename MatrixFormatTag<CooTag>::tag;
 
-  using index_array_type = Morpheus::vector<index_type, device_type>;
-  using value_array_type = Morpheus::vector<value_type, device_type>;
+  using pointer         = CooMatrix *;
+  using const_pointer   = const CooMatrix *;
+  using reference       = CooMatrix &;
+  using const_reference = const CooMatrix &;
+
+  using index_array_type      = Morpheus::vector<index_type, device_type>;
+  using value_array_type      = Morpheus::vector<value_type, device_type>;
+  using value_array_pointer   = typename value_array_type::pointer;
+  using value_array_reference = typename value_array_type::reference;
 
   index_array_type row_indices, column_indices;
   value_array_type values;
@@ -58,8 +66,8 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   ~CooMatrix()                 = default;
   CooMatrix(const CooMatrix &) = default;
   CooMatrix(CooMatrix &&)      = default;
-  CooMatrix &operator=(const CooMatrix &) = default;
-  CooMatrix &operator=(CooMatrix &&) = default;
+  reference operator=(const CooMatrix &) = default;
+  reference operator=(CooMatrix &&) = default;
 
   // Construct an empty CooMatrix
   inline CooMatrix()
@@ -113,7 +121,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
 
   // Assignment from another matrix type
   template <typename MatrixType>
-  CooMatrix &operator=(const MatrixType &matrix) {
+  reference operator=(const MatrixType &matrix) {
     throw Morpheus::NotImplementedException(
         "CooMatrix.operator=(const MatrixType& matrix)");
   }

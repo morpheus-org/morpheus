@@ -52,24 +52,27 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
  public:
   using type   = DynamicMatrix<Properties...>;
   using traits = Impl::MatrixTraits<Properties...>;
+  using tag    = typename MatrixFormatTag<DynamicTag>::tag;
 
   using variant_type = typename MatrixFormats<Properties...>::variant;
-  using index_type   = typename traits::index_type;
   using value_type   = typename traits::value_type;
+  using index_type   = typename traits::index_type;
+  using size_type    = typename traits::index_type;
 
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
-  using tag             = typename MatrixFormatTag<DynamicTag>::tag;
 
+  using pointer         = DynamicMatrix *;
+  using const_pointer   = const DynamicMatrix *;
   using reference       = DynamicMatrix &;
   using const_reference = const DynamicMatrix &;
 
   ~DynamicMatrix()                     = default;
   DynamicMatrix(const DynamicMatrix &) = default;
   DynamicMatrix(DynamicMatrix &&)      = default;
-  DynamicMatrix &operator=(const DynamicMatrix &) = default;
-  DynamicMatrix &operator=(DynamicMatrix &&) = default;
+  reference operator=(const DynamicMatrix &) = default;
+  reference operator=(DynamicMatrix &&) = default;
 
   inline DynamicMatrix() : _name("DynamicMatrix"), _formats() {}
 
@@ -133,7 +136,7 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
 
  private:
   std::string _name;
-  typename MatrixFormats<Properties...>::variant _formats;
+  variant_type _formats;
 };
 }  // namespace Morpheus
 
