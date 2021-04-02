@@ -36,9 +36,11 @@ namespace Impl {
  *
  * Template argument options:
  *  - MatrixTraits<ValueType>
- *  - MatrixTraits<ValueType, IndexType>
+ *  - MatrixTraits<ValueType, ArrayLayout>
  *  - MatrixTraits<ValueType, IndexType, Space>
- *  - MatrixTraits<ValueType, Space>
+ *  - MatrixTraits<ValueType, IndexType, ArrayLayout>
+ *  - MatrixTraits<ValueType, IndexType, ArrayLayout, Space>
+ *  - MatrixTraits<ValueType, ArrayLayout, Space>
  */
 template <typename ValueType, class... Properties>
 struct MatrixTraits;
@@ -46,6 +48,7 @@ struct MatrixTraits;
 template <>
 struct MatrixTraits<void> {
   using index_type      = void;
+  using array_layout    = void;
   using execution_space = void;
   using memory_space    = void;
 };
@@ -55,6 +58,7 @@ struct MatrixTraits<void, void, Prop...> {
   // Ignore an extraneous 'void'
 
   using index_type      = typename MatrixTraits<void, Prop...>::index_type;
+  using array_layout    = typename MatrixTraits<void, Prop...>::array_layout;
   using execution_space = typename MatrixTraits<void, Prop...>::execution_space;
   using memory_space    = typename MatrixTraits<void, Prop...>::memory_space;
 };
@@ -63,9 +67,22 @@ template <typename IndexType, class... Prop>
 struct MatrixTraits<
     typename std::enable_if_t<std::is_integral<IndexType>::value>, IndexType,
     Prop...> {
-  // Specify index type, keep subsequent memory space arguments
+  // Specify index type, keep subsequent layout and space arguments
 
   using index_type      = IndexType;
+  using array_layout    = typename MatrixTraits<void, Prop...>::array_layout;
+  using execution_space = typename MatrixTraits<void, Prop...>::execution_space;
+  using memory_space    = typename MatrixTraits<void, Prop...>::memory_space;
+};
+
+template <typename ArrayLayout, class... Prop>
+struct MatrixTraits<typename std::enable_if_t<
+                        Kokkos::Impl::is_array_layout<ArrayLayout>::value>,
+                    ArrayLayout, Prop...> {
+  // Specify Layout, keep subsequent space arguments
+
+  using index_type      = void;
+  using array_layout    = ArrayLayout;
   using execution_space = typename MatrixTraits<void, Prop...>::execution_space;
   using memory_space    = typename MatrixTraits<void, Prop...>::memory_space;
 };
@@ -84,6 +101,7 @@ struct MatrixTraits<
       "Only one Matrix Execution or Memory Space template argument");
 
   using index_type      = void;
+  using array_layout    = void;
   using execution_space = typename Space::execution_space;
   using memory_space    = typename Space::memory_space;
 };
@@ -98,6 +116,10 @@ struct MatrixTraits {
       !std::is_same_v<typename prop::index_type, void>,
       typename prop::index_type, int>;
 
+  using ArrayLayout = typename std::conditional_t<
+      !std::is_same_v<typename prop::array_layout, void>,
+      typename prop::array_layout, Kokkos::LayoutRight>;
+
   using ExecutionSpace = typename std::conditional_t<
       !std::is_same_v<typename prop::execution_space, void>,
       typename prop::execution_space, Kokkos::DefaultExecutionSpace>;
@@ -111,8 +133,9 @@ struct MatrixTraits {
                 "ValueType must be an arithmetic type such as int or double");
 
  public:
-  using value_type = ValueType;
-  using index_type = IndexType;
+  using value_type   = ValueType;
+  using index_type   = IndexType;
+  using array_layout = ArrayLayout;
 
   using execution_space = ExecutionSpace;
   using memory_space    = MemorySpace;

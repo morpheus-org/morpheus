@@ -25,38 +25,100 @@
 
 #include <morpheus/core/matrix_traits.hpp>
 
-// Template argument options:
-// - MatrixTraits<ValueType>
-// - MatrixTraits<ValueType, IndexType>
-//- MatrixTraits<ValueType, IndexType, Space>
-//- MatrixTraits<ValueType, Space>
+//  * Template argument options:
+//  *  - MatrixTraits<ValueType>
+//  *  - MatrixTraits<ValueType, ArrayLayout>
+//  *  - MatrixTraits<ValueType, IndexType, Space>
+//  *  - MatrixTraits<ValueType, IndexType, ArrayLayout>
+//  *  - MatrixTraits<ValueType, IndexType, ArrayLayout, Space>
+//  *  - MatrixTraits<ValueType, ArrayLayout, Space>
 
-using traits_d = Morpheus::Impl::MatrixTraits<double>;
-static_assert(std::is_same_v<traits_d::value_type, double>);
-static_assert(std::is_same_v<traits_d::index_type, int>);
+//   using value_type   = ValueType;
+//   using index_type   = IndexType;
+//   using array_layout = ArrayLayout;
 
-using traits_il = Morpheus::Impl::MatrixTraits<int, long>;
-static_assert(std::is_same_v<traits_il::value_type, int>);
-static_assert(std::is_same_v<traits_il::index_type, long>);
+//   using execution_space = ExecutionSpace;
+//   using memory_space    = MemorySpace;
+//   using device_type     = Kokkos::Device<ExecutionSpace, MemorySpace>;
 
-using traits_l = Morpheus::Impl::MatrixTraits<long>;
-static_assert(std::is_same_v<traits_l::value_type, long>);
-static_assert(std::is_same_v<traits_l::index_type, int>);
-
-using traits_flv = Morpheus::Impl::MatrixTraits<float, long>;
-static_assert(std::is_same_v<traits_flv::value_type, float>);
-static_assert(std::is_same_v<traits_flv::index_type, long>);
+// MatrixTraits<ValueType>
+using case1 = Morpheus::Impl::MatrixTraits<double>;
+static_assert(std::is_same_v<case1::value_type, double>);
+static_assert(std::is_same_v<case1::index_type, int>);
+static_assert(std::is_same_v<case1::array_layout, Kokkos::LayoutRight>);
 static_assert(
-    std::is_same_v<traits_flv::memory_space, Kokkos::HostSpace::memory_space>);
+    std::is_same_v<case1::execution_space, Kokkos::DefaultExecutionSpace>);
+static_assert(std::is_same_v<case1::memory_space,
+                             Kokkos::DefaultExecutionSpace::memory_space>);
 static_assert(
-    std::is_same_v<traits_flv::execution_space, Kokkos::DefaultExecutionSpace>);
+    std::is_same_v<case1::device_type, Kokkos::Device<case1::execution_space,
+                                                      case1::memory_space>>);
 
-using traits_sp = Morpheus::Impl::MatrixTraits<float, long, Kokkos::HostSpace>;
-static_assert(std::is_same_v<traits_sp::value_type, float>);
-static_assert(std::is_same_v<traits_sp::index_type, long>);
+// MatrixTraits<ValueType, ArrayLayout>
+using case2 = Morpheus::Impl::MatrixTraits<double, Kokkos::LayoutStride>;
+static_assert(std::is_same_v<case2::value_type, double>);
+static_assert(std::is_same_v<case2::index_type, int>);
+static_assert(std::is_same_v<case2::array_layout, Kokkos::LayoutStride>);
 static_assert(
-    std::is_same_v<traits_sp::memory_space, Kokkos::HostSpace::memory_space>);
-static_assert(std::is_same_v<traits_sp::execution_space,
-                             Kokkos::HostSpace::execution_space>);
+    std::is_same_v<case2::execution_space, Kokkos::DefaultExecutionSpace>);
+static_assert(std::is_same_v<case2::memory_space,
+                             Kokkos::DefaultExecutionSpace::memory_space>);
+static_assert(
+    std::is_same_v<case2::device_type, Kokkos::Device<case2::execution_space,
+                                                      case2::memory_space>>);
+
+// MatrixTraits<ValueType, IndexType, Space>
+using case3 = Morpheus::Impl::MatrixTraits<double, long, Kokkos::Serial>;
+static_assert(std::is_same_v<case3::value_type, double>);
+static_assert(std::is_same_v<case3::index_type, long>);
+static_assert(std::is_same_v<case3::array_layout, Kokkos::LayoutRight>);
+static_assert(
+    std::is_same_v<case3::execution_space, Kokkos::Serial::execution_space>);
+static_assert(
+    std::is_same_v<case3::memory_space, Kokkos::Serial::memory_space>);
+static_assert(
+    std::is_same_v<case3::device_type, Kokkos::Device<case3::execution_space,
+                                                      case3::memory_space>>);
+
+// MatrixTraits<ValueType, IndexType, ArrayLayout>
+using case4 = Morpheus::Impl::MatrixTraits<double, long, Kokkos::LayoutStride>;
+static_assert(std::is_same_v<case4::value_type, double>);
+static_assert(std::is_same_v<case4::index_type, long>);
+static_assert(std::is_same_v<case4::array_layout, Kokkos::LayoutStride>);
+static_assert(std::is_same_v<case4::execution_space,
+                             Kokkos::DefaultExecutionSpace::execution_space>);
+static_assert(std::is_same_v<case4::memory_space,
+                             Kokkos::DefaultExecutionSpace::memory_space>);
+static_assert(
+    std::is_same_v<case4::device_type, Kokkos::Device<case4::execution_space,
+                                                      case4::memory_space>>);
+
+// MatrixTraits<ValueType, IndexType, ArrayLayout, Space>
+using case5 = Morpheus::Impl::MatrixTraits<double, long, Kokkos::LayoutStride,
+                                           Kokkos::Serial>;
+static_assert(std::is_same_v<case5::value_type, double>);
+static_assert(std::is_same_v<case5::index_type, long>);
+static_assert(std::is_same_v<case5::array_layout, Kokkos::LayoutStride>);
+static_assert(
+    std::is_same_v<case5::execution_space, Kokkos::Serial::execution_space>);
+static_assert(
+    std::is_same_v<case5::memory_space, Kokkos::Serial::memory_space>);
+static_assert(
+    std::is_same_v<case5::device_type, Kokkos::Device<case5::execution_space,
+                                                      case5::memory_space>>);
+
+// MatrixTraits<ValueType, ArrayLayout, Space>
+using case6 =
+    Morpheus::Impl::MatrixTraits<double, Kokkos::LayoutStride, Kokkos::Serial>;
+static_assert(std::is_same_v<case6::value_type, double>);
+static_assert(std::is_same_v<case6::index_type, int>);
+static_assert(std::is_same_v<case6::array_layout, Kokkos::LayoutStride>);
+static_assert(
+    std::is_same_v<case6::execution_space, Kokkos::Serial::execution_space>);
+static_assert(
+    std::is_same_v<case6::memory_space, Kokkos::Serial::memory_space>);
+static_assert(
+    std::is_same_v<case6::device_type, Kokkos::Device<case6::execution_space,
+                                                      case6::memory_space>>);
 
 int main() { std::puts("All checks are passed."); }
