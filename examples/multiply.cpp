@@ -30,9 +30,9 @@
 int main() {
   Morpheus::initialize();
   {
-    Morpheus::CooMatrix<double, int> A(4, 3, 6);
-    Morpheus::DynamicMatrix<double, int> B(A);
-    Morpheus::DenseVector<double> x(4, 2), ya("ya", 4, 0), yb("yb", 4, 0);
+    Morpheus::CooMatrix<double, int, Kokkos::Serial> A(4, 3, 6);
+    Morpheus::DynamicMatrix<double, int, Kokkos::Serial> B(A);
+    Morpheus::DenseVector<double> x(3, 2), ya("ya", 4, 0), yb("yb", 4, 0);
     // initialize matrix entries
     A.row_indices[0]    = 0;
     A.column_indices[0] = 0;

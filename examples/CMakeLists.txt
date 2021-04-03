@@ -36,6 +36,7 @@ set( SOURCES_IDIOMATIC_EXAMPLES
     CsrMatrix.cpp
     omp.cpp
     DenseMatrix.cpp
+    DiaMatrix.cpp
 )
 
 string( REPLACE ".cpp" "" BASENAMES_IDIOMATIC_EXAMPLES "${SOURCES_IDIOMATIC_EXAMPLES}" )

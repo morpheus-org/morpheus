@@ -28,9 +28,9 @@
 #include <morpheus/algorithms/multiply.hpp>
 #include <morpheus/algorithms/print.hpp>
 
-using coo = Morpheus::CooMatrix<double, int>;
-using csr = Morpheus::CsrMatrix<double, int>;
-using vec = Morpheus::DenseVector<double>;
+using coo = Morpheus::CooMatrix<double, int, Kokkos::Serial>;
+using csr = Morpheus::CsrMatrix<double, int, Kokkos::Serial>;
+using vec = Morpheus::DenseVector<double, Kokkos::Serial>;
 int main() {
   Morpheus::initialize();
   {
