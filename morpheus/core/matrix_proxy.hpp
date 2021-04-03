@@ -37,9 +37,9 @@ struct TypeList {
 
 template <class... Formats>
 struct MatrixFormatsProxy {
-  using type    = MatrixFormatsProxy<Formats...>;
-  using variant = std::variant<Formats...>;
+  using type = MatrixFormatsProxy<Formats...>;
 
+  using variant   = std::variant<Formats...>;
   using type_list = TypeList<Formats...>;
 };
 

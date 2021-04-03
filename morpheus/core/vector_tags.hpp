@@ -1,5 +1,5 @@
 /**
- * multiply.hpp
+ * vector_tags.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,18 +21,24 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_MULTIPLY_HPP
-#define MORPHEUS_ALGORITHMS_MULTIPLY_HPP
-
-#include <morpheus/algorithms/impl/multiply_impl.hpp>
+#ifndef MORPHEUS_CORE_VECTOR_TAGS_HPP
+#define MORPHEUS_CORE_VECTOR_TAGS_HPP
 
 namespace Morpheus {
 
-template <typename Matrix, typename Vector>
-void multiply(Matrix const& A, Vector const& x, Vector& y) {
-  Impl::multiply(A, x, y, typename Matrix::tag());
-}
+namespace Impl {
+struct VectorTag {};
+}  // namespace Impl
+
+// Matrix Format Tag Wrapper
+template <class T>
+struct VectorFormatTag {
+  static_assert(std::is_base_of<Impl::VectorTag, T>::value,
+                "Morpheus: Invalid Vector Format tag.");
+  using format_tag = VectorFormatTag;
+  using tag        = T;
+};
 
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_MULTIPLY_HPP
+#endif  // MORPHEUS_CORE_VECTOR_TAGS_HPP

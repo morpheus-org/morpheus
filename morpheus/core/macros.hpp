@@ -1,5 +1,5 @@
 /**
- * multiply.hpp
+ * macros.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,18 +21,15 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_MULTIPLY_HPP
-#define MORPHEUS_ALGORITHMS_MULTIPLY_HPP
+#ifndef MORPHEUS_CORE_MACROS_HPP
+#define MORPHEUS_CORE_MACROS_HPP
 
-#include <morpheus/algorithms/impl/multiply_impl.hpp>
+#ifdef KOKKOS_ENABLE_CUDA
+#define MORPHEUS_ENABLE_CUDA  // Kokkos::Cuda execution and memory spaces
+#endif
 
-namespace Morpheus {
+#ifdef KOKKOS_ENABLE_OPENMP
+#define MORPHEUS_ENABLE_OPENMP  // Kokkos::OpenMP execution and memory spaces
+#endif
 
-template <typename Matrix, typename Vector>
-void multiply(Matrix const& A, Vector const& x, Vector& y) {
-  Impl::multiply(A, x, y, typename Matrix::tag());
-}
-
-}  // namespace Morpheus
-
-#endif  // MORPHEUS_ALGORITHMS_MULTIPLY_HPP
+#endif  // MORPHEUS_CORE_MACROS_HPP

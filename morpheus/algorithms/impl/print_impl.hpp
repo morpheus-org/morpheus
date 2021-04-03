@@ -1,5 +1,5 @@
 /**
- * multiply.hpp
+ * print_impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,18 +21,14 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_MULTIPLY_HPP
-#define MORPHEUS_ALGORITHMS_MULTIPLY_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_PRINT_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_PRINT_IMPL_HPP
 
-#include <morpheus/algorithms/impl/multiply_impl.hpp>
+#include <morpheus/algorithms/impl/coo_matrix/print_impl_serial.hpp>
+#include <morpheus/algorithms/impl/csr_matrix/print_impl_serial.hpp>
+#include <morpheus/algorithms/impl/dia_matrix/print_impl_serial.hpp>
+#include <morpheus/algorithms/impl/vector/print_impl_serial.hpp>
 
-namespace Morpheus {
+#include <morpheus/algorithms/impl/dynamic_matrix/print_impl.hpp>
 
-template <typename Matrix, typename Vector>
-void multiply(Matrix const& A, Vector const& x, Vector& y) {
-  Impl::multiply(A, x, y, typename Matrix::tag());
-}
-
-}  // namespace Morpheus
-
-#endif  // MORPHEUS_ALGORITHMS_MULTIPLY_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_PRINT_IMPL_HPP

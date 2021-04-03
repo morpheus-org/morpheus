@@ -27,6 +27,16 @@ set( SOURCES_IDIOMATIC_EXAMPLES
     version.cpp
     dynamic_resize.cpp
     switch_interface.cpp
+    matrix_traits.cpp
+    vector_traits.cpp
+    morpheus_init.cpp
+    vector.cpp
+    CooMatrix.cpp
+    multiply.cpp
+    CsrMatrix.cpp
+    omp.cpp
+    DenseMatrix.cpp
+    DiaMatrix.cpp
 )
 
 string( REPLACE ".cpp" "" BASENAMES_IDIOMATIC_EXAMPLES "${SOURCES_IDIOMATIC_EXAMPLES}" )

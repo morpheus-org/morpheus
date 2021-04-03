@@ -1,5 +1,5 @@
 /**
- * multiply.hpp
+ * print_impl_serial.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,18 +21,29 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_MULTIPLY_HPP
-#define MORPHEUS_ALGORITHMS_MULTIPLY_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_VECTOR_PRINT_IMPL_SERIAL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_VECTOR_PRINT_IMPL_SERIAL_HPP
 
-#include <morpheus/algorithms/impl/multiply_impl.hpp>
+#include <iostream>
+#include <iomanip>
+
+#include <morpheus/containers/vector.hpp>
 
 namespace Morpheus {
+namespace Impl {
 
-template <typename Matrix, typename Vector>
-void multiply(Matrix const& A, Vector const& x, Vector& y) {
-  Impl::multiply(A, x, y, typename Matrix::tag());
+template <typename Printable, typename Stream>
+void print(const Printable& p, Stream& s, Morpheus::DenseVectorTag) {
+  using index_type = typename Printable::index_type;
+  s << p.name() << "<" << p.size() << "> with " << p.size() << " entries\n";
+
+  for (index_type n = 0; n < p.size(); n++) {
+    s << " " << std::setw(14) << n;
+    s << " " << std::setprecision(4) << std::setw(8) << "(" << p[n] << ")\n";
+  }
 }
 
+}  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_MULTIPLY_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_VECTOR_PRINT_IMPL_SERIAL_HPP

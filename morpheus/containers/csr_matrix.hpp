@@ -24,50 +24,88 @@
 #ifndef MORPHEUS_CONTAINERS_CSR_MATRIX_HPP
 #define MORPHEUS_CONTAINERS_CSR_MATRIX_HPP
 
-#include <iostream>
 #include <string>
-#include <vector>
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
+#include <morpheus/core/matrix_tags.hpp>
+#include <morpheus/containers/vector.hpp>
 
 namespace Morpheus {
+
+struct CsrTag : public Impl::SparseMatTag {};
+
 template <class... Properties>
-class CsrMatrix
-    : public Impl::MatrixTraits<FormatType<Impl::CsrFormat>, Properties...> {
+class CsrMatrix : public Impl::MatrixTraits<Properties...> {
  public:
   using type   = CsrMatrix<Properties...>;
-  using traits = Impl::MatrixTraits<FormatType<Impl::CsrFormat>, Properties...>;
-  using index_type  = typename traits::index_type;
-  using value_type  = typename traits::value_type;
-  using format_type = typename traits::format_type;
+  using traits = Impl::MatrixTraits<Properties...>;
+  using tag    = typename MatrixFormatTag<CsrTag>::tag;
 
-  // TODO: Use Morpheus::array instead of std::vector
-  using index_array_type = std::vector<index_type>;
-  using value_array_type = std::vector<value_type>;
+  using value_type = typename traits::value_type;
+  using index_type = typename traits::index_type;
+  using size_type  = typename traits::index_type;
 
-  // TODO: Make arrays private
+  using memory_space    = typename traits::memory_space;
+  using execution_space = typename traits::execution_space;
+  using device_type     = typename traits::device_type;
+
+  using pointer         = CsrMatrix *;
+  using const_pointer   = const CsrMatrix *;
+  using reference       = CsrMatrix &;
+  using const_reference = const CsrMatrix &;
+
+  using index_array_type      = Morpheus::vector<index_type, device_type>;
+  using value_array_type      = Morpheus::vector<value_type, device_type>;
+  using value_array_pointer   = typename value_array_type::pointer;
+  using value_array_reference = typename value_array_type::reference;
+
   index_array_type row_offsets, column_indices;
   value_array_type values;
 
+  ~CsrMatrix()                 = default;
+  CsrMatrix(const CsrMatrix &) = default;
+  CsrMatrix(CsrMatrix &&)      = default;
+  reference operator=(const CsrMatrix &) = default;
+  reference operator=(CsrMatrix &&) = default;
+
   // Construct an empty CsrMatrix
-  inline CsrMatrix() {}
+  inline CsrMatrix()
+      : row_offsets(1),
+        column_indices(0),
+        values(0),
+        _name("CsrMatrix"),
+        _m(0),
+        _n(0),
+        _nnz(0) {}
 
   // Construct a CsrMatrix with a specific shape and number of non-zero entries
   inline CsrMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries)
-      : _m(num_rows),
-        _n(num_cols),
-        _nnz(num_entries),
-        row_offsets(num_rows + 1),
+      : row_offsets(num_rows + 1),
         column_indices(num_entries),
-        values(num_entries) {}
+        values(num_entries),
+        _name("CsrMatrix"),
+        _m(num_rows),
+        _n(num_cols),
+        _nnz(num_entries) {}
+
+  inline CsrMatrix(const std::string name, const index_type num_rows,
+                   const index_type num_cols, const index_type num_entries)
+      : row_offsets(num_rows + 1),
+        column_indices(num_entries),
+        values(num_entries),
+        _name(name),
+        _m(num_rows),
+        _n(num_cols),
+        _nnz(num_entries) {}
 
   // Construct from another matrix type
   template <typename MatrixType>
   CsrMatrix(const MatrixType &matrix) {
     // TODO: CsrMatrix(const MatrixType& matrix)
-    Morpheus::NotImplementedException("CsrMatrix(const MatrixType& matrix)");
+    throw Morpheus::NotImplementedException(
+        "CsrMatrix(const MatrixType& matrix)");
   }
 
   // Resize matrix dimensions and underlying storage
@@ -81,28 +119,22 @@ class CsrMatrix
     values.resize(_nnz);
   }
 
-  // Swap the contents of two CsrMatrix objects.
-  void swap(CsrMatrix &matrix) {
-    // TODO: swap(CsrMatrix& matrix)
-    Morpheus::NotImplementedException(
-        "CsrMatrix.swap(const CsrMatrix& matrix)");
-  }
-
   // Assignment from another matrix type
   template <typename MatrixType>
-  CsrMatrix &operator=(const MatrixType &matrix) {
+  reference operator=(const MatrixType &matrix) {
     // TODO: operator=(const MatrixType& matrix)
-    Morpheus::NotImplementedException(
+    throw Morpheus::NotImplementedException(
         "CsrMatrix.operator=(const MatrixType& matrix)");
   }
 
-  inline std::string name() { return _name; }
-  inline index_type nrows() { return _m; }
-  inline index_type ncols() { return _n; }
-  inline index_type nnnz() { return _nnz; }
+  // Unified routines across all formats
+  inline std::string name() const { return _name; }
+  inline index_type nrows() const { return _m; }
+  inline index_type ncols() const { return _n; }
+  inline index_type nnnz() const { return _nnz; }
 
  private:
-  std::string _name = "CsrMatrix";
+  std::string _name;
   index_type _m, _n, _nnz;
 };
 }  // namespace Morpheus

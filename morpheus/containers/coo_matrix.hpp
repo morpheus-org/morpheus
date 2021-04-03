@@ -24,50 +24,88 @@
 #ifndef MORPHEUS_CONTAINERS_COO_MATRIX_HPP
 #define MORPHEUS_CONTAINERS_COO_MATRIX_HPP
 
-#include <iostream>
 #include <string>
-#include <vector>
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
+#include <morpheus/core/matrix_tags.hpp>
+#include <morpheus/containers/vector.hpp>
 
 namespace Morpheus {
+
+struct CooTag : public Impl::SparseMatTag {};
+
 template <class... Properties>
-class CooMatrix
-    : public Impl::MatrixTraits<FormatType<Impl::CooFormat>, Properties...> {
+class CooMatrix : public Impl::MatrixTraits<Properties...> {
  public:
   using type   = CooMatrix<Properties...>;
-  using traits = Impl::MatrixTraits<FormatType<Impl::CooFormat>, Properties...>;
-  using index_type  = typename traits::index_type;
-  using value_type  = typename traits::value_type;
-  using format_type = typename traits::format_type;
+  using traits = Impl::MatrixTraits<Properties...>;
+  using tag    = typename MatrixFormatTag<CooTag>::tag;
 
-  // TODO: Use Morpheus::array instead of std::vector
-  using index_array_type = std::vector<index_type>;
-  using value_array_type = std::vector<value_type>;
+  using value_type = typename traits::value_type;
+  using index_type = typename traits::index_type;
+  using size_type  = typename traits::index_type;
 
-  // TODO: Make arrays private
+  using memory_space    = typename traits::memory_space;
+  using execution_space = typename traits::execution_space;
+  using device_type     = typename traits::device_type;
+
+  using pointer         = CooMatrix *;
+  using const_pointer   = const CooMatrix *;
+  using reference       = CooMatrix &;
+  using const_reference = const CooMatrix &;
+
+  using index_array_type      = Morpheus::vector<index_type, device_type>;
+  using value_array_type      = Morpheus::vector<value_type, device_type>;
+  using value_array_pointer   = typename value_array_type::pointer;
+  using value_array_reference = typename value_array_type::reference;
+
   index_array_type row_indices, column_indices;
   value_array_type values;
 
+  ~CooMatrix()                 = default;
+  CooMatrix(const CooMatrix &) = default;
+  CooMatrix(CooMatrix &&)      = default;
+  reference operator=(const CooMatrix &) = default;
+  reference operator=(CooMatrix &&) = default;
+
   // Construct an empty CooMatrix
-  inline CooMatrix() {}
+  inline CooMatrix()
+      : row_indices(0),
+        column_indices(0),
+        values(0),
+        _name("CooMatrix"),
+        _m(0),
+        _n(0),
+        _nnz(0) {}
 
   // Construct a CooMatrix with a specific shape and number of non-zero entries
   inline CooMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries)
-      : _m(num_rows),
-        _n(num_cols),
-        _nnz(num_entries),
-        row_indices(num_entries),
+      : row_indices(num_entries),
         column_indices(num_entries),
-        values(num_entries) {}
+        values(num_entries),
+        _name("CooMatrix"),
+        _m(num_rows),
+        _n(num_cols),
+        _nnz(num_entries) {}
+
+  inline CooMatrix(const std::string name, const index_type num_rows,
+                   const index_type num_cols, const index_type num_entries)
+      : row_indices(num_entries),
+        column_indices(num_entries),
+        values(num_entries),
+        _name(name),
+        _m(num_rows),
+        _n(num_cols),
+        _nnz(num_entries) {}
 
   // Construct from another matrix type
   template <typename MatrixType>
   CooMatrix(const MatrixType &matrix) {
     // TODO: CooMatrix(const MatrixType& matrix)
-    Morpheus::NotImplementedException("CooMatrix(const MatrixType& matrix)");
+    throw Morpheus::NotImplementedException(
+        "CooMatrix(const MatrixType& matrix)");
   }
 
   // Resize matrix dimensions and underlying storage
@@ -81,51 +119,52 @@ class CooMatrix
     values.resize(_nnz);
   }
 
-  // Swap the contents of two CooMatrix objects.
-  void swap(CooMatrix &matrix) {
-    // TODO: CooMatrix.swap
-    Morpheus::NotImplementedException(
-        "CooMatrix.swap(const MatrixType& matrix)");
-  }
-
   // Assignment from another matrix type
   template <typename MatrixType>
-  CooMatrix &operator=(const MatrixType &matrix) {
-    std::cout << "CooMatrix.operator=(const MatrixType& matrix)" << std::endl;
+  reference operator=(const MatrixType &matrix) {
+    throw Morpheus::NotImplementedException(
+        "CooMatrix.operator=(const MatrixType& matrix)");
   }
+
+  // Operations specific to COO format
 
   // Sort matrix elements by row index
   void sort_by_row(void) {
     // TODO: CooMatrix.sort_by_row
-    Morpheus::NotImplementedException("CooMatrix.sort_by_row()");
+    throw Morpheus::NotImplementedException("CooMatrix.sort_by_row()");
   }
 
   // Sort matrix elements by row and column index
   void sort_by_row_and_column(void) {
     // TODO: CooMatrix.sort_by_row_and_column
-    Morpheus::NotImplementedException("CooMatrix.sort_by_row_and_column()");
+    throw Morpheus::NotImplementedException(
+        "CooMatrix.sort_by_row_and_column()");
   }
 
   // Determine whether matrix elements are sorted by row index
   bool is_sorted_by_row(void) {
     // TODO: CooMatrix.is_sorted_by_row
-    Morpheus::NotImplementedException("CooMatrix.is_sorted_by_row()");
+    throw Morpheus::NotImplementedException("CooMatrix.is_sorted_by_row()");
+    return true;
   }
 
   // Determine whether matrix elements are sorted by row and column index
   bool is_sorted_by_row_and_column(void) {
     // TODO: CooMatrix.is_sorted_by_row_and_column
-    Morpheus::NotImplementedException(
+    throw Morpheus::NotImplementedException(
         "CooMatrix.is_sorted_by_row_and_column()");
+    return true;
   }
 
-  inline std::string name() { return _name; }
-  inline index_type nrows() { return _m; }
-  inline index_type ncols() { return _n; }
-  inline index_type nnnz() { return _nnz; }
+  // Unified routines across all formats
+
+  inline std::string name() const { return _name; }
+  inline index_type nrows() const { return _m; }
+  inline index_type ncols() const { return _n; }
+  inline index_type nnnz() const { return _nnz; }
 
  private:
-  std::string _name = "CooMatrix";
+  std::string _name;
   index_type _m, _n, _nnz;
 };
 }  // namespace Morpheus

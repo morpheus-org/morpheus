@@ -25,14 +25,22 @@
 #define MORPHEUS_CORE_MATRIX_TAGS_HPP
 
 namespace Morpheus {
+
 namespace Impl {
 struct MatrixTag {};
-// TODO: Move each format to its file
-struct CooFormat : public MatrixTag {};
-struct CsrFormat : public MatrixTag {};
-struct DiaFormat : public MatrixTag {};
-struct DynamicFormat : public MatrixTag {};
+
+struct SparseMatTag : public Impl::MatrixTag {};
+struct DenseMatTag : public Impl::MatrixTag {};
 }  // namespace Impl
+
+// Matrix Format Tag Wrapper
+template <class T>
+struct MatrixFormatTag {
+  static_assert(std::is_base_of<Impl::MatrixTag, T>::value,
+                "Morpheus: Invalid Matrix Format tag.");
+  using format_tag = MatrixFormatTag;
+  using tag        = T;
+};
 
 }  // namespace Morpheus
 #endif  // MORPHEUS_CORE_MATRIX_TAGS_HPP

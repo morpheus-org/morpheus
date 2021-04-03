@@ -25,8 +25,9 @@
 #define MORPHEUS_CONTAINERS_DYNAMIC_MATRIX_IMPL_HPP
 
 #include <string>
-
+#include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_proxy.hpp>
+#include <morpheus/core/matrix_traits.hpp>
 
 #include <morpheus/containers/coo_matrix.hpp>
 #include <morpheus/containers/csr_matrix.hpp>
@@ -47,36 +48,41 @@ struct MatrixFormats {
 enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT };
 
 namespace Impl {
-template <typename IndexType, typename ValueType>
-struct any_type_resize {
+
+template <class... Properties>
+struct any_type_resize : public Impl::MatrixTraits<Properties...> {
+  using traits      = Impl::MatrixTraits<Properties...>;
+  using index_type  = typename traits::index_type;
+  using value_type  = typename traits::value_type;
   using result_type = void;
 
   // Specialization for Coo resize with three arguments
   template <typename... Args>
-  result_type operator()(CooMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz) {
+  result_type operator()(CooMatrix<Properties...> &mat, const index_type nrows,
+                         const index_type ncols, const index_type nnnz) {
     mat.resize(nrows, ncols, nnnz);
   }
 
   // Specialization for Csr resize with three arguments
   template <typename... Args>
-  result_type operator()(CsrMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz) {
+  result_type operator()(CsrMatrix<Properties...> &mat, const index_type nrows,
+                         const index_type ncols, const index_type nnnz) {
     mat.resize(nrows, ncols, nnnz);
   }
 
   // Specialization for Dia resize with four arguments
   template <typename... Args>
-  result_type operator()(DiaMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz, IndexType ndiag) {
+  result_type operator()(DiaMatrix<Properties...> &mat, const index_type nrows,
+                         const index_type ncols, const index_type nnnz,
+                         const index_type ndiag) {
     mat.resize(nrows, ncols, nnnz, ndiag);
   }
 
   // Specialization for Dia resize with five arguments
   template <typename... Args>
-  result_type operator()(DiaMatrix<IndexType, ValueType> &mat, IndexType nrows,
-                         IndexType ncols, IndexType nnnz, IndexType ndiag,
-                         IndexType alignment) {
+  result_type operator()(DiaMatrix<Properties...> &mat, const index_type nrows,
+                         const index_type ncols, const index_type nnnz,
+                         const index_type ndiag, const index_type alignment) {
     mat.resize(nrows, ncols, nnnz, ndiag, alignment);
   }
   // Specialization for any other case and dummy overlads
@@ -84,36 +90,39 @@ struct any_type_resize {
   //    though needed for compiling dynamic matrix interface
   template <typename T, typename... Args>
   result_type operator()(T &mat, Args &&...args) {
+    std::string str_args = Morpheus::append_str(args...);
     throw std::runtime_error(
-        "Error::Invalid use of the dynamic resize interface");
+        "Invalid use of the dynamic resize interface.\n\
+                mat.resize(" +
+        str_args + ") for " + mat.name() + " format.");
   }
 };
 
 struct any_type_get_name {
   using result_type = std::string;
   template <typename T>
-  result_type operator()(T &mat) const {
+  result_type operator()(const T &mat) const {
     return mat.name();
   }
 };
 
 struct any_type_get_nrows {
   template <typename T>
-  typename T::index_type operator()(T &mat) const {
+  typename T::index_type operator()(const T &mat) const {
     return mat.nrows();
   }
 };
 
 struct any_type_get_ncols {
   template <typename T>
-  typename T::index_type operator()(T &mat) const {
+  typename T::index_type operator()(const T &mat) const {
     return mat.ncols();
   }
 };
 
 struct any_type_get_nnnz {
   template <typename T>
-  typename T::index_type operator()(T &mat) const {
+  typename T::index_type operator()(const T &mat) const {
     return mat.nnnz();
   }
 };
@@ -139,7 +148,8 @@ struct activate_impl<0, Properties...> {
   using type_list = typename MatrixFormats<Properties...>::type_list;
 
   static void activate(variant &A, size_t idx) {
-    activate_impl<1, Properties...>::activate(A, 0);
+    idx = 0;
+    activate_impl<1, Properties...>::activate(A, idx);
   }
 };
 

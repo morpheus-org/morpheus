@@ -24,79 +24,119 @@
 #ifndef MORPHEUS_CONTAINERS_DYNAMIC_MATRIX_HPP
 #define MORPHEUS_CONTAINERS_DYNAMIC_MATRIX_HPP
 
+#include <iostream>
 #include <string>
 #include <variant>
+#include <functional>
 
 #include <morpheus/containers/impl/dynamic_matrix_impl.hpp>
 #include <morpheus/core/matrix_traits.hpp>
+#include <morpheus/core/matrix_tags.hpp>
 
 namespace Morpheus {
 
-// example:
-// DynamicMatrix<int, double, memspace, formatspace>;
-// where formatspace =
-// std::variant<CooMatrix<int,double>,CsrMatrix<int,double>...>
-template <class... Properties>
-class DynamicMatrix : public Impl::MatrixTraits<FormatType<Impl::DynamicFormat>,
-                                                Properties...> {
- public:
-  using type = DynamicMatrix<Properties...>;
-  using traits =
-      Impl::MatrixTraits<FormatType<Impl::DynamicFormat>, Properties...>;
-  using index_type  = typename traits::index_type;
-  using value_type  = typename traits::value_type;
-  using format_type = typename traits::format_type;
+struct DynamicTag : public Impl::MatrixTag {};
 
+/** @class DynamicMatrix
+ * @brief Dynamic Matrix class that acts as a sum type of all the supporting
+ * Matrix Storage Formats.
+ *
+ * Template argument options:
+ *  - DynamicMatrix<ValueType>
+ *  - DynamicMatrix<ValueType, IndexType>
+ *  - DynamicMatrix<ValueType, IndexType, Space>
+ *  - DynamicMatrix<ValueType, Space>
+ */
+template <class... Properties>
+class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
+ public:
+  using type   = DynamicMatrix<Properties...>;
+  using traits = Impl::MatrixTraits<Properties...>;
+  using tag    = typename MatrixFormatTag<DynamicTag>::tag;
+
+  using variant_type = typename MatrixFormats<Properties...>::variant;
+  using value_type   = typename traits::value_type;
+  using index_type   = typename traits::index_type;
+  using size_type    = typename traits::index_type;
+
+  using memory_space    = typename traits::memory_space;
+  using execution_space = typename traits::execution_space;
+  using device_type     = typename traits::device_type;
+
+  using pointer         = DynamicMatrix *;
+  using const_pointer   = const DynamicMatrix *;
   using reference       = DynamicMatrix &;
   using const_reference = const DynamicMatrix &;
 
-  inline DynamicMatrix() = default;
+  ~DynamicMatrix()                     = default;
+  DynamicMatrix(const DynamicMatrix &) = default;
+  DynamicMatrix(DynamicMatrix &&)      = default;
+  reference operator=(const DynamicMatrix &) = default;
+  reference operator=(DynamicMatrix &&) = default;
+
+  inline DynamicMatrix() : _name("DynamicMatrix"), _formats() {}
 
   template <typename Format>
-  inline DynamicMatrix(const Format &mat) : _formats(mat) {}
+  inline DynamicMatrix(const Format &mat)
+      : _name("DynamicMatrix"), _formats(mat) {}
+
+  template <typename Format>
+  inline DynamicMatrix(const std::string name, const Format &mat)
+      : _name(name), _formats(mat) {}
 
   template <typename... Args>
-  inline void resize(int m, int n, int nnz, Args &&...args) {
-    return std::visit(std::bind(Impl::any_type_resize<index_type, value_type>(),
-                                std::placeholders::_1, m, n, nnz,
-                                std::forward<Args>(args)...),
-                      _formats);
+  inline void resize(const index_type m, const index_type n,
+                     const index_type nnz, Args &&...args) {
+    return std::visit(
+        std::bind(Impl::any_type_resize<Properties...>(), std::placeholders::_1,
+                  m, n, nnz, std::forward<Args>(args)...),
+        _formats);
   }
 
-  inline std::string name() { return _name; }
+  inline std::string name() const { return _name; }
 
-  inline index_type nrows() {
+  inline index_type nrows() const {
     return std::visit(Impl::any_type_get_nrows(), _formats);
   }
 
-  inline index_type ncols() {
+  inline index_type ncols() const {
     return std::visit(Impl::any_type_get_ncols(), _formats);
   }
 
-  inline index_type nnnz() {
+  inline index_type nnnz() const {
     return std::visit(Impl::any_type_get_nnnz(), _formats);
   }
 
-  inline std::string active_name() {
+  inline std::string active_name() const {
     return std::visit(Impl::any_type_get_name(), _formats);
   }
 
-  inline int active_index() { return _formats.index(); }
+  inline int active_index() const { return _formats.index(); }
 
-  inline void activate(formats_e index) {
-    const int size =
+  inline void activate(const formats_e index) {
+    constexpr int size =
         std::variant_size_v<typename MatrixFormats<Properties...>::variant>;
+    const int idx = static_cast<int>(index);
 
-    Impl::activate_impl<size, Properties...>::activate(_formats,
-                                                       static_cast<int>(index));
+    if (idx > size) {
+      std::cout << "Warning: There are " << size
+                << " available formats to switch to. "
+                << "Selecting to switch to format with index " << idx
+                << " will default to the format with index 0." << std::endl;
+    }
+    Impl::activate_impl<size, Properties...>::activate(_formats, idx);
   }
 
   // Enable switching through direct integer indexing
-  inline void activate(int index) { activate(static_cast<formats_e>(index)); }
+  inline void activate(const int index) {
+    activate(static_cast<formats_e>(index));
+  }
+
+  inline const variant_type &formats() const { return _formats; }
 
  private:
-  std::string _name = "DynamicMatrix";
-  typename MatrixFormats<Properties...>::variant _formats;
+  std::string _name;
+  variant_type _formats;
 };
 }  // namespace Morpheus
 

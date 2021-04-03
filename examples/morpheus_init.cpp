@@ -1,5 +1,5 @@
 /**
- * multiply.hpp
+ * morpheus_init.cpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,18 +21,29 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_MULTIPLY_HPP
-#define MORPHEUS_ALGORITHMS_MULTIPLY_HPP
+#include <iostream>
+#include <morpheus/core/core.hpp>
 
-#include <morpheus/algorithms/impl/multiply_impl.hpp>
+int main(int argc, char* argv[]) {
+  {
+    Morpheus::initialize(argc, argv);
+    Morpheus::print_configuration(std::cout);
+    Morpheus::finalize();
+  }
 
-namespace Morpheus {
+  {
+    Morpheus::initialize();
+    Morpheus::print_configuration(std::cout);
+    Morpheus::finalize();
+  }
 
-template <typename Matrix, typename Vector>
-void multiply(Matrix const& A, Vector const& x, Vector& y) {
-  Impl::multiply(A, x, y, typename Matrix::tag());
+  {
+    Morpheus::InitArguments args;
+    args.num_threads = 4;
+
+    Morpheus::initialize(args);
+    Morpheus::print_configuration(std::cout);
+    Morpheus::finalize();
+  }
+  return 0;
 }
-
-}  // namespace Morpheus
-
-#endif  // MORPHEUS_ALGORITHMS_MULTIPLY_HPP
