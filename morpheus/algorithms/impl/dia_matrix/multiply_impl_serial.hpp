@@ -36,6 +36,10 @@ void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::DiaTag,
                   std::is_same<typename Matrix::execution_space,
                                Kokkos::Serial::execution_space>::value,
                   Kokkos::Serial::execution_space>::type* = nullptr) {
+  // Check all containers have access to the same execution space
+  static_assert(std::is_same_v<typename Matrix::execution_space,
+                               typename Vector::execution_space>);
+
   using I = typename Matrix::index_type;
 
   for (I i = 0; i < (int)A.diagonal_offsets.size(); i++) {

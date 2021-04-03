@@ -46,6 +46,10 @@ struct multiply_fn {
 template <typename Matrix, typename Vector>
 void multiply(const Matrix& A, const Vector& x, Vector& y,
               Morpheus::DynamicTag) {
+  // Check all containers have access to the same execution space
+  static_assert(std::is_same_v<typename Matrix::execution_space,
+                               typename Vector::execution_space>);
+
   std::visit(std::bind(Impl::multiply_fn(), std::placeholders::_1, std::cref(x),
                        std::ref(y)),
              A.formats());
