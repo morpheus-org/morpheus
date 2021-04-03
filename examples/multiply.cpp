@@ -27,12 +27,15 @@
 #include <morpheus/algorithms/multiply.hpp>
 #include <morpheus/algorithms/print.hpp>
 
+using coo = Morpheus::CooMatrix<double, int, Kokkos::Serial>;
+using dyn = Morpheus::DynamicMatrix<double, int, Kokkos::Serial>;
+using vec = Morpheus::DenseVector<double, Kokkos::Serial>;
 int main() {
   Morpheus::initialize();
   {
-    Morpheus::CooMatrix<double, int, Kokkos::Serial> A(4, 3, 6);
-    Morpheus::DynamicMatrix<double, int, Kokkos::Serial> B(A);
-    Morpheus::DenseVector<double> x(3, 2), ya("ya", 4, 0), yb("yb", 4, 0);
+    coo A(4, 3, 6);
+    dyn B(A);
+    vec x(3, 2), ya("ya", 4, 0), yb("yb", 4, 0);
     // initialize matrix entries
     A.row_indices[0]    = 0;
     A.column_indices[0] = 0;

@@ -38,14 +38,16 @@ static_assert(
 static_assert(
     std::is_same_v<coo_omp::execution_space, Kokkos::OpenMP::execution_space>);
 
-using vec = Morpheus::DenseVector<double>;
+using vec_serial = Morpheus::DenseVector<double, Kokkos::Serial>;
+using vec_omp    = Morpheus::DenseVector<double, Kokkos::OpenMP>;
 
 int main() {
   Morpheus::initialize();
   {
     coo_serial A(4, 3, 6);
     coo_omp B(4, 3, 6);
-    vec x(4, 2), yserial("yserial", 4, 0), yomp("yomp", 4, 0);
+    vec_serial xserial(4, 2), yserial("yserial", 4, 0);
+    vec_omp xomp(4, 2), yomp("yomp", 4, 0);
 
     // initialize matrix entries
     A.row_indices[0]    = 0;
@@ -73,25 +75,6 @@ int main() {
     //    [ 0  0 30]
     //    [40 50 60]
 
-    // B.row_offsets[0] = 0;  // first offset is always zero
-    // B.row_offsets[1] = 2;
-    // B.row_offsets[2] = 2;
-    // B.row_offsets[3] = 3;
-    // B.row_offsets[4] = 6;  // last offset is always num_entries
-
-    // B.column_indices[0] = 0;
-    // B.values[0]         = 10;
-    // B.column_indices[1] = 2;
-    // B.values[1]         = 20;
-    // B.column_indices[2] = 2;
-    // B.values[2]         = 30;
-    // B.column_indices[3] = 0;
-    // B.values[3]         = 40;
-    // B.column_indices[4] = 1;
-    // B.values[4]         = 50;
-    // B.column_indices[5] = 2;
-    // B.values[5]         = 60;
-
     B.row_indices[0]    = 0;
     B.column_indices[0] = 0;
     B.values[0]         = 10;
@@ -114,10 +97,10 @@ int main() {
     Morpheus::print(A);
     Morpheus::print(B);
 
-    Morpheus::multiply(A, x, yserial);
+    Morpheus::multiply(A, xserial, yserial);
 
     try {
-      Morpheus::multiply(B, x, yomp);
+      Morpheus::multiply(B, xomp, yomp);
     } catch (std::logic_error& e) {
       std::cerr << "Exception Raised:: " << e.what() << std::endl;
     }
