@@ -34,7 +34,7 @@ namespace Impl {
 
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, Morpheus::DenseVectorTag) {
-  using index_type = typename Printable::size_type;
+  using index_type = typename Printable::index_type;
   s << p.name() << "<" << p.size() << "> with " << p.size() << " entries\n";
 
   for (index_type n = 0; n < p.size(); n++) {

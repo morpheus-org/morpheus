@@ -26,10 +26,10 @@
 
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 
 #include <morpheus/containers/dia_matrix.hpp>
 #include <morpheus/containers/vector.hpp>
-#include <morpheus/core/exceptions.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -38,9 +38,21 @@ template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, Morpheus::DiaTag) {
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nnnz() << " entries\n";
-  Morpheus::NotImplementedException(
-      "void print(const Printable& p, Stream& s, "
-      "Morpheus::Impl::SparseMatTag)");
+
+  using I = typename Printable::index_type;
+
+  for (I i = 0; i < (int)p.diagonal_offsets.size(); i++) {
+    const I k       = p.diagonal_offsets[i];  // diagonal offset
+    const I j_start = std::max(0, k);
+    const I j_end   = std::min(std::min(p.nrows() + k, p.ncols()), p.ncols());
+
+    for (I n = j_start; n < j_end; n++) {
+      s << " " << std::setw(14) << i;
+      s << " " << std::setw(14) << n;
+      s << " " << std::setprecision(4) << std::setw(8) << "(" << p.values(i, n)
+        << ")\n";
+    }
+  }
 }
 
 }  // namespace Impl

@@ -26,7 +26,6 @@
 
 #include <morpheus/containers/dia_matrix.hpp>
 #include <morpheus/containers/vector.hpp>
-#include <morpheus/core/exceptions.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -37,9 +36,18 @@ void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::DiaTag,
                   std::is_same<typename Matrix::execution_space,
                                Kokkos::Serial::execution_space>::value,
                   Kokkos::Serial::execution_space>::type* = nullptr) {
-  throw Morpheus::NotImplementedException(
-      "void multiply(const " + A.name() + "& A, const " + x.name() + "& x, " +
-      y.name() + "& y," + "Morpheus::DiaTag, Kokkos::Serial)");
+  using I = typename Matrix::index_type;
+
+  for (I i = 0; i < (int)A.diagonal_offsets.size(); i++) {
+    const I k       = A.diagonal_offsets[i];  // diagonal offset
+    const I i_start = std::max(0, -k);
+    const I j_start = std::max(0, k);
+    const I j_end   = std::min(std::min(A.nrows() + k, A.ncols()), A.ncols());
+
+    for (I n = 0; n < j_end - j_start; n++) {
+      y[i_start + n] += A.values(i, j_start + n) * x[j_start + n];
+    }
+  }
 }
 
 }  // namespace Impl
