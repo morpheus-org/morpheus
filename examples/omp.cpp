@@ -97,11 +97,13 @@ int main() {
     Morpheus::print(A);
     Morpheus::print(B);
 
-    Morpheus::multiply(A, xserial, yserial);
+    Kokkos::Serial::execution_space ser;
+    Kokkos::OpenMP::execution_space par;
+    Morpheus::multiply(ser, A, xserial, yserial);
 
     try {
-      Morpheus::multiply(B, xomp, yomp);
-    } catch (std::logic_error& e) {
+      Morpheus::multiply(par, B, xomp, yomp);
+    } catch (Morpheus::NotImplementedException& e) {
       std::cerr << "Exception Raised:: " << e.what() << std::endl;
     }
 

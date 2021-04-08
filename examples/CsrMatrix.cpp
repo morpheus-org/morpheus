@@ -37,6 +37,7 @@ int main() {
     coo A(4, 3, 6);
     csr B(4, 3, 6);
     vec x(4, 2), ycoo("ycoo", 4, 0), ycsr("ycsr", 4, 0);
+    Kokkos::Serial::execution_space space;
 
     // initialize matrix entries
     A.row_indices[0]    = 0;
@@ -85,8 +86,8 @@ int main() {
     Morpheus::print(A);
     Morpheus::print(B);
 
-    Morpheus::multiply(A, x, ycoo);
-    Morpheus::multiply(B, x, ycsr);
+    Morpheus::multiply(space, A, x, ycoo);
+    Morpheus::multiply(space, B, x, ycsr);
 
     Morpheus::print(ycoo);
     Morpheus::print(ycsr);

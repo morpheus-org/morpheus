@@ -153,6 +153,9 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
   inline index_type nnnz() const { return _nnz; }
+  inline void set_rows(const index_type rows) const { _m = rows; }
+  inline void set_ncols(const index_type cols) const { _n = cols; }
+  inline void set_nnnz(const index_type nnz) const { _nnz = nnz; }
 
  private:
   // Calculates padding to align the data based on the current diagonal length

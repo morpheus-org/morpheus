@@ -29,29 +29,31 @@
 
 namespace Morpheus {
 // forward decl
-template <typename Matrix, typename Vector>
-void multiply(Matrix const& A, Vector const& x, Vector& y);
+template <typename ExecSpace, typename Matrix, typename Vector>
+void multiply(const ExecSpace& space, const Matrix& A, const Vector& x,
+              Vector& y);
 
 namespace Impl {
 
 struct multiply_fn {
   using result_type = void;
 
-  template <typename Mat, typename Vec>
-  result_type operator()(const Mat& A, const Vec& x, Vec& y) const {
-    Morpheus::multiply(A, x, y);
+  template <typename ExecSpace, typename Mat, typename Vec>
+  result_type operator()(const ExecSpace& space, const Mat& A, const Vec& x,
+                         Vec& y) const {
+    Morpheus::multiply(space, A, x, y);
   }
 };
 
-template <typename Matrix, typename Vector>
-void multiply(const Matrix& A, const Vector& x, Vector& y,
-              Morpheus::DynamicTag) {
+template <typename ExecSpace, typename Matrix, typename Vector>
+void multiply(const ExecSpace& space, const Matrix& A, const Vector& x,
+              Vector& y, Morpheus::DynamicTag) {
   // Check all containers have access to the same execution space
-  static_assert(std::is_same_v<typename Matrix::execution_space,
-                               typename Vector::execution_space>);
+  // static_assert(std::is_same_v<typename Matrix::execution_space,
+  //                              typename Vector::execution_space>);
 
-  std::visit(std::bind(Impl::multiply_fn(), std::placeholders::_1, std::cref(x),
-                       std::ref(y)),
+  std::visit(std::bind(Impl::multiply_fn(), std::cref(space),
+                       std::placeholders::_1, std::cref(x), std::ref(y)),
              A.formats());
 }
 

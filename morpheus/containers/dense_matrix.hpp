@@ -126,6 +126,8 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
   inline index_type nnnz() const { return _m * _n; }
+  inline void set_rows(const index_type rows) const { _m = rows; }
+  inline void set_ncols(const index_type cols) const { _n = cols; }
 
  private:
   std::string _name;

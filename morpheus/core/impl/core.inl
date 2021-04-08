@@ -3,6 +3,7 @@
 
 #include <Kokkos_Core.hpp>
 #include <morpheus/version.hpp>
+#include <morpheus/core/macros.hpp>
 
 namespace Morpheus {
 

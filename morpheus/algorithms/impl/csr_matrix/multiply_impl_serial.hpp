@@ -26,19 +26,23 @@
 
 #include <morpheus/containers/csr_matrix.hpp>
 #include <morpheus/containers/vector.hpp>
+#include <morpheus/core/type_traits.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
-template <typename Matrix, typename Vector>
-void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::CsrTag,
-              typename std::enable_if<
-                  std::is_same<typename Matrix::execution_space,
-                               Kokkos::Serial::execution_space>::value,
-                  Kokkos::Serial::execution_space>::type* = nullptr) {
+template <typename ExecSpace, typename Matrix, typename Vector>
+void multiply(
+    const ExecSpace& space, const Matrix& A, const Vector& x, Vector& y,
+    Morpheus::CsrTag,
+    typename std::enable_if<Morpheus::is_execution_space_v<ExecSpace> &&
+                            Morpheus::has_access_v<ExecSpace, Matrix> &&
+                            Morpheus::has_access_v<ExecSpace, Vector> &&
+                            Morpheus::is_Serial_space_v<ExecSpace>>::type* =
+        nullptr) {
   // Check all containers have access to the same execution space
-  static_assert(std::is_same_v<typename Matrix::execution_space,
-                               typename Vector::execution_space>);
+  // static_assert(std::is_same_v<typename Matrix::execution_space,
+  //                              typename Vector::execution_space>);
 
   using I = typename Matrix::index_type;
   using T = typename Matrix::value_type;

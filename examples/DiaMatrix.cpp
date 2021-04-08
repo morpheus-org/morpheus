@@ -32,6 +32,8 @@
 using coo = Morpheus::CooMatrix<double, int, Kokkos::Serial>;
 using dia = Morpheus::DiaMatrix<double, int, Kokkos::Serial>;
 using vec = Morpheus::DenseVector<double, Kokkos::Serial>;
+using ser = typename Kokkos::Serial::execution_space;
+
 int main() {
   Morpheus::initialize();
   {
@@ -161,12 +163,13 @@ int main() {
     B.values(2, 2) = 30;
 
     vec x(3, 0), ya("ya", 4, 0), yb("yb", 4, 0);
+    ser space;
     x[0] = 1;
     x[1] = 2;
     x[2] = 3;
 
-    Morpheus::multiply(A, x, ya);
-    Morpheus::multiply(B, x, yb);
+    Morpheus::multiply(space, A, x, ya);
+    Morpheus::multiply(space, B, x, yb);
 
     Morpheus::print(ya);
     Morpheus::print(yb);
@@ -228,12 +231,13 @@ int main() {
     B.values(4, 2) = 20;
 
     vec x(3, 0), ya("ya", 4, 0), yb("yb", 4, 0);
+    ser space;
     x[0] = 1;
     x[1] = 2;
     x[2] = 3;
 
-    Morpheus::multiply(A, x, ya);
-    Morpheus::multiply(B, x, yb);
+    Morpheus::multiply(space, A, x, ya);
+    Morpheus::multiply(space, B, x, yb);
 
     Morpheus::print(ya);
     Morpheus::print(yb);

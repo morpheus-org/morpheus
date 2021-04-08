@@ -28,9 +28,10 @@
 
 namespace Morpheus {
 
-template <typename Matrix, typename Vector>
-void multiply(Matrix const& A, Vector const& x, Vector& y) {
-  Impl::multiply(A, x, y, typename Matrix::tag());
+template <typename ExecSpace, typename Matrix, typename Vector>
+void multiply(const ExecSpace& space, const Matrix& A, const Vector& x,
+              Vector& y) {
+  Impl::multiply(space, A, x, y, typename Matrix::tag());
 }
 
 }  // namespace Morpheus
