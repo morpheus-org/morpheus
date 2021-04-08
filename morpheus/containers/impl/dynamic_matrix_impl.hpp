@@ -91,7 +91,7 @@ struct any_type_resize : public Impl::MatrixTraits<Properties...> {
   template <typename T, typename... Args>
   result_type operator()(T &mat, Args &&...args) {
     std::string str_args = Morpheus::append_str(args...);
-    throw std::runtime_error(
+    throw Morpheus::RuntimeException(
         "Invalid use of the dynamic resize interface.\n\
                 mat.resize(" +
         str_args + ") for " + mat.name() + " format.");
