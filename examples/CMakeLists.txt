@@ -38,7 +38,7 @@ set( SOURCES_IDIOMATIC_EXAMPLES
     DenseMatrix.cpp
     DiaMatrix.cpp
     Copy.cpp
-    # DynamicCopy.cpp
+    DynamicCopy.cpp
 )
 
 string( REPLACE ".cpp" "" BASENAMES_IDIOMATIC_EXAMPLES "${SOURCES_IDIOMATIC_EXAMPLES}" )

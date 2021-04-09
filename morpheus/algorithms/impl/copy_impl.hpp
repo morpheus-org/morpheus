@@ -30,6 +30,6 @@
 #include <morpheus/algorithms/impl/dense_matrix/copy_impl.hpp>
 #include <morpheus/algorithms/impl/vector/copy_impl.hpp>
 
-// #include <morpheus/algorithms/impl/dynamic_matrix/copy_impl.hpp>
+#include <morpheus/algorithms/impl/dynamic_matrix/copy_impl.hpp>
 
 #endif  // MORPHEUS_ALGORITHMS_IMPL_COPY_IMPL_HPP
