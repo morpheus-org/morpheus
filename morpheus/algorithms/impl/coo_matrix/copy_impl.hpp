@@ -1,5 +1,5 @@
 /**
- * copy_impl_serial.hpp
+ * copy_impl.hpp
  *
  * EPCC, The University of Edinburgh
  *

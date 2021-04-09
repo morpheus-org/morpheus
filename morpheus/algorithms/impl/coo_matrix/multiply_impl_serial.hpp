@@ -1,5 +1,5 @@
 /**
- * multiply_serial.hpp
+ * multiply_impl_serial.hpp
  *
  * EPCC, The University of Edinburgh
  *

@@ -1,5 +1,5 @@
 /**
- * print_impl_serial.hpp
+ * print_impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
