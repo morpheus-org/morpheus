@@ -74,7 +74,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
       : row_indices(0),
         column_indices(0),
         values(0),
-        _name("CooMatrix"),
+        _label("CooMatrix"),
         _m(0),
         _n(0),
         _nnz(0) {}
@@ -85,7 +85,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
       : row_indices(num_entries),
         column_indices(num_entries),
         values(num_entries),
-        _name("CooMatrix"),
+        _label("CooMatrix"),
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {}
@@ -95,7 +95,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
       : row_indices(num_entries),
         column_indices(num_entries),
         values(num_entries),
-        _name(name),
+        _label(name),
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {}
@@ -159,15 +159,17 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   // Unified routines across all formats
 
   inline std::string name() const { return _name; }
+  inline std::string label() const { return _label; }
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
   inline index_type nnnz() const { return _nnz; }
-  inline void set_rows(const index_type rows) const { _m = rows; }
-  inline void set_ncols(const index_type cols) const { _n = cols; }
-  inline void set_nnnz(const index_type nnz) const { _nnz = nnz; }
+  inline void set_nrows(const index_type rows) { _m = rows; }
+  inline void set_ncols(const index_type cols) { _n = cols; }
+  inline void set_nnnz(const index_type nnz) { _nnz = nnz; }
 
  private:
-  std::string _name;
+  const std::string _name = "CooMatrix";
+  std::string _label;
   index_type _m, _n, _nnz;
 };
 }  // namespace Morpheus

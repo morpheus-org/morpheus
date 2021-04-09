@@ -76,7 +76,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   inline DiaMatrix()
       : diagonal_offsets(),
         values(),
-        _name("DiaMatrix"),
+        _label("DiaMatrix"),
         _m(0),
         _n(0),
         _nnz(0) {}
@@ -90,7 +90,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
                    const index_type num_entries, const index_type num_diagonals,
                    const index_type alignment = 32)
       : diagonal_offsets(num_diagonals),
-        _name("DiaMatrix"),
+        _label("DiaMatrix"),
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {
@@ -102,7 +102,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
                    const index_type num_diagonals,
                    const index_type alignment = 32)
       : diagonal_offsets(num_diagonals),
-        _name(name),
+        _label(name),
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {
@@ -150,12 +150,13 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
 
   // Unified routines across all formats
   inline std::string name() const { return _name; }
+  inline std::string label() const { return _label; }
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
   inline index_type nnnz() const { return _nnz; }
-  inline void set_rows(const index_type rows) const { _m = rows; }
-  inline void set_ncols(const index_type cols) const { _n = cols; }
-  inline void set_nnnz(const index_type nnz) const { _nnz = nnz; }
+  inline void set_nrows(const index_type rows) { _m = rows; }
+  inline void set_ncols(const index_type cols) { _n = cols; }
+  inline void set_nnnz(const index_type nnz) { _nnz = nnz; }
 
  private:
   // Calculates padding to align the data based on the current diagonal length
@@ -163,7 +164,8 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
     return alignment * ((diag_len + alignment - 1) / alignment);
   }
 
-  std::string _name;
+  const std::string _name = "DiaMatrix";
+  std::string _label;
   index_type _m, _n, _nnz;
 };
 }  // namespace Morpheus

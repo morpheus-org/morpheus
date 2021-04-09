@@ -76,22 +76,15 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   DenseVector& operator=(const DenseVector&) = default;
   DenseVector& operator=(DenseVector&&) = default;
 
-  inline DenseVector()
-      : _name("Vector"), _size(0), _extra_storage(1.1), _values() {}
+  inline DenseVector() : _label("Vector"), _size(0), _values() {}
 
   inline DenseVector(const std::string name, int n, value_type val = 0)
-      : _name(name),
-        _size(n),
-        _extra_storage(1.1),
-        _values(name, size_t(n * 1.1)) {
+      : _label(name), _size(n), _values(name, size_t(n)) {
     assign(n, val);
   }
 
   inline DenseVector(int n, value_type val = 0)
-      : _name("Vector"),
-        _size(n),
-        _extra_storage(1.1),
-        _values("Vector", size_t(n * 1.1)) {
+      : _label("Vector"), _size(n), _values("Vector", size_t(n)) {
     assign(n, val);
   }
 
@@ -117,6 +110,7 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   inline index_type size() const { return _size; }
 
   inline value_array_pointer data() const { return _values.data(); }
+  inline const value_array_type& view() const { return _values; }
 
   // Iterators
   inline iterator begin() { return _values.data(); }
@@ -134,12 +128,12 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   // Capacity
   //   TODO: reserve should be enabled when push_back methods etc are developed
   //   inline void reserve(size_t n) {
-  //     Kokkos::resize(_values, size_t(n * _extra_storage));
+  //     Kokkos::resize(_values, size_t(n));
   //   }
 
   // Modifiers
   inline void resize(index_type n) {
-    if (n > _values.span()) Kokkos::resize(_values, size_t(n * _extra_storage));
+    Kokkos::resize(_values, size_t(n));
     _size = n;
   }
 
@@ -151,11 +145,12 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
 
   // Other
   inline std::string name() const { return _name; }
+  inline std::string label() const { return _label; }
 
  private:
-  std::string _name;
+  const td::string _name = "DenseVector";
+  std::string _label;
   index_type _size;
-  float _extra_storage;
   value_array_type _values;
 };
 }  // namespace Morpheus

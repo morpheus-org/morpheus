@@ -1,5 +1,5 @@
 /**
- * print_impl.hpp
+ * copy_impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,15 +21,15 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_PRINT_IMPL_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_PRINT_IMPL_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_COPY_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_COPY_IMPL_HPP
 
-#include <morpheus/algorithms/impl/coo_matrix/print_impl.hpp>
-#include <morpheus/algorithms/impl/csr_matrix/print_impl.hpp>
-#include <morpheus/algorithms/impl/dia_matrix/print_impl.hpp>
-#include <morpheus/algorithms/impl/dense_matrix/print_impl.hpp>
-#include <morpheus/algorithms/impl/vector/print_impl.hpp>
+#include <morpheus/algorithms/impl/coo_matrix/copy_impl.hpp>
+#include <morpheus/algorithms/impl/csr_matrix/copy_impl.hpp>
+#include <morpheus/algorithms/impl/dia_matrix/copy_impl.hpp>
+#include <morpheus/algorithms/impl/dense_matrix/copy_impl.hpp>
+#include <morpheus/algorithms/impl/vector/copy_impl.hpp>
 
-#include <morpheus/algorithms/impl/dynamic_matrix/print_impl.hpp>
+// #include <morpheus/algorithms/impl/dynamic_matrix/copy_impl.hpp>
 
-#endif  // MORPHEUS_ALGORITHMS_IMPL_PRINT_IMPL_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_COPY_IMPL_HPP

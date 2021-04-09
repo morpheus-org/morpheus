@@ -56,7 +56,7 @@ class IOException : public Exception {
 class RuntimeException : public Exception {
  public:
   template <typename MessageType>
-  RuntimeException(const MessageType& msg) : Exception("Runtime: " + msg) {}
+  RuntimeException(const MessageType& msg) : Exception(msg) {}
 };
 
 template <typename T, typename... Ts>

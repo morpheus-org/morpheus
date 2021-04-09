@@ -21,48 +21,33 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_PRINT_IMPL_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_PRINT_IMPL_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_PRINT_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_PRINT_IMPL_HPP
 
 #include <iostream>
 #include <iomanip>
 
-#include <morpheus/containers/dynamic_matrix.hpp>
+#include <morpheus/containers/coo_matrix.hpp>
+#include <morpheus/containers/vector.hpp>
 
 namespace Morpheus {
-// forward decl
-template <typename Printable>
-void print(const Printable& p);
-
-template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s);
-
 namespace Impl {
 
-struct print_fn {
-  using result_type = void;
-  // TODO: Specify the stream to print to
-  // template <typename T, typename S>
-  // result_type operator()(const T& mat, S& s) const {
-  //   Morpheus::print(mat, s);
-  // }
-  template <typename Printable>
-  result_type operator()(const Printable& p) const {
-    Morpheus::print(p);
-  }
-};
-
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, Morpheus::DynamicTag) {
+void print(const Printable& p, Stream& s, Morpheus::CooTag) {
+  using I = typename Printable::index_type;
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nnnz() << " entries\n";
-  // TODO: Using a stream in this way doesn't seem to work
-  // std::visit(std::bind(Impl::print_fn(), std::placeholders::_1, std::ref(s)),
-  //            p.formats());
-  std::visit(Impl::print_fn(), p.formats());
+
+  for (I n = 0; n < p.nnnz(); n++) {
+    s << " " << std::setw(14) << p.row_indices[n];
+    s << " " << std::setw(14) << p.column_indices[n];
+    s << " " << std::setprecision(4) << std::setw(8) << "(" << p.values[n]
+      << ")\n";
+  }
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_PRINT_IMPL_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_PRINT_IMPL_HPP

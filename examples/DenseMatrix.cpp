@@ -25,64 +25,49 @@
 
 #include <morpheus/core/core.hpp>
 #include <morpheus/containers/dense_matrix.hpp>
+#include <morpheus/algorithms/print.hpp>
 
 using Matrix =
     Morpheus::DenseMatrix<double, int, Kokkos::LayoutRight, Kokkos::Serial>;
-
-template <typename M>
-void print_stats(const M& A) {
-  std::cout << A.name() << ":\t" << A.nrows() << "\t" << A.ncols() << "\t"
-            << A.nnnz() << std::endl;
-
-  std::cout << "\tData:" << std::endl;
-  for (int i = 0; i < A.nrows(); i++) {
-    std::cout << "\t\t";
-    for (int j = 0; j < A.ncols(); j++) {
-      std::cout << A(i, j) << "\t";
-    }
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
-}
 
 int main(int argc, char* argv[]) {
   Morpheus::initialize(argc, argv);
 
   {
     Matrix A;
-    print_stats(A);
+    Morpheus::print(A);
   }
 
   {
     Matrix A(2, 3);
-    print_stats(A);
+    Morpheus::print(A);
   }
 
   {
     Matrix A(2, 3, 4.0);
-    print_stats(A);
+    Morpheus::print(A);
   }
 
   {
     Matrix A("A", 2, 3);
-    print_stats(A);
+    Morpheus::print(A);
   }
 
   {
     Matrix A("A", 2, 3, 3.0);
-    print_stats(A);
+    Morpheus::print(A);
   }
 
   {
     Matrix A("A", 2, 3, 3.0);
     A.resize(1, 2);
-    print_stats(A);
+    Morpheus::print(A);
   }
 
   {
     Matrix A("A", 2, 3, 3.0);
     A.resize(4, 3);
-    print_stats(A);
+    Morpheus::print(A);
   }
 
   {
@@ -94,7 +79,7 @@ int main(int argc, char* argv[]) {
       }
     }
 
-    print_stats(A);
+    Morpheus::print(A);
   }
 
   {
@@ -107,7 +92,7 @@ int main(int argc, char* argv[]) {
       }
     }
 
-    print_stats(A);
+    Morpheus::print(A);
   }
 
   Morpheus::finalize();

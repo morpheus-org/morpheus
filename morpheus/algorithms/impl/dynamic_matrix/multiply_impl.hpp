@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_MULTIPLY_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_MULTIPLY_IMPL_HPP
 
 #include <morpheus/containers/dynamic_matrix.hpp>
 #include <morpheus/containers/vector.hpp>
@@ -48,10 +48,6 @@ struct multiply_fn {
 template <typename ExecSpace, typename Matrix, typename Vector>
 void multiply(const ExecSpace& space, const Matrix& A, const Vector& x,
               Vector& y, Morpheus::DynamicTag) {
-  // Check all containers have access to the same execution space
-  // static_assert(std::is_same_v<typename Matrix::execution_space,
-  //                              typename Vector::execution_space>);
-
   std::visit(std::bind(Impl::multiply_fn(), std::cref(space),
                        std::placeholders::_1, std::cref(x), std::ref(y)),
              A.formats());
@@ -60,4 +56,4 @@ void multiply(const ExecSpace& space, const Matrix& A, const Vector& x,
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_MULTIPLY_IMPL_HPP
