@@ -64,8 +64,8 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
   ~DenseMatrix()                   = default;
   DenseMatrix(const DenseMatrix &) = default;
   DenseMatrix(DenseMatrix &&)      = default;
-  DenseMatrix &operator=(const DenseMatrix &) = default;
-  DenseMatrix &operator=(DenseMatrix &&) = default;
+  reference operator=(const DenseMatrix &) = default;
+  reference operator=(DenseMatrix &&) = default;
 
   // Construct an empty DenseMatrix
   inline DenseMatrix() : _label("DenseMatrix"), _m(0), _n(0), _values() {}

@@ -54,8 +54,8 @@ struct print_fn {
 
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, Morpheus::DynamicTag) {
-  s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
-    << p.nnnz() << " entries\n";
+  s << p.label() << "<" << p.nrows() << ", " << p.ncols() << ">(" << p.name()
+    << ") with " << p.nnnz() << " entries\n";
   // TODO: Using a stream in this way doesn't seem to work
   // std::visit(std::bind(Impl::print_fn(), std::placeholders::_1, std::ref(s)),
   //            p.formats());

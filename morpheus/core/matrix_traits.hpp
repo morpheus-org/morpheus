@@ -26,6 +26,7 @@
 
 #include <type_traits>
 #include <morpheus/core/core.hpp>
+#include <morpheus/core/matrix_tags.hpp>
 
 namespace Morpheus {
 
@@ -142,5 +143,14 @@ struct MatrixTraits {
   using device_type     = Kokkos::Device<ExecutionSpace, MemorySpace>;
 };
 }  // namespace Impl
+
+template <class T>
+struct is_sparse_mat {
+  using value =
+      typename std::is_same<typename T::tag, Impl::SparseMatTag>::value;
+};
+
+template <class T>
+using is_sparse_mat_v = typename is_sparse_mat<T>::value;
 }  // namespace Morpheus
 #endif  // MORPHEUS_CORE_MATRIX_TRAITS_HPP

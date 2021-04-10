@@ -87,10 +87,10 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
                      const index_type nnz, Args &&...args) {
-    return std::visit(
+    auto f =
         std::bind(Impl::any_type_resize<Properties...>(), std::placeholders::_1,
-                  m, n, nnz, std::forward<Args>(args)...),
-        _formats);
+                  m, n, nnz, std::forward<Args>(args)...);
+    return std::visit(f, _formats);
   }
 
   inline std::string name() const { return _name; }
@@ -126,7 +126,8 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
                 << "Selecting to switch to format with index " << idx
                 << " will default to the format with index 0." << std::endl;
     }
-    Impl::activate_impl<size, Properties...>::activate(_formats, idx);
+    Impl::activate_impl<size, Properties...>::activate(std::cref(_formats),
+                                                       idx);
   }
 
   // Enable switching through direct integer indexing
@@ -135,6 +136,7 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   }
 
   inline const variant_type &formats() const { return _formats; }
+  inline variant_type &formats() { return _formats; }
 
  private:
   const std::string _name = "DynamicMatrix";

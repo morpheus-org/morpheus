@@ -28,12 +28,22 @@
 #include <morpheus/algorithms/impl/vector/copy_impl.hpp>
 
 namespace Morpheus {
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst);
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, Morpheus::CooTag,
           Morpheus::CooTag) {
-  dst.resize(src.nrows(), src.ncols(), src.nnnz());
+  static_assert(
+      !std::is_same_v<DestinationType,
+                      const Morpheus::CooMatrix<double, int, Kokkos::Serial>>,
+      "DestinationType does not match for COO dst");
+  using I      = typename SourceType::index_type;
+  const I rows = src.nrows();
+  const I cols = src.ncols();
+  const I nnzs = src.nnnz();
+  dst.resize(rows, cols, nnzs);
 
   Morpheus::copy(src.row_indices, dst.row_indices);
   Morpheus::copy(src.column_indices, dst.column_indices);

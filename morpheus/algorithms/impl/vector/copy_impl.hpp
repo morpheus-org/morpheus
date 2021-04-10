@@ -27,15 +27,14 @@
 #include <morpheus/containers/vector.hpp>
 
 namespace Morpheus {
-// Forward Declaration
-template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst);
 
 namespace Impl {
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, Morpheus::DenseVectorTag,
           Morpheus::DenseVectorTag) {
-  dst.resize(src.size());
+  using I      = typename SourceType::index_type;
+  const I size = src.size();
+  dst.resize(size);
   // Kokkos has src and dst the other way round
   Kokkos::deep_copy(dst.view(), src.view());
 }

@@ -85,6 +85,7 @@ struct any_type_resize : public Impl::MatrixTraits<Properties...> {
                          const index_type ndiag, const index_type alignment) {
     mat.resize(nrows, ncols, nnnz, ndiag, alignment);
   }
+
   // Specialization for any other case and dummy overlads
   // eg Resize with four arguments is not supported by Coo
   //    though needed for compiling dynamic matrix interface
@@ -132,7 +133,7 @@ struct activate_impl {
   using variant   = typename MatrixFormats<Properties...>::variant;
   using type_list = typename MatrixFormats<Properties...>::type_list;
 
-  static void activate(variant &A, size_t idx) {
+  static void activate(const variant &A, size_t idx) {
     if (idx == I - 1) {
       A = typename type_list::template type<I - 1>{};
     } else {

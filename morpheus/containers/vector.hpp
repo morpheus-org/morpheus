@@ -55,10 +55,10 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
 
-  using pointer         = value_type*;
-  using const_pointer   = const value_type*;
-  using reference       = value_type&;
-  using const_reference = const value_type&;
+  using pointer         = DenseVector*;
+  using const_pointer   = const DenseVector*;
+  using reference       = DenseVector&;
+  using const_reference = const DenseVector&;
 
   using iterator       = value_type*;
   using const_iterator = const value_type*;
@@ -148,7 +148,7 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   inline std::string label() const { return _label; }
 
  private:
-  const td::string _name = "DenseVector";
+  const std::string _name = "DenseVector";
   std::string _label;
   index_type _size;
   value_array_type _values;

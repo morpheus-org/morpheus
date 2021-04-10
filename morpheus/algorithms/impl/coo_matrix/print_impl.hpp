@@ -36,8 +36,8 @@ namespace Impl {
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, Morpheus::CooTag) {
   using I = typename Printable::index_type;
-  s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
-    << p.nnnz() << " entries\n";
+  s << p.label() << "<" << p.nrows() << ", " << p.ncols() << ">(" << p.name()
+    << ") with " << p.nnnz() << " entries\n";
 
   for (I n = 0; n < p.nnnz(); n++) {
     s << " " << std::setw(14) << p.row_indices[n];

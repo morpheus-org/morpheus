@@ -27,7 +27,7 @@
 #include <morpheus/containers/dense_matrix.hpp>
 
 namespace Morpheus {
-// Forward Declaration
+// forward decl
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst);
 
@@ -35,7 +35,10 @@ namespace Impl {
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, Morpheus::DenseMatrixTag,
           Morpheus::DenseMatrixTag) {
-  dst.resize(src.nrows(), src.ncols());
+  using I      = typename SourceType::index_type;
+  const I rows = src.nrows();
+  const I cols = src.ncols();
+  dst.resize(rows, cols);
   // Kokkos has src and dst the other way round
   Kokkos::deep_copy(dst.view(), src.view());
 }

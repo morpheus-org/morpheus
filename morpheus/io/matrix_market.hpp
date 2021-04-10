@@ -31,16 +31,16 @@
 namespace Morpheus {
 namespace Io {
 template <typename Matrix>
-void read(Matrix& mtx, const std::string& filename);
+void read_matrix_market(Matrix& mtx, const std::string& filename);
 
 template <typename Matrix, typename Stream>
-void read(Matrix& mtx, Stream& input);
+void read_matrix_market(Matrix& mtx, Stream& input);
 
 template <typename Matrix>
-void write(const Matrix& mtx, const std::string& filename);
+void write_matrix_market(const Matrix& mtx, const std::string& filename);
 
 template <typename Matrix, typename Stream>
-void write(const Matrix& mtx, Stream& output);
+void write_matrix_market(const Matrix& mtx, Stream& output);
 }  // namespace Io
 }  // namespace Morpheus
 

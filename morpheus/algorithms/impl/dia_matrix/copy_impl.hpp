@@ -33,7 +33,12 @@ namespace Impl {
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, Morpheus::DiaTag,
           Morpheus::DiaTag) {
-  dst.resize(src.nrows(), src.ncols(), src.nnnz(), src.diagonal_offsets.size());
+  using I          = typename SourceType::index_type;
+  const I rows     = src.nrows();
+  const I cols     = src.ncols();
+  const I nnzs     = src.nnnz();
+  const I off_size = src.diagonal_offsets.size();
+  dst.resize(rows, cols, nnzs, off_size);
 
   Morpheus::copy(src.diagonal_offsets, dst.diagonal_offsets);
   Morpheus::copy(src.values, dst.values);

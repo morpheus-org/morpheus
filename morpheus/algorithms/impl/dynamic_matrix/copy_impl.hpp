@@ -33,21 +33,24 @@ namespace Morpheus {
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst);
 
-template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, SourceType& dst);
-
 namespace Impl {
 
 struct copy_fn {
   using result_type = void;
 
   template <typename SourceType, typename DestinationType>
-  result_type operator()(const SourceType& src, SourceType& dst) const {
+  result_type operator()(
+      const SourceType& src, DestinationType& dst,
+      typename std::enable_if_t<std::is_same_v<SourceType, DestinationType>>* =
+          nullptr) {
     Morpheus::copy(src, dst);
   }
 
   template <typename SourceType, typename DestinationType>
-  result_type operator()(const SourceType& src, DestinationType& dst) const {
+  result_type operator()(
+      const SourceType& src, DestinationType& dst,
+      typename std::enable_if_t<!std::is_same_v<SourceType, DestinationType>>* =
+          nullptr) {
     std::string msg("Invalid use of the copy interface: ");
     throw Morpheus::RuntimeException(msg + src.name() + " " + dst.name() +
                                      "\n");
@@ -57,23 +60,22 @@ struct copy_fn {
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, Morpheus::DynamicTag,
           Morpheus::Impl::SparseMatTag) {
-  std::visit(std::bind(Impl::copy_fn(), std::placeholders::_1, std::ref(dst)),
-             src.formats());
+  auto f = std::bind(Impl::copy_fn(), std::placeholders::_1, std::ref(dst));
+  std::visit(f, src.formats());
 }
 
-// template <typename SourceType, typename DestinationType>
-// void copy(const SourceType& src, DestinationType& dst,
-//           Morpheus::Impl::SparseMatTag, Morpheus::DynamicTag) {
-//   std::visit(std::bind(Impl::copy_fn(), std::cref(src),
-//   std::placeholders::_1),
-//              dst.formats());
-// }
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst,
+          Morpheus::Impl::SparseMatTag, Morpheus::DynamicTag) {
+  auto f = std::bind(Impl::copy_fn(), std::cref(src), std::placeholders::_1);
+  std::visit<>(f, dst.formats());
+}
 
-// template <typename SourceType, typename DestinationType>
-// void copy(const SourceType& src, DestinationType& dst, Morpheus::DynamicTag,
-//           Morpheus::DynamicTag) {
-//   std::visit(Impl::copy_fn(), src.formats(), dst.formats());
-// }
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst, Morpheus::DynamicTag,
+          Morpheus::DynamicTag) {
+  std::visit(Impl::copy_fn(), src.formats(), dst.formats());
+}
 
 }  // namespace Impl
 }  // namespace Morpheus
