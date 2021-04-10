@@ -36,8 +36,8 @@ namespace Impl {
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, Morpheus::CsrTag) {
   using I = typename Printable::index_type;
-  s << p.label() << "<" << p.nrows() << ", " << p.ncols() << ">(" << p.name()
-    << ") with " << p.nnnz() << " entries\n";
+  s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
+    << p.nnnz() << " entries\n";
 
   for (I i = 0; i < p.nrows(); i++) {
     for (I jj = p.row_offsets[i]; jj < p.row_offsets[i + 1]; jj++) {

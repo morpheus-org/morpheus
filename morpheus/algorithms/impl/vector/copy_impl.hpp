@@ -27,6 +27,9 @@
 #include <morpheus/containers/vector.hpp>
 
 namespace Morpheus {
+// forward decl
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst);
 
 namespace Impl {
 template <typename SourceType, typename DestinationType>

@@ -35,8 +35,8 @@ namespace Impl {
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, Morpheus::DenseMatrixTag) {
   using index_type = typename Printable::index_type;
-  s << p.label() << "<" << p.nrows() << ", " << p.ncols() << ">(" << p.name()
-    << ") with " << p.nrows() * p.ncols() << " entries\n";
+  s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
+    << p.nrows() * p.ncols() << " entries\n";
 
   for (index_type i = 0; i < p.nrows(); i++) {
     for (index_type j = 0; j < p.ncols(); j++) {

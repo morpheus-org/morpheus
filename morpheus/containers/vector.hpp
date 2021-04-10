@@ -73,18 +73,18 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   ~DenseVector()                  = default;
   DenseVector(const DenseVector&) = default;
   DenseVector(DenseVector&&)      = default;
-  DenseVector& operator=(const DenseVector&) = default;
-  DenseVector& operator=(DenseVector&&) = default;
+  reference operator=(const DenseVector&) = default;
+  reference operator=(DenseVector&&) = default;
 
-  inline DenseVector() : _label("Vector"), _size(0), _values() {}
+  inline DenseVector() : _name("Vector"), _size(0), _values() {}
 
   inline DenseVector(const std::string name, int n, value_type val = 0)
-      : _label(name), _size(n), _values(name, size_t(n)) {
+      : _name(name), _size(n), _values(name, size_t(n)) {
     assign(n, val);
   }
 
   inline DenseVector(int n, value_type val = 0)
-      : _label("Vector"), _size(n), _values("Vector", size_t(n)) {
+      : _name("Vector"), _size(n), _values("Vector", size_t(n)) {
     assign(n, val);
   }
 
@@ -145,11 +145,9 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
 
   // Other
   inline std::string name() const { return _name; }
-  inline std::string label() const { return _label; }
 
  private:
-  const std::string _name = "DenseVector";
-  std::string _label;
+  std::string _name;
   index_type _size;
   value_array_type _values;
 };

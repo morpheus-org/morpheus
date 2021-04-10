@@ -133,7 +133,7 @@ struct activate_impl {
   using variant   = typename MatrixFormats<Properties...>::variant;
   using type_list = typename MatrixFormats<Properties...>::type_list;
 
-  static void activate(const variant &A, size_t idx) {
+  static void activate(variant &A, size_t idx) {
     if (idx == I - 1) {
       A = typename type_list::template type<I - 1>{};
     } else {

@@ -36,8 +36,8 @@ namespace Impl {
 
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, Morpheus::DiaTag) {
-  s << p.label() << "<" << p.nrows() << ", " << p.ncols() << ">(" << p.name()
-    << ") with " << p.nnnz() << " entries\n";
+  s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
+    << p.nnnz() << " entries\n";
 
   using I = typename Printable::index_type;
 

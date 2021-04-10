@@ -68,12 +68,12 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
   reference operator=(DenseMatrix &&) = default;
 
   // Construct an empty DenseMatrix
-  inline DenseMatrix() : _label("DenseMatrix"), _m(0), _n(0), _values() {}
+  inline DenseMatrix() : _name("DenseMatrix"), _m(0), _n(0), _values() {}
 
   // Construct a DenseMatrix with a specific shape
   inline DenseMatrix(const index_type num_rows, const index_type num_cols,
                      const value_type val = 0)
-      : _label("DenseMatrix"),
+      : _name("DenseMatrix"),
         _m(num_rows),
         _n(num_cols),
         _values("DenseMatrix", size_t(num_rows), size_t(num_cols)) {
@@ -82,7 +82,7 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
 
   inline DenseMatrix(const std::string name, const index_type num_rows,
                      const index_type num_cols, const value_type val = 0)
-      : _label(name),
+      : _name(name),
         _m(num_rows),
         _n(num_cols),
         _values(name, size_t(num_rows), size_t(num_cols)) {
@@ -122,7 +122,6 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
   // Unified routines across all formats
 
   inline std::string name() const { return _name; }
-  inline std::string label() const { return _label; }
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
   inline index_type nnnz() const { return _m * _n; }
@@ -130,8 +129,7 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
   inline void set_ncols(const index_type cols) { _n = cols; }
 
  private:
-  const std::string _name = "DenseMatrix";
-  std::string _label;
+  std::string _name;
   index_type _m, _n;
   value_array_type _values;
 };

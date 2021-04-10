@@ -76,6 +76,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   inline DiaMatrix()
       : diagonal_offsets(),
         values(),
+        _name("DiaMatrix"),
         _label("DiaMatrix"),
         _m(0),
         _n(0),
@@ -90,6 +91,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
                    const index_type num_entries, const index_type num_diagonals,
                    const index_type alignment = 32)
       : diagonal_offsets(num_diagonals),
+        _name("DiaMatrix"),
         _label("DiaMatrix"),
         _m(num_rows),
         _n(num_cols),
@@ -102,6 +104,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
                    const index_type num_diagonals,
                    const index_type alignment = 32)
       : diagonal_offsets(num_diagonals),
+        _name("DiaMatrix"),
         _label(name),
         _m(num_rows),
         _n(num_cols),
@@ -164,7 +167,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
     return alignment * ((diag_len + alignment - 1) / alignment);
   }
 
-  const std::string _name = "DiaMatrix";
+  std::string _name;
   std::string _label;
   index_type _m, _n, _nnz;
 };
