@@ -79,7 +79,7 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   inline DenseVector() : _name("Vector"), _size(0), _values() {}
 
   inline DenseVector(const std::string name, int n, value_type val = 0)
-      : _name(name), _size(n), _values(name, size_t(n)) {
+      : _name(name + "Vector"), _size(n), _values(name, size_t(n)) {
     assign(n, val);
   }
 

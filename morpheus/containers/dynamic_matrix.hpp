@@ -74,16 +74,15 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   reference operator=(const DynamicMatrix &) = default;
   reference operator=(DynamicMatrix &&) = default;
 
-  inline DynamicMatrix()
-      : _name("DynamicMatrix"), _label("DynamicMatrix"), _formats() {}
+  inline DynamicMatrix() : _name("DynamicMatrix"), _formats() {}
 
   template <typename Format>
   inline DynamicMatrix(const Format &mat)
-      : _name("DynamicMatrix"), _label("DynamicMatrix"), _formats(mat) {}
+      : _name("DynamicMatrix"), _formats(mat) {}
 
   template <typename Format>
   inline DynamicMatrix(const std::string name, const Format &mat)
-      : _label(name), _formats(mat) {}
+      : _name(name + "(DynamicMatrix)"), _formats(mat) {}
 
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
@@ -95,8 +94,6 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   }
 
   inline std::string name() const { return _name; }
-
-  inline std::string label() const { return _label; }
 
   inline index_type nrows() const {
     return std::visit(Impl::any_type_get_nrows(), _formats);
@@ -140,7 +137,6 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
 
  private:
   std::string _name;
-  std::string _label;
   variant_type _formats;
 };
 }  // namespace Morpheus

@@ -82,10 +82,10 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
 
   inline DenseMatrix(const std::string name, const index_type num_rows,
                      const index_type num_cols, const value_type val = 0)
-      : _name(name),
+      : _name(name + "(DenseMatrix)"),
         _m(num_rows),
         _n(num_cols),
-        _values(name, size_t(num_rows), size_t(num_cols)) {
+        _values(name + "(DenseMatrix)", size_t(num_rows), size_t(num_cols)) {
     assign(num_rows, num_cols, val);
   }
 

@@ -56,7 +56,7 @@ int main() {
     B.column_indices[1] = 2;
     B.values[1]         = 20;
 
-    Morpheus::copy(C, B);
+    Morpheus::copy(B, C);
     A.row_indices[0]    = 1;
     A.column_indices[0] = 1;
     A.values[0]         = -5;

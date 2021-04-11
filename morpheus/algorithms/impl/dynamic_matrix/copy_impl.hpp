@@ -68,7 +68,7 @@ template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst,
           Morpheus::Impl::SparseMatTag, Morpheus::DynamicTag) {
   auto f = std::bind(Impl::copy_fn(), std::cref(src), std::placeholders::_1);
-  std::visit<>(f, dst.formats());
+  std::visit(f, dst.formats());
 }
 
 template <typename SourceType, typename DestinationType>
