@@ -59,6 +59,12 @@ class RuntimeException : public Exception {
   RuntimeException(const MessageType& msg) : Exception(msg) {}
 };
 
+class InvalidInputException : public Exception {
+ public:
+  template <typename MessageType>
+  InvalidInputException(const MessageType& msg) : Exception(msg) {}
+};
+
 template <typename T, typename... Ts>
 constexpr std::string append_str(T&& first, Ts&&... rest) {
   if constexpr (sizeof...(Ts) == 0) {

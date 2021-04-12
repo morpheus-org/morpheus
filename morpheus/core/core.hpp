@@ -1,6 +1,8 @@
 #ifndef MORPHEUS_CORE_CORE_HPP
 #define MORPHEUS_CORE_CORE_HPP
 
+#include <iostream>
+
 namespace Morpheus {
 
 struct InitArguments;
