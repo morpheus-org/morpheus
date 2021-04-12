@@ -90,6 +90,17 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
         _n(num_cols),
         _nnz(num_entries) {}
 
+  inline CooMatrix(const std::string name, const index_array_type &rind,
+                   const index_array_type &cind, const value_array_type &vals)
+      : row_indices(rind),
+        column_indices(cind),
+        values(vals),
+        _name(name + "(CooMatrix)"),
+        _m(rind.size()),
+        _n(cind.size()),
+        _nnz(vals.size()) {}
+
+  // Construct from vectors
   inline CooMatrix(const std::string name, const index_type num_rows,
                    const index_type num_cols, const index_type num_entries)
       : row_indices(num_entries),
