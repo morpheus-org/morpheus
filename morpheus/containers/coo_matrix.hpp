@@ -137,36 +137,6 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
         "CooMatrix.operator=(const MatrixType& matrix)");
   }
 
-  // Operations specific to COO format
-
-  // Sort matrix elements by row index
-  void sort_by_row(void) {
-    // TODO: CooMatrix.sort_by_row
-    throw Morpheus::NotImplementedException("CooMatrix.sort_by_row()");
-  }
-
-  // Sort matrix elements by row and column index
-  void sort_by_row_and_column(void) {
-    // TODO: CooMatrix.sort_by_row_and_column
-    throw Morpheus::NotImplementedException(
-        "CooMatrix.sort_by_row_and_column()");
-  }
-
-  // Determine whether matrix elements are sorted by row index
-  bool is_sorted_by_row(void) {
-    // TODO: CooMatrix.is_sorted_by_row
-    throw Morpheus::NotImplementedException("CooMatrix.is_sorted_by_row()");
-    return true;
-  }
-
-  // Determine whether matrix elements are sorted by row and column index
-  bool is_sorted_by_row_and_column(void) {
-    // TODO: CooMatrix.is_sorted_by_row_and_column
-    throw Morpheus::NotImplementedException(
-        "CooMatrix.is_sorted_by_row_and_column()");
-    return true;
-  }
-
   // Unified routines across all formats
 
   inline std::string name() const { return _name; }

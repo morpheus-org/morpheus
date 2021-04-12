@@ -38,6 +38,11 @@ void sort_by_row_and_column(const ExecSpace& space, Matrix& mat,
                                max_row, min_col, max_col);
 }
 
+template <typename ExecSpace, typename Matrix>
+bool is_sorted(const ExecSpace& space, Matrix& mat) {
+  return Impl::is_sorted(space, mat, typename Matrix::tag{});
+}
+
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_ALGORITHMS_SORT_HPP

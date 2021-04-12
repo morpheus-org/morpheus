@@ -40,8 +40,10 @@ int main() {
     coo A("A", ii, jj, vv);
 
     Morpheus::print(A);
+    std::cout << "Is sorted:: " << Morpheus::is_sorted(space, A) << std::endl;
     Morpheus::sort_by_row_and_column(space, A);
     Morpheus::print(A);
+    std::cout << "Is sorted:: " << Morpheus::is_sorted(space, A) << std::endl;
   }
   Morpheus::finalize();
 }

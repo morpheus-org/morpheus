@@ -24,6 +24,7 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_SORT_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_SORT_IMPL_HPP
 
+#include <morpheus/core/exceptions.hpp>
 #include <morpheus/containers/coo_matrix.hpp>
 #include <morpheus/algorithms/impl/vector/sort_impl.hpp>
 
@@ -88,6 +89,27 @@ void sort_by_row_and_column(
       mat.values[i] = temp[permutation[i]];
     }
   }
+}
+
+template <typename ExecSpace, typename Matrix>
+bool is_sorted(
+    const ExecSpace& space, Matrix& mat, Morpheus::CooTag,
+    typename std::enable_if_t<Morpheus::is_Serial_space_v<ExecSpace>>* =
+        nullptr) {
+  using IndexType = typename Matrix::index_array_type::index_type;
+
+  if (mat.row_indices.size() != mat.column_indices.size()) {
+    throw Morpheus::RuntimeException(
+        "Sizes of row and column indeces do not match.");
+  }
+
+  for (IndexType i = 0; i < IndexType(mat.nnnz()) - 1; i++) {
+    if ((mat.row_indices[i] > mat.row_indices[i + 1]) ||
+        (mat.row_indices[i] == mat.row_indices[i + 1] &&
+         mat.column_indices[i] > mat.column_indices[i + 1]))
+      return false;
+  }
+  return true;
 }
 }  // namespace Impl
 }  // namespace Morpheus
