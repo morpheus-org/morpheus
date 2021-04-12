@@ -29,6 +29,8 @@
 #include <morpheus/core/vector_traits.hpp>
 #include <morpheus/core/vector_tags.hpp>
 
+#include <Kokkos_Random.hpp>
+
 namespace Morpheus {
 
 /* Forward declaration */
@@ -87,6 +89,12 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
       : _name("Vector"), _size(n), _values("Vector", size_t(n)) {
     assign(n, val);
   }
+  template <typename Generator>
+  inline DenseVector(const std::string name, int n, Generator rand_pool,
+                     const value_type range_low, const value_type range_high)
+      : _name(name + "Vector"), _size(n), _values(name + "Vector", size_t(n)) {
+    assign(n, rand_pool, range_low, range_high);
+  }
 
   inline void assign(const index_type n, const value_type val) {
     /* Resize if necessary (behavior of std:vector) */
@@ -96,6 +104,22 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
     Kokkos::parallel_for(
         "Morpheus::DenseVector::assign", range,
         KOKKOS_LAMBDA(const int i) { _values(i) = val; });
+  }
+
+  template <typename Generator>
+  inline void assign(const index_type n, const Generator rand_pool,
+                     const value_type range_low, const value_type range_high) {
+    using rng_type = typename Generator::generator_type;
+    using rand     = Kokkos::rand<rng_type, value_type>;
+
+    /* Resize if necessary (behavior of std:vector) */
+    this->resize(n);
+
+    rng_type rand_gen = rand_pool.get_state();
+
+    for (index_type i = 0; i < n; ++i) {
+      _values(i) = rand::draw(rand_gen, range_low, range_high);
+    }
   }
 
   // Element access
@@ -126,8 +150,8 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   }
 
   // Capacity
-  //   TODO: reserve should be enabled when push_back methods etc are developed
-  //   inline void reserve(size_t n) {
+  //   TODO: reserve should be enabled when push_back methods etc are
+  //   developed inline void reserve(size_t n) {
   //     Kokkos::resize(_values, size_t(n));
   //   }
 
