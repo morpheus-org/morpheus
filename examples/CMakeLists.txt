@@ -39,6 +39,7 @@ set( SOURCES_IDIOMATIC_EXAMPLES
     DiaMatrix.cpp
     Copy.cpp
     DynamicCopy.cpp
+    sorting.cpp
 )
 
 string( REPLACE ".cpp" "" BASENAMES_IDIOMATIC_EXAMPLES "${SOURCES_IDIOMATIC_EXAMPLES}" )
