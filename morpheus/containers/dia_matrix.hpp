@@ -28,13 +28,11 @@
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
-#include <morpheus/core/matrix_tags.hpp>
-#include <morpheus/containers/dense_matrix.hpp>
 #include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/dense_matrix.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
-
-struct DiaTag : public Impl::SparseMatTag {};
 
 template <class... Properties>
 class DiaMatrix : public Impl::MatrixTraits<Properties...> {

@@ -24,7 +24,7 @@
 #define MORPHEUS_CORE_TYPE_TRAITS_HPP
 
 #include <morpheus/core/core.hpp>
-
+#include <type_traits>
 namespace Morpheus {
 
 namespace Impl {}

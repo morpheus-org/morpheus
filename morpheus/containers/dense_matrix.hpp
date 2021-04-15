@@ -27,13 +27,11 @@
 #include <string>
 
 #include <morpheus/core/core.hpp>
-#include <morpheus/core/matrix_traits.hpp>
-#include <morpheus/core/matrix_tags.hpp>
 #include <morpheus/core/exceptions.hpp>
+#include <morpheus/core/matrix_traits.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
-
-struct DenseMatrixTag : public Impl::DenseMatTag {};
 
 template <class... Properties>
 class DenseMatrix : public Impl::MatrixTraits<Properties...> {

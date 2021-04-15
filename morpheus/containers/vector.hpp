@@ -27,7 +27,7 @@
 
 #include <morpheus/core/core.hpp>
 #include <morpheus/core/vector_traits.hpp>
-#include <morpheus/core/vector_tags.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 #include <Kokkos_Random.hpp>
 
@@ -36,8 +36,6 @@ namespace Morpheus {
 /* Forward declaration */
 template <class... Properties>
 class DenseVector;
-
-struct DenseVectorTag : public Impl::VectorTag {};
 
 /* Alias type to match std::vector */
 template <class... Properties>
@@ -48,7 +46,7 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
  public:
   using type   = DenseVector<Properties...>;
   using traits = Impl::VectorTraits<Properties...>;
-  using tag    = typename VectorFormatTag<DenseVectorTag>::tag;
+  using tag    = typename VectorFormatTag<Morpheus::DenseVectorTag>::tag;
 
   using value_type = typename traits::value_type;
   using index_type = size_t;

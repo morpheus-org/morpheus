@@ -29,13 +29,11 @@
 #include <variant>
 #include <functional>
 
-#include <morpheus/containers/impl/dynamic_matrix_impl.hpp>
 #include <morpheus/core/matrix_traits.hpp>
-#include <morpheus/core/matrix_tags.hpp>
+#include <morpheus/containers/impl/dynamic_matrix_impl.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
-
-struct DynamicTag : public Impl::MatrixTag {};
 
 /** @class DynamicMatrix
  * @brief Dynamic Matrix class that acts as a sum type of all the supporting
@@ -52,7 +50,7 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
  public:
   using type   = DynamicMatrix<Properties...>;
   using traits = Impl::MatrixTraits<Properties...>;
-  using tag    = typename MatrixFormatTag<DynamicTag>::tag;
+  using tag    = typename MatrixFormatTag<Morpheus::DynamicTag>::tag;
 
   using variant_type = typename MatrixFormats<Properties...>::variant;
   using value_type   = typename traits::value_type;

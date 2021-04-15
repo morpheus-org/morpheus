@@ -28,19 +28,18 @@
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
-#include <morpheus/core/matrix_tags.hpp>
+#include <morpheus/algorithms/sort.hpp>
 #include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
-
-struct CooTag : public Impl::SparseMatTag {};
 
 template <class... Properties>
 class CooMatrix : public Impl::MatrixTraits<Properties...> {
  public:
   using type   = CooMatrix<Properties...>;
   using traits = Impl::MatrixTraits<Properties...>;
-  using tag    = typename MatrixFormatTag<CooTag>::tag;
+  using tag    = typename MatrixFormatTag<Morpheus::CooTag>::tag;
 
   using value_type = typename traits::value_type;
   using index_type = typename traits::index_type;
@@ -135,6 +134,38 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   reference operator=(const MatrixType &matrix) {
     throw Morpheus::NotImplementedException(
         "CooMatrix.operator=(const MatrixType& matrix)");
+  }
+
+  // Sort matrix elements by row index
+  void sort_by_row(void) {
+    // TODO: CooMatrix.sort_by_row
+    throw Morpheus::NotImplementedException("CooMatrix.sort_by_row()");
+  }
+
+  // Sort matrix elements by row and column index
+  void sort_by_row_and_column(void) {
+    execution_space space;
+    Morpheus::sort_by_row_and_column(space, *this, 0, _m, 0, _n);
+    // // TODO: CooMatrix.sort_by_row_and_column
+    // throw Morpheus::NotImplementedException(
+    //     "CooMatrix.sort_by_row_and_column()");
+  }
+
+  // Determine whether matrix elements are sorted by row index
+  bool is_sorted_by_row(void) {
+    // TODO: CooMatrix.is_sorted_by_row
+    throw Morpheus::NotImplementedException("CooMatrix.is_sorted_by_row()");
+    return true;
+  }
+
+  // Determine whether matrix elements are sorted by row and column index
+  bool is_sorted(void) {
+    execution_space space;
+    return Morpheus::is_sorted(space, *this);
+    // TODO: CooMatrix.is_sorted_by_row_and_column
+    // throw Morpheus::NotImplementedException(
+    //     "CooMatrix.is_sorted_by_row_and_column()");
+    // return true;
   }
 
   // Unified routines across all formats

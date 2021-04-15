@@ -28,19 +28,17 @@
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
-#include <morpheus/core/matrix_tags.hpp>
 #include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
-
-struct CsrTag : public Impl::SparseMatTag {};
 
 template <class... Properties>
 class CsrMatrix : public Impl::MatrixTraits<Properties...> {
  public:
   using type   = CsrMatrix<Properties...>;
   using traits = Impl::MatrixTraits<Properties...>;
-  using tag    = typename MatrixFormatTag<CsrTag>::tag;
+  using tag    = typename MatrixFormatTag<Morpheus::CsrTag>::tag;
 
   using value_type = typename traits::value_type;
   using index_type = typename traits::index_type;

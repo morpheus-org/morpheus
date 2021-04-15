@@ -1,5 +1,5 @@
 /**
- * matrix_tags.hpp
+ * format_tags.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,29 +21,22 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_CORE_MATRIX_TAGS_HPP
-#define MORPHEUS_CORE_MATRIX_TAGS_HPP
+#ifndef MORPHEUS_CONTAINERS_IMPL_FORMAT_TAGS_HPP
+#define MORPHEUS_CONTAINERS_IMPL_FORMAT_TAGS_HPP
 
-#include <type_traits>
+#include <morpheus/core/matrix_tags.hpp>
+#include <morpheus/core/vector_tags.hpp>
 
 namespace Morpheus {
 
-namespace Impl {
-struct MatrixTag {};
+struct CooTag : public Impl::SparseMatTag {};
+struct CsrTag : public Impl::SparseMatTag {};
+struct DiaTag : public Impl::SparseMatTag {};
+struct DynamicTag : public Impl::SparseMatTag {};
 
-struct SparseMatTag : public Impl::MatrixTag {};
-struct DenseMatTag : public Impl::MatrixTag {};
-
-}  // namespace Impl
-
-// Matrix Format Tag Wrapper
-template <class T>
-struct MatrixFormatTag {
-  static_assert(std::is_base_of<Impl::MatrixTag, T>::value,
-                "Morpheus: Invalid Matrix Format tag.");
-  using format_tag = MatrixFormatTag;
-  using tag        = T;
-};
+struct DenseMatrixTag : public Impl::DenseMatTag {};
+struct DenseVectorTag : public Impl::VectorTag {};
 
 }  // namespace Morpheus
-#endif  // MORPHEUS_CORE_MATRIX_TAGS_HPP
+
+#endif  // MORPHEUS_CONTAINERS_IMPL_FORMAT_TAGS_HPP
