@@ -24,15 +24,14 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_COPY_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_COPY_IMPL_HPP
 
-#include <morpheus/containers/csr_matrix.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 #include <morpheus/algorithms/impl/vector/copy_impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, Morpheus::CsrTag,
-          Morpheus::CsrTag) {
+void copy(const SourceType& src, DestinationType& dst, CsrTag, CsrTag) {
   using I      = typename SourceType::index_type;
   const I rows = src.nrows();
   const I cols = src.ncols();

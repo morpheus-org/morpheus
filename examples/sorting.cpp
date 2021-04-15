@@ -21,7 +21,9 @@
  * limitations under the License.
  */
 
+#include <morpheus/containers/coo_matrix.hpp>
 #include <morpheus/algorithms/sort.hpp>
+#include <morpheus/algorithms/copy.hpp>
 #include <morpheus/algorithms/print.hpp>
 #include <Kokkos_Random.hpp>
 
@@ -37,13 +39,17 @@ int main() {
 
     vvec vv("vv", 20, Generator(0), 0, 100);
     ivec ii("ii", 20, Generator(0), 0, 100), jj("jj", 20, Generator(1), 0, 100);
-    coo A("A", ii, jj, vv);
+    coo A("A", ii, jj, vv), B;
+    Morpheus::copy(A, B);
 
     Morpheus::print(A);
     std::cout << "Is sorted:: " << Morpheus::is_sorted(space, A) << std::endl;
     Morpheus::sort_by_row_and_column(space, A);
     Morpheus::print(A);
     std::cout << "Is sorted:: " << Morpheus::is_sorted(space, A) << std::endl;
+    std::cout << "Is sorted:: " << B.is_sorted() << std::endl;
+    B.sort_by_row_and_column();
+    std::cout << "Is sorted:: " << B.is_sorted() << std::endl;
   }
   Morpheus::finalize();
 }

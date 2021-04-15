@@ -24,15 +24,14 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_COPY_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_COPY_IMPL_HPP
 
-#include <morpheus/containers/dia_matrix.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 #include <morpheus/algorithms/impl/dense_matrix/copy_impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, Morpheus::DiaTag,
-          Morpheus::DiaTag) {
+void copy(const SourceType& src, DestinationType& dst, DiaTag, DiaTag) {
   using I          = typename SourceType::index_type;
   const I rows     = src.nrows();
   const I cols     = src.ncols();

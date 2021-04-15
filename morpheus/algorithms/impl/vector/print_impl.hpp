@@ -27,13 +27,13 @@
 #include <iostream>
 #include <iomanip>
 
-#include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, Morpheus::DenseVectorTag) {
+void print(const Printable& p, Stream& s, DenseVectorTag) {
   using index_type = typename Printable::index_type;
   s << p.name() << "<" << p.size() << "> with " << p.size() << " entries\n";
 

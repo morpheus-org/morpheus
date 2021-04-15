@@ -21,8 +21,12 @@
  * limitations under the License.
  */
 #include <iostream>
+
 #include <morpheus/core/core.hpp>
+
+#include <morpheus/containers/coo_matrix.hpp>
 #include <morpheus/containers/vector.hpp>
+
 #include <morpheus/algorithms/multiply.hpp>
 #include <morpheus/algorithms/print.hpp>
 

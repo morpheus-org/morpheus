@@ -24,6 +24,7 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_VECTOR_MATRIX_SORT_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_VECTOR_MATRIX_SORT_IMPL_HPP
 
+#include <morpheus/containers/impl/format_tags.hpp>
 #include <morpheus/core/type_traits.hpp>
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/algorithms/copy.hpp>
@@ -47,7 +48,7 @@ template <typename ExecSpace, typename Vector1, typename Vector2>
 void counting_sort_by_key(
     const ExecSpace& space, Vector1& keys, Vector2& vals,
     typename Vector1::value_type min, typename Vector1::value_type max,
-    Morpheus::DenseVectorTag,
+    DenseVectorTag,
     typename std::enable_if_t<Morpheus::is_Serial_space_v<ExecSpace>>* =
         nullptr) {
   //   using IndexType1 = typename VectorType1::value_type;

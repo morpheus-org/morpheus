@@ -24,7 +24,8 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_DENSEMATRIX_COPY_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_DENSEMATRIX_COPY_IMPL_HPP
 
-#include <morpheus/containers/dense_matrix.hpp>
+#include <morpheus/core/core.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
 // forward decl
@@ -33,8 +34,8 @@ void copy(const SourceType& src, DestinationType& dst);
 
 namespace Impl {
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, Morpheus::DenseMatrixTag,
-          Morpheus::DenseMatrixTag) {
+void copy(const SourceType& src, DestinationType& dst, DenseMatrixTag,
+          DenseMatrixTag) {
   using I      = typename SourceType::index_type;
   const I rows = src.nrows();
   const I cols = src.ncols();

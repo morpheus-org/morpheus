@@ -24,7 +24,8 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_VECTOR_COPY_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_VECTOR_COPY_IMPL_HPP
 
-#include <morpheus/containers/vector.hpp>
+#include <morpheus/core/core.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
 // forward decl
@@ -33,8 +34,8 @@ void copy(const SourceType& src, DestinationType& dst);
 
 namespace Impl {
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, Morpheus::DenseVectorTag,
-          Morpheus::DenseVectorTag) {
+void copy(const SourceType& src, DestinationType& dst, DenseVectorTag,
+          DenseVectorTag) {
   using I      = typename SourceType::index_type;
   const I size = src.size();
   dst.resize(size);

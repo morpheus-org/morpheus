@@ -24,27 +24,24 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
 
-#include <morpheus/containers/dia_matrix.hpp>
-#include <morpheus/containers/vector.hpp>
 #include <morpheus/core/type_traits.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Matrix, typename Vector>
+template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
+          typename MatrixOrVector2>
 void multiply(
-    const ExecSpace& space, const Matrix& A, const Vector& x, Vector& y,
-    Morpheus::DiaTag,
-    typename std::enable_if<Morpheus::is_execution_space_v<ExecSpace> &&
-                            Morpheus::has_access_v<ExecSpace, Matrix> &&
-                            Morpheus::has_access_v<ExecSpace, Vector> &&
-                            Morpheus::is_Serial_space_v<ExecSpace>>::type* =
-        nullptr) {
-  // Check all containers have access to the same execution space
-  // static_assert(std::is_same_v<typename Matrix::execution_space,
-  //                              typename Vector::execution_space>);
-
-  using I = typename Matrix::index_type;
+    const ExecSpace& space, const LinearOperator& A, const MatrixOrVector1& x,
+    MatrixOrVector2& y, DiaTag, DenseVectorTag, DenseVectorTag,
+    typename std::enable_if_t<
+        Morpheus::is_execution_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, LinearOperator> &&
+        Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
+        Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
+  using I = typename LinearOperator::index_type;
 
   for (I i = 0; i < (int)A.diagonal_offsets.size(); i++) {
     const I k       = A.diagonal_offsets[i];  // diagonal offset

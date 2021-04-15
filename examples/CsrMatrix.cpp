@@ -23,7 +23,8 @@
 
 #include <iostream>
 #include <morpheus/core/core.hpp>
-#include <morpheus/containers/dynamic_matrix.hpp>
+#include <morpheus/containers/coo_matrix.hpp>
+#include <morpheus/containers/csr_matrix.hpp>
 #include <morpheus/containers/vector.hpp>
 #include <morpheus/algorithms/multiply.hpp>
 #include <morpheus/algorithms/print.hpp>

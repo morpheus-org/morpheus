@@ -24,9 +24,11 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_COPY_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_COPY_IMPL_HPP
 
-#include <morpheus/core/matrix_tags.hpp>
+#include <variant>
+
+#include <morpheus/containers/impl/format_tags.hpp>
+#include <morpheus/algorithms/impl/vector/copy_impl.hpp>
 #include <morpheus/core/exceptions.hpp>
-#include <morpheus/containers/dynamic_matrix.hpp>
 
 namespace Morpheus {
 // forward decl
@@ -58,22 +60,21 @@ struct copy_fn {
 };
 
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, Morpheus::DynamicTag,
-          Morpheus::Impl::SparseMatTag) {
+void copy(const SourceType& src, DestinationType& dst, DynamicTag,
+          SparseMatTag) {
   auto f = std::bind(Impl::copy_fn(), std::placeholders::_1, std::ref(dst));
   std::visit(f, src.formats());
 }
 
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst,
-          Morpheus::Impl::SparseMatTag, Morpheus::DynamicTag) {
+void copy(const SourceType& src, DestinationType& dst, SparseMatTag,
+          DynamicTag) {
   auto f = std::bind(Impl::copy_fn(), std::cref(src), std::placeholders::_1);
   std::visit(f, dst.formats());
 }
 
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, Morpheus::DynamicTag,
-          Morpheus::DynamicTag) {
+void copy(const SourceType& src, DestinationType& dst, DynamicTag, DynamicTag) {
   std::visit(Impl::copy_fn(), src.formats(), dst.formats());
 }
 

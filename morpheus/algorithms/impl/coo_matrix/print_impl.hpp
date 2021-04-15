@@ -27,14 +27,13 @@
 #include <iostream>
 #include <iomanip>
 
-#include <morpheus/containers/coo_matrix.hpp>
-#include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, Morpheus::CooTag) {
+void print(const Printable& p, Stream& s, CooTag) {
   using I = typename Printable::index_type;
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nnnz() << " entries\n";

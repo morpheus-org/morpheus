@@ -145,7 +145,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   // Sort matrix elements by row and column index
   void sort_by_row_and_column(void) {
     execution_space space;
-    Morpheus::sort_by_row_and_column(space, *this, 0, _m, 0, _n);
+    Morpheus::sort_by_row_and_column(space, *this);
     // // TODO: CooMatrix.sort_by_row_and_column
     // throw Morpheus::NotImplementedException(
     //     "CooMatrix.sort_by_row_and_column()");

@@ -21,6 +21,9 @@
  * limitations under the License.
  */
 
+#include <morpheus/containers/coo_matrix.hpp>
+#include <morpheus/containers/dynamic_matrix.hpp>
+
 #include <morpheus/algorithms/print.hpp>
 #include <morpheus/algorithms/copy.hpp>
 #include <morpheus/core/exceptions.hpp>

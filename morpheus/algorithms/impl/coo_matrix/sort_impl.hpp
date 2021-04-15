@@ -25,14 +25,15 @@
 #define MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_SORT_IMPL_HPP
 
 #include <morpheus/core/exceptions.hpp>
-#include <morpheus/containers/coo_matrix.hpp>
+#include <morpheus/core/type_traits.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 #include <morpheus/algorithms/impl/vector/sort_impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
 template <typename ExecSpace, typename Matrix>
 void sort_by_row_and_column(
-    const ExecSpace& space, Matrix& mat, Morpheus::CooTag,
+    const ExecSpace& space, Matrix& mat, CooTag,
     typename Matrix::index_type min_row = 0,
     typename Matrix::index_type max_row = 0,
     typename Matrix::index_type min_col = 0,
@@ -93,7 +94,7 @@ void sort_by_row_and_column(
 
 template <typename ExecSpace, typename Matrix>
 bool is_sorted(
-    const ExecSpace& space, Matrix& mat, Morpheus::CooTag,
+    const ExecSpace& space, Matrix& mat, CooTag,
     typename std::enable_if_t<Morpheus::is_Serial_space_v<ExecSpace>>* =
         nullptr) {
   using IndexType = typename Matrix::index_array_type::index_type;

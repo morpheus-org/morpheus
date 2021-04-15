@@ -24,19 +24,14 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_COPY_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_COPY_IMPL_HPP
 
-#include <morpheus/containers/coo_matrix.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 #include <morpheus/algorithms/impl/vector/copy_impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, Morpheus::CooTag,
-          Morpheus::CooTag) {
-  static_assert(
-      !std::is_same_v<DestinationType,
-                      const Morpheus::CooMatrix<double, int, Kokkos::Serial>>,
-      "DestinationType does not match for COO dst");
+void copy(const SourceType& src, DestinationType& dst, CooTag, CooTag) {
   using I      = typename SourceType::index_type;
   const I rows = src.nrows();
   const I cols = src.ncols();

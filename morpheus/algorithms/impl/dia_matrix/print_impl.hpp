@@ -28,14 +28,13 @@
 #include <iomanip>
 #include <algorithm>
 
-#include <morpheus/containers/dia_matrix.hpp>
-#include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, Morpheus::DiaTag) {
+void print(const Printable& p, Stream& s, DiaTag) {
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nnnz() << " entries\n";
 

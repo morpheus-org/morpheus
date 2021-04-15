@@ -26,8 +26,9 @@
 
 #include <iostream>
 #include <iomanip>
+#include <variant>
 
-#include <morpheus/containers/dynamic_matrix.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
 // forward decl
@@ -53,7 +54,7 @@ struct print_fn {
 };
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, Morpheus::DynamicTag) {
+void print(const Printable& p, Stream& s, DynamicTag) {
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nnnz() << " entries\n";
   // TODO: Using a stream in this way doesn't seem to work

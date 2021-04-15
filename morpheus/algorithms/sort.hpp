@@ -34,13 +34,13 @@ void sort_by_row_and_column(const ExecSpace& space, Matrix& mat,
                             typename Matrix::index_type max_row = 0,
                             typename Matrix::index_type min_col = 0,
                             typename Matrix::index_type max_col = 0) {
-  Impl::sort_by_row_and_column(space, mat, typename Matrix::tag{}, min_row,
+  Impl::sort_by_row_and_column(space, mat, typename Matrix::tag(), min_row,
                                max_row, min_col, max_col);
 }
 
 template <typename ExecSpace, typename Matrix>
 bool is_sorted(const ExecSpace& space, Matrix& mat) {
-  return Impl::is_sorted(space, mat, typename Matrix::tag{});
+  return Impl::is_sorted(space, mat, typename Matrix::tag());
 }
 
 }  // namespace Morpheus
