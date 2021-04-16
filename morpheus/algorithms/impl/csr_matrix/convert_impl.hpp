@@ -36,9 +36,7 @@ void convert(const SourceType& src, DestinationType& dst, CsrTag, CooTag) {
   // Complexity: Linear.  Specifically O(nnz(csr) + max(n_row,n_col))
   using I = typename SourceType::index_type;
 
-  dst.set_nrows(src.nrows());
-  dst.set_ncols(src.ncols());
-  dst.set_nnnz(src.nnnz());
+  dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
   // expand compressed indices
   for (I i = 0; i < src.nrows(); i++) {

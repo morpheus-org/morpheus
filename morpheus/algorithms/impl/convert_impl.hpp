@@ -54,8 +54,6 @@ void convert(const SourceType& src, DestinationType& dst, Format1, Format2) {
       Morpheus::CooMatrix<value_type, index_type, array_layout, memory_space>;
   Coo tmp;
 
-  std::cout << "Converting with intermediate format" << std::endl;
-
   Morpheus::Impl::convert(src, tmp, Format1(), typename Coo::tag());
   Morpheus::Impl::convert(tmp, dst, typename Coo::tag(), Format2());
 }
