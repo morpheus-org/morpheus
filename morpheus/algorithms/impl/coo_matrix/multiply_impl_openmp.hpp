@@ -45,9 +45,13 @@ void multiply(
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
-  throw Morpheus::NotImplementedException(
-      "void multiply(const " + A.name() + "& A, const " + x.name() + "& x, " +
-      y.name() + "& y," + "Morpheus::CooTag, Kokkos::OpenMP)");
+  using I = typename LinearOperator::index_type;
+
+// assumes A is sorted
+#pragma omp parallel for
+  for (I n = 0; n < A.nnnz(); n++) {
+    y[A.row_indices[n]] += A.values[n] * x[A.column_indices[n]];
+  }
 }
 
 }  // namespace Impl
