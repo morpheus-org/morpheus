@@ -28,18 +28,10 @@
 #include <morpheus/core/core.hpp>
 #include <morpheus/core/vector_traits.hpp>
 #include <morpheus/containers/impl/format_tags.hpp>
-
+#include <morpheus/containers/fwd/vector.hpp>
 #include <Kokkos_Random.hpp>
 
 namespace Morpheus {
-
-/* Forward declaration */
-template <class... Properties>
-class DenseVector;
-
-/* Alias type to match std::vector */
-template <class... Properties>
-using vector = DenseVector<Properties...>;
 
 template <class... Properties>
 class DenseVector : public Impl::VectorTraits<Properties...> {

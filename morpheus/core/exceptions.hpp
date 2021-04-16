@@ -44,7 +44,8 @@ class NotImplementedException : public Exception {
  public:
   template <typename MessageType>
   NotImplementedException(const MessageType& fn_name)
-      : Exception("NotImplemented: " + fn_name + " not yet implemented.") {}
+      : Exception(std::string("NotImplemented: ") + fn_name +
+                  std::string(" not yet implemented.")) {}
 };
 
 class IOException : public Exception {
