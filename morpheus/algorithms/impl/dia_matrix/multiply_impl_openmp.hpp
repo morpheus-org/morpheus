@@ -45,9 +45,19 @@ void multiply(
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
-  throw Morpheus::NotImplementedException(
-      "void multiply(const " + A.name() + "& A, const " + x.name() + "& x, " +
-      y.name() + "& y," + "Morpheus::DiaTag, Kokkos::OpenMP)");
+  using I = typename LinearOperator::index_type;
+
+#pragma omp parallel for
+  for (I i = 0; i < (int)A.diagonal_offsets.size(); i++) {
+    const I k       = A.diagonal_offsets[i];  // diagonal offset
+    const I i_start = std::max(0, -k);
+    const I j_start = std::max(0, k);
+    const I N       = std::min(A.nrows() - i_start, A.ncols() - j_start);
+
+    for (I n = 0; n < N; n++) {
+      y[i_start + n] += A.values(i, j_start + n) * x[j_start + n];
+    }
+  }
 }
 
 }  // namespace Impl

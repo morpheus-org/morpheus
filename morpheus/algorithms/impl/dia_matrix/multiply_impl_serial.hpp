@@ -47,9 +47,9 @@ void multiply(
     const I k       = A.diagonal_offsets[i];  // diagonal offset
     const I i_start = std::max(0, -k);
     const I j_start = std::max(0, k);
-    const I j_end   = std::min(std::min(A.nrows() + k, A.ncols()), A.ncols());
+    const I N       = std::min(A.nrows() - i_start, A.ncols() - j_start);
 
-    for (I n = 0; n < j_end - j_start; n++) {
+    for (I n = 0; n < N; n++) {
       y[i_start + n] += A.values(i, j_start + n) * x[j_start + n];
     }
   }
