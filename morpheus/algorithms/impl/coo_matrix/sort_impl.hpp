@@ -31,15 +31,12 @@
 
 namespace Morpheus {
 namespace Impl {
-template <typename ExecSpace, typename Matrix>
-void sort_by_row_and_column(
-    const ExecSpace& space, Matrix& mat, CooTag,
-    typename Matrix::index_type min_row = 0,
-    typename Matrix::index_type max_row = 0,
-    typename Matrix::index_type min_col = 0,
-    typename Matrix::index_type max_col = 0,
-    typename std::enable_if_t<Morpheus::is_Serial_space_v<ExecSpace>>* =
-        nullptr) {
+template <typename Matrix>
+void sort_by_row_and_column(Matrix& mat, CooTag,
+                            typename Matrix::index_type min_row = 0,
+                            typename Matrix::index_type max_row = 0,
+                            typename Matrix::index_type min_col = 0,
+                            typename Matrix::index_type max_col = 0) {
   using IndexType      = typename Matrix::index_type;
   using IndexArrayType = typename Matrix::index_array_type;
   using ValueArrayType = typename Matrix::value_array_type;
@@ -65,7 +62,7 @@ void sort_by_row_and_column(
     IndexArrayType temp;
     Morpheus::copy(mat.column_indices, temp);
 
-    Morpheus::Impl::counting_sort_by_key(space, temp, permutation, minc, maxc,
+    Morpheus::Impl::counting_sort_by_key(temp, permutation, minc, maxc,
                                          typename IndexArrayType::tag());
 
     Morpheus::copy(mat.row_indices, temp);
@@ -74,9 +71,8 @@ void sort_by_row_and_column(
       mat.row_indices[i] = temp[permutation[i]];
     }
 
-    Morpheus::Impl::counting_sort_by_key(space, mat.row_indices, permutation,
-                                         minr, maxr,
-                                         typename IndexArrayType::tag());
+    Morpheus::Impl::counting_sort_by_key(mat.row_indices, permutation, minr,
+                                         maxr, typename IndexArrayType::tag());
     Morpheus::copy(mat.column_indices, temp);
     for (IndexType i = 0; i < IndexType(permutation.size()); i++) {
       mat.column_indices[i] = temp[permutation[i]];
@@ -92,11 +88,8 @@ void sort_by_row_and_column(
   }
 }
 
-template <typename ExecSpace, typename Matrix>
-bool is_sorted(
-    const ExecSpace& space, Matrix& mat, CooTag,
-    typename std::enable_if_t<Morpheus::is_Serial_space_v<ExecSpace>>* =
-        nullptr) {
+template <typename Matrix>
+bool is_sorted(Matrix& mat, CooTag) {
   using IndexType = typename Matrix::index_array_type::index_type;
 
   if (mat.row_indices.size() != mat.column_indices.size()) {

@@ -143,10 +143,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   }
 
   // Sort matrix elements by row and column index
-  void sort_by_row_and_column(void) {
-    execution_space space;
-    Morpheus::sort_by_row_and_column(space, *this);
-  }
+  void sort_by_row_and_column(void) { Morpheus::sort_by_row_and_column(*this); }
 
   // Determine whether matrix elements are sorted by row index
   bool is_sorted_by_row(void) {
@@ -156,10 +153,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   }
 
   // Determine whether matrix elements are sorted by row and column index
-  bool is_sorted(void) {
-    execution_space space;
-    return Morpheus::is_sorted(space, *this);
-  }
+  bool is_sorted(void) { return Morpheus::is_sorted(*this); }
 
   // Unified routines across all formats
 

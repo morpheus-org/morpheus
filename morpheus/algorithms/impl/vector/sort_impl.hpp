@@ -44,16 +44,10 @@ typename Vector::value_type find_max_element(const Vector& vec) {
   return max;
 }
 
-template <typename ExecSpace, typename Vector1, typename Vector2>
-void counting_sort_by_key(
-    const ExecSpace& space, Vector1& keys, Vector2& vals,
-    typename Vector1::value_type min, typename Vector1::value_type max,
-    DenseVectorTag,
-    typename std::enable_if_t<Morpheus::is_Serial_space_v<ExecSpace>>* =
-        nullptr) {
-  //   using IndexType1 = typename VectorType1::value_type;
-  //   using IndexType2 = typename VectorType2::value_type;
-
+template <typename Vector1, typename Vector2>
+void counting_sort_by_key(Vector1& keys, Vector2& vals,
+                          typename Vector1::value_type min,
+                          typename Vector1::value_type max, DenseVectorTag) {
   if (min < 0)
     throw Morpheus::InvalidInputException(
         "counting_sort_by_key min element less than 0");
