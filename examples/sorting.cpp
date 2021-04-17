@@ -35,7 +35,6 @@ int main() {
   Morpheus::initialize();
   {
     using Generator = Kokkos::Random_XorShift64_Pool<Kokkos::Serial>;
-    Kokkos::Serial::execution_space space;
 
     vvec vv("vv", 20, Generator(0), 0, 100);
     ivec ii("ii", 20, Generator(0), 0, 100), jj("jj", 20, Generator(1), 0, 100);
@@ -43,10 +42,10 @@ int main() {
     Morpheus::copy(A, B);
 
     Morpheus::print(A);
-    std::cout << "Is sorted:: " << Morpheus::is_sorted(space, A) << std::endl;
-    Morpheus::sort_by_row_and_column(space, A);
+    std::cout << "Is sorted:: " << Morpheus::is_sorted(A) << std::endl;
+    Morpheus::sort_by_row_and_column(A);
     Morpheus::print(A);
-    std::cout << "Is sorted:: " << Morpheus::is_sorted(space, A) << std::endl;
+    std::cout << "Is sorted:: " << Morpheus::is_sorted(A) << std::endl;
     std::cout << "Is sorted:: " << B.is_sorted() << std::endl;
     B.sort_by_row_and_column();
     std::cout << "Is sorted:: " << B.is_sorted() << std::endl;

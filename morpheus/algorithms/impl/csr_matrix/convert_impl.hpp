@@ -87,9 +87,6 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, CsrTag) {
   }
 
   // remove duplicates?
-  // throw Morpheus::NotImplementedException(
-  //     "convert(const SourceType& src, DestinationType& "
-  //     "dst, CooTag, CsrTag)");
 }
 
 }  // namespace Impl

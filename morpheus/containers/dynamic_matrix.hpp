@@ -30,6 +30,8 @@
 #include <functional>
 
 #include <morpheus/core/matrix_traits.hpp>
+#include <morpheus/algorithms/convert.hpp>
+#include <morpheus/algorithms/print.hpp>
 #include <morpheus/containers/impl/dynamic_matrix_impl.hpp>
 #include <morpheus/containers/impl/format_tags.hpp>
 
@@ -111,6 +113,11 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
 
   inline int active_index() const { return _formats.index(); }
 
+  template <typename MatrixType>
+  inline void activate(const MatrixType &) {
+    _formats = MatrixType();
+  }
+
   inline void activate(const formats_e index) {
     constexpr int size =
         std::variant_size_v<typename MatrixFormats<Properties...>::variant>;
@@ -128,6 +135,22 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
   // Enable switching through direct integer indexing
   inline void activate(const int index) {
     activate(static_cast<formats_e>(index));
+  }
+
+  template <typename MatrixType>
+  inline void convert(const MatrixType &matrix) {
+    _formats = matrix;
+  }
+
+  inline void convert(const formats_e index) {
+    Morpheus::CooMatrix<Properties...> temp;
+    Morpheus::convert(*this, temp);
+    activate(index);
+    Morpheus::convert(temp, *this);
+  }
+
+  inline void convert(const int index) {
+    convert(static_cast<formats_e>(index));
   }
 
   inline const variant_type &formats() const { return _formats; }
