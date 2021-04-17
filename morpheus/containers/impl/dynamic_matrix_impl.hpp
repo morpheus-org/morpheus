@@ -70,27 +70,37 @@ struct any_type_resize : public Impl::MatrixTraits<Properties...> {
     mat.resize(nrows, ncols, nnnz);
   }
 
-  // Specialization for Dia resize with four arguments
-  template <typename... Args>
-  result_type operator()(DiaMatrix<Properties...> &mat, const index_type nrows,
-                         const index_type ncols, const index_type nnnz,
-                         const index_type ndiag) {
-    mat.resize(nrows, ncols, nnnz, ndiag);
-  }
-
   // Specialization for Dia resize with five arguments
   template <typename... Args>
   result_type operator()(DiaMatrix<Properties...> &mat, const index_type nrows,
                          const index_type ncols, const index_type nnnz,
-                         const index_type ndiag, const index_type alignment) {
+                         const index_type ndiag,
+                         const index_type alignment = 32) {
     mat.resize(nrows, ncols, nnnz, ndiag, alignment);
   }
 
-  // Specialization for any other case and dummy overlads
-  // eg Resize with four arguments is not supported by Coo
-  //    though needed for compiling dynamic matrix interface
-  template <typename T, typename... Args>
-  result_type operator()(T &mat, Args &&...args) {
+  // Constrains any other overloads for supporting formats
+  // Unsupported formats won't compile
+  template <typename... Args>
+  result_type operator()(CooMatrix<Properties...> &mat, Args &&...args) {
+    std::string str_args = Morpheus::append_str(args...);
+    throw Morpheus::RuntimeException(
+        "Invalid use of the dynamic resize interface.\n\
+                mat.resize(" +
+        str_args + ") for " + mat.name() + " format.");
+  }
+
+  template <typename... Args>
+  result_type operator()(CsrMatrix<Properties...> &mat, Args &&...args) {
+    std::string str_args = Morpheus::append_str(args...);
+    throw Morpheus::RuntimeException(
+        "Invalid use of the dynamic resize interface.\n\
+                mat.resize(" +
+        str_args + ") for " + mat.name() + " format.");
+  }
+
+  template <typename... Args>
+  result_type operator()(DiaMatrix<Properties...> &mat, Args &&...args) {
     std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic resize interface.\n\
