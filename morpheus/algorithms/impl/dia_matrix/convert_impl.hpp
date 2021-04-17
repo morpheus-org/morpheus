@@ -24,6 +24,7 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_CONVERT_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_CONVERT_IMPL_HPP
 
+#include <set>
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/containers/impl/format_tags.hpp>
 
@@ -60,10 +61,49 @@ void convert(const SourceType& src, DestinationType& dst, DiaTag, CooTag) {
 }
 
 template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag) {
-  throw Morpheus::NotImplementedException(
-      "convert(const SourceType& src, DestinationType& "
-      "dst, CooTag, DiaTag)");
+void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
+             typename SourceType::index_type alignment = 32) {
+  using I                = typename SourceType::index_type;
+  using index_array_type = typename SourceType::index_array_type;
+
+  if (src.nnnz() == 0) {
+    dst.resize(src.nrows(), src.ncols(), src.nnnz(), 0);
+    return;
+  }
+
+  index_array_type diag_map(src.nnnz(), 0);
+
+  // Find on which diagonal each entry sits on
+  for (I n = 0; n < I(src.nnnz()); n++) {
+    diag_map[n] = src.column_indices[n] - src.row_indices[n];
+  }
+
+  // Create unique diagonal set
+  std::set<I> diag_set(diag_map.begin(), diag_map.end());
+  I ndiags = I(diag_set.size());
+  index_array_type diagonal_offsets(ndiags, 0);
+  for (auto it = diag_set.cbegin(); it != diag_set.cend(); ++it) {
+    auto i              = std::distance(diag_set.cbegin(), it);
+    diagonal_offsets[i] = *it;
+  }
+
+  // Create diagonal indexes
+  index_array_type diag_idx(src.nnnz(), 0);
+  for (I n = 0; n < I(src.nnnz()); n++) {
+    for (I i = 0; i < I(ndiags); i++) {
+      if (diag_map[n] == diagonal_offsets[i]) diag_idx[n] = i;
+    }
+  }
+
+  dst.resize(src.nrows(), src.ncols(), src.nnnz(), ndiags, alignment);
+
+  for (I i = 0; i < I(ndiags); i++) {
+    dst.diagonal_offsets[i] = diagonal_offsets[i];
+  }
+
+  for (I n = 0; n < I(src.nnnz()); n++) {
+    dst.values(diag_idx[n], src.column_indices[n]) = src.values[n];
+  }
 }
 
 }  // namespace Impl

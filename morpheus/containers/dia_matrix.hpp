@@ -118,19 +118,8 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   // Resize matrix dimensions and underlying storage
   inline void resize(const index_type num_rows, const index_type num_cols,
                      const index_type num_entries,
-                     const index_type num_diagonals) {
-    _m   = num_rows;
-    _n   = num_cols;
-    _nnz = num_entries;
-    diagonal_offsets.resize(num_diagonals);
-    values.resize(num_diagonals, num_cols);
-  }
-
-  // Resize matrix dimensions and underlying storage
-  inline void resize(const index_type num_rows, const index_type num_cols,
-                     const index_type num_entries,
                      const index_type num_diagonals,
-                     const index_type alignment) {
+                     const index_type alignment = 32) {
     _m   = num_rows;
     _n   = num_cols;
     _nnz = num_entries;
