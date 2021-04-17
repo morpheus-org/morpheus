@@ -28,6 +28,7 @@
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
+#include <morpheus/algorithms/convert.hpp>
 #include <morpheus/containers/vector.hpp>
 #include <morpheus/containers/impl/format_tags.hpp>
 
@@ -100,10 +101,8 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
 
   // Construct from another matrix type
   template <typename MatrixType>
-  CsrMatrix(const MatrixType &matrix) {
-    // TODO: CsrMatrix(const MatrixType& matrix)
-    throw Morpheus::NotImplementedException(
-        "CsrMatrix(const MatrixType& matrix)");
+  CsrMatrix(const MatrixType &matrix) : _name("CsrMatrix") {
+    Morpheus::convert(matrix, *this);
   }
 
   // Resize matrix dimensions and underlying storage
@@ -120,9 +119,8 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
   // Assignment from another matrix type
   template <typename MatrixType>
   reference operator=(const MatrixType &matrix) {
-    // TODO: operator=(const MatrixType& matrix)
-    throw Morpheus::NotImplementedException(
-        "CsrMatrix.operator=(const MatrixType& matrix)");
+    Morpheus::convert(matrix, *this);
+    return *this;
   }
 
   // Unified routines across all formats

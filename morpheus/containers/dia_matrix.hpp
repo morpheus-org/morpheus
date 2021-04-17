@@ -109,10 +109,8 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
 
   // Construct from another matrix type
   template <typename MatrixType>
-  DiaMatrix(const MatrixType &matrix) {
-    // TODO: DiaMatrix(const MatrixType& matrix)
-    throw Morpheus::NotImplementedException(
-        "DiaMatrix(const MatrixType& matrix)");
+  DiaMatrix(const MatrixType &matrix) : _name("DiaMatrix") {
+    Morpheus::convert(matrix, *this);
   }
 
   // Resize matrix dimensions and underlying storage
@@ -130,9 +128,8 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   // Assignment from another matrix type
   template <typename MatrixType>
   reference operator=(const MatrixType &matrix) {
-    // TODO: DiaMatrix.operator=(const MatrixType& matrix)
-    throw Morpheus::NotImplementedException(
-        "DiaMatrix.operator=(const MatrixType& matrix)");
+    Morpheus::convert(matrix, *this);
+    return *this;
   }
 
   // Unified routines across all formats
