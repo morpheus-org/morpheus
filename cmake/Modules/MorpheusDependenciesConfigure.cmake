@@ -1,19 +1,21 @@
 include(cmake/Modules/DownloadProject.cmake)
 
-function(morpheus_configure_thrust) 
-    set(Morpheus_MIN_VERSION_Thrust 1.10.0 PARENT_SCOPE)
-
-    # If Thrust_DIR is not set download Thrust
-    if(NOT Thrust_DIR)
-        download_project(
-            PROJ                thrust
-            GIT_REPOSITORY      https://github.com/NVIDIA/thrust.git
-            GIT_TAG             1.10.0
-            SOURCE_DIR          ${Morpheus_SOURCE_DIR}/thirdparty/thrust
-            UPDATE_DISCONNECTED TRUE # Never update automatically from the remote repository
-        )
-        
-        set(Thrust_DIR ${Morpheus_SOURCE_DIR}/thirdparty/thrust/thrust/cmake PARENT_SCOPE)
-    endif()
+function(morpheus_configure_googlebenchmark) 
     
+    if (CMAKE_VERSION VERSION_LESS 3.2)
+        set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
+    else()
+        set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
+    endif()
+
+    download_project(PROJ                googlebenchmark
+                    GIT_REPOSITORY      https://github.com/google/benchmark.git
+                    GIT_TAG             master
+                    SOURCE_DIR          ${Morpheus_SOURCE_DIR}/tpl/googlebenchmark
+                    ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+    )
+    
+    add_subdirectory(${googlebenchmark_SOURCE_DIR} ${googlebenchmark_BINARY_DIR})
+
+    include_directories("${googlebenchmark_SOURCE_DIR}/include")
 endfunction()
