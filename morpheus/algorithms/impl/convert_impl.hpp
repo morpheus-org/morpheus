@@ -26,7 +26,10 @@
 
 #include <morpheus/algorithms/impl/csr_matrix/convert_impl.hpp>
 #include <morpheus/algorithms/impl/dia_matrix/convert_impl.hpp>
+#include <morpheus/algorithms/impl/dense_matrix/convert_impl.hpp>
 #include <morpheus/algorithms/impl/dynamic_matrix/convert_impl.hpp>
+
+#include <morpheus/algorithms/impl/vector/convert_impl.hpp>
 
 #include <morpheus/containers/fwd/coo_matrix.hpp>
 

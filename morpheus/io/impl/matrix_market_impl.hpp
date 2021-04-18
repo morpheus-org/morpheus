@@ -29,11 +29,22 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
+#include <morpheus/core/core.hpp>
 #include <morpheus/core/exceptions.hpp>
+#include <morpheus/algorithms/sort.hpp>
+#include <morpheus/algorithms/convert.hpp>
+#include <morpheus/algorithms/copy.hpp>
+#include <morpheus/containers/coo_matrix.hpp>
+#include <morpheus/containers/dense_matrix.hpp>
 
 namespace Morpheus {
 namespace Io {
+// forward decl
+template <typename Matrix, typename Stream>
+void read_matrix_market_stream(Matrix& mtx, Stream& input);
+
 namespace Impl {
 
 inline void tokenize(std::vector<std::string>& tokens, const std::string& str,
@@ -92,37 +103,257 @@ void read_matrix_market_banner(matrix_market_banner& banner, Stream& input) {
                                 banner.symmetry + "]");
 }
 
+template <typename ValueType, typename IndexType, typename Space,
+          typename Stream>
+void read_coordinate_stream(
+    Morpheus::CooMatrix<ValueType, IndexType, Space>& coo, Stream& input,
+    const matrix_market_banner& banner) {
+  // read file contents line by line
+  std::string line;
+
+  // skip over banner and comments
+  do {
+    std::getline(input, line);
+  } while (line[0] == '%');
+
+  // line contains [num_rows num_columns num_entries]
+  std::vector<std::string> tokens;
+  Impl::tokenize(tokens, line);
+
+  if (tokens.size() != 3)
+    throw Morpheus::IOException("invalid MatrixMarket coordinate format");
+
+  IndexType num_rows, num_cols, num_entries;
+
+  std::istringstream(tokens[0]) >> num_rows;
+  std::istringstream(tokens[1]) >> num_cols;
+  std::istringstream(tokens[2]) >> num_entries;
+
+  coo.resize(num_rows, num_cols, num_entries);
+
+  IndexType num_entries_read = 0;
+
+  // read file contents
+  if (banner.type == "pattern") {
+    while (num_entries_read < coo.nnnz() && !input.eof()) {
+      input >> coo.row_indices[num_entries_read];
+      input >> coo.column_indices[num_entries_read];
+      num_entries_read++;
+    }
+
+    std::fill(coo.values.begin(), coo.values.end(), ValueType(1));
+  } else if (banner.type == "real" || banner.type == "integer") {
+    while (num_entries_read < coo.nnnz() && !input.eof()) {
+      ValueType real;
+
+      input >> coo.row_indices[num_entries_read];
+      input >> coo.column_indices[num_entries_read];
+      input >> real;
+
+      coo.values[num_entries_read] = real;
+      num_entries_read++;
+    }
+  } else if (banner.type == "complex") {
+    throw Morpheus::NotImplementedException(
+        "Morpheus does not currently support complex "
+        "matrices");
+
+  } else {
+    throw Morpheus::IOException("invalid MatrixMarket data type");
+  }
+
+  if (num_entries_read != coo.nnnz())
+    throw Morpheus::IOException(
+        "unexpected EOF while reading MatrixMarket entries");
+
+  // check validity of row and column index data
+  if (coo.nnnz() > 0) {
+    IndexType min_row_index =
+        *std::min_element(coo.row_indices.begin(), coo.row_indices.end());
+    IndexType max_row_index =
+        *std::max_element(coo.row_indices.begin(), coo.row_indices.end());
+    IndexType min_col_index =
+        *std::min_element(coo.column_indices.begin(), coo.column_indices.end());
+    IndexType max_col_index =
+        *std::max_element(coo.column_indices.begin(), coo.column_indices.end());
+
+    if (min_row_index < 1)
+      throw Morpheus::IOException("found invalid row index (index < 1)");
+    if (min_col_index < 1)
+      throw Morpheus::IOException("found invalid column index (index < 1)");
+    if (max_row_index > coo.nrows())
+      throw Morpheus::IOException("found invalid row index (index > num_rows)");
+    if (max_col_index > coo.ncols())
+      throw Morpheus::IOException(
+          "found invalid column index (index > num_columns)");
+  }
+
+  // convert base-1 indices to base-0
+  for (IndexType n = 0; n < coo.nnnz(); n++) {
+    coo.row_indices[n] -= 1;
+    coo.column_indices[n] -= 1;
+  }
+
+  // expand symmetric formats to "general" format
+  if (banner.symmetry != "general") {
+    IndexType off_diagonals = 0;
+
+    for (IndexType n = 0; n < coo.nnnz(); n++)
+      if (coo.row_indices[n] != coo.column_indices[n]) off_diagonals++;
+
+    IndexType general_num_entries = coo.nnnz() + off_diagonals;
+
+    Morpheus::CooMatrix<ValueType, IndexType, Space> general(
+        num_rows, num_cols, general_num_entries);
+
+    if (banner.symmetry == "symmetric") {
+      IndexType nnz = 0;
+
+      for (IndexType n = 0; n < coo.nnnz(); n++) {
+        // copy entry over
+        general.row_indices[nnz]    = coo.row_indices[n];
+        general.column_indices[nnz] = coo.column_indices[n];
+        general.values[nnz]         = coo.values[n];
+        nnz++;
+
+        // duplicate off-diagonals
+        if (coo.row_indices[n] != coo.column_indices[n]) {
+          general.row_indices[nnz]    = coo.column_indices[n];
+          general.column_indices[nnz] = coo.row_indices[n];
+          general.values[nnz]         = coo.values[n];
+          nnz++;
+        }
+      }
+    } else if (banner.symmetry == "hermitian") {
+      throw Morpheus::NotImplementedException(
+          "MatrixMarket I/O does not currently support hermitian matrices");
+      // TODO
+    } else if (banner.symmetry == "skew-symmetric") {
+      // TODO
+      throw Morpheus::NotImplementedException(
+          "MatrixMarket I/O does not currently support skew-symmetric "
+          "matrices");
+    }
+
+    // store full matrix in coo
+    // ! FIXME: might be better to do swap
+    coo = general;
+  }  // if (banner.symmetry != "general")
+  // sort indices by (row,column)
+  Morpheus::sort_by_row_and_column(coo);
+}
+
+template <typename ValueType, typename Space, typename Stream>
+void read_array_stream(Morpheus::DenseMatrix<ValueType, Space>& mtx,
+                       Stream& input, const matrix_market_banner& banner) {
+  // read file contents line by line
+  std::string line;
+
+  // skip over banner and comments
+  do {
+    std::getline(input, line);
+  } while (line[0] == '%');
+
+  std::vector<std::string> tokens;
+  Impl::tokenize(tokens, line);
+
+  if (tokens.size() != 2)
+    throw Morpheus::IOException("invalid MatrixMarket array format");
+
+  size_t num_rows, num_cols;
+
+  std::istringstream(tokens[0]) >> num_rows;
+  std::istringstream(tokens[1]) >> num_cols;
+
+  Morpheus::DenseMatrix<ValueType, Space> dense(num_rows, num_cols);
+
+  size_t num_entries = num_rows * num_cols;
+
+  size_t num_entries_read = 0, nrows = 0, ncols = 0;
+
+  // read file contents
+  if (banner.type == "pattern") {
+    throw Morpheus::NotImplementedException(
+        "pattern array MatrixMarket format is not supported");
+  } else if (banner.type == "real" || banner.type == "integer") {
+    while (num_entries_read < num_entries && !input.eof()) {
+      double real;
+
+      input >> real;
+
+      dense(nrows, ncols) = real;
+
+      num_entries_read++;
+      ncols++;
+      if (num_entries_read % ncols == 0) {
+        nrows++;
+        ncols = 0;
+      }
+    }
+  } else if (banner.type == "complex") {
+    throw Morpheus::NotImplementedException("complex type is not supported");
+  } else {
+    throw Morpheus::IOException("invalid MatrixMarket data type");
+  }
+
+  if (num_entries_read != num_entries)
+    throw Morpheus::IOException(
+        "unexpected EOF while reading MatrixMarket entries");
+
+  if (banner.symmetry != "general")
+    throw Morpheus::NotImplementedException(
+        "only general array symmetric MatrixMarket format is supported");
+
+  Morpheus::copy(dense, mtx);
+}
+
 template <typename Matrix, typename Stream, typename Format>
 void read_matrix_market_stream(Matrix& mtx, Stream& input, Format) {
   // general case
   using IndexType = typename Matrix::index_type;
   using ValueType = typename Matrix::value_type;
-  using Space     = typename Kokkos::Serial;
+  using Space     = Kokkos::Serial;
 
   // read banner
   matrix_market_banner banner;
   read_matrix_market_banner(banner, input);
 
   if (banner.storage == "coordinate") {
-    Morpheus::CooMatrix<IndexType, ValueType, Space> temp;
-    // TODO:
+    Morpheus::CooMatrix<ValueType, IndexType, Space> temp;
     read_coordinate_stream(temp, input, banner);
-    // TODO:
     Morpheus::convert(temp, mtx);
   } else  // banner.storage == "array"
   {
     Morpheus::DenseMatrix<ValueType, Space> temp;
-    // TODO:
     read_array_stream(temp, input, banner);
-    // TODO:
     Morpheus::convert(temp, mtx);
   }
 }
 
+template <typename Matrix, typename Stream>
+void read_matrix_market_stream(Matrix& mtx, Stream& input,
+                               Morpheus::DenseVectorTag) {
+  // array1d case
+  using ValueType = typename Matrix::value_type;
+  using Space     = Kokkos::Serial;
+
+  Morpheus::DenseMatrix<ValueType, Space> temp;
+
+  Morpheus::Io::read_matrix_market_stream(temp, input);
+
+  Morpheus::convert(temp, mtx);
+}
+
 }  // namespace Impl
 
+template <typename Matrix, typename Stream>
+void read_matrix_market_stream(Matrix& mtx, Stream& input) {
+  Morpheus::Io::Impl::read_matrix_market_stream(mtx, input,
+                                                typename Matrix::tag());
+}
+
 template <typename Matrix>
-void read_matrix_market(Matrix& mtx, const std::string& filename) {
+void read_matrix_market_file(Matrix& mtx, const std::string& filename) {
   std::ifstream file(filename.c_str());
 
   if (!file)
@@ -138,54 +369,12 @@ void read_matrix_market(Matrix& mtx, const std::string& filename) {
   file.rdbuf()->sgetn(&buffer[0], buffer.size());
   file_string.write(&buffer[0], buffer.size());
 
-  Morpheus::Io::read_matrix_market(mtx, file_string);
+  Morpheus::Io::read_matrix_market_stream(mtx, file_string);
 #else
-  Morpheus::Io::read_matrix_market(mtx, file);
+  Morpheus::Io::read_matrix_market_stream(mtx, file);
 #endif
 }
 
-template <typename Matrix, typename Stream>
-void read_matrix_market(Matrix& mtx, Stream& input) {
-  Morpheus::Io::Impl::read_matrix_market_stream(mtx, input,
-                                                typename Matrix::format());
-
-  throw Morpheus::NotImplementedException{
-      "void read(Matrix& mtx, Stream& input)"};
-}
-
-// template <typename Matrix>
-// void write_matrix_market(const Matrix& mtx, const std::string& filename) {
-//   std::ofstream file(filename.c_str());
-
-//   if (!file)
-//     throw cusp::io_exception(std::string("unable to open file \"") + filename
-//     +
-//                              std::string("\" for writing"));
-
-// #ifdef __APPLE__
-//   // WAR OSX-specific issue using rdbuf
-//   std::stringstream file_string(std::stringstream::in |
-//   std::stringstream::out);
-
-//   cusp::io::write_matrix_market_stream(mtx, file_string);
-
-//   file.rdbuf()->sputn(file_string.str().c_str(), file_string.str().size());
-// #else
-//   cusp::io::write_matrix_market_stream(mtx, file);
-// #endif
-
-//   throw Morpheus::NotImplementedException{
-//       "void write(const Matrix& mtx, const std::string& filename)"};
-// }
-
-// template <typename Matrix, typename Stream>
-// void write_matrix_market(const Matrix& mtx, Stream& output) {
-//   cusp::io::detail::write_matrix_market_stream(mtx, output,
-//                                                typename Matrix::format());
-
-//   throw Morpheus::NotImplementedException{
-//       "void write(const Matrix& mtx, Stream& output)"};
-// }
 }  // namespace Io
 }  // namespace Morpheus
 

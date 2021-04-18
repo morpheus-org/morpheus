@@ -51,7 +51,7 @@ class NotImplementedException : public Exception {
 class IOException : public Exception {
  public:
   template <typename MessageType>
-  IOException(const MessageType& msg) : Exception("IO: " + msg) {}
+  IOException(const MessageType& msg) : Exception(std::string("IO: ") + msg) {}
 };
 
 class RuntimeException : public Exception {
