@@ -28,19 +28,18 @@
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
-#include <morpheus/core/matrix_tags.hpp>
+#include <morpheus/algorithms/convert.hpp>
 #include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
-
-struct CsrTag : public Impl::SparseMatTag {};
 
 template <class... Properties>
 class CsrMatrix : public Impl::MatrixTraits<Properties...> {
  public:
   using type   = CsrMatrix<Properties...>;
   using traits = Impl::MatrixTraits<Properties...>;
-  using tag    = typename MatrixFormatTag<CsrTag>::tag;
+  using tag    = typename MatrixFormatTag<Morpheus::CsrTag>::tag;
 
   using value_type = typename traits::value_type;
   using index_type = typename traits::index_type;
@@ -95,17 +94,15 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
       : row_offsets(num_rows + 1),
         column_indices(num_entries),
         values(num_entries),
-        _name(name),
+        _name(name + "(CsrMatrix)"),
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {}
 
   // Construct from another matrix type
   template <typename MatrixType>
-  CsrMatrix(const MatrixType &matrix) {
-    // TODO: CsrMatrix(const MatrixType& matrix)
-    throw Morpheus::NotImplementedException(
-        "CsrMatrix(const MatrixType& matrix)");
+  CsrMatrix(const MatrixType &matrix) : _name("CsrMatrix") {
+    Morpheus::convert(matrix, *this);
   }
 
   // Resize matrix dimensions and underlying storage
@@ -122,9 +119,8 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
   // Assignment from another matrix type
   template <typename MatrixType>
   reference operator=(const MatrixType &matrix) {
-    // TODO: operator=(const MatrixType& matrix)
-    throw Morpheus::NotImplementedException(
-        "CsrMatrix.operator=(const MatrixType& matrix)");
+    Morpheus::convert(matrix, *this);
+    return *this;
   }
 
   // Unified routines across all formats
@@ -132,6 +128,9 @@ class CsrMatrix : public Impl::MatrixTraits<Properties...> {
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
   inline index_type nnnz() const { return _nnz; }
+  inline void set_nrows(const index_type rows) { _m = rows; }
+  inline void set_ncols(const index_type cols) { _n = cols; }
+  inline void set_nnnz(const index_type nnz) { _nnz = nnz; }
 
  private:
   std::string _name;

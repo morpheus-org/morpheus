@@ -24,10 +24,11 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_PRINT_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_PRINT_IMPL_HPP
 
-#include <morpheus/algorithms/impl/coo_matrix/print_impl_serial.hpp>
-#include <morpheus/algorithms/impl/csr_matrix/print_impl_serial.hpp>
-#include <morpheus/algorithms/impl/dia_matrix/print_impl_serial.hpp>
-#include <morpheus/algorithms/impl/vector/print_impl_serial.hpp>
+#include <morpheus/algorithms/impl/coo_matrix/print_impl.hpp>
+#include <morpheus/algorithms/impl/csr_matrix/print_impl.hpp>
+#include <morpheus/algorithms/impl/dia_matrix/print_impl.hpp>
+#include <morpheus/algorithms/impl/dense_matrix/print_impl.hpp>
+#include <morpheus/algorithms/impl/vector/print_impl.hpp>
 
 #include <morpheus/algorithms/impl/dynamic_matrix/print_impl.hpp>
 

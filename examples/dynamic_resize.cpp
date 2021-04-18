@@ -45,7 +45,7 @@ int main() {
 
     try {
       A.resize(5, 10, 15, 20);
-    } catch (std::runtime_error& e) {
+    } catch (Morpheus::RuntimeException& e) {
       std::cerr << "Exception Raised:: " << e.what() << std::endl;
     }
     stats(A, "A", "resize(5, 10, 15, 20)");

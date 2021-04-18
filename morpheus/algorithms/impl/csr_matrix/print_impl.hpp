@@ -1,5 +1,5 @@
 /**
- * print_impl_serial.hpp
+ * print_impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,35 +21,28 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_PRINT_IMPL_SERIAL_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_PRINT_IMPL_SERIAL_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_PRINT_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_PRINT_IMPL_HPP
 
 #include <iostream>
 #include <iomanip>
-#include <algorithm>
 
-#include <morpheus/containers/dia_matrix.hpp>
-#include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, Morpheus::DiaTag) {
+void print(const Printable& p, Stream& s, CsrTag) {
+  using I = typename Printable::index_type;
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nnnz() << " entries\n";
 
-  using I = typename Printable::index_type;
-
-  for (I i = 0; i < (int)p.diagonal_offsets.size(); i++) {
-    const I k       = p.diagonal_offsets[i];  // diagonal offset
-    const I j_start = std::max(0, k);
-    const I j_end   = std::min(std::min(p.nrows() + k, p.ncols()), p.ncols());
-
-    for (I n = j_start; n < j_end; n++) {
+  for (I i = 0; i < p.nrows(); i++) {
+    for (I jj = p.row_offsets[i]; jj < p.row_offsets[i + 1]; jj++) {
       s << " " << std::setw(14) << i;
-      s << " " << std::setw(14) << n;
-      s << " " << std::setprecision(4) << std::setw(8) << "(" << p.values(i, n)
+      s << " " << std::setw(14) << p.column_indices[jj];
+      s << " " << std::setprecision(4) << std::setw(8) << "(" << p.values[jj]
         << ")\n";
     }
   }
@@ -58,4 +51,4 @@ void print(const Printable& p, Stream& s, Morpheus::DiaTag) {
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_PRINT_IMPL_SERIAL_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_PRINT_IMPL_HPP

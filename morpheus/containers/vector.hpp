@@ -27,26 +27,18 @@
 
 #include <morpheus/core/core.hpp>
 #include <morpheus/core/vector_traits.hpp>
-#include <morpheus/core/vector_tags.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
+#include <morpheus/containers/fwd/vector.hpp>
+#include <Kokkos_Random.hpp>
 
 namespace Morpheus {
-
-/* Forward declaration */
-template <class... Properties>
-class DenseVector;
-
-struct DenseVectorTag : public Impl::VectorTag {};
-
-/* Alias type to match std::vector */
-template <class... Properties>
-using vector = DenseVector<Properties...>;
 
 template <class... Properties>
 class DenseVector : public Impl::VectorTraits<Properties...> {
  public:
   using type   = DenseVector<Properties...>;
   using traits = Impl::VectorTraits<Properties...>;
-  using tag    = typename VectorFormatTag<DenseVectorTag>::tag;
+  using tag    = typename VectorFormatTag<Morpheus::DenseVectorTag>::tag;
 
   using value_type = typename traits::value_type;
   using index_type = size_t;
@@ -55,10 +47,10 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
 
-  using pointer         = value_type*;
-  using const_pointer   = const value_type*;
-  using reference       = value_type&;
-  using const_reference = const value_type&;
+  using pointer         = DenseVector*;
+  using const_pointer   = const DenseVector*;
+  using reference       = DenseVector&;
+  using const_reference = const DenseVector&;
 
   using iterator       = value_type*;
   using const_iterator = const value_type*;
@@ -73,26 +65,25 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   ~DenseVector()                  = default;
   DenseVector(const DenseVector&) = default;
   DenseVector(DenseVector&&)      = default;
-  DenseVector& operator=(const DenseVector&) = default;
-  DenseVector& operator=(DenseVector&&) = default;
+  reference operator=(const DenseVector&) = default;
+  reference operator=(DenseVector&&) = default;
 
-  inline DenseVector()
-      : _name("Vector"), _size(0), _extra_storage(1.1), _values() {}
+  inline DenseVector() : _name("Vector"), _size(0), _values() {}
 
   inline DenseVector(const std::string name, int n, value_type val = 0)
-      : _name(name),
-        _size(n),
-        _extra_storage(1.1),
-        _values(name, size_t(n * 1.1)) {
+      : _name(name + "Vector"), _size(n), _values(name, size_t(n)) {
     assign(n, val);
   }
 
   inline DenseVector(int n, value_type val = 0)
-      : _name("Vector"),
-        _size(n),
-        _extra_storage(1.1),
-        _values("Vector", size_t(n * 1.1)) {
+      : _name("Vector"), _size(n), _values("Vector", size_t(n)) {
     assign(n, val);
+  }
+  template <typename Generator>
+  inline DenseVector(const std::string name, int n, Generator rand_pool,
+                     const value_type range_low, const value_type range_high)
+      : _name(name + "Vector"), _size(n), _values(name + "Vector", size_t(n)) {
+    assign(n, rand_pool, range_low, range_high);
   }
 
   inline void assign(const index_type n, const value_type val) {
@@ -103,6 +94,22 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
     Kokkos::parallel_for(
         "Morpheus::DenseVector::assign", range,
         KOKKOS_LAMBDA(const int i) { _values(i) = val; });
+  }
+
+  template <typename Generator>
+  inline void assign(const index_type n, const Generator rand_pool,
+                     const value_type range_low, const value_type range_high) {
+    using rng_type = typename Generator::generator_type;
+    using rand     = Kokkos::rand<rng_type, value_type>;
+
+    /* Resize if necessary (behavior of std:vector) */
+    this->resize(n);
+
+    rng_type rand_gen = rand_pool.get_state();
+
+    for (index_type i = 0; i < n; ++i) {
+      _values(i) = rand::draw(rand_gen, range_low, range_high);
+    }
   }
 
   // Element access
@@ -117,6 +124,7 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   inline index_type size() const { return _size; }
 
   inline value_array_pointer data() const { return _values.data(); }
+  inline const value_array_type& view() const { return _values; }
 
   // Iterators
   inline iterator begin() { return _values.data(); }
@@ -132,14 +140,14 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   }
 
   // Capacity
-  //   TODO: reserve should be enabled when push_back methods etc are developed
-  //   inline void reserve(size_t n) {
-  //     Kokkos::resize(_values, size_t(n * _extra_storage));
+  //   TODO: reserve should be enabled when push_back methods etc are
+  //   developed inline void reserve(size_t n) {
+  //     Kokkos::resize(_values, size_t(n));
   //   }
 
   // Modifiers
   inline void resize(index_type n) {
-    if (n > _values.span()) Kokkos::resize(_values, size_t(n * _extra_storage));
+    Kokkos::resize(_values, size_t(n));
     _size = n;
   }
 
@@ -155,7 +163,6 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
  private:
   std::string _name;
   index_type _size;
-  float _extra_storage;
   value_array_type _values;
 };
 }  // namespace Morpheus

@@ -1,5 +1,5 @@
 /**
- * multiply_serial.hpp
+ * multiply_impl_serial.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -24,31 +24,32 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
 
-#include <morpheus/containers/dia_matrix.hpp>
-#include <morpheus/containers/vector.hpp>
+#include <morpheus/core/type_traits.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
-template <typename Matrix, typename Vector>
-void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::DiaTag,
-              typename std::enable_if<
-                  std::is_same<typename Matrix::execution_space,
-                               Kokkos::Serial::execution_space>::value,
-                  Kokkos::Serial::execution_space>::type* = nullptr) {
-  // Check all containers have access to the same execution space
-  static_assert(std::is_same_v<typename Matrix::execution_space,
-                               typename Vector::execution_space>);
-
-  using I = typename Matrix::index_type;
+template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
+          typename MatrixOrVector2>
+void multiply(
+    const ExecSpace& space, const LinearOperator& A, const MatrixOrVector1& x,
+    MatrixOrVector2& y, DiaTag, DenseVectorTag, DenseVectorTag,
+    typename std::enable_if_t<
+        Morpheus::is_execution_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, LinearOperator> &&
+        Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
+        Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
+  using I = typename LinearOperator::index_type;
 
   for (I i = 0; i < (int)A.diagonal_offsets.size(); i++) {
     const I k       = A.diagonal_offsets[i];  // diagonal offset
     const I i_start = std::max(0, -k);
     const I j_start = std::max(0, k);
-    const I j_end   = std::min(std::min(A.nrows() + k, A.ncols()), A.ncols());
+    const I N       = std::min(A.nrows() - i_start, A.ncols() - j_start);
 
-    for (I n = 0; n < j_end - j_start; n++) {
+    for (I n = 0; n < N; n++) {
       y[i_start + n] += A.values(i, j_start + n) * x[j_start + n];
     }
   }

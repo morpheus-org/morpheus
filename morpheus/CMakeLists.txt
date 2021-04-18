@@ -11,12 +11,12 @@ target_link_libraries(morpheus INTERFACE Kokkos::kokkos)
 
 target_compile_features(morpheus INTERFACE cxx_std_17)
 set(gnu_cxx "$<COMPILE_LANG_AND_ID:CXX,GNU>")
-set(gnu_cxx_flags 	-Wall -Wunused-parameter -Wshadow -pedantic
+set(gnu_cxx_flags 	-Wall -Wshadow -pedantic
 					-Werror -Wsign-compare -Wtype-limits
 					-Wignored-qualifiers -Wempty-body
 					-Wclobbered -Wuninitialized)
 set(clang_cxx "$<COMPILE_LANG_AND_ID:CXX,RMClang,AppleClang,Clang>")
-set(clang_cxx_flags -Wall -Wunused-parameter -Wshadow -pedantic
+set(clang_cxx_flags -Wall -Wshadow -pedantic
 					-Werror -Wsign-compare -Wtype-limits
 					-Wignored-qualifiers -Wempty-body
 					-Wclobbered -Wuninitialized)

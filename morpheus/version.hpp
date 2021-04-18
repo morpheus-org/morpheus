@@ -30,7 +30,7 @@
 //  change with every morpheus release.
 
 #define MORPHEUS_MAJOR_VERSION  0
-#define MORPHEUS_MINOR_VERSION  1
+#define MORPHEUS_MINOR_VERSION  2
 #define MORPHEUS_PATCH_VERSION  0
 
 #endif //MORPHEUS_VERSION_HPP

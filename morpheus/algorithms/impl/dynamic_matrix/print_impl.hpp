@@ -21,14 +21,14 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_PRINT_IMPL_SERIAL_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_PRINT_IMPL_SERIAL_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_PRINT_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_PRINT_IMPL_HPP
 
 #include <iostream>
 #include <iomanip>
+#include <variant>
 
-#include <morpheus/containers/dynamic_matrix.hpp>
-#include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
 // forward decl
@@ -54,11 +54,11 @@ struct print_fn {
 };
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, Morpheus::DynamicTag) {
+void print(const Printable& p, Stream& s, DynamicTag) {
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nnnz() << " entries\n";
   // TODO: Using a stream in this way doesn't seem to work
-  // std::visit(std::bind(Impl::print_fn(), std::placeholders::_1, s),
+  // std::visit(std::bind(Impl::print_fn(), std::placeholders::_1, std::ref(s)),
   //            p.formats());
   std::visit(Impl::print_fn(), p.formats());
 }
@@ -66,4 +66,4 @@ void print(const Printable& p, Stream& s, Morpheus::DynamicTag) {
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_PRINT_IMPL_SERIAL_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_DYNAMIC_MATRIX_PRINT_IMPL_HPP

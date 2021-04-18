@@ -23,7 +23,8 @@
 
 #include <iostream>
 #include <morpheus/core/core.hpp>
-#include <morpheus/containers/dynamic_matrix.hpp>
+#include <morpheus/containers/coo_matrix.hpp>
+#include <morpheus/containers/csr_matrix.hpp>
 #include <morpheus/containers/vector.hpp>
 #include <morpheus/algorithms/multiply.hpp>
 #include <morpheus/algorithms/print.hpp>
@@ -37,6 +38,7 @@ int main() {
     coo A(4, 3, 6);
     csr B(4, 3, 6);
     vec x(4, 2), ycoo("ycoo", 4, 0), ycsr("ycsr", 4, 0);
+    Kokkos::Serial::execution_space space;
 
     // initialize matrix entries
     A.row_indices[0]    = 0;
@@ -85,8 +87,8 @@ int main() {
     Morpheus::print(A);
     Morpheus::print(B);
 
-    Morpheus::multiply(A, x, ycoo);
-    Morpheus::multiply(B, x, ycsr);
+    Morpheus::multiply(space, A, x, ycoo);
+    Morpheus::multiply(space, B, x, ycsr);
 
     Morpheus::print(ycoo);
     Morpheus::print(ycsr);

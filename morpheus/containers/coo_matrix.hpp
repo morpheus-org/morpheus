@@ -28,19 +28,19 @@
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
-#include <morpheus/core/matrix_tags.hpp>
+#include <morpheus/algorithms/sort.hpp>
+#include <morpheus/algorithms/convert.hpp>
 #include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
-
-struct CooTag : public Impl::SparseMatTag {};
 
 template <class... Properties>
 class CooMatrix : public Impl::MatrixTraits<Properties...> {
  public:
   using type   = CooMatrix<Properties...>;
   using traits = Impl::MatrixTraits<Properties...>;
-  using tag    = typename MatrixFormatTag<CooTag>::tag;
+  using tag    = typename MatrixFormatTag<Morpheus::CooTag>::tag;
 
   using value_type = typename traits::value_type;
   using index_type = typename traits::index_type;
@@ -90,22 +90,31 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
         _n(num_cols),
         _nnz(num_entries) {}
 
+  inline CooMatrix(const std::string name, const index_array_type &rind,
+                   const index_array_type &cind, const value_array_type &vals)
+      : row_indices(rind),
+        column_indices(cind),
+        values(vals),
+        _name(name + "(CooMatrix)"),
+        _m(rind.size()),
+        _n(cind.size()),
+        _nnz(vals.size()) {}
+
+  // Construct from vectors
   inline CooMatrix(const std::string name, const index_type num_rows,
                    const index_type num_cols, const index_type num_entries)
       : row_indices(num_entries),
         column_indices(num_entries),
         values(num_entries),
-        _name(name),
+        _name(name + "(CooMatrix)"),
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {}
 
   // Construct from another matrix type
   template <typename MatrixType>
-  CooMatrix(const MatrixType &matrix) {
-    // TODO: CooMatrix(const MatrixType& matrix)
-    throw Morpheus::NotImplementedException(
-        "CooMatrix(const MatrixType& matrix)");
+  CooMatrix(const MatrixType &matrix) : _name("CooMatrix") {
+    Morpheus::convert(matrix, *this);
   }
 
   // Resize matrix dimensions and underlying storage
@@ -122,11 +131,9 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   // Assignment from another matrix type
   template <typename MatrixType>
   reference operator=(const MatrixType &matrix) {
-    throw Morpheus::NotImplementedException(
-        "CooMatrix.operator=(const MatrixType& matrix)");
+    Morpheus::convert(matrix, *this);
+    return *this;
   }
-
-  // Operations specific to COO format
 
   // Sort matrix elements by row index
   void sort_by_row(void) {
@@ -135,11 +142,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   }
 
   // Sort matrix elements by row and column index
-  void sort_by_row_and_column(void) {
-    // TODO: CooMatrix.sort_by_row_and_column
-    throw Morpheus::NotImplementedException(
-        "CooMatrix.sort_by_row_and_column()");
-  }
+  void sort_by_row_and_column(void) { Morpheus::sort_by_row_and_column(*this); }
 
   // Determine whether matrix elements are sorted by row index
   bool is_sorted_by_row(void) {
@@ -149,12 +152,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   }
 
   // Determine whether matrix elements are sorted by row and column index
-  bool is_sorted_by_row_and_column(void) {
-    // TODO: CooMatrix.is_sorted_by_row_and_column
-    throw Morpheus::NotImplementedException(
-        "CooMatrix.is_sorted_by_row_and_column()");
-    return true;
-  }
+  bool is_sorted(void) { return Morpheus::is_sorted(*this); }
 
   // Unified routines across all formats
 
@@ -162,6 +160,9 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
   inline index_type nnnz() const { return _nnz; }
+  inline void set_nrows(const index_type rows) { _m = rows; }
+  inline void set_ncols(const index_type cols) { _n = cols; }
+  inline void set_nnnz(const index_type nnz) { _nnz = nnz; }
 
  private:
   std::string _name;

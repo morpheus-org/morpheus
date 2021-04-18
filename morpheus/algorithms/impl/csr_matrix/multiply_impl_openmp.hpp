@@ -27,25 +27,35 @@
 #include <morpheus/core/macros.hpp>
 #if defined(MORPHEUS_ENABLE_OPENMP)
 
-#include <morpheus/containers/csr_matrix.hpp>
-#include <morpheus/containers/vector.hpp>
+#include <morpheus/core/type_traits.hpp>
 #include <morpheus/core/exceptions.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
+
 namespace Morpheus {
 namespace Impl {
 
-template <typename Matrix, typename Vector>
-void multiply(const Matrix& A, const Vector& x, Vector& y, Morpheus::CsrTag,
-              typename std::enable_if<
-                  std::is_same<typename Matrix::execution_space,
-                               Kokkos::OpenMP::execution_space>::value,
-                  Kokkos::OpenMP::execution_space>::type* = nullptr) {
-  // Check all containers have access to the same execution space
-  static_assert(std::is_same_v<typename Matrix::execution_space,
-                               typename Vector::execution_space>);
+template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
+          typename MatrixOrVector2>
+void multiply(
+    const ExecSpace& space, const LinearOperator& A, const MatrixOrVector1& x,
+    MatrixOrVector2& y, CsrTag, DenseVectorTag, DenseVectorTag,
+    typename std::enable_if_t<
+        Morpheus::is_execution_space_v<ExecSpace> &&
+        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, LinearOperator> &&
+        Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
+        Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
+  using I = typename LinearOperator::index_type;
+  using T = typename LinearOperator::value_type;
 
-  throw Morpheus::NotImplementedException(
-      "void multiply(const " + A.name() + "& A, const " + x.name() + "& x, " +
-      y.name() + "& y," + "Morpheus::CsrTag, Kokkos::OpenMP)");
+#pragma omp parallel for
+  for (I i = 0; i < A.nrows(); i++) {
+    T sum = y[i];
+    for (I jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
+      sum += A.values[jj] * x[A.column_indices[jj]];
+    }
+    y[i] = sum;
+  }
 }
 
 }  // namespace Impl

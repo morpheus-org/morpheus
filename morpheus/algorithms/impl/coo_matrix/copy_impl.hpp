@@ -1,5 +1,5 @@
 /**
- * print_impl_serial.hpp
+ * copy_impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,29 +21,29 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_VECTOR_PRINT_IMPL_SERIAL_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_VECTOR_PRINT_IMPL_SERIAL_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_COPY_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_COPY_IMPL_HPP
 
-#include <iostream>
-#include <iomanip>
-
-#include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
+#include <morpheus/algorithms/impl/vector/copy_impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
-template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, Morpheus::DenseVectorTag) {
-  using index_type = typename Printable::index_type;
-  s << p.name() << "<" << p.size() << "> with " << p.size() << " entries\n";
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst, CooTag, CooTag) {
+  using I      = typename SourceType::index_type;
+  const I rows = src.nrows();
+  const I cols = src.ncols();
+  const I nnzs = src.nnnz();
+  dst.resize(rows, cols, nnzs);
 
-  for (index_type n = 0; n < p.size(); n++) {
-    s << " " << std::setw(14) << n;
-    s << " " << std::setprecision(4) << std::setw(8) << "(" << p[n] << ")\n";
-  }
+  Morpheus::copy(src.row_indices, dst.row_indices);
+  Morpheus::copy(src.column_indices, dst.column_indices);
+  Morpheus::copy(src.values, dst.values);
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_IMPL_VECTOR_PRINT_IMPL_SERIAL_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_COPY_IMPL_HPP

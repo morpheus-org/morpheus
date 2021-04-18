@@ -37,6 +37,11 @@ set( SOURCES_IDIOMATIC_EXAMPLES
     omp.cpp
     DenseMatrix.cpp
     DiaMatrix.cpp
+    Copy.cpp
+    DynamicCopy.cpp
+    sorting.cpp
+    convert.cpp
+    io.cpp
 )
 
 string( REPLACE ".cpp" "" BASENAMES_IDIOMATIC_EXAMPLES "${SOURCES_IDIOMATIC_EXAMPLES}" )

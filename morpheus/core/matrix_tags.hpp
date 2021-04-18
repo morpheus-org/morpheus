@@ -24,6 +24,8 @@
 #ifndef MORPHEUS_CORE_MATRIX_TAGS_HPP
 #define MORPHEUS_CORE_MATRIX_TAGS_HPP
 
+#include <type_traits>
+
 namespace Morpheus {
 
 namespace Impl {
@@ -31,6 +33,7 @@ struct MatrixTag {};
 
 struct SparseMatTag : public Impl::MatrixTag {};
 struct DenseMatTag : public Impl::MatrixTag {};
+
 }  // namespace Impl
 
 // Matrix Format Tag Wrapper

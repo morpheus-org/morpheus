@@ -28,13 +28,11 @@
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
-#include <morpheus/core/matrix_tags.hpp>
-#include <morpheus/containers/dense_matrix.hpp>
 #include <morpheus/containers/vector.hpp>
+#include <morpheus/containers/dense_matrix.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
-
-struct DiaTag : public Impl::SparseMatTag {};
 
 template <class... Properties>
 class DiaMatrix : public Impl::MatrixTraits<Properties...> {
@@ -102,7 +100,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
                    const index_type num_diagonals,
                    const index_type alignment = 32)
       : diagonal_offsets(num_diagonals),
-        _name(name),
+        _name(name + "(DiaMatrix)"),
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {
@@ -111,28 +109,15 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
 
   // Construct from another matrix type
   template <typename MatrixType>
-  DiaMatrix(const MatrixType &matrix) {
-    // TODO: DiaMatrix(const MatrixType& matrix)
-    throw Morpheus::NotImplementedException(
-        "DiaMatrix(const MatrixType& matrix)");
-  }
-
-  // Resize matrix dimensions and underlying storage
-  inline void resize(const index_type num_rows, const index_type num_cols,
-                     const index_type num_entries,
-                     const index_type num_diagonals) {
-    _m   = num_rows;
-    _n   = num_cols;
-    _nnz = num_entries;
-    diagonal_offsets.resize(num_diagonals);
-    values.resize(num_diagonals, num_cols);
+  DiaMatrix(const MatrixType &matrix) : _name("DiaMatrix") {
+    Morpheus::convert(matrix, *this);
   }
 
   // Resize matrix dimensions and underlying storage
   inline void resize(const index_type num_rows, const index_type num_cols,
                      const index_type num_entries,
                      const index_type num_diagonals,
-                     const index_type alignment) {
+                     const index_type alignment = 32) {
     _m   = num_rows;
     _n   = num_cols;
     _nnz = num_entries;
@@ -143,9 +128,8 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   // Assignment from another matrix type
   template <typename MatrixType>
   reference operator=(const MatrixType &matrix) {
-    // TODO: DiaMatrix.operator=(const MatrixType& matrix)
-    throw Morpheus::NotImplementedException(
-        "DiaMatrix.operator=(const MatrixType& matrix)");
+    Morpheus::convert(matrix, *this);
+    return *this;
   }
 
   // Unified routines across all formats
@@ -153,6 +137,9 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
   inline index_type nnnz() const { return _nnz; }
+  inline void set_nrows(const index_type rows) { _m = rows; }
+  inline void set_ncols(const index_type cols) { _n = cols; }
+  inline void set_nnnz(const index_type nnz) { _nnz = nnz; }
 
  private:
   // Calculates padding to align the data based on the current diagonal length

@@ -27,13 +27,11 @@
 #include <string>
 
 #include <morpheus/core/core.hpp>
-#include <morpheus/core/matrix_traits.hpp>
-#include <morpheus/core/matrix_tags.hpp>
 #include <morpheus/core/exceptions.hpp>
+#include <morpheus/core/matrix_traits.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
-
-struct DenseMatrixTag : public Impl::DenseMatTag {};
 
 template <class... Properties>
 class DenseMatrix : public Impl::MatrixTraits<Properties...> {
@@ -64,8 +62,8 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
   ~DenseMatrix()                   = default;
   DenseMatrix(const DenseMatrix &) = default;
   DenseMatrix(DenseMatrix &&)      = default;
-  DenseMatrix &operator=(const DenseMatrix &) = default;
-  DenseMatrix &operator=(DenseMatrix &&) = default;
+  reference operator=(const DenseMatrix &) = default;
+  reference operator=(DenseMatrix &&) = default;
 
   // Construct an empty DenseMatrix
   inline DenseMatrix() : _name("DenseMatrix"), _m(0), _n(0), _values() {}
@@ -82,10 +80,10 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
 
   inline DenseMatrix(const std::string name, const index_type num_rows,
                      const index_type num_cols, const value_type val = 0)
-      : _name(name),
+      : _name(name + "(DenseMatrix)"),
         _m(num_rows),
         _n(num_cols),
-        _values(name, size_t(num_rows), size_t(num_cols)) {
+        _values(name + "(DenseMatrix)", size_t(num_rows), size_t(num_cols)) {
     assign(num_rows, num_cols, val);
   }
 
@@ -106,9 +104,7 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
 
   // Modifiers
   inline void resize(index_type num_rows, index_type num_cols) {
-    if (size_t(num_rows * num_cols) > _values.span())
-      Kokkos::resize(_values, size_t(num_rows), size_t(num_cols));
-
+    Kokkos::resize(_values, size_t(num_rows), size_t(num_cols));
     _m = num_rows;
     _n = num_cols;
   }
@@ -119,6 +115,7 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
   }
 
   inline value_array_pointer data() const { return _values.data(); }
+  inline const value_array_type &view() const { return _values; }
 
   // Unified routines across all formats
 
@@ -126,6 +123,8 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
   inline index_type nnnz() const { return _m * _n; }
+  inline void set_nrows(const index_type rows) { _m = rows; }
+  inline void set_ncols(const index_type cols) { _n = cols; }
 
  private:
   std::string _name;

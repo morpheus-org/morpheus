@@ -29,13 +29,13 @@
 #include <variant>
 #include <functional>
 
-#include <morpheus/containers/impl/dynamic_matrix_impl.hpp>
 #include <morpheus/core/matrix_traits.hpp>
-#include <morpheus/core/matrix_tags.hpp>
+#include <morpheus/algorithms/convert.hpp>
+#include <morpheus/algorithms/print.hpp>
+#include <morpheus/containers/impl/dynamic_matrix_impl.hpp>
+#include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
-
-struct DynamicTag : public Impl::MatrixTag {};
 
 /** @class DynamicMatrix
  * @brief Dynamic Matrix class that acts as a sum type of all the supporting
@@ -52,7 +52,7 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
  public:
   using type   = DynamicMatrix<Properties...>;
   using traits = Impl::MatrixTraits<Properties...>;
-  using tag    = typename MatrixFormatTag<DynamicTag>::tag;
+  using tag    = typename MatrixFormatTag<Morpheus::DynamicTag>::tag;
 
   using variant_type = typename MatrixFormats<Properties...>::variant;
   using value_type   = typename traits::value_type;
@@ -82,15 +82,15 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
 
   template <typename Format>
   inline DynamicMatrix(const std::string name, const Format &mat)
-      : _name(name), _formats(mat) {}
+      : _name(name + "(DynamicMatrix)"), _formats(mat) {}
 
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
                      const index_type nnz, Args &&...args) {
-    return std::visit(
+    auto f =
         std::bind(Impl::any_type_resize<Properties...>(), std::placeholders::_1,
-                  m, n, nnz, std::forward<Args>(args)...),
-        _formats);
+                  m, n, nnz, std::forward<Args>(args)...);
+    return std::visit(f, _formats);
   }
 
   inline std::string name() const { return _name; }
@@ -113,6 +113,11 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
 
   inline int active_index() const { return _formats.index(); }
 
+  template <typename MatrixType>
+  inline void activate(const MatrixType &) {
+    _formats = MatrixType();
+  }
+
   inline void activate(const formats_e index) {
     constexpr int size =
         std::variant_size_v<typename MatrixFormats<Properties...>::variant>;
@@ -132,7 +137,24 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
     activate(static_cast<formats_e>(index));
   }
 
+  template <typename MatrixType>
+  inline void convert(const MatrixType &matrix) {
+    _formats = matrix;
+  }
+
+  inline void convert(const formats_e index) {
+    Morpheus::CooMatrix<Properties...> temp;
+    Morpheus::convert(*this, temp);
+    activate(index);
+    Morpheus::convert(temp, *this);
+  }
+
+  inline void convert(const int index) {
+    convert(static_cast<formats_e>(index));
+  }
+
   inline const variant_type &formats() const { return _formats; }
+  inline variant_type &formats() { return _formats; }
 
  private:
   std::string _name;

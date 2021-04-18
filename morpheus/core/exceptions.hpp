@@ -28,11 +28,42 @@
 #include <stdexcept>
 
 namespace Morpheus {
-class NotImplementedException : public std::logic_error {
+
+class Exception : public std::exception {
  public:
-  NotImplementedException(std::string fn_name)
-      : std::logic_error{"NotImplemented: " + fn_name +
-                         " not yet implemented."} {}
+  Exception(const Exception& exception_) : message(exception_.message) {}
+  Exception(const std::string& message_) : message(message_) {}
+  ~Exception() throw() {}
+  const char* what() const throw() { return message.c_str(); }
+
+ protected:
+  std::string message;
+};
+
+class NotImplementedException : public Exception {
+ public:
+  template <typename MessageType>
+  NotImplementedException(const MessageType& fn_name)
+      : Exception(std::string("NotImplemented: ") + fn_name +
+                  std::string(" not yet implemented.")) {}
+};
+
+class IOException : public Exception {
+ public:
+  template <typename MessageType>
+  IOException(const MessageType& msg) : Exception(std::string("IO: ") + msg) {}
+};
+
+class RuntimeException : public Exception {
+ public:
+  template <typename MessageType>
+  RuntimeException(const MessageType& msg) : Exception(msg) {}
+};
+
+class InvalidInputException : public Exception {
+ public:
+  template <typename MessageType>
+  InvalidInputException(const MessageType& msg) : Exception(msg) {}
 };
 
 template <typename T, typename... Ts>
