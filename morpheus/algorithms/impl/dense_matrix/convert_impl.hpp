@@ -67,9 +67,9 @@ void convert(const SourceType& src, DestinationType& dst, CooTag,
   dst.resize(src.nrows(), src.ncols());
 
   for (I n = 0; n < src.nnnz(); n++) {
-    I i              = dst.row_indices[n];
-    I j              = dst.column_indices[n];
-    dst.values(i, j) = dst.values[n];
+    I i       = src.row_indices[n];
+    I j       = src.column_indices[n];
+    dst(i, j) = src.values[n];
   }
 }
 

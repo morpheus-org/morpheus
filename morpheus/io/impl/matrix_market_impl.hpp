@@ -344,37 +344,90 @@ void read_matrix_market_stream(Matrix& mtx, Stream& input,
   Morpheus::convert(temp, mtx);
 }
 
-}  // namespace Impl
+template <typename Stream, typename ScalarType>
+void write_value(Stream& output, const ScalarType& value) {
+  output << value;
+}
+
+template <typename ValueType, typename IndexType, typename Space,
+          typename Stream>
+void write_coordinate_stream(
+    const Morpheus::CooMatrix<ValueType, IndexType, Space>& coo,
+    Stream& output) {
+  if (std::is_floating_point_v<ValueType> || std::is_integral_v<ValueType>) {
+    output << "%%MatrixMarket matrix coordinate real general\n";
+  } else {
+    // output << "%%MatrixMarket matrix coordinate complex general\n";
+    throw Morpheus::NotImplementedException("complex type is not supported.");
+  }
+
+  output << "\t" << coo.nrows() << "\t" << coo.ncols() << "\t" << coo.nnnz()
+         << "\n";
+
+  for (size_t i = 0; i < size_t(coo.nnnz()); i++) {
+    output << (coo.row_indices[i] + 1) << " ";
+    output << (coo.column_indices[i] + 1) << " ";
+    Morpheus::Io::Impl::write_value(output, coo.values[i]);
+    output << "\n";
+  }
+}
 
 template <typename Matrix, typename Stream>
-void read_matrix_market_stream(Matrix& mtx, Stream& input) {
-  Morpheus::Io::Impl::read_matrix_market_stream(mtx, input,
-                                                typename Matrix::tag());
+void write_matrix_market_stream(const Matrix& mtx, Stream& output,
+                                Morpheus::Impl::SparseMatTag) {
+  // general sparse case
+  using IndexType = typename Matrix::index_type;
+  using ValueType = typename Matrix::value_type;
+  using Space     = Kokkos::Serial;
+
+  Morpheus::CooMatrix<ValueType, IndexType, Space> coo(mtx);
+
+  Morpheus::Io::Impl::write_coordinate_stream(coo, output);
 }
 
-template <typename Matrix>
-void read_matrix_market_file(Matrix& mtx, const std::string& filename) {
-  std::ifstream file(filename.c_str());
+template <typename Matrix, typename Stream>
+void write_matrix_market_stream(const Matrix& mtx, Stream& output,
+                                Morpheus::DenseVectorTag) {
+  using ValueType = typename Matrix::value_type;
 
-  if (!file)
-    throw Morpheus::IOException(std::string("unable to open file \"") +
-                                filename + std::string("\" for reading"));
+  if (std::is_floating_point_v<ValueType> || std::is_integral_v<ValueType>) {
+    output << "%%MatrixMarket matrix array real general\n";
+  } else {
+    // output << "%%MatrixMarket matrix array complex general\n";
+    throw Morpheus::NotImplementedException("complex type is not supported.");
+  }
 
-#ifdef __APPLE__
-  // WAR OSX-specific issue using rdbuf
-  std::stringstream file_string(std::stringstream::in | std::stringstream::out);
-  std::vector<char> buffer(
-      file.rdbuf()->pubseekoff(0, std::ios::end, std::ios::in));
-  file.rdbuf()->pubseekpos(0, std::ios::in);
-  file.rdbuf()->sgetn(&buffer[0], buffer.size());
-  file_string.write(&buffer[0], buffer.size());
+  output << "\t" << mtx.size() << "\t1\n";
 
-  Morpheus::Io::read_matrix_market_stream(mtx, file_string);
-#else
-  Morpheus::Io::read_matrix_market_stream(mtx, file);
-#endif
+  for (size_t i = 0; i < mtx.size(); i++) {
+    write_value(output, mtx[i]);
+    output << "\n";
+  }
 }
 
+template <typename Matrix, typename Stream>
+void write_matrix_market_stream(const Matrix& mtx, Stream& output,
+                                Morpheus::DenseMatrixTag) {
+  using ValueType = typename Matrix::value_type;
+
+  if (std::is_floating_point_v<ValueType> || std::is_integral_v<ValueType>) {
+    output << "%%MatrixMarket matrix array real general\n";
+  } else {
+    // output << "%%MatrixMarket matrix array complex general\n";
+    throw Morpheus::NotImplementedException("complex type is not supported.");
+  }
+
+  output << "\t" << mtx.nrows() << "\t" << mtx.ncols() << "\n";
+
+  for (size_t j = 0; j < mtx.nrows(); j++) {
+    for (size_t i = 0; i < mtx.ncols(); i++) {
+      write_value(output, mtx(i, j));
+      output << "\n";
+    }
+  }
+}
+
+}  // namespace Impl
 }  // namespace Io
 }  // namespace Morpheus
 
