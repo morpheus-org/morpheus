@@ -41,6 +41,7 @@ set( SOURCES_IDIOMATIC_EXAMPLES
     DynamicCopy.cpp
     sorting.cpp
     convert.cpp
+    io.cpp
 )
 
 string( REPLACE ".cpp" "" BASENAMES_IDIOMATIC_EXAMPLES "${SOURCES_IDIOMATIC_EXAMPLES}" )
