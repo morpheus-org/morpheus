@@ -66,6 +66,12 @@ class InvalidInputException : public Exception {
   InvalidInputException(const MessageType& msg) : Exception(msg) {}
 };
 
+class FormatConversionException : public Exception {
+ public:
+  template <typename MessageType>
+  FormatConversionException(const MessageType& msg) : Exception(msg) {}
+};
+
 template <typename T, typename... Ts>
 constexpr std::string append_str(T&& first, Ts&&... rest) {
   if constexpr (sizeof...(Ts) == 0) {

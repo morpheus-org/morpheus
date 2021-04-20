@@ -60,6 +60,7 @@ int main(int argc, char* argv[]) {
     uint64_t seed        = atoi(argv[2]);
     uint64_t reps        = atoi(argv[3]);
     int print_freq       = reps / 10;
+    if (print_freq == 0) print_freq = 1;
 
     std::cout << "\nRunning convert.cpp with:\n";
     std::cout << "\tFilename:\t" << filename << "\n";
@@ -68,9 +69,14 @@ int main(int argc, char* argv[]) {
 
     coo Aio;
 
-    timer.start(timer.IO_READ);
-    Morpheus::Io::read_matrix_market_file(Aio, filename);
-    timer.stop(timer.IO_READ);
+    try {
+      timer.start(timer.IO_READ);
+      Morpheus::Io::read_matrix_market_file(Aio, filename);
+      timer.stop(timer.IO_READ);
+    } catch (Morpheus::NotImplementedException& e) {
+      std::cerr << "Exception Raised:: " << e.what() << std::endl;
+      exit(0);
+    }
 
     int rep = 0;
     std::cout << "Starting experiment:\n";
@@ -96,7 +102,7 @@ int main(int argc, char* argv[]) {
       }
 
       if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep << "/" << reps
+        std::cout << "\t Step " << rep + 1 << "/" << reps
                   << "\tconcrete_spmv<coo,csr,dia>\n";
       }
 
@@ -113,7 +119,7 @@ int main(int argc, char* argv[]) {
       }
 
       if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep << "/" << reps
+        std::cout << "\t Step " << rep + 1 << "/" << reps
                   << "\tdynamic_spmv<coo,csr,dia>\n";
       }
       rep = rep + 1;

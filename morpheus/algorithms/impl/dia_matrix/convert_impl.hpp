@@ -81,6 +81,16 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
   // Create unique diagonal set
   std::set<I> diag_set(diag_map.begin(), diag_map.end());
   I ndiags = I(diag_set.size());
+
+  // const float max_fill   = 3.0;
+  // const float threshold  = 1e6;  // 1M entries
+  // const float size       = float(ndiags) * float(src.ncols());
+  // const float fill_ratio = size / std::max(1.0f, float(src.nnnz()));
+
+  // if (max_fill < fill_ratio && size > threshold)
+  //   throw Morpheus::format_conversion_exception(
+  //       "DiaMatrix fill-in would exceed maximum tolerance");
+
   index_array_type diagonal_offsets(ndiags, 0);
   for (auto it = diag_set.cbegin(); it != diag_set.cend(); ++it) {
     auto i              = std::distance(diag_set.cbegin(), it);

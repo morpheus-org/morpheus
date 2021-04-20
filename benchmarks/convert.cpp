@@ -42,6 +42,7 @@ Morpheus::TimerPool timer;
 template <typename SrcFmt, typename DstFmt>
 void concrete_convert(coo ref, enum Morpheus::TimerPool::timer_id tidx) {
   SrcFmt A(ref);
+
   timer.start(tidx);
   DstFmt B = A;
   timer.stop(tidx);
@@ -62,28 +63,34 @@ int main(int argc, char* argv[]) {
   Morpheus::initialize(argc, argv);
   {
     std::string filename = argv[1];
-    uint64_t reps        = atoi(argv[2]);
+    int reps             = atoi(argv[2]);
     int print_freq       = reps / 10;
+    if (print_freq == 0) print_freq = 1;
 
     std::cout << "\nRunning convert.cpp with:\n";
     std::cout << "\tFilename:\t" << filename << "\n";
-    std::cout << "\tReps:    \t" << reps << "\n\n";
+    std::cout << "\tReps:    \t" << reps << "\n" << std::endl;
 
     coo Aio;
 
-    timer.start(timer.IO_READ);
-    Morpheus::Io::read_matrix_market_file(Aio, filename);
-    timer.stop(timer.IO_READ);
+    try {
+      timer.start(timer.IO_READ);
+      Morpheus::Io::read_matrix_market_file(Aio, filename);
+      timer.stop(timer.IO_READ);
+    } catch (Morpheus::NotImplementedException& e) {
+      std::cerr << "Exception Raised:: " << e.what() << std::endl;
+      exit(0);
+    }
 
     std::cout << "Starting experiment:\n";
-    for (uint64_t rep = 0; rep < reps; rep++) {
+    for (auto rep = 0; rep < reps; rep++) {
       concrete_convert<coo, coo>(Aio, timer.CONVERT_COO_COO);
       concrete_convert<coo, csr>(Aio, timer.CONVERT_COO_CSR);
       concrete_convert<coo, dia>(Aio, timer.CONVERT_COO_DIA);
 
       if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep << "/" << reps
-                  << "\tconcrete_convert<coo>\n";
+        std::cout << "\t Step " << rep + 1 << "/" << reps
+                  << "\tconcrete_convert<coo>" << std::endl;
       }
 
       concrete_convert<csr, coo>(Aio, timer.CONVERT_CSR_COO);
@@ -91,8 +98,8 @@ int main(int argc, char* argv[]) {
       concrete_convert<csr, dia>(Aio, timer.CONVERT_CSR_DIA);
 
       if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep << "/" << reps
-                  << "\tconcrete_convert<csr>\n";
+        std::cout << "\t Step " << rep + 1 << "/" << reps
+                  << "\tconcrete_convert<csr>" << std::endl;
       }
 
       concrete_convert<dia, coo>(Aio, timer.CONVERT_DIA_COO);
@@ -100,8 +107,8 @@ int main(int argc, char* argv[]) {
       concrete_convert<dia, dia>(Aio, timer.CONVERT_DIA_DIA);
 
       if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep << "/" << reps
-                  << "\tconcrete_convert<dia>\n";
+        std::cout << "\t Step " << rep + 1 << "/" << reps
+                  << "\tconcrete_convert<dia>" << std::endl;
       }
 
       dynamic_convert(Aio, COO_FORMAT, COO_FORMAT, timer.CONVERT_DYN_COO_COO);
@@ -109,8 +116,8 @@ int main(int argc, char* argv[]) {
       dynamic_convert(Aio, COO_FORMAT, DIA_FORMAT, timer.CONVERT_DYN_COO_DIA);
 
       if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep << "/" << reps
-                  << "\tdynamic_convert<coo>\n";
+        std::cout << "\t Step " << rep + 1 << "/" << reps
+                  << "\tdynamic_convert<coo>" << std::endl;
       }
 
       dynamic_convert(Aio, CSR_FORMAT, COO_FORMAT, timer.CONVERT_DYN_CSR_COO);
@@ -118,8 +125,8 @@ int main(int argc, char* argv[]) {
       dynamic_convert(Aio, CSR_FORMAT, DIA_FORMAT, timer.CONVERT_DYN_CSR_DIA);
 
       if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep << "/" << reps
-                  << "\tdynamic_convert<csr>\n";
+        std::cout << "\t Step " << rep + 1 << "/" << reps
+                  << "\tdynamic_convert<csr>" << std::endl;
       }
 
       dynamic_convert(Aio, DIA_FORMAT, COO_FORMAT, timer.CONVERT_DYN_DIA_COO);
@@ -127,8 +134,8 @@ int main(int argc, char* argv[]) {
       dynamic_convert(Aio, DIA_FORMAT, DIA_FORMAT, timer.CONVERT_DYN_DIA_DIA);
 
       if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep << "/" << reps
-                  << "\tdynamic_convert<dia>\n";
+        std::cout << "\t Step " << rep + 1 << "/" << reps
+                  << "\tdynamic_convert<dia>" << std::endl;
       }
     }
 
