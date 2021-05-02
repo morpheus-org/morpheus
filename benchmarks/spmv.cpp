@@ -45,12 +45,27 @@ Morpheus::TimerPool timer;
 #define DIA_FORMAT Morpheus::DIA_FORMAT
 
 template <typename Matrix>
-void spmv_bench(const Matrix& A, const vec x, vec y,
-                enum Morpheus::TimerPool::timer_id spmv) {
-  timer.start(spmv);
-  exec space;
-  Morpheus::multiply(space, A, x, y);
-  timer.stop(spmv);
+void spmv_bench(const Matrix& A, enum Morpheus::TimerPool::timer_id spmv,
+                uint64_t seed, int reps, int print_freq, std::string fn_str) {
+  int rep = 0;
+  for (uint64_t s = seed, cols = A.ncols(); s < seed + reps; s++) {
+    timer.start(timer.SET_VECS);
+    vec x("x", cols, Generator(s), 0, 100);
+    vec y("y", x.size(), 0);
+    timer.stop(timer.SET_VECS);
+
+    timer.start(spmv);
+    exec space;
+    Morpheus::multiply(space, A, x, y);
+    timer.stop(spmv);
+
+    if (rep % print_freq == 0) {
+      std::cout << "\t Step " << rep + 1 << "/" << reps << "\t" << fn_str
+                << std::endl;
+    }
+
+    rep = rep + 1;
+  }
 }
 
 int main(int argc, char* argv[]) {
@@ -78,51 +93,33 @@ int main(int argc, char* argv[]) {
       exit(0);
     }
 
-    int rep = 0;
-    std::cout << "Starting experiment:\n";
-    for (uint64_t s = seed, cols = Aio.ncols(); s < seed + reps; s++) {
-      timer.start(timer.SET_VECS);
-      vec x("x", cols, Generator(s), 0, 100);
-      vec y("y", x.size(), 0);
-      timer.stop(timer.SET_VECS);
+    std::cout << "Starting experiment:" << std::endl;
 
-      {
-        coo A(Aio);
-        spmv_bench(A, x, y, timer.SPMV_COO);
-      }
+    {
+      coo A(Aio);
+      spmv_bench(A, timer.SPMV_COO, seed, reps, print_freq,
+                 "concrete_spmv<coo>");
+      dyn Adyn(A);
+      spmv_bench(Adyn, timer.SPMV_DYN_COO, seed, reps, print_freq,
+                 "dynamic_spmv<coo>");
+    }
 
-      {
-        csr A(Aio);
-        spmv_bench(A, x, y, timer.SPMV_CSR);
-      }
+    {
+      csr A(Aio);
+      spmv_bench(A, timer.SPMV_CSR, seed, reps, print_freq,
+                 "concrete_spmv<csr>");
+      dyn Adyn(A);
+      spmv_bench(Adyn, timer.SPMV_DYN_CSR, seed, reps, print_freq,
+                 "dynamic_spmv<csr>");
+    }
 
-      {
-        dia A(Aio);
-        spmv_bench(A, x, y, timer.SPMV_DIA);
-      }
-
-      if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep + 1 << "/" << reps
-                  << "\tconcrete_spmv<coo,csr,dia>\n";
-      }
-
-      {
-        dyn A(Aio);
-        A.convert(COO_FORMAT);
-        spmv_bench(A, x, y, timer.SPMV_DYN_COO);
-
-        A.convert(CSR_FORMAT);
-        spmv_bench(A, x, y, timer.SPMV_DYN_CSR);
-
-        A.convert(DIA_FORMAT);
-        spmv_bench(A, x, y, timer.SPMV_DYN_DIA);
-      }
-
-      if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep + 1 << "/" << reps
-                  << "\tdynamic_spmv<coo,csr,dia>\n";
-      }
-      rep = rep + 1;
+    {
+      dia A(Aio);
+      spmv_bench(A, timer.SPMV_DIA, seed, reps, print_freq,
+                 "concrete_spmv<dia>");
+      dyn Adyn(A);
+      spmv_bench(Adyn, timer.SPMV_DYN_DIA, seed, reps, print_freq,
+                 "dynamic_spmv<dia>");
     }
   }
 

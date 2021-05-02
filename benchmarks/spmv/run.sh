@@ -37,8 +37,8 @@ mkdir -p $RESULTS_PATH
 
 PROGRESS="$RESULTS_PATH/progress_$DATASET.txt"
 
-# REPS=10
-REPS=5
+REPS=10
+# REPS=5
 SEED=0
 EXECUTABLE="$ROOT_PATH/build/benchmarks/spmv"
 
@@ -53,6 +53,7 @@ do
     echo -e "\t$BASE" 2>&1 | tee -a "$PROGRESS"
 
     OUTFILE="$RESULTS_PATH/$DATASET/$BASE/out.txt"
+    ERRFILE="$RESULTS_PATH/$DATASET/$BASE/out-err.txt"
     mkdir -p $(dirname $OUTFILE)
 
     launch_cmd="srun -n 1 --ntasks=1 $EXECUTABLE $MATRIX $SEED $REPS 2>&1 | tee -a $OUTFILE"

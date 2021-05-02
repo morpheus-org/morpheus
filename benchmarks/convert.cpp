@@ -23,7 +23,9 @@
 
 #include <morpheus/io/matrix_market.hpp>
 #include <morpheus/containers/dynamic_matrix.hpp>
-#include <morpheus/algorithms/convert.hpp>
+#include <morpheus/algorithms/copy.hpp>
+
+#include <morpheus/algorithms/print.hpp>
 
 #include "timer.hpp"
 #include <cstdlib>
@@ -40,23 +42,38 @@ using dyn = Morpheus::DynamicMatrix<double, int, Kokkos::Serial>;
 Morpheus::TimerPool timer;
 
 template <typename SrcFmt, typename DstFmt>
-void concrete_convert(coo ref, enum Morpheus::TimerPool::timer_id tidx) {
-  SrcFmt A(ref);
+void concrete_convert(const SrcFmt& A, enum Morpheus::TimerPool::timer_id tidx,
+                      int reps, int print_freq, std::string fn_str) {
+  for (auto rep = 0; rep < reps; rep++) {
+    DstFmt B;
 
-  timer.start(tidx);
-  DstFmt B = A;
-  timer.stop(tidx);
+    timer.start(tidx);
+    Morpheus::copy(A, B);
+    timer.stop(tidx);
+
+    if (rep % print_freq == 0) {
+      std::cout << "\t Step " << rep + 1 << "/" << reps << "\t" << fn_str
+                << std::endl;
+    }
+  }
 }
 
-void dynamic_convert(coo ref, enum Morpheus::formats_e srcfmt,
-                     enum Morpheus::formats_e dstfmt,
-                     enum Morpheus::TimerPool::timer_id tidx) {
-  dyn A(ref);
-  A.convert(srcfmt);
+template <typename SrcFmt>
+void to_dynamic_convert(const SrcFmt& A, enum Morpheus::formats_e dstfmt,
+                        enum Morpheus::TimerPool::timer_id tidx, int reps,
+                        int print_freq, std::string fn_str) {
+  for (auto rep = 0; rep < reps; rep++) {
+    dyn B;
+    timer.start(tidx);
+    B.activate(dstfmt);
+    Morpheus::copy(A, B);
+    timer.stop(tidx);
 
-  timer.start(tidx);
-  A.convert(dstfmt);
-  timer.stop(tidx);
+    if (rep % print_freq == 0) {
+      std::cout << "\t Step " << rep + 1 << "/" << reps << "\t" << fn_str
+                << std::endl;
+    }
+  }
 }
 
 int main(int argc, char* argv[]) {
@@ -82,61 +99,57 @@ int main(int argc, char* argv[]) {
       exit(0);
     }
 
-    std::cout << "Starting experiment:\n";
-    for (auto rep = 0; rep < reps; rep++) {
-      concrete_convert<coo, coo>(Aio, timer.CONVERT_COO_COO);
-      concrete_convert<coo, csr>(Aio, timer.CONVERT_COO_CSR);
-      concrete_convert<coo, dia>(Aio, timer.CONVERT_COO_DIA);
+    std::cout << "Starting experiment:" << std::endl;
 
-      if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep + 1 << "/" << reps
-                  << "\tconcrete_convert<coo>" << std::endl;
-      }
+    {
+      coo A(Aio);
+      concrete_convert<coo, coo>(A, timer.CONVERT_COO_COO, reps, print_freq,
+                                 "concrete_convert<coo, coo>");
+      concrete_convert<coo, csr>(A, timer.CONVERT_COO_CSR, reps, print_freq,
+                                 "concrete_convert<coo, csr>");
+      concrete_convert<coo, dia>(A, timer.CONVERT_COO_DIA, reps, print_freq,
+                                 "concrete_convert<coo, dia>");
 
-      concrete_convert<csr, coo>(Aio, timer.CONVERT_CSR_COO);
-      concrete_convert<csr, csr>(Aio, timer.CONVERT_CSR_CSR);
-      concrete_convert<csr, dia>(Aio, timer.CONVERT_CSR_DIA);
+      to_dynamic_convert<coo>(A, COO_FORMAT, timer.CONVERT_DYN_COO_COO, reps,
+                              print_freq, "to_dynamic_convert<coo>[COO->COO]");
+      to_dynamic_convert<coo>(A, CSR_FORMAT, timer.CONVERT_DYN_COO_CSR, reps,
+                              print_freq, "to_dynamic_convert<coo>[COO->CSR]");
+      to_dynamic_convert<coo>(A, DIA_FORMAT, timer.CONVERT_DYN_COO_DIA, reps,
+                              print_freq, "to_dynamic_convert<coo>[COO->DIA]");
+    }
 
-      if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep + 1 << "/" << reps
-                  << "\tconcrete_convert<csr>" << std::endl;
-      }
+    {
+      csr A(Aio);
+      concrete_convert<csr, coo>(A, timer.CONVERT_CSR_COO, reps, print_freq,
+                                 "concrete_convert<csr, coo>");
+      concrete_convert<csr, csr>(A, timer.CONVERT_CSR_CSR, reps, print_freq,
+                                 "concrete_convert<csr, csr>");
+      concrete_convert<csr, dia>(A, timer.CONVERT_CSR_DIA, reps, print_freq,
+                                 "concrete_convert<csr, dia>");
 
-      concrete_convert<dia, coo>(Aio, timer.CONVERT_DIA_COO);
-      concrete_convert<dia, csr>(Aio, timer.CONVERT_DIA_CSR);
-      concrete_convert<dia, dia>(Aio, timer.CONVERT_DIA_DIA);
+      to_dynamic_convert<csr>(A, COO_FORMAT, timer.CONVERT_DYN_CSR_COO, reps,
+                              print_freq, "to_dynamic_convert<csr>[CSR->COO]");
+      to_dynamic_convert<csr>(A, CSR_FORMAT, timer.CONVERT_DYN_CSR_CSR, reps,
+                              print_freq, "to_dynamic_convert<csr>[CSR->CSR]");
+      to_dynamic_convert<csr>(A, DIA_FORMAT, timer.CONVERT_DYN_CSR_DIA, reps,
+                              print_freq, "to_dynamic_convert<csr>[CSR->DIA]");
+    }
 
-      if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep + 1 << "/" << reps
-                  << "\tconcrete_convert<dia>" << std::endl;
-      }
+    {
+      dia A(Aio);
+      concrete_convert<dia, coo>(A, timer.CONVERT_DIA_COO, reps, print_freq,
+                                 "concrete_convert<dia, coo>");
+      concrete_convert<dia, csr>(A, timer.CONVERT_DIA_CSR, reps, print_freq,
+                                 "concrete_convert<dia, csr>");
+      concrete_convert<dia, dia>(A, timer.CONVERT_DIA_DIA, reps, print_freq,
+                                 "concrete_convert<dia, dia>");
 
-      dynamic_convert(Aio, COO_FORMAT, COO_FORMAT, timer.CONVERT_DYN_COO_COO);
-      dynamic_convert(Aio, COO_FORMAT, CSR_FORMAT, timer.CONVERT_DYN_COO_CSR);
-      dynamic_convert(Aio, COO_FORMAT, DIA_FORMAT, timer.CONVERT_DYN_COO_DIA);
-
-      if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep + 1 << "/" << reps
-                  << "\tdynamic_convert<coo>" << std::endl;
-      }
-
-      dynamic_convert(Aio, CSR_FORMAT, COO_FORMAT, timer.CONVERT_DYN_CSR_COO);
-      dynamic_convert(Aio, CSR_FORMAT, CSR_FORMAT, timer.CONVERT_DYN_CSR_CSR);
-      dynamic_convert(Aio, CSR_FORMAT, DIA_FORMAT, timer.CONVERT_DYN_CSR_DIA);
-
-      if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep + 1 << "/" << reps
-                  << "\tdynamic_convert<csr>" << std::endl;
-      }
-
-      dynamic_convert(Aio, DIA_FORMAT, COO_FORMAT, timer.CONVERT_DYN_DIA_COO);
-      dynamic_convert(Aio, DIA_FORMAT, CSR_FORMAT, timer.CONVERT_DYN_DIA_CSR);
-      dynamic_convert(Aio, DIA_FORMAT, DIA_FORMAT, timer.CONVERT_DYN_DIA_DIA);
-
-      if (rep % print_freq == 0) {
-        std::cout << "\t Step " << rep + 1 << "/" << reps
-                  << "\tdynamic_convert<dia>" << std::endl;
-      }
+      to_dynamic_convert<dia>(A, COO_FORMAT, timer.CONVERT_DYN_DIA_COO, reps,
+                              print_freq, "to_dynamic_convert<dia>[DIA->COO]");
+      to_dynamic_convert<dia>(A, CSR_FORMAT, timer.CONVERT_DYN_DIA_CSR, reps,
+                              print_freq, "to_dynamic_convert<dia>[DIA->CSR]");
+      to_dynamic_convert<dia>(A, DIA_FORMAT, timer.CONVERT_DYN_DIA_DIA, reps,
+                              print_freq, "to_dynamic_convert<dia>[DIA->DIA]");
     }
 
     timer.statistics();
