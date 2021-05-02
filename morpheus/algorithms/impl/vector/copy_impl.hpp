@@ -43,6 +43,21 @@ void copy(const SourceType& src, DestinationType& dst, DenseVectorTag,
   Kokkos::deep_copy(dst.view(), src.view());
 }
 
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst, DenseMatrixTag,
+          DenseVectorTag) {
+  using I = typename SourceType::index_type;
+
+  dst.resize(src.nrows() * src.ncols());
+
+  for (I i = 0; i < src.nrows(); i++) {
+    for (I j = 0; j < src.ncols(); j++) {
+      I idx    = i * src.ncols() + j;
+      dst(idx) = src(i, j);
+    }
+  }
+}
+
 }  // namespace Impl
 }  // namespace Morpheus
 

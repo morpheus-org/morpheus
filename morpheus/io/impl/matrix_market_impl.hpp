@@ -34,7 +34,6 @@
 #include <morpheus/core/core.hpp>
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/algorithms/sort.hpp>
-#include <morpheus/algorithms/convert.hpp>
 #include <morpheus/algorithms/copy.hpp>
 #include <morpheus/containers/coo_matrix.hpp>
 #include <morpheus/containers/dense_matrix.hpp>
@@ -321,12 +320,12 @@ void read_matrix_market_stream(Matrix& mtx, Stream& input, Format) {
   if (banner.storage == "coordinate") {
     Morpheus::CooMatrix<ValueType, IndexType, Space> temp;
     read_coordinate_stream(temp, input, banner);
-    Morpheus::convert(temp, mtx);
+    Morpheus::copy(temp, mtx);
   } else  // banner.storage == "array"
   {
     Morpheus::DenseMatrix<ValueType, Space> temp;
     read_array_stream(temp, input, banner);
-    Morpheus::convert(temp, mtx);
+    Morpheus::copy(temp, mtx);
   }
 }
 
@@ -341,7 +340,7 @@ void read_matrix_market_stream(Matrix& mtx, Stream& input,
 
   Morpheus::Io::read_matrix_market_stream(temp, input);
 
-  Morpheus::convert(temp, mtx);
+  Morpheus::copy(temp, mtx);
 }
 
 template <typename Stream, typename ScalarType>

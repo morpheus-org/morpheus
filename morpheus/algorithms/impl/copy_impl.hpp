@@ -32,4 +32,31 @@
 
 #include <morpheus/algorithms/impl/dynamic_matrix/copy_impl.hpp>
 
+#include <morpheus/containers/fwd/coo_matrix.hpp>
+
+namespace Morpheus {
+namespace Impl {
+
+// convert src -> coo_matrix -> dst
+template <typename SourceType, typename DestinationType, typename Format1,
+          typename Format2>
+void copy(const SourceType& src, DestinationType& dst, Format1, Format2,
+          typename std::enable_if_t<!std::is_same_v<Format1, DynamicTag> &&
+                                    !std::is_same_v<Format2, DynamicTag>>* =
+              nullptr) {
+  using value_type   = typename SourceType::value_type;
+  using index_type   = typename SourceType::index_type;
+  using array_layout = typename SourceType::array_layout;
+  using memory_space = typename SourceType::memory_space;
+
+  using Coo =
+      Morpheus::CooMatrix<value_type, index_type, array_layout, memory_space>;
+  Coo tmp;
+
+  Morpheus::Impl::copy(src, tmp, Format1(), typename Coo::tag());
+  Morpheus::Impl::copy(tmp, dst, typename Coo::tag(), Format2());
+}
+}  // namespace Impl
+}  // namespace Morpheus
+
 #endif  // MORPHEUS_ALGORITHMS_IMPL_COPY_IMPL_HPP

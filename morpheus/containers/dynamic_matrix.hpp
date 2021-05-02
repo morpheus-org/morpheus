@@ -30,7 +30,7 @@
 #include <functional>
 
 #include <morpheus/core/matrix_traits.hpp>
-#include <morpheus/algorithms/convert.hpp>
+#include <morpheus/algorithms/copy.hpp>
 #include <morpheus/algorithms/print.hpp>
 #include <morpheus/containers/impl/dynamic_matrix_impl.hpp>
 #include <morpheus/containers/impl/format_tags.hpp>
@@ -86,7 +86,7 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
 
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
-                     const index_type nnz, Args &&...args) {
+                     const index_type nnz, Args &&... args) {
     auto f =
         std::bind(Impl::any_type_resize<Properties...>(), std::placeholders::_1,
                   m, n, nnz, std::forward<Args>(args)...);
@@ -144,9 +144,9 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
 
   inline void convert(const formats_e index) {
     Morpheus::CooMatrix<Properties...> temp;
-    Morpheus::convert(*this, temp);
+    Morpheus::copy(*this, temp);
     activate(index);
-    Morpheus::convert(temp, *this);
+    Morpheus::copy(temp, *this);
   }
 
   inline void convert(const int index) {

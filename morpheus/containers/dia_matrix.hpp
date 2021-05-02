@@ -28,6 +28,7 @@
 
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
+#include <morpheus/algorithms/copy.hpp>
 #include <morpheus/containers/vector.hpp>
 #include <morpheus/containers/dense_matrix.hpp>
 #include <morpheus/containers/impl/format_tags.hpp>
@@ -110,7 +111,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   // Construct from another matrix type
   template <typename MatrixType>
   DiaMatrix(const MatrixType &matrix) : _name("DiaMatrix") {
-    Morpheus::convert(matrix, *this);
+    Morpheus::copy(matrix, *this);
   }
 
   // Resize matrix dimensions and underlying storage
@@ -128,7 +129,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   // Assignment from another matrix type
   template <typename MatrixType>
   reference operator=(const MatrixType &matrix) {
-    Morpheus::convert(matrix, *this);
+    Morpheus::copy(matrix, *this);
     return *this;
   }
 
