@@ -24,6 +24,7 @@ endfunction()
 set( SOURCES_IDIOMATIC_BENCHMARKS
     spmv.cpp
     convert.cpp
+    spmv-omp.cpp
 )
 
 string( REPLACE ".cpp" "" BASENAMES_IDIOMATIC_BENCHMARKS "${SOURCES_IDIOMATIC_BENCHMARKS}" )

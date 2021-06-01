@@ -37,13 +37,22 @@ mkdir -p $RESULTS_PATH
 
 PROGRESS="$RESULTS_PATH/progress_$DATASET.txt"
 
+ITER=200
 REPS=10
-# REPS=5
 SEED=0
 EXECUTABLE="$ROOT_PATH/build/benchmarks/spmv"
 
+MATRICES=("/work/e609/e609/cstyl/morpheus/data/clSpMV/cant"
+        "/work/e609/e609/cstyl/morpheus/data/clSpMV/consph"
+        "/work/e609/e609/cstyl/morpheus/data/clSpMV/mac_econ_fwd500"
+        "/work/e609/e609/cstyl/morpheus/data/clSpMV/mc2depi"
+        "/work/e609/e609/cstyl/morpheus/data/clSpMV/pdb1HYS"
+        "/work/e609/e609/cstyl/morpheus/data/clSpMV/pwtk"
+        "/work/e609/e609/cstyl/morpheus/data/clSpMV/rma10"
+        "/work/e609/e609/cstyl/morpheus/data/clSpMV/shipsec1")
 # for each matrix in test space
-for mat in "$MATRIX_PATH"/*/
+# for mat in "$MATRIX_PATH"/*/
+for mat in "${MATRICES[@]}"
 do
 
     BASE=$(basename $mat)
@@ -51,13 +60,14 @@ do
     MATRIX="$DIR/$BASE/$BASE.mtx"
 
     echo -e "\t$BASE" 2>&1 | tee -a "$PROGRESS"
-
-    OUTFILE="$RESULTS_PATH/$DATASET/$BASE/out.txt"
-    ERRFILE="$RESULTS_PATH/$DATASET/$BASE/out-err.txt"
+    
+    OUTDIR="$RESULTS_PATH/$DATASET/$BASE"
+    OUTFILE="$OUTDIR/out.txt"
+    ERRFILE="$OUTDIR/out-err.txt"
     mkdir -p $(dirname $OUTFILE)
 
-    launch_cmd="srun -n 1 --ntasks=1 $EXECUTABLE $MATRIX $SEED $REPS 2>&1 | tee -a $OUTFILE"
+    launch_cmd="srun -n 1 --ntasks=1 $EXECUTABLE $MATRIX $SEED $ITER"
     SCHEDULER_FILES="--output=$OUTFILE --error=$ERRFILE"
-    $SCHEDULER_LAUNCER $SCHEDULER_ARGS $SCHEDULER_FILES submit.sh "$launch_cmd"
-
+    $SCHEDULER_LAUNCER $SCHEDULER_ARGS $SCHEDULER_FILES submit.sh "$launch_cmd" "$OUTDIR"
+    
 done
