@@ -21,10 +21,7 @@
  * limitations under the License.
  */
 
-#include <morpheus/io/matrix_market.hpp>
-#include <morpheus/containers/dynamic_matrix.hpp>
-#include <morpheus/containers/vector.hpp>
-#include <morpheus/algorithms/multiply.hpp>
+#include <morpheus/morpheus.hpp>
 
 #include "timer.hpp"
 #include <Kokkos_Random.hpp>

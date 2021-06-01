@@ -28,4 +28,6 @@
 #include <morpheus/algorithms/algorithms.hpp>
 #include <morpheus/io/io.hpp>
 
+#include <morpheus/version.hpp>
+
 #endif  // MORPEHUS_MORPEHUS_HPP

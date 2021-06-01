@@ -21,11 +21,7 @@
  * limitations under the License.
  */
 
-#include <morpheus/io/matrix_market.hpp>
-#include <morpheus/containers/dynamic_matrix.hpp>
-#include <morpheus/algorithms/copy.hpp>
-
-#include <morpheus/algorithms/print.hpp>
+#include <morpheus/morpheus.hpp>
 
 #include "timer.hpp"
 #include <cstdlib>
