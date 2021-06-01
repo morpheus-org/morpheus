@@ -41,21 +41,8 @@ struct copy_fn {
   using result_type = void;
 
   template <typename SourceType, typename DestinationType>
-  result_type operator()(
-      const SourceType& src, DestinationType& dst,
-      typename std::enable_if_t<std::is_same_v<SourceType, DestinationType>>* =
-          nullptr) {
+  result_type operator()(const SourceType& src, DestinationType& dst) {
     Morpheus::copy(src, dst);
-  }
-
-  template <typename SourceType, typename DestinationType>
-  result_type operator()(
-      const SourceType& src, DestinationType& dst,
-      typename std::enable_if_t<!std::is_same_v<SourceType, DestinationType>>* =
-          nullptr) {
-    std::string msg("Invalid use of the copy interface: ");
-    throw Morpheus::RuntimeException(msg + src.name() + " " + dst.name() +
-                                     "\n");
   }
 };
 

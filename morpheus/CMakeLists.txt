@@ -1,7 +1,7 @@
 # Library Targets
 add_library(morpheus INTERFACE)
 add_library(Morpheus::morpheus ALIAS morpheus)
-message(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
+
 target_include_directories(morpheus INTERFACE 
 	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
 	$<INSTALL_INTERFACE:include>)

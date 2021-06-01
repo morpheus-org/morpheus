@@ -12,6 +12,7 @@ enable_language(CXX)
 set(Morpheus_DIR ${Morpheus_SOURCE_DIR})
 set(Morpheus_INCLUDE_DIR ${Morpheus_SOURCE_DIR}/morpheus)
 set(Morpheus_EXAMPLES_DIR ${Morpheus_SOURCE_DIR}/examples)
+set(Morpheus_BENCHMARKS_DIR ${Morpheus_SOURCE_DIR}/benchmarks)
 
 # Write morpheus version
 write_version()

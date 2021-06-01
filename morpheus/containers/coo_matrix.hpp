@@ -29,7 +29,7 @@
 #include <morpheus/core/exceptions.hpp>
 #include <morpheus/core/matrix_traits.hpp>
 #include <morpheus/algorithms/sort.hpp>
-#include <morpheus/algorithms/convert.hpp>
+#include <morpheus/algorithms/copy.hpp>
 #include <morpheus/containers/vector.hpp>
 #include <morpheus/containers/impl/format_tags.hpp>
 
@@ -114,7 +114,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   // Construct from another matrix type
   template <typename MatrixType>
   CooMatrix(const MatrixType &matrix) : _name("CooMatrix") {
-    Morpheus::convert(matrix, *this);
+    Morpheus::copy(matrix, *this);
   }
 
   // Resize matrix dimensions and underlying storage
@@ -131,7 +131,7 @@ class CooMatrix : public Impl::MatrixTraits<Properties...> {
   // Assignment from another matrix type
   template <typename MatrixType>
   reference operator=(const MatrixType &matrix) {
-    Morpheus::convert(matrix, *this);
+    Morpheus::copy(matrix, *this);
     return *this;
   }
 

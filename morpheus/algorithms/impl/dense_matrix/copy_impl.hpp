@@ -26,6 +26,7 @@
 
 #include <morpheus/core/core.hpp>
 #include <morpheus/containers/impl/format_tags.hpp>
+#include <morpheus/algorithms/impl/vector/copy_impl.hpp>
 
 namespace Morpheus {
 // forward decl
@@ -42,6 +43,46 @@ void copy(const SourceType& src, DestinationType& dst, DenseMatrixTag,
   dst.resize(rows, cols);
   // Kokkos has src and dst the other way round
   Kokkos::deep_copy(dst.view(), src.view());
+}
+
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst, DenseMatrixTag, CooTag) {
+  using I = typename SourceType::index_type;
+  using V = typename SourceType::value_type;
+
+  // Count non-zeros
+  I nnz = 0;
+  for (I i = 0; i < src.nrows(); i++) {
+    for (I j = 0; j < src.ncols(); j++) {
+      if (src(i, j) != V(0)) nnz = nnz + 1;
+    }
+  }
+
+  dst.resize(src.nrows(), src.ncols(), nnz);
+
+  for (I i = 0, n = 0; i < src.nrows(); i++) {
+    for (I j = 0; j < src.ncols(); j++) {
+      if (src(i, j) != V(0)) {
+        dst.row_indices[n]    = i;
+        dst.column_indices[n] = j;
+        dst.values[n]         = src(i, j);
+        n                     = n + 1;
+      }
+    }
+  }
+}
+
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst, CooTag, DenseMatrixTag) {
+  using I = typename SourceType::index_type;
+
+  dst.resize(src.nrows(), src.ncols());
+
+  for (I n = 0; n < src.nnnz(); n++) {
+    I i       = src.row_indices[n];
+    I j       = src.column_indices[n];
+    dst(i, j) = src.values[n];
+  }
 }
 
 }  // namespace Impl
