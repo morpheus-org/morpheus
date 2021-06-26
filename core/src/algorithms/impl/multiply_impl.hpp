@@ -24,13 +24,13 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
 
-#include <morpheus/algorithms/impl/coo_matrix/multiply_impl_serial.hpp>
-#include <morpheus/algorithms/impl/csr_matrix/multiply_impl_serial.hpp>
-#include <morpheus/algorithms/impl/dia_matrix/multiply_impl_serial.hpp>
+#include <morpheus/algorithms/impl/coo_matrix/serial/multiply_impl.hpp>
+#include <morpheus/algorithms/impl/csr_matrix/serial/multiply_impl.hpp>
+#include <morpheus/algorithms/impl/dia_matrix/serial/multiply_impl.hpp>
 
-#include <morpheus/algorithms/impl/coo_matrix/multiply_impl_openmp.hpp>
-#include <morpheus/algorithms/impl/csr_matrix/multiply_impl_openmp.hpp>
-#include <morpheus/algorithms/impl/dia_matrix/multiply_impl_openmp.hpp>
+#include <morpheus/algorithms/impl/coo_matrix/omp/multiply_impl.hpp>
+#include <morpheus/algorithms/impl/csr_matrix/omp/multiply_impl.hpp>
+#include <morpheus/algorithms/impl/dia_matrix/omp/multiply_impl.hpp>
 
 #include <morpheus/algorithms/impl/dynamic_matrix/multiply_impl.hpp>
 

@@ -1,5 +1,5 @@
 /**
- * multiply_impl_serial.hpp
+ * multiply_impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_SERIAL_MULTIPLY_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_SERIAL_MULTIPLY_IMPL_HPP
 
 #include <morpheus/core/type_traits.hpp>
 #include <morpheus/containers/impl/format_tags.hpp>
@@ -56,4 +56,4 @@ void multiply(
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_SERIAL_MULTIPLY_IMPL_HPP

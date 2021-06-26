@@ -1,0 +1,38 @@
+# From CMake 3.10 documentation
+
+#This can run at any time
+MORPHEUS_OPTION(CXX_STANDARD "" STRING "The C++ standard for Morpheus to use: 17, or 20. If empty, this will default to CMAKE_CXX_STANDARD. If both CMAKE_CXX_STANDARD and Morpheus_CXX_STANDARD are empty, this will default to 17")
+
+# Set CXX standard flags
+SET(MORPHEUS_ENABLE_CXX17 OFF)
+SET(MORPHEUS_ENABLE_CXX20 OFF)
+IF (MORPHEUS_CXX_STANDARD)
+  IF (${MORPHEUS_CXX_STANDARD} STREQUAL "c++98")
+    MESSAGE(FATAL_ERROR "Morpheus does not support C++98 - minimum C++17")
+  ELSEIF (${MORPHEUS_CXX_STANDARD} STREQUAL "c++11")
+    MESSAGE(FATAL_ERROR "Morpheus does not support C++98 - minimum C++17")
+  ELSEIF(${MORPHEUS_CXX_STANDARD} STREQUAL "c++14")
+    MESSAGE(WARNING "Morpheus does not support C++98 - minimum C++17")
+    SET(MORPHEUS_CXX_STANDARD "14")
+  ELSEIF(${MORPHEUS_CXX_STANDARD} STREQUAL "c++17")
+    MESSAGE(WARNING "Deprecated Morpheus C++ standard set as 'c++17'. Use '17' instead.")
+    SET(MORPHEUS_CXX_STANDARD "17")
+  ELSEIF(${MORPHEUS_CXX_STANDARD} STREQUAL "c++1y")
+    MESSAGE(WARNING "Deprecated Morpheus C++ standard set as 'c++1y'. Use '1Y' instead.")
+    SET(MORPHEUS_CXX_STANDARD "1Y")
+  ELSEIF(${MORPHEUS_CXX_STANDARD} STREQUAL "c++1z")
+    MESSAGE(WARNING "Deprecated Morpheus C++ standard set as 'c++1z'. Use '1Z' instead.")
+    SET(MORPHEUS_CXX_STANDARD "1Z")
+  ELSEIF(${MORPHEUS_CXX_STANDARD} STREQUAL "c++2a")
+    MESSAGE(WARNING "Deprecated Morpheus C++ standard set as 'c++2a'. Use '2A' instead.")
+    SET(MORPHEUS_CXX_STANDARD "2A")
+  ENDIF()
+ENDIF()
+
+IF (NOT MORPHEUS_CXX_STANDARD AND NOT CMAKE_CXX_STANDARD)
+  MESSAGE(STATUS "Setting default Morpheus CXX standard to 17")
+  SET(MORPHEUS_CXX_STANDARD "17")
+ELSEIF(NOT MORPHEUS_CXX_STANDARD)
+  MESSAGE(STATUS "Setting default Morpheus CXX standard to ${CMAKE_CXX_STANDARD}")
+  SET(MORPHEUS_CXX_STANDARD ${CMAKE_CXX_STANDARD})
+ENDIF()

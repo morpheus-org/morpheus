@@ -1,5 +1,5 @@
 /**
- * multiply_impl_serial.hpp
+ * multiply_impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,10 +21,14 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_OMP_MULTIPLY_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_OMP_MULTIPLY_IMPL_HPP
+
+#include <morpheus/core/macros.hpp>
+#if defined(MORPHEUS_ENABLE_OPENMP)
 
 #include <morpheus/core/type_traits.hpp>
+#include <morpheus/core/exceptions.hpp>
 #include <morpheus/containers/impl/format_tags.hpp>
 
 namespace Morpheus {
@@ -34,28 +38,24 @@ template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
 void multiply(
     const ExecSpace& space, const LinearOperator& A, const MatrixOrVector1& x,
-    MatrixOrVector2& y, DiaTag, DenseVectorTag, DenseVectorTag,
+    MatrixOrVector2& y, CooTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_execution_space_v<ExecSpace> &&
-        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::is_OpenMP_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
   using I = typename LinearOperator::index_type;
 
-  for (I i = 0; i < (int)A.diagonal_offsets.size(); i++) {
-    const I k       = A.diagonal_offsets[i];  // diagonal offset
-    const I i_start = std::max(0, -k);
-    const I j_start = std::max(0, k);
-    const I N       = std::min(A.nrows() - i_start, A.ncols() - j_start);
-
-    for (I n = 0; n < N; n++) {
-      y[i_start + n] += A.values(i, j_start + n) * x[j_start + n];
-    }
+// assumes A is sorted
+#pragma omp parallel for
+  for (I n = 0; n < A.nnnz(); n++) {
+    y[A.row_indices[n]] += A.values[n] * x[A.column_indices[n]];
   }
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_MULTIPLY_IMPL_SERIAL_HPP
+#endif  // MORPHEUS_ENABLE_OPENMP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_COO_MATRIX_OMP_MULTIPLY_IMPL_HPP

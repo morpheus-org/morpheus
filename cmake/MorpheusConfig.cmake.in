@@ -1,24 +1,62 @@
+# No need for policy push/pop. CMake also manages a new entry for scripts
+# loaded by include() and find_package() commands except when invoked with
+# the NO_POLICY_SCOPE option
+# CMP0057 + NEW -> IN_LIST operator in IF(...)
+CMAKE_POLICY(SET CMP0057 NEW)
+
+# Compute paths
 @PACKAGE_INIT@
 
-cmake_minimum_required(VERSION 3.12)
+#Find dependencies
+INCLUDE(CMakeFindDependencyMacro)
 
-@Morpheus_BUILD_DIR_EXPORT_SETTINGS@
+#This needs to go above the MorpheusTargets in case
+#the Morpheus targets depend in some way on the TPL imports
+@MORPHEUS_TPL_EXPORTS@
 
-# make the bundled find modules in this directory available
-list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+GET_FILENAME_COMPONENT(Morpheus_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+INCLUDE("${Morpheus_CMAKE_DIR}/MorpheusTargets.cmake")
+INCLUDE("${Morpheus_CMAKE_DIR}/MorpheusConfigCommon.cmake")
+UNSET(Morpheus_CMAKE_DIR)
 
-include(CMakeFindDependencyMacro)
+# check for conflicts
+IF("launch_compiler" IN_LIST Morpheus_FIND_COMPONENTS AND
+    "separable_compilation" IN_LIST Morpheus_FIND_COMPONENTS)
+    MESSAGE(STATUS "'launch_compiler' implies global redirection of targets depending on Morpheus to appropriate compiler.")
+    MESSAGE(STATUS "'separable_compilation' implies explicitly defining where redirection occurs via 'morphues_compilation(PROJECT|TARGET|SOURCE|DIRECTORY ...)'")
+    MESSAGE(FATAL_ERROR "Conflicting COMPONENTS: 'launch_compiler' and 'separable_compilation'")
+ENDIF()
 
-include("${CMAKE_CURRENT_LIST_DIR}/MorpheusTargets.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/MorpheusConfigVersion.cmake")
+IF("launch_compiler" IN_LIST Morpheus_FIND_COMPONENTS)
+    #
+    # if find_package(Morpheus COMPONENTS launch_compiler) then rely on the
+    # RULE_LAUNCH_COMPILE and RULE_LAUNCH_LINK to always redirect to the
+    # appropriate compiler for Morpheus
+    #
 
-find_dependency(Kokkos REQUIRED)
+    MESSAGE(STATUS "morpheus_launch_compiler is enabled globally. C++ compiler commands with -DMORPHEUS_DEPENDENCE will be redirected to the appropriate compiler for Morpheus")
+    morpheus_compilation(
+        GLOBAL
+        CHECK_CUDA_COMPILES)
 
-list(POP_FRONT CMAKE_MODULE_PATH)
+ELSEIF(@Morpheus_ENABLE_CUDA@ AND NOT "separable_compilation" IN_LIST Morpheus_FIND_COMPONENTS)
+    #
+    # if CUDA was enabled, separable compilation was not specified, and current compiler
+    # cannot compile CUDA, then set the RULE_LAUNCH_COMPILE and RULE_LAUNCH_LINK globally and
+    # kokkos_launch_compiler will re-direct to the compiler used to compile CUDA code during installation.
+    # kokkos_launch_compiler will re-direct if ${CMAKE_CXX_COMPILER} and -DKOKKOS_DEPENDENCE is present,
+    # otherwise, the original command will be executed
+    #
 
-check_required_components(morpheus)
+    # run test to see if CMAKE_CXX_COMPILER=nvcc_wrapper
+    morpheus_compiler_is_nvcc(IS_NVCC ${CMAKE_CXX_COMPILER})
 
-set(${CMAKE_FIND_PACKAGE_NAME}_CONFIG "${CMAKE_CURRENT_LIST_FILE}")
+    # if not nvcc_wrapper and Kokkos_LAUNCH_COMPILER was not set to OFF
+    IF(NOT IS_NVCC AND (NOT DEFINED Morpheus_LAUNCH_COMPILER OR Morpheus_LAUNCH_COMPILER))
+        MESSAGE(STATUS "Morpheus_launch_compiler is enabled globally. C++ compiler commands with -DMORPHEUS_DEPENDENCE will be redirected to the appropriate compiler for Morpheus")
+        morpheus_compilation(GLOBAL)
+    ENDIF()
 
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(${CMAKE_FIND_PACKAGE_NAME} CONFIG_MODE)
+    # be mindful of the environment, pollution is bad
+    UNSET(IS_NVCC)
+ENDIF()

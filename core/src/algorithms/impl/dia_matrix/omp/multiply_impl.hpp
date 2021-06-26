@@ -1,5 +1,5 @@
 /**
- * multiply_impl_openmp.hpp
+ * multiply_impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_MULTIPLY_IMPL_OPENMP_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_MULTIPLY_IMPL_OPENMP_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_OMP_MULTIPLY_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_OMP_MULTIPLY_IMPL_HPP
 
 #include <morpheus/core/macros.hpp>
 #if defined(MORPHEUS_ENABLE_OPENMP)
@@ -38,7 +38,7 @@ template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
 void multiply(
     const ExecSpace& space, const LinearOperator& A, const MatrixOrVector1& x,
-    MatrixOrVector2& y, CsrTag, DenseVectorTag, DenseVectorTag,
+    MatrixOrVector2& y, DiaTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_execution_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
@@ -46,15 +46,17 @@ void multiply(
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
   using I = typename LinearOperator::index_type;
-  using T = typename LinearOperator::value_type;
 
 #pragma omp parallel for
-  for (I i = 0; i < A.nrows(); i++) {
-    T sum = y[i];
-    for (I jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
-      sum += A.values[jj] * x[A.column_indices[jj]];
+  for (I i = 0; i < (int)A.diagonal_offsets.size(); i++) {
+    const I k       = A.diagonal_offsets[i];  // diagonal offset
+    const I i_start = std::max(0, -k);
+    const I j_start = std::max(0, k);
+    const I N       = std::min(A.nrows() - i_start, A.ncols() - j_start);
+
+    for (I n = 0; n < N; n++) {
+      y[i_start + n] += A.values(i, j_start + n) * x[j_start + n];
     }
-    y[i] = sum;
   }
 }
 
@@ -62,4 +64,4 @@ void multiply(
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_ENABLE_OPENMP
-#endif  // MORPHEUS_ALGORITHMS_IMPL_CSR_MATRIX_MULTIPLY_IMPL_OPENMP_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_DIA_MATRIX_OMP_MULTIPLY_IMPL_HPP
