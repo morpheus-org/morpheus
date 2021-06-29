@@ -21,17 +21,26 @@
  * limitations under the License.
  */
 
-#ifndef MORPEHUS_MORPEHUS_HPP
-#define MORPEHUS_MORPEHUS_HPP
+#ifndef MORPHEUS_CORE_HPP
+#define MORPHEUS_CORE_HPP
 
 #include <iostream>
 
 #include <Morpheus_Version.hpp>
 #include <Morpheus_Macros.hpp>
 
-#include <Morpheus_Containers.hpp>
-#include <Morpheus_Algorithms.hpp>
-#include <Morpheus_IO.hpp>
+#include <Morpheus_CooMatrix.hpp>
+#include <Morpheus_CsrMatrix.hpp>
+#include <Morpheus_DiaMatrix.hpp>
+#include <Morpheus_DynamicMatrix.hpp>
+#include <Morpheus_DenseMatrix.hpp>
+#include <Morpheus_DenseVector.hpp>
+
+#include <Morpheus_Multiply.hpp>
+#include <Morpheus_Print.hpp>
+#include <Morpheus_Sort.hpp>
+
+#include <Morpheus_MatrixMarket.hpp>
 
 #include <Kokkos_Core.hpp>
 
@@ -72,4 +81,4 @@ void finalize() { Kokkos::finalize(); }
 
 }  // namespace Morpheus
 
-#endif  // MORPEHUS_MORPEHUS_HPP
+#endif  // MORPHEUS_CORE_HPP
