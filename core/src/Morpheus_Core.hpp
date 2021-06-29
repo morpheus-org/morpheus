@@ -1,5 +1,5 @@
 /**
- * morpheus.hpp
+ * Morpheus_Core.hpp
  *
  * EPCC, The University of Edinburgh
  *
