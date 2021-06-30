@@ -21,28 +21,27 @@ GET_DIRECTORY_PROPERTY(HAS_PARENT PARENT_DIRECTORY)
 INCLUDE(${MORPHEUS_SRC_PATH}/cmake/morpheus_functions.cmake)
 INCLUDE(${MORPHEUS_SRC_PATH}/cmake/morpheus_pick_cxx_std.cmake)
 
-# SET(KOKKOS_ENABLED_OPTIONS)      #exported in config file
-# SET(KOKKOS_ENABLED_DEVICES)      #exported in config file
-# SET(KOKKOS_ENABLED_TPLS)         #exported in config file
-# SET(KOKKOS_ENABLED_ARCH_LIST)    #exported in config file
+SET(MORPHEUS_ENABLED_OPTIONS)      #exported in config file
+SET(MORPHEUS_ENABLED_DEVICES)      #exported in config file
+SET(MORPHEUS_ENABLED_TPLS)         #exported in config file
+SET(MORPHEUS_ENABLED_ARCH_LIST)    #exported in config file
 
-# #These are helper flags used for sanity checks during config
-# #Certain features should depend on other features being configured first
-# SET(KOKKOS_CFG_DAG_NONE              On) #sentinel to indicate no dependencies
-# SET(KOKKOS_CFG_DAG_DEVICES_DONE      Off)
-# SET(KOKKOS_CFG_DAG_OPTIONS_DONE      Off)
-# SET(KOKKOS_CFG_DAG_ARCH_DONE         Off)
-# SET(KOKKOS_CFG_DAG_CXX_STD_DONE      Off)
-# SET(KOKKOS_CFG_DAG_COMPILER_ID_DONE  Off)
-# FUNCTION(KOKKOS_CFG_DEPENDS SUCCESSOR PRECURSOR)
-#   SET(PRE_FLAG  KOKKOS_CFG_DAG_${PRECURSOR})
-#   SET(POST_FLAG KOKKOS_CFG_DAG_${SUCCESSOR})
-#   IF (NOT ${PRE_FLAG})
-#     MESSAGE(FATAL_ERROR "Bad CMake refactor: feature ${SUCCESSOR} cannot be configured until ${PRECURSOR} is configured")
-#   ENDIF()
-#   GLOBAL_SET(${POST_FLAG} On)
-# ENDFUNCTION()
-
+#These are helper flags used for sanity checks during config
+#Certain features should depend on other features being configured first
+SET(MORPHEUS_CFG_DAG_NONE              On) #sentinel to indicate no dependencies
+SET(MORPHEUS_CFG_DAG_DEVICES_DONE      Off)
+SET(MORPHEUS_CFG_DAG_OPTIONS_DONE      Off)
+SET(MORPHEUS_CFG_DAG_ARCH_DONE         Off)
+SET(MORPHEUS_CFG_DAG_CXX_STD_DONE      Off)
+SET(MORPHEUS_CFG_DAG_COMPILER_ID_DONE  Off)
+FUNCTION(MORPHEUS_CFG_DEPENDS SUCCESSOR PRECURSOR)
+  SET(PRE_FLAG  MORPHEUS_CFG_DAG_${PRECURSOR})
+  SET(POST_FLAG MORPHEUS_CFG_DAG_${SUCCESSOR})
+  IF (NOT ${PRE_FLAG})
+    MESSAGE(FATAL_ERROR "Bad CMake refactor: feature ${SUCCESSOR} cannot be configured until ${PRECURSOR} is configured")
+  ENDIF()
+  GLOBAL_SET(${POST_FLAG} On)
+ENDFUNCTION()
 
 LIST(APPEND CMAKE_MODULE_PATH cmake/Modules)
 
@@ -122,8 +121,6 @@ ENDIF()
 # will either call raw CMake or TriBITS
 # These are functions like MORPHEUS_INCLUDE_DIRECTORIES
 INCLUDE(${MORPHEUS_SRC_PATH}/cmake/morpheus_tribits.cmake)
-
-
 # Check the environment and set certain variables
 # to allow platform-specific checks
 INCLUDE(${MORPHEUS_SRC_PATH}/cmake/morpheus_check_env.cmake)
@@ -177,9 +174,6 @@ MORPHEUS_PROCESS_SUBPACKAGES()
 # E) If Morpheus itself is enabled, process the Morpheus package
 #
 
-MORPHEUS_PACKAGE_DEF()
-MORPHEUS_EXCLUDE_AUTOTOOLS_FILES()
-MORPHEUS_PACKAGE_POSTPROCESS()
 MORPHEUS_CONFIGURE_CORE()
 
 IF (NOT Kokkos_INSTALL_TESTING)
