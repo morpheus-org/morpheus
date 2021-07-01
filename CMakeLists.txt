@@ -176,15 +176,15 @@ MORPHEUS_PROCESS_SUBPACKAGES()
 
 MORPHEUS_CONFIGURE_CORE()
 
-IF (NOT Kokkos_INSTALL_TESTING)
+IF (NOT Morpheus_INSTALL_TESTING)
   ADD_LIBRARY(morpheus INTERFACE)
   #Make sure in-tree projects can reference this as Morpheus::
   #to match the installed target names
   ADD_LIBRARY(Morpheus::morpheus ALIAS morpheus)
   TARGET_LINK_LIBRARIES(morpheus INTERFACE morpheuscore)
-  KOKKOS_INTERNAL_ADD_LIBRARY_INSTALL(morpheus)
+  MORPHEUS_INTERNAL_ADD_LIBRARY_INSTALL(morpheus)
 ENDIF()
-INCLUDE(${KOKKOS_SRC_PATH}/cmake/morpheus_install.cmake)
+INCLUDE(${MORPHEUS_SRC_PATH}/cmake/morpheus_install.cmake)
 
 # nvcc_wrapper is Kokkos' wrapper for NVIDIA's NVCC CUDA compiler.
 # Morpheus needs nvcc_wrapper in order to build.  Other libraries and
