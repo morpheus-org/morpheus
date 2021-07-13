@@ -1,9 +1,9 @@
-MORPHEUS_SUBPACKAGE(Core)
+morpheus_subpackage(Core)
 
-IF (NOT Morpheus_INSTALL_TESTING)
-  ADD_SUBDIRECTORY(src)
-ENDIF()
+if(NOT Morpheus_INSTALL_TESTING)
+  add_subdirectory(src)
+endif()
 
-MORPHEUS_ADD_TEST_DIRECTORIES(tests)
-MORPHEUS_ADD_TEST_DIRECTORIES(benchmarks)
-MORPHEUS_ADD_EXAMPLE_DIRECTORIES(example)
+morpheus_add_test_directories(tests)
+morpheus_add_test_directories(benchmarks)
+morpheus_add_example_directories(example)
