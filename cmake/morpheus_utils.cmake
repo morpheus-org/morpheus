@@ -32,21 +32,34 @@ endmacro(MORPHEUS_PACKAGE_DECL)
 
 macro(MORPHEUS_PACKAGE_POSTPROCESS)
   include(CMakePackageConfigHelpers)
-  configure_package_config_file(
-    cmake/MorpheusConfig.cmake.in "${Morpheus_BINARY_DIR}/MorpheusConfig.cmake"
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus)
-  write_basic_package_version_file(
-    "${Morpheus_BINARY_DIR}/MorpheusConfigVersion.cmake"
-    VERSION
-      "${Morpheus_VERSION_MAJOR}.${Morpheus_VERSION_MINOR}.${Morpheus_VERSION_PATCH}"
-    COMPATIBILITY SameMajorVersion)
-  install(FILES "${Morpheus_BINARY_DIR}/MorpheusConfig.cmake"
-                "${Morpheus_BINARY_DIR}/MorpheusConfigVersion.cmake"
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus)
-  install(
-    EXPORT MorpheusTargets
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus
-    NAMESPACE Morpheus::)
+  if(NOT Morpheus_INSTALL_TESTING)
+    configure_package_config_file(
+      cmake/MorpheusConfig.cmake.in
+      "${Morpheus_BINARY_DIR}/MorpheusConfig.cmake"
+      INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus)
+
+    write_basic_package_version_file(
+      "${Morpheus_BINARY_DIR}/MorpheusConfigVersion.cmake"
+      VERSION "${Morpheus_VERSION}"
+      COMPATIBILITY SameMajorVersion)
+
+    install(FILES "${Morpheus_BINARY_DIR}/MorpheusConfig.cmake"
+                  "${Morpheus_BINARY_DIR}/MorpheusConfigVersion.cmake"
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus)
+
+    install(
+      EXPORT MorpheusTargets
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus
+      NAMESPACE Morpheus::)
+  else()
+    write_basic_package_version_file(
+      "${CMAKE_CURRENT_BINARY_DIR}/MorpheusConfigVersion.cmake"
+      VERSION "${Morpheus_VERSION}"
+      COMPATIBILITY SameMajorVersion)
+
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/MorpheusConfigVersion.cmake
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus)
+  endif()
 endmacro(MORPHEUS_PACKAGE_POSTPROCESS)
 
 macro(MORPHEUS_PROCESS_SUBPACKAGES)
@@ -61,8 +74,6 @@ macro(MORPHEUS_SUBPACKAGE NAME)
   set(PACKAGE_NAME ${PACKAGE_NAME}${NAME})
   string(TOUPPER ${PACKAGE_NAME} PACKAGE_NAME_UC)
   set(${PACKAGE_NAME}_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-  # ADD_INTERFACE_LIBRARY(PACKAGE_${PACKAGE_NAME})
-  # GLOBAL_SET(${PACKAGE_NAME}_LIBS "")
 endmacro()
 
 macro(MORPHEUS_ADD_TEST_DIRECTORIES)
@@ -353,4 +364,118 @@ function(MORPHEUS_INCLUDE_DIRECTORIES)
   cmake_parse_arguments(INC "REQUIRED_DURING_INSTALLATION_TESTING" "" ""
                         ${ARGN})
   include_directories(${INC_UNPARSED_ARGUMENTS})
+endfunction()
+
+function(MORPHEUS_ADD_EXECUTABLE_AND_TEST ROOT_NAME)
+  cmake_parse_arguments(PARSE "" "" "SOURCES;CATEGORIES;ARGS" ${ARGN})
+  verify_empty(MORPHEUS_ADD_EXECUTABLE_AND_TEST ${PARSE_UNPARSED_ARGUMENTS})
+
+  morpheus_add_test_executable(${ROOT_NAME} SOURCES ${PARSE_SOURCES})
+  if(PARSE_ARGS)
+    set(TEST_NUMBER 0)
+    foreach(ARG_STR ${PARSE_ARGS})
+      # This is passed as a single string blob to match TriBITS behavior We need
+      # this to be turned into a list
+      string(REPLACE " " ";" ARG_STR_LIST ${ARG_STR})
+      list(APPEND TEST_NAME "${ROOT_NAME}${TEST_NUMBER}")
+      math(EXPR TEST_NUMBER "${TEST_NUMBER} + 1")
+      morpheus_add_test(
+        NAME
+        ${TEST_NAME}
+        EXE
+        ${ROOT_NAME}
+        FAIL_REGULAR_EXPRESSION
+        "  FAILED  "
+        ARGS
+        ${ARG_STR_LIST})
+    endforeach()
+  else()
+    morpheus_add_test(NAME ${ROOT_NAME} EXE ${ROOT_NAME}
+                      FAIL_REGULAR_EXPRESSION "  FAILED  ")
+  endif()
+endfunction()
+
+macro(MORPHEUS_ADD_TEST_EXECUTABLE ROOT_NAME)
+  cmake_parse_arguments(PARSE "" "" "SOURCES" ${ARGN})
+  morpheus_add_executable(
+    ${ROOT_NAME} SOURCES ${PARSE_SOURCES} ${PARSE_UNPARSED_ARGUMENTS}
+    TESTONLYLIBS morpheus_gtest)
+  set(EXE_NAME ${PACKAGE_NAME}_${ROOT_NAME})
+endmacro()
+
+function(MORPHEUS_ADD_TEST)
+  cmake_parse_arguments(
+    TEST "WILL_FAIL;"
+    "FAIL_REGULAR_EXPRESSION;PASS_REGULAR_EXPRESSION;EXE;NAME;TOOL"
+    "CATEGORIES;ARGS" ${ARGN})
+  if(TEST_EXE)
+    set(EXE_ROOT ${TEST_EXE})
+  else()
+    set(EXE_ROOT ${TEST_NAME})
+  endif()
+  # Prepend package name to the test name These should be the full target name
+  set(TEST_NAME ${PACKAGE_NAME}_${TEST_NAME})
+  set(EXE ${PACKAGE_NAME}_${EXE_ROOT})
+  if(WIN32)
+    add_test(
+      NAME ${TEST_NAME}
+      WORKING_DIRECTORY ${LIBRARY_OUTPUT_PATH}
+      COMMAND ${EXE}${CMAKE_EXECUTABLE_SUFFIX} ${TEST_ARGS})
+  else()
+    add_test(NAME ${TEST_NAME} COMMAND ${EXE} ${TEST_ARGS})
+  endif()
+  if(TEST_WILL_FAIL)
+    set_tests_properties(${TEST_NAME} PROPERTIES WILL_FAIL ${TEST_WILL_FAIL})
+  endif()
+  if(TEST_FAIL_REGULAR_EXPRESSION)
+    set_tests_properties(
+      ${TEST_NAME} PROPERTIES FAIL_REGULAR_EXPRESSION
+                              ${TEST_FAIL_REGULAR_EXPRESSION})
+  endif()
+  if(TEST_PASS_REGULAR_EXPRESSION)
+    set_tests_properties(
+      ${TEST_NAME} PROPERTIES PASS_REGULAR_EXPRESSION
+                              ${TEST_PASS_REGULAR_EXPRESSION})
+  endif()
+  verify_empty(MORPHEUS_ADD_TEST ${TEST_UNPARSED_ARGUMENTS})
+endfunction()
+
+function(MORPHEUS_ADD_EXECUTABLE ROOT_NAME)
+  cmake_parse_arguments(PARSE "TESTONLY" "" "SOURCES;TESTONLYLIBS" ${ARGN})
+
+  set(EXE_NAME ${PACKAGE_NAME}_${ROOT_NAME})
+  add_executable(${EXE_NAME} ${PARSE_SOURCES})
+  if(PARSE_TESTONLYLIBS)
+    target_link_libraries(${EXE_NAME} PRIVATE ${PARSE_TESTONLYLIBS})
+  endif()
+  verify_empty(MORPHEUS_ADD_EXECUTABLE ${PARSE_UNPARSED_ARGUMENTS})
+  # All executables must link to all the morpheus targets This is just private
+  # linkage because exe is final
+  target_link_libraries(${EXE_NAME} PRIVATE Morpheus::morpheus)
+endfunction()
+
+function(MORPHEUS_ADD_TEST_LIBRARY NAME)
+  set(oneValueArgs)
+  set(multiValueArgs HEADERS SOURCES)
+
+  cmake_parse_arguments(PARSE "STATIC;SHARED" "" "HEADERS;SOURCES;DEPLIBS"
+                        ${ARGN})
+
+  set(LIB_TYPE)
+  if(PARSE_STATIC)
+    set(LIB_TYPE STATIC)
+  elseif(PARSE_SHARED)
+    set(LIB_TYPE SHARED)
+  endif()
+
+  if(PARSE_HEADERS)
+    list(REMOVE_DUPLICATES PARSE_HEADERS)
+  endif()
+  if(PARSE_SOURCES)
+    list(REMOVE_DUPLICATES PARSE_SOURCES)
+  endif()
+  add_library(${NAME} ${LIB_TYPE} ${PARSE_SOURCES})
+  if(PARSE_DEPLIBS)
+    target_link_libraries(${NAME} PRIVATE ${PARSE_DEPLIBS})
+  endif()
 endfunction()
