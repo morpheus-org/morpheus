@@ -27,15 +27,9 @@
 
 namespace Morpheus {
 
-struct InitArguments : public Kokkos::InitArguments {
-  InitArguments(int nt = -1, int nn = -1, int dv = -1, bool dw = false,
-                bool ti = false)
-      : Kokkos::InitArguments(nt, nn, dv, dw, ti) {}
-};
-
 void initialize(int& argc, char* argv[]) { Kokkos::initialize(argc, argv); }
 
-void print_configuration(std::ostream& out, const bool detail = true) {
+void print_configuration(std::ostream& out, const bool detail) {
   std::ostringstream msg;
 
   msg << "Morpheus Version:" << std::endl;
@@ -53,9 +47,7 @@ void print_configuration(std::ostream& out, const bool detail = true) {
 
   out << msg.str() << std::endl;
 }
-void initialize(InitArguments args = InitArguments()) {
-  Kokkos::initialize(args);
-}
+void initialize(InitArguments args) { Kokkos::initialize(args); }
 
 void finalize() { Kokkos::finalize(); }
 

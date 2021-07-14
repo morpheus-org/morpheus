@@ -43,11 +43,15 @@
 
 namespace Morpheus {
 
-struct InitArguments;
+struct InitArguments : public Kokkos::InitArguments {
+  InitArguments(int nt = -1, int nn = -1, int dv = -1, bool dw = false,
+                bool ti = false)
+      : Kokkos::InitArguments(nt, nn, dv, dw, ti) {}
+};
 
 void initialize(int& argc, char* argv[]);
-void print_configuration(std::ostream& out, const bool detail);
-void initialize(InitArguments args);
+void print_configuration(std::ostream& out, const bool detail = true);
+void initialize(InitArguments args = InitArguments());
 void finalize();
 
 }  // namespace Morpheus
