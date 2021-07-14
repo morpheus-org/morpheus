@@ -24,15 +24,16 @@
 #ifndef MORPHEUS_CORE_HPP
 #define MORPHEUS_CORE_HPP
 
-#include <Morpheus_Version.hpp>
 #include <Morpheus_Macros.hpp>
 
+#include <Kokkos_Core.hpp>
+
+#include <Morpheus_DenseMatrix.hpp>
+#include <Morpheus_DenseVector.hpp>
 #include <Morpheus_CooMatrix.hpp>
 #include <Morpheus_CsrMatrix.hpp>
 #include <Morpheus_DiaMatrix.hpp>
 #include <Morpheus_DynamicMatrix.hpp>
-#include <Morpheus_DenseMatrix.hpp>
-#include <Morpheus_DenseVector.hpp>
 
 #include <Morpheus_Multiply.hpp>
 #include <Morpheus_Print.hpp>
@@ -40,15 +41,13 @@
 
 #include <Morpheus_MatrixMarket.hpp>
 
-#include <Kokkos_Core.hpp>
-
 namespace Morpheus {
 
 struct InitArguments;
 
 void initialize(int& argc, char* argv[]);
-void print_configuration(std::ostream& out, const bool detail = true);
-void initialize(InitArguments args = InitArguments());
+void print_configuration(std::ostream& out, const bool detail);
+void initialize(InitArguments args);
 void finalize();
 
 }  // namespace Morpheus

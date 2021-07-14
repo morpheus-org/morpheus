@@ -1,4 +1,4 @@
-morpheus_configure_file(Morpheus_config.h)
+morpheus_configure_file(MorpheusCore_config.hpp)
 
 morpheus_include_directories(
   ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
@@ -6,53 +6,78 @@ morpheus_include_directories(
 
 install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-  DESTINATION ${MORPHEUS_HEADER_DIR}
+  DESTINATION ${MORPHEUS_HEADER_INSTALL_DIR}
   FILES_MATCHING
   PATTERN "*.hpp"
   PATTERN "*.h")
 
-# I don't want the complexity of sometimes interface/sometimes not Just
-# minimally force an empty dummy file
-set(MORPHEUS_CORE_SRCS dummy.cpp)
-append_glob(MORPHEUS_CORE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/impl/*.cpp)
-append_glob(MORPHEUS_CORE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+set(MORPHEUS_CORE_SOURCES)
+append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/*.cpp)
+
 set(MORPHEUS_CORE_HEADERS)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/*.hpp)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/fwd/*.hpp)
 
-if(MORPEHUS_ENABLE_CUDA)
-  append_glob(MORPHEUS_CORE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/impl/Cuda/*.cpp)
-  append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/Cuda/*.hpp)
-endif()
-
-if(MORPEHUS_ENABLE_OPENMP)
-  append_glob(MORPHEUS_CORE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/impl/OpenMP/*.cpp)
-  append_glob(MORPHEUS_CORE_HEADERS
-              ${CMAKE_CURRENT_SOURCE_DIR}/impl/OpenMP/*.hpp)
-endif()
-
-if(MORPEHUS_ENABLE_SERIAL)
+if(MORPHEUS_ENABLE_SERIAL)
+  append_glob(MORPHEUS_CORE_SOURCES
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/Serial/*.cpp)
   append_glob(MORPHEUS_CORE_HEADERS
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/Serial/*.hpp)
 endif()
 
+if(MORPHEUS_ENABLE_OPENMP)
+  append_glob(MORPHEUS_CORE_SOURCES
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/OpenMP/*.cpp)
+  append_glob(MORPHEUS_CORE_HEADERS
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/OpenMP/*.hpp)
+endif()
+
+if(MORPHEUS_ENABLE_CUDA)
+  append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/Cuda/*.cpp)
+  append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/Cuda/*.hpp)
+endif()
+
+if(MORPHEUS_ENABLE_HIP)
+  append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/HIP/*.cpp)
+  append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/HIP/*.hpp)
+endif()
+
 append_glob(MORPHEUS_CORE_HEADERS
-            ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}_config.h)
+            ${CMAKE_CURRENT_BINARY_DIR}/MorpheusCore_config.hpp)
+
+foreach(HEADER ${MORPHEUS_CORE_HEADERS})
+  get_filename_component(dirname ${HEADER} DIRECTORY)
+  morpheus_include_directories(${dirname})
+endforeach()
 
 morpheus_add_library(
-  morpheuscore SOURCES ${MORPHEUS_CORE_SRCS} HEADERS ${MORPHEUS_CORE_HEADERS}
-  ADD_BUILD_OPTIONS # core should be given all the necessary compiler/linker
-                    # flags
+  morpheuscore SOURCES ${MORPHEUS_CORE_SOURCES} HEADERS
+  ${MORPHEUS_CORE_HEADERS} ADD_BUILD_OPTIONS # core should be given all the
+                                             # necessary compiler/linker flags
 )
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/MorpheusCore_config.hpp
+        DESTINATION ${MORPHEUS_HEADER_INSTALL_DIR})
 
 morpheus_lib_include_directories(
   morpheuscore ${MORPHEUS_TOP_BUILD_DIR} ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR})
+
 # Link with Kokkos
 target_link_libraries(morpheuscore PUBLIC Kokkos::kokkos)
-foreach(DIR ${MORPHEUS_CORE_HEADERS})
-  target_include_directories(morpheuscore PUBLIC $<BUILD_INTERFACE:${DIR}>)
+
+foreach(HEADER ${MORPHEUS_CORE_HEADERS})
+  get_filename_component(dirname ${HEADER} DIRECTORY)
+  target_include_directories(morpheuscore PUBLIC $<BUILD_INTERFACE:${dirname}>)
 endforeach()
-target_include_directories(morpheuscore
-                           PUBLIC $<INSTALL_INTERFACE:${MORPHEUS_HEADER_DIR}>)
+target_include_directories(
+  morpheuscore PUBLIC $<INSTALL_INTERFACE:${MORPHEUS_HEADER_INSTALL_DIR}>)
+
+morpheus_link_tpl(morpheuscore PUBLIC BLAS)
+morpheus_link_tpl(morpheuscore PUBLIC CBLAS)
+morpheus_link_tpl(morpheuscore PUBLIC MKL)
+morpheus_link_tpl(morpheuscore PUBLIC CUBLAS)
+morpheus_link_tpl(morpheuscore PUBLIC CUSPARSE)
+morpheus_link_tpl(morpheuscore PUBLIC METIS)
+morpheus_link_tpl(morpheuscore PUBLIC ARMPL)

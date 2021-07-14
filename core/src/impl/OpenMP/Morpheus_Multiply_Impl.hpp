@@ -62,17 +62,17 @@ void multiply(
   }
 }
 
-emplate<typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-        typename MatrixOrVector2> void
-multiply(const ExecSpace& space, const LinearOperator& A,
-         const MatrixOrVector1& x, MatrixOrVector2& y, CsrTag, DenseVectorTag,
-         DenseVectorTag,
-         typename std::enable_if_t<
-             Morpheus::is_execution_space_v<ExecSpace> &&
-             Morpheus::is_OpenMP_space_v<ExecSpace> &&
-             Morpheus::has_access_v<ExecSpace, LinearOperator> &&
-             Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
-             Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
+template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
+          typename MatrixOrVector2>
+void multiply(
+    const ExecSpace& space, const LinearOperator& A, const MatrixOrVector1& x,
+    MatrixOrVector2& y, CsrTag, DenseVectorTag, DenseVectorTag,
+    typename std::enable_if_t<
+        Morpheus::is_execution_space_v<ExecSpace> &&
+        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, LinearOperator> &&
+        Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
+        Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
   using I = typename LinearOperator::index_type;
   using T = typename LinearOperator::value_type;
 

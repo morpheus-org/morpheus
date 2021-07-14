@@ -6,4 +6,4 @@ endif()
 
 morpheus_add_test_directories(tests)
 morpheus_add_test_directories(benchmarks)
-morpheus_add_example_directories(example)
+morpheus_add_example_directories(examples)

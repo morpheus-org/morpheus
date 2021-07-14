@@ -129,11 +129,12 @@ set(MORPHEUS_EXT_LIBRARIES Morpheus::morpheus Morpheus::morpheuscore)
 set(MORPHEUS_INT_LIBRARIES morpheus morpheuscore)
 set_property(GLOBAL PROPERTY MORPHEUS_INT_LIBRARIES ${MORPHEUS_INT_LIBRARIES})
 
+include(GNUInstallDirs)
 if(MORPHEUS_HAS_PARENT)
-  set(MORPHEUS_HEADER_DIR "CMAKE_INSTALL_INCLUDEDIR/morpheus")
+  set(MORPHEUS_HEADER_INSTALL_DIR "include/morpheus")
   set(MORPHEUS_IS_SUBDIRECTORY TRUE)
 else()
-  set(MORPHEUS_HEADER_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
+  set(MORPHEUS_HEADER_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
   set(MORPHEUS_IS_SUBDIRECTORY FALSE)
 endif()
 
@@ -146,11 +147,13 @@ morpheus_process_subpackages()
 # If Morpheus itself is enabled, process the Morpheus package
 if(NOT Morpheus_INSTALL_TESTING)
   add_library(morpheus INTERFACE)
-  # Make sure in-tree projects can reference this as Morpheus:: to match the
-  # installed target names
+  # ~~~
+  # Make sure in-tree projects can reference this as Morpheus::
+  # to match the installed target names
+  # ~~~
   add_library(Morpheus::morpheus ALIAS morpheus)
   target_link_libraries(morpheus INTERFACE morpheuscore)
-  morpheus_internal_add_library_install(morpheus) # TODO
+  morpheus_internal_add_library_install(morpheus)
 endif()
 
-include(cmake/morpheus_install.cmake) # TODO
+morpheus_package_postprocess()

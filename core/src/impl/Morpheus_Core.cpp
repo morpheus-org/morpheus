@@ -39,8 +39,8 @@ void print_configuration(std::ostream& out, const bool detail = true) {
   std::ostringstream msg;
 
   msg << "Morpheus Version:" << std::endl;
-  msg << "  " << MORPHEUS_MAJOR_VERSION << "." << MORPHEUS_MINOR_VERSION << "."
-      << MORPHEUS_PATCH_VERSION << std::endl;
+  msg << "  " << MORPHEUS_VERSION_MAJOR << "." << MORPHEUS_VERSION_MINOR << "."
+      << MORPHEUS_VERSION_PATCH << " (" << MORPHEUS_VERSION << ")" << std::endl;
 
   Kokkos::print_configuration(msg, detail);
 

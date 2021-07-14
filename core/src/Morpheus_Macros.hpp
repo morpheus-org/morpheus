@@ -24,12 +24,6 @@
 #ifndef MORPHEUS_MACROS_HPP
 #define MORPHEUS_MACROS_HPP
 
-#ifdef KOKKOS_ENABLE_CUDA
-#define MORPHEUS_ENABLE_CUDA  // Kokkos::Cuda execution and memory spaces
-#endif
-
-#ifdef KOKKOS_ENABLE_OPENMP
-#define MORPHEUS_ENABLE_OPENMP  // Kokkos::OpenMP execution and memory spaces
-#endif
+#include <MorpheusCore_config.hpp>
 
 #endif  // MORPHEUS_MACROS_HPP

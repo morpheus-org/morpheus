@@ -17,35 +17,41 @@ macro(APPEND_GLOB VAR)
   list(APPEND ${VAR} ${LOCAL_TMP_VAR})
 endmacro()
 
+function(VERIFY_EMPTY CONTEXT)
+  if(${ARGN})
+    message(FATAL_ERROR "Unhandled arguments in ${CONTEXT}:\n${ARGN}")
+  endif()
+endfunction()
+
 macro(MORPHEUS_PACKAGE_DECL)
   set(PACKAGE_NAME Morpheus)
   set(PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
   string(TOUPPER ${PACKAGE_NAME} PACKAGE_NAME_UC)
   set(${PACKAGE_NAME}_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 endmacro(MORPHEUS_PACKAGE_DECL)
-# ~~~
-# macro(MORPHEUS_PACKAGE_POSTPROCESS)
-#   include(CMakePackageConfigHelpers)
-#   configure_package_config_file(
-#     cmake/MorpheusConfig.cmake.in "${Morpheus_BINARY_DIR}/MorpheusConfig.cmake"
-#     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus)
-#   write_basic_package_version_file(
-#     "${Morpheus_BINARY_DIR}/MorpheusConfigVersion.cmake"
-#     VERSION
-#       "${Morpheus_VERSION_MAJOR}.${Morpheus_VERSION_MINOR}.${Morpheus_VERSION_PATCH}"
-#     COMPATIBILITY SameMajorVersion)
-#   install(FILES "${Morpheus_BINARY_DIR}/MorpheusConfig.cmake"
-#                 "${Morpheus_BINARY_DIR}/MorpheusConfigVersion.cmake"
-#           DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus)
-#   install(
-#     EXPORT MorpheusTargets
-#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus
-#     NAMESPACE Morpheus::)
-# endmacro(MORPHEUS_PACKAGE_POSTPROCESS)
-# ~~~
+
+macro(MORPHEUS_PACKAGE_POSTPROCESS)
+  include(CMakePackageConfigHelpers)
+  configure_package_config_file(
+    cmake/MorpheusConfig.cmake.in "${Morpheus_BINARY_DIR}/MorpheusConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus)
+  write_basic_package_version_file(
+    "${Morpheus_BINARY_DIR}/MorpheusConfigVersion.cmake"
+    VERSION
+      "${Morpheus_VERSION_MAJOR}.${Morpheus_VERSION_MINOR}.${Morpheus_VERSION_PATCH}"
+    COMPATIBILITY SameMajorVersion)
+  install(FILES "${Morpheus_BINARY_DIR}/MorpheusConfig.cmake"
+                "${Morpheus_BINARY_DIR}/MorpheusConfigVersion.cmake"
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus)
+  install(
+    EXPORT MorpheusTargets
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Morpheus
+    NAMESPACE Morpheus::)
+endmacro(MORPHEUS_PACKAGE_POSTPROCESS)
 
 macro(MORPHEUS_PROCESS_SUBPACKAGES)
   add_subdirectory(core)
+  add_subdirectory(tests)
   add_subdirectory(examples)
 endmacro()
 
@@ -128,5 +134,223 @@ function(morpheus_add_option SUFFIX DEFAULT TYPE DOCSTRING)
         ${DEFAULT}
         PARENT_SCOPE)
   endif()
+endfunction()
 
+function(MORPHEUS_ADD_LIBRARY LIBRARY_NAME)
+  cmake_parse_arguments(PARSE "ADD_BUILD_OPTIONS" "" "HEADERS" ${ARGN})
+
+  # Forward the headers, we want to know about all headers to make sure they
+  # appear correctly in IDEs
+  morpheus_internal_add_library(${LIBRARY_NAME} ${PARSE_UNPARSED_ARGUMENTS}
+                                HEADERS ${PARSE_HEADERS})
+  if(PARSE_ADD_BUILD_OPTIONS)
+    morpheus_set_library_properties(${LIBRARY_NAME})
+  endif()
+endfunction()
+
+function(MORPHEUS_SET_LIBRARY_PROPERTIES LIBRARY_NAME)
+  cmake_parse_arguments(PARSE "PLAIN_STYLE" "" "" ${ARGN})
+
+  if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18")
+    # I can use link options check for CXX linkage using the simple 3.18 way
+    target_link_options(${LIBRARY_NAME} PUBLIC
+                        $<$<LINK_LANGUAGE:CXX>:${KOKKOS_LINK_OPTIONS}>)
+  else()
+    # I can use link options just assume CXX linkage
+    target_link_options(${LIBRARY_NAME} PUBLIC ${KOKKOS_LINK_OPTIONS})
+  endif()
+
+  target_compile_options(
+    ${LIBRARY_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${KOKKOS_COMPILE_OPTIONS}>)
+
+  target_compile_definitions(
+    ${LIBRARY_NAME}
+    PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${KOKKOS_COMPILE_DEFINITIONS}>)
+
+  target_link_libraries(${LIBRARY_NAME} PUBLIC ${KOKKOS_LINK_LIBRARIES})
+
+  if(MORPHEUS_ENABLE_CUDA)
+    target_compile_options(
+      ${LIBRARY_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${KOKKOS_CUDA_OPTIONS}>)
+    foreach(OPT ${KOKKOS_CUDAFE_OPTIONS})
+      list(APPEND NODEDUP_CUDAFE_OPTIONS -Xcudafe ${OPT})
+    endforeach()
+    target_compile_options(
+      ${LIBRARY_NAME}
+      PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${NODEDUP_CUDAFE_OPTIONS}>)
+  endif()
+
+  if(MORPHEUS_ENABLE_HIP)
+    target_compile_options(
+      ${LIBRARY_NAME}
+      PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${KOKKOS_AMDGPU_OPTIONS}>)
+  endif()
+
+  list(LENGTH KOKKOS_XCOMPILER_OPTIONS XOPT_LENGTH)
+  if(XOPT_LENGTH GREATER 1)
+    message(
+      FATAL_ERROR
+        "CMake deduplication does not allow multiple -Xcompiler flags (${KOKKOS_XCOMPILER_OPTIONS}): will require Kokkos to upgrade to minimum 3.12"
+    )
+  endif()
+  if(KOKKOS_XCOMPILER_OPTIONS)
+    set(NODEDUP_XCOMPILER_OPTIONS)
+    foreach(OPT ${KOKKOS_XCOMPILER_OPTIONS})
+      # I have to do this for now because we can't guarantee 3.12 support I
+      # really should do this with the shell option
+      list(APPEND NODEDUP_XCOMPILER_OPTIONS -Xcompiler)
+      list(APPEND NODEDUP_XCOMPILER_OPTIONS ${OPT})
+    endforeach()
+    target_compile_options(
+      ${LIBRARY_NAME}
+      PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${NODEDUP_XCOMPILER_OPTIONS}>)
+  endif()
+
+  if(KOKKOS_CXX_STANDARD_FEATURE)
+    # GREAT! I can do this the right way
+    target_compile_features(${LIBRARY_NAME}
+                            PUBLIC ${KOKKOS_CXX_STANDARD_FEATURE})
+    if(NOT KOKKOS_USE_CXX_EXTENSIONS)
+      set_target_properties(${LIBRARY_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+    endif()
+  else()
+    # OH, well, no choice but the wrong way
+    target_compile_options(${LIBRARY_NAME} PUBLIC ${KOKKOS_CXX_STANDARD_FLAG})
+  endif()
+endfunction()
+
+function(MORPHEUS_LIB_TYPE LIB RET)
+  get_target_property(PROP ${LIB} TYPE)
+  if(${PROP} STREQUAL "INTERFACE_LIBRARY")
+    set(${RET}
+        "INTERFACE"
+        PARENT_SCOPE)
+  else()
+    set(${RET}
+        "PUBLIC"
+        PARENT_SCOPE)
+  endif()
+endfunction()
+
+function(MORPHEUS_INTERNAL_ADD_LIBRARY LIBRARY_NAME)
+  cmake_parse_arguments(PARSE "STATIC;SHARED" "" "HEADERS;SOURCES" ${ARGN})
+
+  if(PARSE_HEADERS)
+    list(REMOVE_DUPLICATES PARSE_HEADERS)
+  endif()
+  if(PARSE_SOURCES)
+    list(REMOVE_DUPLICATES PARSE_SOURCES)
+  endif()
+
+  if(PARSE_STATIC)
+    set(LINK_TYPE STATIC)
+  endif()
+
+  if(PARSE_SHARED)
+    set(LINK_TYPE SHARED)
+  endif()
+
+  # MSVC and other platforms want to have the headers included as source files
+  # for better dependency detection
+  add_library(${LIBRARY_NAME} ${LINK_TYPE} ${PARSE_HEADERS} ${PARSE_SOURCES})
+
+  if(PARSE_SHARED OR BUILD_SHARED_LIBS)
+    set_target_properties(
+      ${LIBRARY_NAME}
+      PROPERTIES VERSION ${MORPHEUS_VERSION}
+                 SOVERSION ${Morpheus_VERSION_MAJOR}.${Morpheus_VERSION_MINOR})
+  endif()
+
+  morpheus_internal_add_library_install(${LIBRARY_NAME})
+
+  # In case we are building in-tree, add an alias name that matches the install
+  # Morpheus:: name
+  add_library(Morpheus::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
+endfunction()
+
+macro(MORPHEUS_INTERNAL_ADD_LIBRARY_INSTALL LIBRARY_NAME)
+  morpheus_lib_type(${LIBRARY_NAME} INCTYPE)
+  target_include_directories(
+    ${LIBRARY_NAME} ${INCTYPE}
+    $<INSTALL_INTERFACE:${MORPHEUS_HEADER_INSTALL_DIR}>)
+
+  install(
+    TARGETS ${LIBRARY_NAME}
+    EXPORT ${PROJECT_NAME}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${PACKAGE_NAME})
+
+  install(
+    TARGETS ${LIBRARY_NAME}
+    EXPORT MorpheusTargets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+  verify_empty(MORPHEUS_ADD_LIBRARY ${PARSE_UNPARSED_ARGUMENTS})
+endmacro()
+
+function(MORPHEUS_LIB_INCLUDE_DIRECTORIES TARGET)
+  # append to a list for later
+  morpheus_lib_type(${TARGET} INCTYPE)
+  foreach(DIR ${ARGN})
+    target_include_directories(${TARGET} ${INCTYPE} $<BUILD_INTERFACE:${DIR}>)
+  endforeach()
+endfunction()
+
+macro(MORPHEUS_ADD_DEBUG_OPTION)
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # option(HAVE_MORPHEUS_DEBUG "Build Morpheus with debug symbols." ON)
+    set(HAVE_MORPHEUS_DEBUG)
+  endif()
+endmacro()
+
+macro(MORPHEUS_SETUP_BUILD_ENVIRONMENT)
+  # set an internal option, if not already set
+  set(Morpheus_INSTALL_TESTING
+      OFF
+      CACHE INTERNAL "Whether to build tests and examples against installation")
+  if(Morpheus_INSTALL_TESTING)
+    set(MORPHEUS_ENABLE_TESTS ON)
+    set(MORPHEUS_ENABLE_EXAMPLES ON)
+    # We are NOT going build Morpheus but instead look for an installed Morpheus
+    # then build examples and tests against that installed Morpheus
+    find_package(Morpheus REQUIRED)
+    # Still need to figure out which backends
+    include(cmake/kokkos_backends.cmake)
+  else()
+    # Regular build, not install testing
+    if(NOT MORPHEUS_HAS_PARENT)
+      # This is a standalone build
+      find_package(Kokkos REQUIRED)
+      message(STATUS "Found Kokkos at ${Kokkos_DIR}")
+    endif()
+    include(cmake/kokkos_backends.cmake)
+    include(cmake/morpheus_test_cxx_std.cmake) # TODO: Enforce cxx std17 or
+                                               # above
+
+    # If building in debug mode, define the HAVE_MORPHEUS_DEBUG macro.
+    morpheus_add_debug_option()
+
+    # ==================================================================
+    # Enable Third Party Libraries
+    # ==================================================================
+    include(cmake/morpheus_tpls.cmake)
+    # include(cmake/morpheus_features.cmake) # TODO
+    include(cmake/kokkos_requirements.cmake)
+
+  endif()
+endmacro()
+
+function(MORPHEUS_CONFIGURE_FILE PACKAGE_NAME_CONFIG_FILE)
+  # Configure the file
+  configure_file(${PACKAGE_SOURCE_DIR}/cmake/${PACKAGE_NAME_CONFIG_FILE}.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME_CONFIG_FILE})
+endfunction(MORPHEUS_CONFIGURE_FILE)
+
+function(MORPHEUS_INCLUDE_DIRECTORIES)
+  cmake_parse_arguments(INC "REQUIRED_DURING_INSTALLATION_TESTING" "" ""
+                        ${ARGN})
+  include_directories(${INC_UNPARSED_ARGUMENTS})
 endfunction()
