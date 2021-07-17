@@ -34,19 +34,11 @@
 namespace Morpheus {
 namespace Impl {
 
-// template <typename LinearOperator, typename MatrixOrVector1, typename
-// MatrixOrVector2> void multiply(
-//     const Kokkos::OpenMP& space, const LinearOperator& A, const
-//     MatrixOrVector1& x, MatrixOrVector2& y, CooTag, DenseVectorTag,
-//     DenseVectorTag, typename std::enable_if_t<
-//         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
-//         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
-//         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr)
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
 void multiply(
-    const ExecSpace& space, const LinearOperator& A, const MatrixOrVector1& x,
-    MatrixOrVector2& y, CooTag, DenseVectorTag, DenseVectorTag,
+    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
+    CooTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_execution_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
@@ -65,8 +57,8 @@ void multiply(
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
 void multiply(
-    const ExecSpace& space, const LinearOperator& A, const MatrixOrVector1& x,
-    MatrixOrVector2& y, CsrTag, DenseVectorTag, DenseVectorTag,
+    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
+    CsrTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_execution_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
@@ -89,8 +81,8 @@ void multiply(
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
 void multiply(
-    const ExecSpace& space, const LinearOperator& A, const MatrixOrVector1& x,
-    MatrixOrVector2& y, DiaTag, DenseVectorTag, DenseVectorTag,
+    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
+    DiaTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_execution_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&

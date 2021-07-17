@@ -31,30 +31,29 @@ namespace Morpheus {
 // forward decl
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-void multiply(const ExecSpace& space, const LinearOperator& A,
-              const MatrixOrVector1& x, MatrixOrVector2& y);
+void multiply(const LinearOperator& A, const MatrixOrVector1& x,
+              MatrixOrVector2& y);
 
 namespace Impl {
 
+template <typename ExecSpace>
 struct multiply_fn {
   using result_type = void;
 
-  template <typename ExecSpace, typename LinearOperator, typename MatOrVec1,
-            typename MatrOrVec2>
-  result_type operator()(const ExecSpace& space, const LinearOperator& A,
-                         const MatOrVec1& x, MatrOrVec2& y) const {
-    Morpheus::multiply(space, A, x, y);
+  template <typename LinearOperator, typename MatOrVec1, typename MatrOrVec2>
+  result_type operator()(const LinearOperator& A, const MatOrVec1& x,
+                         MatrOrVec2& y) const {
+    Morpheus::multiply<ExecSpace>(A, x, y);
   }
 };
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-void multiply(const ExecSpace& space, const LinearOperator& A,
-              const MatrixOrVector1& x, MatrixOrVector2& y,
-              Morpheus::DynamicTag, Morpheus::DenseVectorTag,
-              Morpheus::DenseVectorTag) {
-  std::visit(std::bind(Impl::multiply_fn(), std::cref(space),
-                       std::placeholders::_1, std::cref(x), std::ref(y)),
+void multiply(const LinearOperator& A, const MatrixOrVector1& x,
+              MatrixOrVector2& y, Morpheus::DynamicTag,
+              Morpheus::DenseVectorTag, Morpheus::DenseVectorTag) {
+  std::visit(std::bind(Impl::multiply_fn<ExecSpace>(), std::placeholders::_1,
+                       std::cref(x), std::ref(y)),
              A.formats());
 }
 

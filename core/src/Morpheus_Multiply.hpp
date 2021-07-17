@@ -30,11 +30,11 @@ namespace Morpheus {
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-void multiply(const ExecSpace& space, const LinearOperator& A,
-              const MatrixOrVector1& x, MatrixOrVector2& y) {
-  Impl::multiply(space, A, x, y, typename LinearOperator::tag(),
-                 typename MatrixOrVector1::tag(),
-                 typename MatrixOrVector2::tag());
+void multiply(const LinearOperator& A, const MatrixOrVector1& x,
+              MatrixOrVector2& y) {
+  Impl::multiply<ExecSpace>(A, x, y, typename LinearOperator::tag(),
+                            typename MatrixOrVector1::tag(),
+                            typename MatrixOrVector2::tag());
 }
 
 }  // namespace Morpheus
