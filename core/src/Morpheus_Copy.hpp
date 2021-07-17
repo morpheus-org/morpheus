@@ -24,7 +24,7 @@
 #ifndef MORPHEUS_COPY_HPP
 #define MORPHEUS_COPY_HPP
 
-#include <impl/Morpheus_Copy_impl.hpp>
+#include <impl/Morpheus_Copy_Impl.hpp>
 
 namespace Morpheus {
 

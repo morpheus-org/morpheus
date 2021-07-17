@@ -77,7 +77,7 @@ macro(MORPHEUS_SUBPACKAGE NAME)
 endmacro()
 
 macro(MORPHEUS_ADD_TEST_DIRECTORIES)
-  if(MORPHEUS_ENABLE_TESTS)
+  if(Morpheus_ENABLE_TESTS)
     foreach(TEST_DIR ${ARGN})
       add_subdirectory(${TEST_DIR})
     endforeach()
@@ -85,9 +85,17 @@ macro(MORPHEUS_ADD_TEST_DIRECTORIES)
 endmacro()
 
 macro(MORPHEUS_ADD_EXAMPLE_DIRECTORIES)
-  if(MORPHEUS_ENABLE_EXAMPLES)
+  if(Morpheus_ENABLE_EXAMPLES)
     foreach(EXAMPLE_DIR ${ARGN})
       add_subdirectory(${EXAMPLE_DIR})
+    endforeach()
+  endif()
+endmacro()
+
+macro(MORPHEUS_ADD_BENCHMARK_DIRECTORIES)
+  if(Morpheus_ENABLE_BENCHMARKS)
+    foreach(BENCHMARK_DIR ${ARGN})
+      add_subdirectory(${BENCHMARK_DIR})
     endforeach()
   endif()
 endmacro()
@@ -322,9 +330,23 @@ macro(MORPHEUS_SETUP_BUILD_ENVIRONMENT)
   set(Morpheus_INSTALL_TESTING
       OFF
       CACHE INTERNAL "Whether to build tests and examples against installation")
+
+  set(Morpheus_ENABLE_TESTS
+      OFF
+      CACHE INTERNAL "Whether to build tests")
+
+  set(Morpheus_ENABLE_EXAMPLES
+      OFF
+      CACHE INTERNAL "Whether to build examples")
+
+  set(Morpheus_ENABLE_BENCHMARKS
+      OFF
+      CACHE INTERNAL "Whether to build benchmarks")
+
   if(Morpheus_INSTALL_TESTING)
-    set(MORPHEUS_ENABLE_TESTS ON)
-    set(MORPHEUS_ENABLE_EXAMPLES ON)
+    set(Morpheus_ENABLE_TESTS ON)
+    set(Morpheus_ENABLE_EXAMPLES ON)
+    set(Morpheus_ENABLE_BENCHMARKS ON)
     # We are NOT going build Morpheus but instead look for an installed Morpheus
     # then build examples and tests against that installed Morpheus
     find_package(Morpheus REQUIRED)
