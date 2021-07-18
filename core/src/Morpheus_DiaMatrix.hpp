@@ -56,10 +56,8 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
   using reference       = DiaMatrix &;
   using const_reference = const DiaMatrix &;
 
-  using index_array_type = Morpheus::vector<index_type, device_type>;
-  using value_array_type =
-      Morpheus::DenseMatrix<value_type, typename execution_space::array_layout,
-                            memory_space>;
+  using index_array_type      = Morpheus::vector<index_type, device_type>;
+  using value_array_type      = Morpheus::DenseMatrix<value_type, device_type>;
   using value_array_pointer   = typename value_array_type::pointer;
   using value_array_reference = typename value_array_type::reference;
 
@@ -94,7 +92,9 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {
-    values.resize(num_diagonals, this->_pad_size(num_cols, alignment));
+    values.resize(num_rows, num_diagonals);
+    // values.resize(this->_pad_size(num_cols, alignment), num_diagonals);
+    // values.resize(num_rows, num_diagonals);
   }
 
   inline DiaMatrix(const std::string name, const index_type num_rows,
@@ -106,7 +106,9 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {
-    values.resize(num_diagonals, this->_pad_size(num_cols, alignment));
+    values.resize(num_rows, num_diagonals);
+    // values.resize(this->_pad_size(num_cols, alignment), num_diagonals);
+    // values.resize(num_rows, num_diagonals);
   }
 
   // Construct from another matrix type
@@ -124,7 +126,9 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
     _n   = num_cols;
     _nnz = num_entries;
     diagonal_offsets.resize(num_diagonals);
-    values.resize(num_diagonals, this->_pad_size(num_cols, alignment));
+    values.resize(num_rows, num_diagonals);
+    // values.resize(this->_pad_size(num_cols, alignment), num_diagonals);
+    // values.resize(num_rows, num_diagonals);
   }
 
   // Assignment from another matrix type

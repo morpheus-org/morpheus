@@ -43,11 +43,11 @@ void print(const Printable& p, Stream& s);
 namespace Impl {
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, CooTag) {
-  using I = typename Printable::index_type;
+  using IndexType = typename Printable::index_type;
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nnnz() << " entries\n";
 
-  for (I n = 0; n < p.nnnz(); n++) {
+  for (IndexType n = 0; n < p.nnnz(); n++) {
     s << " " << std::setw(14) << p.row_indices[n];
     s << " " << std::setw(14) << p.column_indices[n];
     s << " " << std::setprecision(4) << std::setw(8) << "(" << p.values[n]
@@ -57,12 +57,12 @@ void print(const Printable& p, Stream& s, CooTag) {
 
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, CsrTag) {
-  using I = typename Printable::index_type;
+  using IndexType = typename Printable::index_type;
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nnnz() << " entries\n";
 
-  for (I i = 0; i < p.nrows(); i++) {
-    for (I jj = p.row_offsets[i]; jj < p.row_offsets[i + 1]; jj++) {
+  for (IndexType i = 0; i < p.nrows(); i++) {
+    for (IndexType jj = p.row_offsets[i]; jj < p.row_offsets[i + 1]; jj++) {
       s << " " << std::setw(14) << i;
       s << " " << std::setw(14) << p.column_indices[jj];
       s << " " << std::setprecision(4) << std::setw(8) << "(" << p.values[jj]
@@ -76,30 +76,47 @@ void print(const Printable& p, Stream& s, DiaTag) {
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nnnz() << " entries\n";
 
-  using I = typename Printable::index_type;
+  using IndexType       = typename Printable::index_type;
+  using ValueType       = typename Printable::value_type;
+  const IndexType ndiag = p.values.ncols();
+  // for (IndexType i = 0; i < p.values.nrows(); i++) {
+  //   for (IndexType j = 0; j < p.values.ncols(); j++) {
+  //     s << " " << std::setw(14) << i;
+  //     s << " " << std::setw(14) << j;
+  //     s << " " << std::setprecision(4) << std::setw(8) << "(" << p.values(i,
+  //     j)
+  //       << ")\n";
+  //   }
+  // }
+  for (IndexType i = 0; i < ndiag; i++) {
+    const IndexType k = p.diagonal_offsets[i];  // diagonal offset
 
-  for (I i = 0; i < (int)p.diagonal_offsets.size(); i++) {
-    const I k       = p.diagonal_offsets[i];  // diagonal offset
-    const I j_start = std::max(0, k);
-    const I j_end   = std::min(std::min(p.nrows() + k, p.ncols()), p.ncols());
+    const IndexType i_start = std::max<IndexType>(0, -k);
+    const IndexType j_start = std::max<IndexType>(0, k);
 
-    for (I n = j_start; n < j_end; n++) {
-      s << " " << std::setw(14) << i;
-      s << " " << std::setw(14) << n;
-      s << " " << std::setprecision(4) << std::setw(8) << "(" << p.values(i, n)
-        << ")\n";
+    // number of elements to process in this diagonal
+    const IndexType N = std::min(p.nrows() - i_start, p.ncols() - j_start);
+
+    for (IndexType n = 0; n < N; n++) {
+      ValueType temp = p.values(i_start + n, i);
+      if (temp != ValueType(0)) {
+        s << " " << std::setw(14) << i_start + n;
+        s << " " << std::setw(14) << i;
+        s << " " << std::setprecision(4) << std::setw(8) << "(" << temp
+          << ")\n";
+      }
     }
   }
 }
 
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, DenseMatrixTag) {
-  using index_type = typename Printable::index_type;
+  using IndexType = typename Printable::index_type;
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nrows() * p.ncols() << " entries\n";
 
-  for (index_type i = 0; i < p.nrows(); i++) {
-    for (index_type j = 0; j < p.ncols(); j++) {
+  for (IndexType i = 0; i < p.nrows(); i++) {
+    for (IndexType j = 0; j < p.ncols(); j++) {
       s << " " << std::setw(14) << i;
       s << " " << std::setw(14) << j;
       s << " " << std::setprecision(4) << std::setw(8) << "(" << p(i, j)
@@ -110,10 +127,10 @@ void print(const Printable& p, Stream& s, DenseMatrixTag) {
 
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, DenseVectorTag) {
-  using index_type = typename Printable::index_type;
+  using IndexType = typename Printable::index_type;
   s << p.name() << "<" << p.size() << "> with " << p.size() << " entries\n";
 
-  for (index_type n = 0; n < p.size(); n++) {
+  for (IndexType n = 0; n < p.size(); n++) {
     s << " " << std::setw(14) << n;
     s << " " << std::setprecision(4) << std::setw(8) << "(" << p[n] << ")\n";
   }

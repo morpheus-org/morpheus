@@ -9,3 +9,5 @@ morpheus_add_executable_and_test(Examples_Multiply SOURCES
                                  Examples_Multiply.cpp)
 morpheus_add_executable_and_test(Examples_DynamicResize SOURCES
                                  Examples_DynamicResize.cpp)
+morpheus_add_executable_and_test(Examples_DiaMatrix SOURCES
+                                 Examples_DiaMatrix.cpp)
