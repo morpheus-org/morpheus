@@ -21,15 +21,16 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_OPENMP_MULTIPLY_IMPL_HPP
-#define MORPHEUS_OPENMP_MULTIPLY_IMPL_HPP
+#ifndef MORPHEUS_CUDA_MULTIPLY_IMPL_HPP
+#define MORPHEUS_CUDA_MULTIPLY_IMPL_HPP
 
 #include <Morpheus_Macros.hpp>
-#if defined(MORPHEUS_ENABLE_OPENMP)
+#if defined(MORPHEUS_ENABLE_CUDA)
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_Exceptions.hpp>
 #include <impl/Morpheus_FormatTags.hpp>
+#include <impl/Cuda/Morpheus_Multiply_Kernels.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -41,17 +42,22 @@ MORPHEUS_INLINE_FUNCTION void multiply(
     CooTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_execution_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
   using IndexType = typename LinearOperator::index_type;
+  using ValueType = typename LinearOperator::value_type;
 
-// assumes A is sorted
-#pragma omp parallel for
-  for (IndexType n = 0; n < A.nnnz(); n++) {
-    y[A.row_indices[n]] += A.values[n] * x[A.column_indices[n]];
-  }
+  const IndexType* I = A.row_indices.data();
+  const IndexType* J = A.column_indices.data());
+  const ValueType* V = A.values.data();
+
+  const ValueType* x_ptr = x.data();
+  ValueType* y_ptr       = y.data();
+
+  Morpheus::Impl::Kernels::spmv_coo_serial_kernel<IndexType, ValueType>
+      <<<1, 1>>>(A.nnnz(), I, J, V, x_ptr, y_ptr);
 }
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
@@ -68,14 +74,18 @@ MORPHEUS_INLINE_FUNCTION void multiply(
   using IndexType = typename LinearOperator::index_type;
   using ValueType = typename LinearOperator::value_type;
 
-#pragma omp parallel for
-  for (IndexType i = 0; i < A.nrows(); i++) {
-    ValueType sum = y[i];
-    for (IndexType jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
-      sum += A.values[jj] * x[A.column_indices[jj]];
-    }
-    y[i] = sum;
-  }
+  const size_t BLOCK_SIZE = 256;
+  const size_t NUM_BLOCKS = (A.nrows() + BLOCK_SIZE - 1) / BLOCK_SIZE;
+
+  const IndexType* I = A.row_offsets.data();
+  const IndexType* J = A.column_indices.data());
+  const ValueType* V = A.values.data();
+
+  const ValueType* x_ptr = x.data();
+  ValueType* y_ptr       = y.data();
+
+  Morpheus::Impl::Kernels::spmv_csr_scalar_kernel<IndexType, ValueType>
+      <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), I, J, V, x_ptr, y_ptr);
 }
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
@@ -89,25 +99,16 @@ MORPHEUS_INLINE_FUNCTION void multiply(
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
-  using IndexType       = typename LinearOperator::index_type;
-  const IndexType ndiag = A.values.ncols();
+  using IndexType = typename LinearOperator::index_type;
+  using ValueType = typename LinearOperator::value_type;
 
-  for (IndexType i = 0; i < A.nrows(); i++) y[i] = 0;
+  const size_t BLOCK_SIZE = 256;
+  const size_t NUM_BLOCKS = (A.nrows() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-#pragma omp parallel for
-  for (IndexType i = 0; i < ndiag; i++) {
-    const IndexType k = A.diagonal_offsets[i];
-
-    const IndexType i_start = std::max<IndexType>(0, -k);
-    const IndexType j_start = std::max<IndexType>(0, k);
-
-    // number of elements to process in this diagonal
-    const IndexType N = std::min(A.nrows() - i_start, A.ncols() - j_start);
-
-    for (IndexType n = 0; n < N; n++) {
-      y[i_start + n] += A.values(i_start + n, i) * x[j_start + n];
-    }
-  }
+  const IndexType* D     = A.diagonal_offsets.data());
+  const ValueType* V     = A.values.data();
+  const ValueType* x_ptr = x.data();
+  ValueType* y_ptr       = y.data();
 }
 
 }  // namespace Impl

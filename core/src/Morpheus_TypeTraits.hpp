@@ -60,6 +60,13 @@ inline constexpr bool is_OpenMP_space_v =
                  Kokkos::OpenMP::execution_space>::value;
 #endif  // MORPHEUS_ENABLE_OPENMP
 
+#if defined(MORPHEUS_ENABLE_CUDA)
+template <class ExecSpace>
+inline constexpr bool is_Cuda_space_v =
+    std::is_same<typename ExecSpace::execution_space,
+                 Kokkos::Cuda::execution_space>::value;
+#endif  // MORPHEUS_ENABLE_CUDA
+
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_TYPETRAITS_HPP

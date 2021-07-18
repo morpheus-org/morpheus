@@ -32,7 +32,7 @@ namespace Impl {
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-void multiply(
+MORPHEUS_INLINE_FUNCTION void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     CooTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
@@ -41,16 +41,16 @@ void multiply(
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
-  using I = typename LinearOperator::index_type;
+  using IndexType = typename LinearOperator::index_type;
 
-  for (I n = 0; n < A.nnnz(); n++) {
+  for (IndexType n = 0; n < A.nnnz(); n++) {
     y[A.row_indices[n]] += A.values[n] * x[A.column_indices[n]];
   }
 }
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-void multiply(
+MORPHEUS_INLINE_FUNCTION void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     CsrTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
@@ -59,12 +59,12 @@ void multiply(
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
-  using I = typename LinearOperator::index_type;
-  using T = typename LinearOperator::value_type;
+  using IndexType = typename LinearOperator::index_type;
+  using ValueType = typename LinearOperator::value_type;
 
-  for (I i = 0; i < A.nrows(); i++) {
-    T sum = y[i];
-    for (I jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
+  for (IndexType i = 0; i < A.nrows(); i++) {
+    ValueType sum = y[i];
+    for (IndexType jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
       sum += A.values[jj] * x[A.column_indices[jj]];
     }
     y[i] = sum;
@@ -73,7 +73,7 @@ void multiply(
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-void multiply(
+MORPHEUS_INLINE_FUNCTION void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     DiaTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
@@ -82,16 +82,22 @@ void multiply(
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
-  using I = typename LinearOperator::index_type;
+  using IndexType       = typename LinearOperator::index_type;
+  const IndexType ndiag = A.values.ncols();
 
-  for (I i = 0; i < (int)A.diagonal_offsets.size(); i++) {
-    const I k       = A.diagonal_offsets[i];  // diagonal offset
-    const I i_start = std::max(0, -k);
-    const I j_start = std::max(0, k);
-    const I N       = std::min(A.nrows() - i_start, A.ncols() - j_start);
+  for (IndexType i = 0; i < A.nrows(); i++) y[i] = 0;
 
-    for (I n = 0; n < N; n++) {
-      y[i_start + n] += A.values(i, j_start + n) * x[j_start + n];
+  for (IndexType i = 0; i < ndiag; i++) {
+    const IndexType k = A.diagonal_offsets[i];
+
+    const IndexType i_start = std::max<IndexType>(0, -k);
+    const IndexType j_start = std::max<IndexType>(0, k);
+
+    // number of elements to process in this diagonal
+    const IndexType N = std::min(A.nrows() - i_start, A.ncols() - j_start);
+
+    for (IndexType n = 0; n < N; n++) {
+      y[i_start + n] += A.values(i_start + n, i) * x[j_start + n];
     }
   }
 }
