@@ -45,8 +45,8 @@ $ module restore PrgEnv-cray
 $ module load cmake
 $ export CRAYPE_LINK_TYPE=dynamic
 $ CXX_COMPILER=/opt/cray/pe/craype/2.7.2/bin/CC
-$ KOKKOS_INSTALL_DIR=/work/e609/e609/cstyl/libs/kokkos/cray
-$ MORPHEUS_INSTALL_DIR=/work/e609/e609/cstyl/libs/morpheus/cray
+$ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/cray
+$ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/cray
 ```
 
 ### Setup environment - GNU
@@ -55,8 +55,8 @@ $ module restore PrgEnv-gnu
 $ module load cmake
 $ export CRAYPE_LINK_TYPE=dynamic
 $ CXX_COMPILER=/opt/cray/pe/craype/2.7.2/bin/CC
-$ KOKKOS_INSTALL_DIR=/work/e609/e609/cstyl/libs/kokkos/gnu
-$ MORPHEUS_INSTALL_DIR=/work/e609/e609/cstyl/libs/morpheus/gnu
+$ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/gnu
+$ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/gnu
 ```
 
 ### Setup environment - AMD
@@ -65,20 +65,25 @@ $ module restore PrgEnv-aocc
 $ module load cmake
 $ export CRAYPE_LINK_TYPE=dynamic
 $ CXX_COMPILER=/opt/cray/pe/craype/2.7.2/bin/CC
-$ KOKKOS_INSTALL_DIR=/work/e609/e609/cstyl/libs/kokkos/aocc
-$ MORPHEUS_INSTALL_DIR=/work/e609/e609/cstyl/libs/morpheus/aocc
+$ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/aocc
+$ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/aocc
 ```
 
 ### Installing Kokkos
 ```sh
-$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_INSTALL_DIR} -DCMAKE_BUILD_TYPE=Release -DKokkos_ENABLE_OPENMP=ON  -DKokkos_ENABLE_SERIAL=ON -DKokkos_CXX_STANDARD=17 -DKokkos_ENABLE_COMPILER_WARNINGS=On -DKokkos_ARCH_ZEN2=On -DKokkos_ENABLE_AGGRESSIVE_VECTORIZATION=On
+$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_INSTALL_DIR} \
+           -DCMAKE_BUILD_TYPE=Release -DKokkos_ENABLE_OPENMP=ON  -DKokkos_ENABLE_SERIAL=ON \
+           -DKokkos_CXX_STANDARD=17 -DKokkos_ENABLE_COMPILER_WARNINGS=On -DKokkos_ARCH_ZEN2=On \
+           -DKokkos_ENABLE_AGGRESSIVE_VECTORIZATION=On
 $ make
 $ make install
 ```
 
 ### Installing Morpheus
 ```sh
-$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${MORPHEUS_INSTALL_DIR} -DKokkos_ROOT=${KOKKOS_INSTALL_DIR} -DCMAKE_BUILD_TYPE=Release -DMorpheus_ENABLE_EXAMPLES=On -DMorpheus_ENABLE_TESTS=On
+$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${MORPHEUS_INSTALL_DIR} \
+           -DKokkos_ROOT=${KOKKOS_INSTALL_DIR} -DCMAKE_BUILD_TYPE=Release \
+           -DMorpheus_ENABLE_EXAMPLES=On -DMorpheus_ENABLE_TESTS=On
 $ make
 $ make install
 ```
