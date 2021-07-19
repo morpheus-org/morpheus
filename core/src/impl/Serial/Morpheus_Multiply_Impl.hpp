@@ -83,7 +83,7 @@ MORPHEUS_INLINE_FUNCTION void multiply(
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
   using IndexType       = typename LinearOperator::index_type;
-  const IndexType ndiag = A.values.ncols();
+  const IndexType ndiag = A.diagonal_offsets.size();
 
   for (IndexType i = 0; i < A.nrows(); i++) y[i] = 0;
 
@@ -97,7 +97,7 @@ MORPHEUS_INLINE_FUNCTION void multiply(
     const IndexType N = std::min(A.nrows() - i_start, A.ncols() - j_start);
 
     for (IndexType n = 0; n < N; n++) {
-      y[i_start + n] += A.values(i_start + n, i) * x[j_start + n];
+      y[i_start + n] += A.values(i, j_start + n) * x[j_start + n];
     }
   }
 }

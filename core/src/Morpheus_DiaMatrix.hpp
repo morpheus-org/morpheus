@@ -92,6 +92,11 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {
+    // std::cout << "Shape(mat): (" << num_rows << ", " << num_cols << ", "
+    //           << num_entries << ")";
+    // std::cout << "Shape(val): (" << num_diagonals << ", "
+    //           << this->_pad_size(num_cols, alignment) << ")";
+    // values.resize(num_diagonals, this->_pad_size(num_cols, alignment));
     values.resize(num_rows, num_diagonals);
     // values.resize(this->_pad_size(num_cols, alignment), num_diagonals);
     // values.resize(num_rows, num_diagonals);
@@ -106,6 +111,11 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
         _m(num_rows),
         _n(num_cols),
         _nnz(num_entries) {
+    // std::cout << "Shape(mat): (" << num_rows << ", " << num_cols << ", "
+    //           << num_entries << ")";
+    // std::cout << "Shape(val): (" << num_diagonals << ", "
+    //           << this->_pad_size(num_cols, alignment) << ")";
+    // values.resize(num_diagonals, this->_pad_size(num_cols, alignment));
     values.resize(num_rows, num_diagonals);
     // values.resize(this->_pad_size(num_cols, alignment), num_diagonals);
     // values.resize(num_rows, num_diagonals);
@@ -126,6 +136,11 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
     _n   = num_cols;
     _nnz = num_entries;
     diagonal_offsets.resize(num_diagonals);
+    // std::cout << "Shape(mat): (" << num_rows << ", " << num_cols << ", "
+    //           << num_entries << ")" << std::endl;
+    // std::cout << "Shape(val): (" << num_diagonals << ", "
+    //           << this->_pad_size(num_cols, alignment) << ")" << std::endl;
+    // values.resize(num_diagonals, this->_pad_size(num_cols, alignment));
     values.resize(num_rows, num_diagonals);
     // values.resize(this->_pad_size(num_cols, alignment), num_diagonals);
     // values.resize(num_rows, num_diagonals);

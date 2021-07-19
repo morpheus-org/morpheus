@@ -57,7 +57,7 @@ using serial = typename Kokkos::Serial::execution_space;
 // [ 0,  0,  3,  0, 15],
 // [ 6,  0,  0,  4,  0],
 // [ 0,  7,  0,  0,  5],
-// [ 0,  0,  8,  0,  0],
+// [ 0,  0,  8,  1,  0],
 // [ 0,  0,  0,  9,  0]
 
 // Medium matrix
@@ -80,35 +80,45 @@ using serial = typename Kokkos::Serial::execution_space;
 //    [00 60 00]
 
 dia build_large_dia() {
-  dia mat(7, 5, 12, 3);
+  dia mat(7, 5, 13, 4);
   // Diagonal offsets
   mat.diagonal_offsets[0] = -3;
-  mat.diagonal_offsets[1] = 0;
-  mat.diagonal_offsets[2] = 2;
+  mat.diagonal_offsets[1] = -2;
+  mat.diagonal_offsets[2] = 0;
+  mat.diagonal_offsets[3] = 2;
   // First Diagonal
-  mat.values(0, 0) = -1;
-  mat.values(1, 0) = -1;
-  mat.values(2, 0) = -1;
+  mat.values(0, 0) = -3;
+  mat.values(1, 0) = -3;
+  mat.values(2, 0) = -3;
   mat.values(3, 0) = 6;
   mat.values(4, 0) = 7;
   mat.values(5, 0) = 8;
   mat.values(6, 0) = 9;
   // Second Diagonal
-  mat.values(0, 1) = 1;
+  mat.values(0, 0) = -2;
+  mat.values(1, 0) = -2;
+  mat.values(2, 0) = 0;
+  mat.values(3, 0) = 0;
+  mat.values(4, 0) = 0;
+  mat.values(5, 0) = 1;
+  mat.values(6, 0) = 0;
+  // Second Diagonal
+  mat.values(0, 0) = 1;
   mat.values(1, 1) = 2;
-  mat.values(2, 1) = 3;
-  mat.values(3, 1) = 4;
-  mat.values(4, 1) = 5;
-  mat.values(5, 1) = -2;
-  mat.values(6, 1) = -2;
+  mat.values(2, 2) = 3;
+  mat.values(3, 3) = 4;
+  mat.values(4, 4) = 5;
+  mat.values(5, 5) = -2;
+  mat.values(6, 6) = -2;
   // Third Diagonal
-  mat.values(0, 2) = 13;
-  mat.values(1, 2) = 14;
-  mat.values(2, 2) = 15;
-  mat.values(3, 2) = -33;
-  mat.values(4, 2) = -33;
-  mat.values(4, 2) = -3;
-  mat.values(4, 2) = -3;
+  mat.values(2, 0) = -3;
+  mat.values(2, 1) = -3;
+  mat.values(2, 2) = 13;
+  mat.values(2, 3) = 14;
+  mat.values(2, 4) = 15;
+  mat.values(2, 5) = -33;
+  mat.values(2, 6) = -33;
+  mat.values(2, 7) = -33;
 
   return mat;
 }
@@ -388,51 +398,9 @@ coo build_medium_coo() {
 
 int main() {
   Morpheus::initialize();
-  {
-    coo A = build_medium_coo(), A_from_dia;
-    dia B = build_medium_dia(), B_from_coo;
-
-    //   vec x(5, 0), ya("ycoo", 5, 0), yb("ydia", 5, 0);
-
-    //   x[0] = 1;
-    //   x[1] = 2;
-    //   x[2] = 3;
-    //   x[3] = 4;
-    //   x[4] = 5;
-
-    //   Morpheus::multiply<serial>(A, x, ya);
-    //   Morpheus::multiply<serial>(B, x, yb);
-
-    //   Morpheus::copy(A, B_from_coo);  // should be same with B
-    //   Morpheus::copy(B, A_from_dia);  // should be same with A
-
-    std::cout << "============ Checking build_large ============\n";
-    //   Morpheus::print(ya);
-    //   Morpheus::print(yb);
-
-    // Morpheus::print(A);
-    //   Morpheus::print(A_from_dia);
-    // Morpheus::print(B);
-    //   Morpheus::print(B_from_coo);
-    using IndexType = dia::index_type;
-    using ValueType = dia::value_type;
-    std::cout << "[";
-    for (IndexType i = 0; i < B.values.nrows(); i++) {
-      std::cout << "[";
-      for (IndexType j = 0; j < B.values.ncols(); j++) {
-        std::cout << B.values(i, j) << ",";
-      }
-      std::cout << "], ";
-    }
-    std::cout << "]\n";
-
-    Morpheus::print(A);
-    Morpheus::print(B);
-    std::cout << "==============================================\n";
-  }
   // {
-  //   coo A = build_large_coo(), A_from_dia;
-  //   dia B = build_large_dia(), B_from_coo;
+  //   coo A = build_medium_coo(), A_from_dia;
+  //   dia B = build_medium_dia(), B_from_coo;
 
   //   vec x(5, 0), ya("ycoo", 5, 0), yb("ydia", 5, 0);
 
@@ -456,8 +424,82 @@ int main() {
   //   Morpheus::print(A_from_dia);
   // Morpheus::print(B);
   //   Morpheus::print(B_from_coo);
-  //   std::cout << "==============================================\n";
+  // using IndexType = dia::index_type;
+  // using ValueType = dia::value_type;
+  // std::cout << "[";
+  // for (IndexType i = 0; i < B.values.nrows(); i++) {
+  //   std::cout << "[";
+  //   for (IndexType j = 0; j < B.values.ncols(); j++) {
+  //     std::cout << B.values(i, j) << ",";
+  //   }
+  //   std::cout << "], ";
   // }
+  // std::cout << "]\n";
+
+  // Morpheus::print(A);
+  // Morpheus::print(B);
+  // std::cout << "==============================================\n";
+  // }
+
+  {
+    coo A = build_large_coo(), A_from_dia;
+    dia B = build_large_dia(), B_from_coo;
+
+    // vec x(5, 0), ya("ycoo", 5, 0), yb("ydia", 5, 0);
+
+    // x[0] = 1;
+    // x[1] = 2;
+    // x[2] = 3;
+    // x[3] = 4;
+    // x[4] = 5;
+
+    //   Morpheus::multiply<serial>(A, x, ya);
+    //   Morpheus::multiply<serial>(B, x, yb);
+
+    //   Morpheus::copy(A, B_from_coo);  // should be same with B
+    //   Morpheus::copy(B, A_from_dia);  // should be same with A
+
+    std::cout << "============ Checking build_large ============\n";
+    //   Morpheus::print(ya);
+    //   Morpheus::print(yb);
+
+    // Morpheus::print(A);
+    // Morpheus::print(A_from_dia);
+    // Morpheus::print(B);
+    // // Morpheus::print(B_from_coo);
+    // using IndexType = dia::index_type;
+    // using ValueType = dia::value_type;
+    // std::cout << "[";
+    // for (IndexType i = 0; i < B.values.nrows(); i++) {
+    //   std::cout << "[";
+    //   for (IndexType j = 0; j < B.values.ncols(); j++) {
+    //     std::cout << B.values(i, j) << ",";
+    //   }
+    //   std::cout << "], ";
+    // }
+    // std::cout << "]\n\n";
+
+    // // std::cout << "[";
+    // for (IndexType i = 0; i < B.diagonal_offsets.size(); i++) {
+    //   const IndexType k = B.diagonal_offsets[i];
+
+    //   const IndexType i_start = std::max<IndexType>(0, -k);
+    //   const IndexType j_start = std::max<IndexType>(0, k);
+
+    //   // number of elements to process in this diagonal
+    //   const IndexType N = std::min(B.nrows() - i_start, B.ncols() - j_start);
+
+    //   for (IndexType n = 0; n < N; n++) {
+    //     std::cout << "(" << i << "," << j_start + n << ")\n";
+    //     // y[i_start + n] += B.values(i, j_start + n) * x[j_start + n];
+    //   }
+    // }
+
+    Morpheus::print(A);
+    Morpheus::print(B);
+    // std::cout << "]\n\n";
+    std::cout << "==============================================\n";
+  }
 
   // {
   //   coo A = build_many_diag_coo(), A_from_dia;
