@@ -92,8 +92,9 @@ void print(const Printable& p, Stream& s, DiaTag) {
     for (IndexType n = 0; n < N; n++) {
       ValueType temp = p.values(i_start + n, i);
       if (temp != ValueType(0)) {
-        s << " " << std::setw(14) << i_start + n;
         s << " " << std::setw(14) << i;
+        s << " " << std::setw(14) << i_start + n;
+        s << " " << std::setw(14) << j_start + n;
         s << " " << std::setprecision(4) << std::setw(8) << "(" << temp
           << ")\n";
       }

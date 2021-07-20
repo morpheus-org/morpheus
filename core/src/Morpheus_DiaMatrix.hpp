@@ -58,7 +58,7 @@ class DiaMatrix : public Impl::MatrixTraits<Properties...> {
 
   using index_array_type = Morpheus::vector<index_type, device_type>;
   using value_array_type =
-      Morpheus::DenseMatrix<value_type, device_type, Kokkos::LayoutLeft>;
+      Morpheus::DenseMatrix<value_type, Kokkos::LayoutLeft, device_type>;
   using value_array_pointer   = typename value_array_type::pointer;
   using value_array_reference = typename value_array_type::reference;
 

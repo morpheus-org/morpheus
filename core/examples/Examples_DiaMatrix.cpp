@@ -108,7 +108,7 @@ int main() {
     Morpheus::copy(A, B_from_coo);  // should be same with B
     Morpheus::copy(B, A_from_dia);  // should be same with A
 
-    std::cout << "============ Checking build_large ============\n";
+    std::cout << "============ Checking build_large ============" << std::endl;
     Morpheus::print(ya);
     Morpheus::print(yb);
 
@@ -117,13 +117,12 @@ int main() {
     Morpheus::print(B);
     Morpheus::print(B_from_coo);
 
-    std::cout << "==============================================\n";
+    std::cout << "==============================================" << std::endl;
   }
 
   {
     coo A = build_medium_coo(), A_from_dia;
     dia B = build_medium_dia(), B_from_coo;
-
     vec x(5, 0), ya("ycoo", 5, 0), yb("ydia", 5, 0);
 
     x[0] = 1;
@@ -296,12 +295,7 @@ coo build_large_coo() {
 
   return mat;
 }
-// Medium matrix
-// [ 1, -1, -3,  0,  0]
-// [-2,  5,  0,  0,  0]
-// [ 0,  0,  4,  6,  4]
-// [-4,  0,  2,  7,  0]
-// [ 0,  8,  0,  0, -5]
+
 dia build_medium_dia() {
   dia mat(5, 5, 13, 5);
   // Diagonal offsets
@@ -360,7 +354,7 @@ coo build_medium_coo() {
   mat.values[2]         = -3;
 
   mat.row_indices[3]    = 1;
-  mat.column_indices[3] = 9;
+  mat.column_indices[3] = 0;
   mat.values[3]         = -2;
 
   mat.row_indices[4]    = 1;
@@ -446,7 +440,7 @@ coo build_many_diag_coo() {
   mat.column_indices[0] = 0;
   mat.values[0]         = 10;
   mat.row_indices[1]    = 0;
-  mat.column_indices[1] = 1;
+  mat.column_indices[1] = 2;
   mat.values[1]         = 20;
   mat.row_indices[2]    = 2;
   mat.column_indices[2] = 2;

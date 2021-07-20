@@ -130,6 +130,8 @@ class DenseMatrix : public Impl::MatrixTraits<Properties...> {
  private:
   std::string _name;
   index_type _m, _n;
+
+ public:
   value_array_type _values;
 };
 }  // namespace Morpheus
