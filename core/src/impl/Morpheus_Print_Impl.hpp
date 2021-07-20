@@ -78,50 +78,27 @@ void print(const Printable& p, Stream& s, DiaTag) {
 
   using IndexType       = typename Printable::index_type;
   using ValueType       = typename Printable::value_type;
-  const IndexType ndiag = p.diagonal_offsets.size();
+  const IndexType ndiag = p.values.ncols();
 
-  std::cout << "Values Mapping::\n";
-  std::cout << "\t(vi,vj)\t*\txj\t=\tyi\n";
-  for (IndexType i = 0; i < n; ++i) {
-    for (IndexType j = 0; j < n_diag; ++j) {
-      IndexType start = 0, v_offset = 0, end = p.nrows();
-      if (p.diagonal_offsets[j] < 0) {
-        start -= p.diagonal_offsets[j];
-        v_offset = -start;
-      } else {
-        end -= p.diagonal_offsets[j];
-        v_offset = p.diagonal_offsets[j];
+  for (IndexType i = 0; i < ndiag; i++) {
+    const IndexType k = p.diagonal_offsets[i];
+
+    const IndexType i_start = std::max<IndexType>(0, -k);
+    const IndexType j_start = std::max<IndexType>(0, k);
+
+    // number of elements to process in this diagonal
+    const IndexType N = std::min(p.nrows() - i_start, p.ncols() - j_start);
+
+    for (IndexType n = 0; n < N; n++) {
+      ValueType temp = p.values(i_start + n, i);
+      if (temp != ValueType(0)) {
+        s << " " << std::setw(14) << i_start + n;
+        s << " " << std::setw(14) << i;
+        s << " " << std::setprecision(4) << std::setw(8) << "(" << temp
+          << ")\n";
       }
-      // ind = j * n_row + i;
-      std::cout << "\t(" << i << "," << j << ")\t*\t" << j << "\t=\t" << i
-                << "\n";
-      // if ((i >= start) && (i < end)) {
-      //   // std::cout << "\t(" << i << "," << j << ")\t*\t" << j << "\t=\t" <<
-      //   i
-      //   //           << "\n";
-      //   // y[i] += val[ind] * x[i + v_offset];
-      // }
     }
   }
-  // for (IndexType i = 0; i < ndiag; i++) {
-  //   const IndexType k = p.diagonal_offsets[i];  // diagonal offset
-
-  //   const IndexType i_start = std::max<IndexType>(0, -k);
-  //   const IndexType j_start = std::max<IndexType>(0, k);
-
-  //   // number of elements to process in this diagonal
-  //   const IndexType N = std::min(p.nrows() - i_start, p.ncols() - j_start);
-
-  //   for (IndexType n = 0; n < N; n++) {
-  //     ValueType temp = p.values(i, j_start + n);
-  //     if (temp != ValueType(0)) {
-  //       s << " " << std::setw(14) << i;
-  //       s << " " << std::setw(14) << j_start + n;
-  //       s << " " << std::setprecision(4) << std::setw(8) << "(" << temp
-  //         << ")\n";
-  //     }
-  //   }
-  // }
 }
 
 template <typename Printable, typename Stream>

@@ -323,7 +323,7 @@ void copy(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
   }
 
   for (IndexType n = 0; n < IndexType(src.nnnz()); n++) {
-    dst.values(diag_idx[n], src.column_indices[n]) = src.values[n];
+    dst.values(src.row_indices[n], diag_idx[n]) = src.values[n];
   }
 }
 
