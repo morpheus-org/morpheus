@@ -79,11 +79,37 @@ $ make
 $ make install
 ```
 
-### Installing Morpheus
+## Cirrus 
+
+### Setup environment - Intel
+```sh
+$ module load cmake
+$ module load intel-20.4/compilers
+$ CXX_COMPILER=/lustre/sw/intel/compilers_and_libraries_2020.4.304/linux/bin/intel64/icpc
+$ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/intel
+$ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/intel
+```
+
+### Installing Kokkos
+```sh
+$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_INSTALL_DIR} \
+           -DCMAKE_BUILD_TYPE=Release -DKokkos_ENABLE_OPENMP=ON  -DKokkos_ENABLE_SERIAL=ON \
+           -DKokkos_CXX_STANDARD=17 -DKokkos_ENABLE_COMPILER_WARNINGS=On -DKokkos_ARCH_BDW=On \
+           -DKokkos_ENABLE_AGGRESSIVE_VECTORIZATION=On
+$ make
+$ make install
+```
+
+## Installing Morpheus
 ```sh
 $ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${MORPHEUS_INSTALL_DIR} \
            -DKokkos_ROOT=${KOKKOS_INSTALL_DIR} -DCMAKE_BUILD_TYPE=Release \
            -DMorpheus_ENABLE_EXAMPLES=On -DMorpheus_ENABLE_TESTS=On
 $ make
 $ make install
+```
+
+## Valgrind Memcheck
+```sh
+$  valgrind -s --tool=memcheck --leak-check=full --track-origins=yes /path/to/exe
 ```
