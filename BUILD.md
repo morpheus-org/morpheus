@@ -79,7 +79,7 @@ $ make
 $ make install
 ```
 
-## Cirrus 
+## Cirrus - CPU
 
 ### Setup environment - Intel
 ```sh
@@ -99,6 +99,37 @@ $ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_
 $ make
 $ make install
 ```
+
+## Cirrus - GPU
+
+### Setup environment - Intel
+```sh
+$ module load cmake
+$ module load nvidia/cuda-10.2
+$ CXX_COMPILER=/path/to/kokkos/bin/nvcc_wrapper
+CXX_COMPILER=/lustre/home/e609/cstyl/kokkos/bin/nvcc_wrapper
+$ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/cuda
+KOKKOS_INSTALL_DIR=/lustre/home/e609/cstyl/libs/kokkos/cuda
+$ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/cuda
+MORPHEUS_INSTALL_DIR=/lustre/home/e609/cstyl/libs/morpheus/cuda
+```
+
+### Installing Kokkos
+```sh
+$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_INSTALL_DIR} \
+           -DCMAKE_BUILD_TYPE=Release -DKokkos_ENABLE_CUDA=ON -DKokkos_ENABLE_OPENMP=ON  -DKokkos_ENABLE_SERIAL=ON \
+           -DKokkos_CXX_STANDARD=17 -DKokkos_ENABLE_COMPILER_WARNINGS=On -DKokkos_ARCH_VOLTA70=On -DKokkos_ARCH_SKX=On \
+           -DKokkos_ENABLE_AGGRESSIVE_VECTORIZATION=On
+$ make
+$ make install
+```
+**Warning** For cmake to find the cuda drivers you need to have a visible NVIDIA GPU. For Cirrus this can be achieved by creating an interactive session by
+```sh
+PROJECT_ACC=Project_No
+$ srun --exclusive --nodes=1 --time=01:00:00 --gres=gpu:1 --partition=gpu-cascade --qos=gpu --account=${PROJECT_ACC} --pty /usr/bin/bash --login
+```
+
+**Warning** For C++17 support requires NVCC 11.0+ or Clang 4.0+
 
 ## Installing Morpheus
 ```sh
