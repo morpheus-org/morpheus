@@ -113,3 +113,12 @@ $ make install
 ```sh
 $  valgrind -s --tool=memcheck --leak-check=full --track-origins=yes /path/to/exe
 ```
+
+### Installing Kokkos with Bound Checks
+```sh
+$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_INSTALL_DIR} \
+           -DCMAKE_BUILD_TYPE=Debug -DKokkos_ENABLE_OPENMP=ON  -DKokkos_ENABLE_SERIAL=ON \
+           -DKokkos_CXX_STANDARD=17 -DKokkos_ENABLE_COMPILER_WARNINGS=On -DKokkos_ENABLE_DEBUG_BOUNDS_CHECK=On
+$ make
+$ make install
+```
