@@ -1,5 +1,5 @@
 /**
- * version.cpp
+ * Examples_Version.cpp
  *
  * EPCC, The University of Edinburgh
  *
