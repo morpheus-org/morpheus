@@ -87,3 +87,15 @@ $ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${MORPHEU
 $ make
 $ make install
 ```
+
+#### Interactive GPU Session on Cirrus
+```sh
+$ ACCOUNT_ID=YOUR_PROJECT_ID
+$ srun --exclusive --nodes=1 --time=01:00:00 --gres=gpu:4 --partition=gpu-cascade --qos=gpu --account=${ACCOUNT_ID} --pty /usr/bin/bash --login
+```
+
+#### Interactive CPU Session on Cirrus
+```sh
+$ ACCOUNT_ID=YOUR_PROJECT_ID
+srun --exclusive --nodes=1 --time=01:00:00 --partition=standard --qos=standard --account=${ACCOUNT_ID} --pty /usr/bin/bash --login
+```
