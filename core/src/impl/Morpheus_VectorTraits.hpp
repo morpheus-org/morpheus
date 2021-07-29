@@ -45,6 +45,7 @@ template <>
 struct VectorTraits<void> {
   using execution_space = void;
   using memory_space    = void;
+  using HostMirrorSpace = void;
 };
 
 template <class... Prop>
@@ -53,6 +54,7 @@ struct VectorTraits<void, void, Prop...> {
 
   using execution_space = typename VectorTraits<void, Prop...>::execution_space;
   using memory_space    = typename VectorTraits<void, Prop...>::memory_space;
+  using HostMirrorSpace = typename VectorTraits<void, Prop...>::HostMirrorSpace;
 };
 
 template <class Space, class... Prop>
@@ -69,6 +71,8 @@ struct VectorTraits<
       "Only one Vector Execution or Memory Space template argument");
   using execution_space = typename Space::execution_space;
   using memory_space    = typename Space::memory_space;
+  using HostMirrorSpace =
+      typename Kokkos::Impl::HostMirror<Space>::Space::memory_space;
 };
 
 template <class ValueType, class... Properties>
@@ -85,6 +89,11 @@ struct VectorTraits {
       !std::is_same_v<typename prop::memory_space, void>,
       typename prop::memory_space, typename ExecutionSpace::memory_space>;
 
+  using HostMirrorSpace = typename std::conditional<
+      !std::is_same<typename prop::HostMirrorSpace, void>::value,
+      typename prop::HostMirrorSpace,
+      typename Kokkos::Impl::HostMirror<ExecutionSpace>::Space>::type;
+
   // Check the validity of ValueType
   static_assert(std::is_arithmetic_v<ValueType>,
                 "ValueType must be an arithmetic type such as int or double");
@@ -92,9 +101,10 @@ struct VectorTraits {
  public:
   using value_type = ValueType;
 
-  using execution_space = ExecutionSpace;
-  using memory_space    = MemorySpace;
-  using device_type     = Kokkos::Device<ExecutionSpace, MemorySpace>;
+  using execution_space   = ExecutionSpace;
+  using memory_space      = MemorySpace;
+  using device_type       = Kokkos::Device<ExecutionSpace, MemorySpace>;
+  using host_mirror_space = HostMirrorSpace;
 };
 }  // namespace Impl
 }  // namespace Morpheus
