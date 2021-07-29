@@ -31,16 +31,16 @@
 #include <Morpheus_DenseMatrix.hpp>
 #include <Morpheus_Copy.hpp>
 
-#include <impl/Morpheus_MatrixTraits.hpp>
+#include <impl/Morpheus_ContainerTraits.hpp>
 #include <impl/Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 
-template <class... Properties>
-class DiaMatrix : public Impl::MatrixTraits<Properties...> {
+template <class Datatype, class... Properties>
+class DiaMatrix : public Impl::ContainerTraits<Datatype, Properties...> {
  public:
-  using type   = DiaMatrix<Properties...>;
-  using traits = Impl::MatrixTraits<Properties...>;
+  using type   = DiaMatrix<Datatype, Properties...>;
+  using traits = Impl::ContainerTraits<Datatype, Properties...>;
   using tag    = typename MatrixFormatTag<DiaTag>::tag;
 
   using value_type = typename traits::value_type;

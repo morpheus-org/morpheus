@@ -29,16 +29,16 @@
 #include <Morpheus_Core.hpp>
 #include <Morpheus_Exceptions.hpp>
 
-#include <impl/Morpheus_MatrixTraits.hpp>
+#include <impl/Morpheus_ContainerTraits.hpp>
 #include <impl/Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 
-template <class... Properties>
-class DenseMatrix : public Impl::MatrixTraits<Properties...> {
+template <class Datatype, class... Properties>
+class DenseMatrix : public Impl::ContainerTraits<Datatype, Properties...> {
  public:
-  using type   = DenseMatrix<Properties...>;
-  using traits = Impl::MatrixTraits<Properties...>;
+  using type   = DenseMatrix<Datatype, Properties...>;
+  using traits = Impl::ContainerTraits<Datatype, Properties...>;
   using tag    = typename MatrixFormatTag<DenseMatrixTag>::tag;
 
   using value_type   = typename traits::value_type;

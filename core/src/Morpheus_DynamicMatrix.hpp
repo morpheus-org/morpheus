@@ -32,27 +32,17 @@
 #include <Morpheus_Copy.hpp>
 #include <Morpheus_Print.hpp>
 
-#include <impl/Morpheus_MatrixTraits.hpp>
+#include <impl/Morpheus_ContainerTraits.hpp>
 #include <impl/Morpheus_FormatTags.hpp>
 #include <impl/Morpheus_DynamicMatrix_Impl.hpp>
 
 namespace Morpheus {
 
-/** @class DynamicMatrix
- * @brief Dynamic Matrix class that acts as a sum type of all the supporting
- * Matrix Storage Formats.
- *
- * Template argument options:
- *  - DynamicMatrix<ValueType>
- *  - DynamicMatrix<ValueType, IndexType>
- *  - DynamicMatrix<ValueType, IndexType, Space>
- *  - DynamicMatrix<ValueType, Space>
- */
 template <class... Properties>
-class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
+class DynamicMatrix : public Impl::ContainerTraits<Properties...> {
  public:
   using type   = DynamicMatrix<Properties...>;
-  using traits = Impl::MatrixTraits<Properties...>;
+  using traits = Impl::ContainerTraits<Properties...>;
   using tag    = typename MatrixFormatTag<Morpheus::DynamicTag>::tag;
 
   using variant_type = typename MatrixFormats<Properties...>::variant;
@@ -87,7 +77,7 @@ class DynamicMatrix : public Impl::MatrixTraits<Properties...> {
 
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
-                     const index_type nnz, Args &&...args) {
+                     const index_type nnz, Args &&... args) {
     auto f =
         std::bind(Impl::any_type_resize<Properties...>(), std::placeholders::_1,
                   m, n, nnz, std::forward<Args>(args)...);

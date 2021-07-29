@@ -25,7 +25,7 @@
 #define MORPHEUS_FWD_DYNAMICMATRIX_HPP
 
 namespace Morpheus {
-template <typename... Properties>
+template <class DataType, typename... Properties>
 class DynamicMatrix;
 }  // namespace Morpheus
 

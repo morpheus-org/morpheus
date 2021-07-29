@@ -32,7 +32,7 @@
 #include <Morpheus_DiaMatrix.hpp>
 
 #include <impl/Morpheus_MatrixProxy.hpp>
-#include <impl/Morpheus_MatrixTraits.hpp>
+#include <impl/Morpheus_ContainerTraits.hpp>
 
 namespace Morpheus {
 
@@ -51,8 +51,8 @@ enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT };
 namespace Impl {
 
 template <class... Properties>
-struct any_type_resize : public Impl::MatrixTraits<Properties...> {
-  using traits      = Impl::MatrixTraits<Properties...>;
+struct any_type_resize : public Impl::ContainerTraits<Properties...> {
+  using traits      = Impl::ContainerTraits<Properties...>;
   using index_type  = typename traits::index_type;
   using value_type  = typename traits::value_type;
   using result_type = void;
@@ -83,7 +83,7 @@ struct any_type_resize : public Impl::MatrixTraits<Properties...> {
   // Constrains any other overloads for supporting formats
   // Unsupported formats won't compile
   template <typename... Args>
-  result_type operator()(CooMatrix<Properties...> &mat, Args &&...args) {
+  result_type operator()(CooMatrix<Properties...> &mat, Args &&... args) {
     std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic resize interface.\n\
@@ -92,7 +92,7 @@ struct any_type_resize : public Impl::MatrixTraits<Properties...> {
   }
 
   template <typename... Args>
-  result_type operator()(CsrMatrix<Properties...> &mat, Args &&...args) {
+  result_type operator()(CsrMatrix<Properties...> &mat, Args &&... args) {
     std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic resize interface.\n\
@@ -101,7 +101,7 @@ struct any_type_resize : public Impl::MatrixTraits<Properties...> {
   }
 
   template <typename... Args>
-  result_type operator()(DiaMatrix<Properties...> &mat, Args &&...args) {
+  result_type operator()(DiaMatrix<Properties...> &mat, Args &&... args) {
     std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic resize interface.\n\

@@ -29,26 +29,36 @@
 
 #include <fwd/Morpheus_Fwd_DenseVector.hpp>
 
-#include <impl/Morpheus_VectorTraits.hpp>
+#include <impl/Morpheus_ContainerTraits.hpp>
 #include <impl/Morpheus_FormatTags.hpp>
 
 #include <Kokkos_Random.hpp>
 
 namespace Morpheus {
 
-template <class... Properties>
-class DenseVector : public Impl::VectorTraits<Properties...> {
+template <class Datatype, class... Properties>
+class DenseVector : public Impl::ContainerTraits<Datatype, Properties...> {
  public:
-  using type   = DenseVector<Properties...>;
-  using traits = Impl::VectorTraits<Properties...>;
+  using type   = DenseVector<Datatype, Properties...>;
+  using traits = Impl::ContainerTraits<Datatype, Properties...>;
   using tag    = typename VectorFormatTag<Morpheus::DenseVectorTag>::tag;
 
-  using value_type = typename traits::value_type;
-  using index_type = size_t;
+  using value_type   = typename traits::value_type;
+  using index_type   = typename traits::index_type;
+  using array_layout = typename traits::array_layout;
 
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
+
+  using HostMirror = DenseVector<
+      typename traits::non_const_value_type, typename traits::array_layout,
+      Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
+                     typename traits::host_mirror_space::memory_space>>;
+
+  using host_mirror_type = DenseVector<typename traits::non_const_value_type,
+                                       typename traits::array_layout,
+                                       typename traits::host_mirror_space>;
 
   using pointer         = DenseVector*;
   using const_pointer   = const DenseVector*;
@@ -58,8 +68,7 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   using iterator       = value_type*;
   using const_iterator = const value_type*;
 
-  using value_array_type =
-      Kokkos::View<value_type*, Kokkos::LayoutRight, device_type>;
+  using value_array_type = Kokkos::View<value_type*, array_layout, device_type>;
   using value_array_pointer   = typename value_array_type::pointer_type;
   using value_array_reference = typename value_array_type::reference_type;
 
@@ -142,12 +151,6 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
     return _size > 0 ? _values.data() + _size : _values.data();
   }
 
-  // Capacity
-  //   TODO: reserve should be enabled when push_back methods etc are
-  //   developed inline void reserve(size_t n) {
-  //     Kokkos::resize(_values, size_t(n));
-  //   }
-
   // Modifiers
   inline void resize(index_type n) {
     Kokkos::resize(_values, size_t(n));
@@ -157,8 +160,6 @@ class DenseVector : public Impl::VectorTraits<Properties...> {
   inline void resize(const index_type n, const index_type val) {
     assign(n, val);
   }
-
-  // TODO: Data management routines for copying to and from a space
 
   // Other
   inline std::string name() const { return _name; }

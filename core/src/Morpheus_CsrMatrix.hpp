@@ -30,16 +30,16 @@
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_Copy.hpp>
 
-#include <impl/Morpheus_MatrixTraits.hpp>
+#include <impl/Morpheus_ContainerTraits.hpp>
 #include <impl/Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 
-template <class... Properties>
-class CsrMatrix : public Impl::MatrixTraits<Properties...> {
+template <class Datatype, class... Properties>
+class CsrMatrix : public Impl::ContainerTraits<Datatype, Properties...> {
  public:
-  using type   = CsrMatrix<Properties...>;
-  using traits = Impl::MatrixTraits<Properties...>;
+  using type   = CsrMatrix<Datatype, Properties...>;
+  using traits = Impl::ContainerTraits<Datatype, Properties...>;
   using tag    = typename MatrixFormatTag<Morpheus::CsrTag>::tag;
 
   using value_type = typename traits::value_type;

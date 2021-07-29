@@ -26,10 +26,20 @@
 #include <type_traits>
 
 #include <Morpheus_Core.hpp>
+#include <impl/Morpheus_MatrixTags.hpp>
 
 namespace Morpheus {
 
 namespace Impl {}
+
+template <class T>
+struct is_sparse_mat {
+  using value =
+      typename std::is_same<typename T::tag, Impl::SparseMatTag>::value;
+};
+
+template <class T>
+using is_sparse_mat_v = typename is_sparse_mat<T>::value;
 
 template <class T>
 struct remove_cvref {

@@ -31,16 +31,16 @@
 #include <Morpheus_Sort.hpp>
 #include <Morpheus_Copy.hpp>
 
-#include <impl/Morpheus_MatrixTraits.hpp>
+#include <impl/Morpheus_ContainerTraits.hpp>
 #include <impl/Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 
-template <class... Properties>
-class CooMatrix : public Impl::MatrixTraits<Properties...> {
+template <class DataType, class... Properties>
+class CooMatrix : public Impl::ContainerTraits<Datatype, Properties...> {
  public:
-  using type   = CooMatrix<Properties...>;
-  using traits = Impl::MatrixTraits<Properties...>;
+  using type   = CooMatrix<Datatype, Properties...>;
+  using traits = Impl::ContainerTraits<Datatype, Properties...>;
   using tag    = typename MatrixFormatTag<Morpheus::CooTag>::tag;
 
   using value_type = typename traits::value_type;

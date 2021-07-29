@@ -25,7 +25,7 @@
 #define MORPHEUS_FWD_DIAMATRIX_HPP
 
 namespace Morpheus {
-template <typename... Properties>
+template <class DataType, typename... Properties>
 class DiaMatrix;
 }  // namespace Morpheus
 

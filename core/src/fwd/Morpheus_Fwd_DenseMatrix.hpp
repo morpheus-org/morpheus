@@ -25,7 +25,7 @@
 #define MORPHEUS_FWD_DENSEMATRIX_HPP
 
 namespace Morpheus {
-template <typename... Properties>
+template <class DataType, typename... Properties>
 class DenseMatrix;
 }  // namespace Morpheus
 
