@@ -51,6 +51,17 @@ class CooMatrix : public Impl::ContainerTraits<Datatype, Properties...> {
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
 
+  using HostMirror = CooMatrix<
+      typename traits::non_const_value_type, typename traits::index_type,
+      typename traits::array_layout,
+      Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
+                     typename traits::host_mirror_space::memory_space>>;
+
+  using host_mirror_type =
+      CooMatrix<typename traits::non_const_value_type,
+                typename traits::index_type, typename traits::array_layout,
+                typename traits::host_mirror_space>;
+
   using pointer         = CooMatrix *;
   using const_pointer   = const CooMatrix *;
   using reference       = CooMatrix &;

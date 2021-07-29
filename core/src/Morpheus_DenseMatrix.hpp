@@ -51,6 +51,17 @@ class DenseMatrix : public Impl::ContainerTraits<Datatype, Properties...> {
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
 
+  using HostMirror = DenseMatrix<
+      typename traits::non_const_value_type, typename traits::index_type,
+      typename traits::array_layout,
+      Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
+                     typename traits::host_mirror_space::memory_space>>;
+
+  using host_mirror_type =
+      DenseMatrix<typename traits::non_const_value_type,
+                  typename traits::index_type, typename traits::array_layout,
+                  typename traits::host_mirror_space>;
+
   using pointer         = DenseMatrix *;
   using const_pointer   = const DenseMatrix *;
   using reference       = DenseMatrix &;

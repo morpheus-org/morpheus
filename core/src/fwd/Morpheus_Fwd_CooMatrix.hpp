@@ -25,7 +25,7 @@
 #define MORPHEUS_FWD_COOMATRIX_HPP
 
 namespace Morpheus {
-template <typename... Properties>
+template <class Datatype, typename... Properties>
 class CooMatrix;
 }  // namespace Morpheus
 

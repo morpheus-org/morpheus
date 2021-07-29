@@ -38,11 +38,11 @@
 
 namespace Morpheus {
 
-template <class... Properties>
-class DynamicMatrix : public Impl::ContainerTraits<Properties...> {
+template <class Datatype, class... Properties>
+class DynamicMatrix : public Impl::ContainerTraits<Datatype, Properties...> {
  public:
-  using type   = DynamicMatrix<Properties...>;
-  using traits = Impl::ContainerTraits<Properties...>;
+  using type   = DynamicMatrix<Datatype, Properties...>;
+  using traits = Impl::ContainerTraits<Datatype, Properties...>;
   using tag    = typename MatrixFormatTag<Morpheus::DynamicTag>::tag;
 
   using variant_type = typename MatrixFormats<Properties...>::variant;
@@ -53,6 +53,17 @@ class DynamicMatrix : public Impl::ContainerTraits<Properties...> {
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
+
+  using HostMirror = DynamicMatrix<
+      typename traits::non_const_value_type, typename traits::index_type,
+      typename traits::array_layout,
+      Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
+                     typename traits::host_mirror_space::memory_space>>;
+
+  using host_mirror_type =
+      DynamicMatrix<typename traits::non_const_value_type,
+                    typename traits::index_type, typename traits::array_layout,
+                    typename traits::host_mirror_space>;
 
   using pointer         = DynamicMatrix *;
   using const_pointer   = const DynamicMatrix *;

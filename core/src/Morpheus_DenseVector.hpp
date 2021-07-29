@@ -32,6 +32,7 @@
 #include <Kokkos_Random.hpp>
 
 #include <string>
+
 namespace Morpheus {
 
 template <class Datatype, class... Properties>
@@ -43,6 +44,7 @@ class DenseVector : public Impl::ContainerTraits<Datatype, Properties...> {
 
   using value_type   = typename traits::value_type;
   using index_type   = typename traits::index_type;
+  using size_type    = size_t;
   using array_layout = typename traits::array_layout;
 
   using memory_space    = typename traits::memory_space;
