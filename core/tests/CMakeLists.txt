@@ -17,7 +17,7 @@ target_compile_definitions(morpheus_gtest PUBLIC GTEST_HAS_TR1_TUPLE=0
                                                  GTEST_HAS_PTHREAD=0)
 
 target_include_directories(morpheus_gtest PUBLIC ${GTEST_SOURCE_DIR})
-if((NOT (Morpheus_ENABLE_CUDA AND WIN32)) AND (NOT ("${KOKKOS_CXX_COMPILER_ID}"
+if((NOT (MORPHEUS_ENABLE_CUDA AND WIN32)) AND (NOT ("${KOKKOS_CXX_COMPILER_ID}"
                                                     STREQUAL "Fujitsu")))
   target_compile_features(morpheus_gtest PUBLIC cxx_std_14)
 endif()

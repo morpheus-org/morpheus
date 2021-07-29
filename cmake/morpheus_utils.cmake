@@ -369,7 +369,7 @@ macro(MORPHEUS_SETUP_BUILD_ENVIRONMENT)
     # ==================================================================
     # Enable Third Party Libraries
     # ==================================================================
-    include(cmake/morpheus_tpls.cmake)
+    # include(cmake/morpheus_tpls.cmake)
     # include(cmake/morpheus_features.cmake) # TODO
     include(cmake/kokkos_requirements.cmake)
 

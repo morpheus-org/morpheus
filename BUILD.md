@@ -102,13 +102,14 @@ $ make install
 
 ## Cirrus - GPU
 
-### Setup environment - Intel
+### Setup environment
 ```sh
 $ module load cmake
-$ module load nvidia/cuda-10.2
+$ module load nvidia/cuda-11.0
+$ module swap gcc/6.3.0 gcc/8.2.0 # otherwise complaints for not compatible with c++17 features
 $ CXX_COMPILER=/path/to/kokkos/bin/nvcc_wrapper
-$ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/cuda
-$ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/cuda
+$ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/cuda-11.0
+$ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/cuda-11.0
 ```
 
 ### Installing Kokkos
@@ -132,6 +133,8 @@ $ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${MORPHEU
 $ make
 $ make install
 ```
+
+**Warning** The installed Kokkos configuration does not support CXX extensions when build with `CUDA` enabled. Add the `-DCMAKE_CXX_EXTENSIONS=Off` to surpress warning.
 
 ## Valgrind Memcheck
 ```sh
