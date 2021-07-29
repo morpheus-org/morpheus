@@ -6,7 +6,7 @@
  * (c) 2021 The University of Edinburgh
  *
  * Contributing Authors:
- * cstyl
+ * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

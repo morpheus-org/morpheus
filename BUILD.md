@@ -79,7 +79,52 @@ $ make
 $ make install
 ```
 
-### Installing Morpheus
+## Cirrus - CPU
+
+### Setup environment - Intel
+```sh
+$ module load cmake
+$ module load intel-20.4/compilers
+$ CXX_COMPILER=/lustre/sw/intel/compilers_and_libraries_2020.4.304/linux/bin/intel64/icpc
+$ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/intel
+$ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/intel
+```
+
+### Installing Kokkos
+```sh
+$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_INSTALL_DIR} \
+           -DCMAKE_BUILD_TYPE=Release -DKokkos_ENABLE_OPENMP=ON  -DKokkos_ENABLE_SERIAL=ON \
+           -DKokkos_CXX_STANDARD=17 -DKokkos_ENABLE_COMPILER_WARNINGS=On -DKokkos_ARCH_BDW=On \
+           -DKokkos_ENABLE_AGGRESSIVE_VECTORIZATION=On
+$ make
+$ make install
+```
+
+## Cirrus - GPU
+
+### Setup environment - Intel
+```sh
+$ module load cmake
+$ module load nvidia/cuda-10.2
+$ CXX_COMPILER=/path/to/kokkos/bin/nvcc_wrapper
+$ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/cuda
+$ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/cuda
+```
+
+### Installing Kokkos
+```sh
+$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_INSTALL_DIR} \
+           -DCMAKE_BUILD_TYPE=Release -DKokkos_ENABLE_CUDA=ON -DKokkos_ENABLE_OPENMP=ON  -DKokkos_ENABLE_SERIAL=ON \
+           -DKokkos_CXX_STANDARD=17 -DKokkos_ENABLE_COMPILER_WARNINGS=On -DKokkos_ARCH_VOLTA70=On -DKokkos_ARCH_SKX=On \
+           -DKokkos_ENABLE_AGGRESSIVE_VECTORIZATION=On
+$ make
+$ make install
+```
+**Warning** For cmake to find the cuda drivers you need to have a visible NVIDIA GPU. See [here](#gpu_interactive) how to create an interactive GPU session on Cirrus.
+
+**Warning** For C++17 support requires NVCC 11.0+ or Clang 4.0+
+
+## Installing Morpheus
 ```sh
 $ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${MORPHEUS_INSTALL_DIR} \
            -DKokkos_ROOT=${KOKKOS_INSTALL_DIR} -DCMAKE_BUILD_TYPE=Release \
@@ -88,13 +133,28 @@ $ make
 $ make install
 ```
 
-#### Interactive GPU Session on Cirrus
+## Valgrind Memcheck
+```sh
+$  valgrind -s --tool=memcheck --leak-check=full --track-origins=yes /path/to/exe
+```
+
+### Installing Kokkos with Bound Checks
+```sh
+$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_INSTALL_DIR} \
+           -DCMAKE_BUILD_TYPE=Debug -DKokkos_ENABLE_OPENMP=ON  -DKokkos_ENABLE_SERIAL=ON \
+           -DKokkos_CXX_STANDARD=17 -DKokkos_ENABLE_COMPILER_WARNINGS=On -DKokkos_ENABLE_DEBUG_BOUNDS_CHECK=On
+$ make
+$ make install
+```
+
+## Interactive Sessions on Cirrus
+### GPU Session <a name="gpu_interactive"></a>
 ```sh
 $ ACCOUNT_ID=YOUR_PROJECT_ID
 $ srun --exclusive --nodes=1 --time=01:00:00 --gres=gpu:4 --partition=gpu-cascade --qos=gpu --account=${ACCOUNT_ID} --pty /usr/bin/bash --login
 ```
 
-#### Interactive CPU Session on Cirrus
+### CPU Session
 ```sh
 $ ACCOUNT_ID=YOUR_PROJECT_ID
 srun --exclusive --nodes=1 --time=01:00:00 --partition=standard --qos=standard --account=${ACCOUNT_ID} --pty /usr/bin/bash --login

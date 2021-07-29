@@ -219,7 +219,7 @@ void copy(const SourceType& src, DestinationType& dst, CooTag, CsrTag) {
     last               = temp;
   }
 
-  // remove duplicates?
+  // TODO: remove duplicates, if any?
 }
 
 template <typename SourceType, typename DestinationType>
@@ -243,7 +243,6 @@ void copy(const SourceType& src, DestinationType& dst, DiaTag, CooTag) {
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
   const IndexType ndiag = src.values.ncols();
-  assert(ndiag != src.diagonal_offsets.size());
 
   for (IndexType i = 0, nnzid = 0; i < ndiag; i++) {
     const IndexType k = src.diagonal_offsets[i];
@@ -293,14 +292,8 @@ void copy(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
   std::set<IndexType> diag_set(diag_map.begin(), diag_map.end());
   IndexType ndiags = IndexType(diag_set.size());
 
-  // const float max_fill   = 3.0;
-  // const float threshold  = 1e6;  // 1M entries
-  // const float size       = float(ndiags) * float(src.ncols());
-  // const float fill_ratio = size / std::max(1.0f, float(src.nnnz()));
-
-  // if (max_fill < fill_ratio && size > threshold)
-  //   throw Morpheus::format_conversion_exception(
-  //       "DiaMatrix fill-in would exceed maximum tolerance");
+  // TODO: Check if fill in exceeds a tolerance value otherwise throw
+  // format_conversion_exception
 
   IndexArrayType diagonal_offsets(ndiags, 0);
   for (auto it = diag_set.cbegin(); it != diag_set.cend(); ++it) {
