@@ -24,17 +24,17 @@
 #ifndef MORPHEUS_DYNAMICMATRIX_HPP
 #define MORPHEUS_DYNAMICMATRIX_HPP
 
+#include <Morpheus_Copy.hpp>
+#include <Morpheus_Print.hpp>
+#include <Morpheus_FormatTags.hpp>
+
+#include <impl/Morpheus_ContainerTraits.hpp>
+#include <impl/Morpheus_DynamicMatrix_Impl.hpp>
+
 #include <iostream>
 #include <string>
 #include <variant>
 #include <functional>
-
-#include <Morpheus_Copy.hpp>
-#include <Morpheus_Print.hpp>
-
-#include <impl/Morpheus_ContainerTraits.hpp>
-#include <impl/Morpheus_FormatTags.hpp>
-#include <impl/Morpheus_DynamicMatrix_Impl.hpp>
 
 namespace Morpheus {
 

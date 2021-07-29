@@ -23,17 +23,15 @@
 #ifndef MORPHEUS_DENSEVECTOR_HPP
 #define MORPHEUS_DENSEVECTOR_HPP
 
-#include <string>
-
-#include <Morpheus_Core.hpp>
+#include <Morpheus_FormatTags.hpp>
 
 #include <fwd/Morpheus_Fwd_DenseVector.hpp>
-
 #include <impl/Morpheus_ContainerTraits.hpp>
-#include <impl/Morpheus_FormatTags.hpp>
 
+#include <Kokkos_Core.hpp>
 #include <Kokkos_Random.hpp>
 
+#include <string>
 namespace Morpheus {
 
 template <class Datatype, class... Properties>

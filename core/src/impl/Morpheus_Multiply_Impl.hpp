@@ -26,6 +26,7 @@
 
 #include <impl/Serial/Morpheus_Multiply_Impl.hpp>
 #include <impl/OpenMP/Morpheus_Multiply_Impl.hpp>
+#include <impl/Cuda/Morpheus_Multiply_Impl.hpp>
 
 namespace Morpheus {
 // forward decl

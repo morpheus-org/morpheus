@@ -29,7 +29,7 @@
 #include <algorithm>  // max, min
 #include <variant>    // visit
 
-#include <impl/Morpheus_FormatTags.hpp>
+#include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 

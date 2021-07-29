@@ -24,13 +24,14 @@
 #ifndef MORPHEUS_DENSEMATRIX_HPP
 #define MORPHEUS_DENSEMATRIX_HPP
 
-#include <string>
-
-#include <Morpheus_Core.hpp>
 #include <Morpheus_Exceptions.hpp>
+#include <Morpheus_FormatTags.hpp>
 
 #include <impl/Morpheus_ContainerTraits.hpp>
-#include <impl/Morpheus_FormatTags.hpp>
+
+#include <Kokkos_Core.hpp>
+
+#include <string>
 
 namespace Morpheus {
 

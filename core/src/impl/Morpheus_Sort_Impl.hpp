@@ -26,9 +26,8 @@
 
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Copy.hpp>
-
-#include <impl/Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 namespace Impl {

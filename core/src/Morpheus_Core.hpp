@@ -28,8 +28,6 @@
 
 #include <Kokkos_Core.hpp>
 
-#include <Morpheus_TypeTraits.hpp>
-
 #include <Morpheus_DenseMatrix.hpp>
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_CooMatrix.hpp>

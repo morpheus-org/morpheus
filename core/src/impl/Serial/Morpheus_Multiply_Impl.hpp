@@ -25,7 +25,7 @@
 #define MORPHEUS_SERIAL_MULTIPLY_IMPL_HPP
 
 #include <Morpheus_TypeTraits.hpp>
-#include <impl/Morpheus_FormatTags.hpp>
+#include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 namespace Impl {

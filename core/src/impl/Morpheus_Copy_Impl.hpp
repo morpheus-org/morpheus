@@ -30,8 +30,8 @@
 
 #include <Morpheus_Core.hpp>
 #include <Morpheus_Exceptions.hpp>
+#include <Morpheus_FormatTags.hpp>
 
-#include <impl/Morpheus_FormatTags.hpp>
 #include <fwd/Morpheus_Fwd_CooMatrix.hpp>
 
 namespace Morpheus {
