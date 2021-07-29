@@ -32,15 +32,41 @@ morpheus_include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/category_files)
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/format_files)
 
+# Do test independent of formats
 foreach(Tag Serial;OpenMP;Cuda;HIP)
   string(TOUPPER ${Tag} DEVICE)
   string(TOLOWER ${Tag} dir)
 
   set(${Tag}_SOURCES)
-  foreach(Fmt Coo;Csr)
+  if(MORPHEUS_ENABLE_${DEVICE})
+      set(testdir ${CMAKE_CURRENT_BINARY_DIR}/${dir})
+      file(MAKE_DIRECTORY ${testdir})
+
+      foreach(Name DenseVector)
+        set(file ${testdir}/Test${Tag}_${Name}.cpp)
+        # Write to a temporary intermediate file and call configure_file to
+        # avoid updating timestamps triggering unnecessary rebuilds on
+        # subsequent cmake runs.
+        file(
+          WRITE ${testdir}/dummy.cpp
+          "#include <Test${Tag}_Category.hpp>\n"
+          "#define TESTSUITE_NAME ${Tag}\n"
+          "#include <Test_${Name}.hpp>\n")
+        configure_file(${testdir}/dummy.cpp ${file})
+        list(APPEND ${Tag}_SOURCES ${file})
+      endforeach()
+    endif()
+endforeach()
+
+# Do for each available format
+foreach(Tag Serial;OpenMP;Cuda;HIP)
+  string(TOUPPER ${Tag} DEVICE)
+  string(TOLOWER ${Tag} dir)
+
+  foreach(Fmt Coo;Csr;Dia)
     string(TOUPPER ${Fmt} FORMAT)
     string(TOLOWER ${Fmt} fmtdir)
-    if(Morpheus_ENABLE_${DEVICE})
+    if(MORPHEUS_ENABLE_${DEVICE})
       set(testdir ${CMAKE_CURRENT_BINARY_DIR}/${dir}/${fmtdir})
       file(MAKE_DIRECTORY ${testdir})
 
@@ -62,22 +88,22 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
   endforeach()
 endforeach()
 
-if(Morpheus_ENABLE_SERIAL)
+if(MORPHEUS_ENABLE_SERIAL)
   morpheus_add_executable_and_test(UnitTest_Serial SOURCES TestMain.cpp
                                    ${Serial_SOURCES})
 endif()
 
-if(Morpheus_ENABLE_OPENMP)
+if(MORPHEUS_ENABLE_OPENMP)
   morpheus_add_executable_and_test(UnitTest_OpenMP SOURCES TestMain.cpp
                                    ${OpenMP_SOURCES})
 endif()
 
-if(Morpheus_ENABLE_CUDA)
+if(MORPHEUS_ENABLE_CUDA)
   morpheus_add_executable_and_test(UnitTest_Cuda SOURCES TestMain.cpp
                                    ${Cuda_SOURCES})
 endif()
 
-if(Morpheus_ENABLE_HIP)
+if(MORPHEUS_ENABLE_HIP)
   morpheus_add_executable_and_test(UnitTest_HIP SOURCES TestMain.cpp
                                    ${HIP_SOURCES})
 endif()
