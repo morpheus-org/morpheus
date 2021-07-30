@@ -26,12 +26,12 @@
 
 namespace Morpheus {
 /* Forward declaration */
-template <class DataType, class... Properties>
+template <class Datatype, class... Properties>
 class DenseVector;
 
 /* Alias type to match std::vector */
-template <class DataType, class... Properties>
-using vector = DenseVector<DataType, Properties...>;
+template <class Datatype, class... Properties>
+using vector = DenseVector<Datatype, Properties...>;
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_FWD_DENSEVECTOR_HPP

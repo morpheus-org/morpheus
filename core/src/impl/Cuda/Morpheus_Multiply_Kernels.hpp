@@ -68,5 +68,6 @@ MORPHEUS_INLINE_FUNCTION void spmv_csr_scalar_kernel(
 }  // namespace Kernels
 }  // namespace Impl
 }  // namespace Morpheus
+#endif
 
 #endif  // MORPHEUS_CUDA_MULTIPLY_KERNELS_HPP

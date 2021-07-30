@@ -50,7 +50,7 @@ enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT };
 
 namespace Impl {
 
-template <class... Properties>
+template <class Datatype, class... Properties>
 struct any_type_resize : public Impl::ContainerTraits<Datatype, Properties...> {
   using traits      = Impl::ContainerTraits<Datatype, Properties...>;
   using index_type  = typename traits::index_type;
@@ -160,7 +160,7 @@ struct activate_impl {
 
 // Base case, activate to the first type in the variant
 template <class Datatype, typename... Properties>
-struct activate_impl<0, Properties...> {
+struct activate_impl<0, Datatype, Properties...> {
   using variant   = typename MatrixFormats<Datatype, Properties...>::variant;
   using type_list = typename MatrixFormats<Datatype, Properties...>::type_list;
 

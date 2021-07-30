@@ -38,7 +38,7 @@ namespace Impl {
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-MORPHEUS_INLINE_FUNCTION void multiply(
+void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     CooTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
@@ -47,11 +47,10 @@ MORPHEUS_INLINE_FUNCTION void multiply(
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
-  using IndexType = typename LinearOperator::index_type;
-  using ValueType = typename LinearOperator::value_type;
-
+  using IndexType    = typename LinearOperator::index_type;
+  using ValueType    = typename LinearOperator::value_type;
   const IndexType* I = A.row_indices.data();
-  const IndexType* J = A.column_indices.data());
+  const IndexType* J = A.column_indices.data();
   const ValueType* V = A.values.data();
 
   const ValueType* x_ptr = x.data();
@@ -63,12 +62,12 @@ MORPHEUS_INLINE_FUNCTION void multiply(
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-MORPHEUS_INLINE_FUNCTION void multiply(
+void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     CsrTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_execution_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
@@ -79,7 +78,7 @@ MORPHEUS_INLINE_FUNCTION void multiply(
   const size_t NUM_BLOCKS = (A.nrows() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
   const IndexType* I = A.row_offsets.data();
-  const IndexType* J = A.column_indices.data());
+  const IndexType* J = A.column_indices.data();
   const ValueType* V = A.values.data();
 
   const ValueType* x_ptr = x.data();
@@ -91,12 +90,12 @@ MORPHEUS_INLINE_FUNCTION void multiply(
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-MORPHEUS_INLINE_FUNCTION void multiply(
+void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     DiaTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_execution_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
@@ -106,7 +105,7 @@ MORPHEUS_INLINE_FUNCTION void multiply(
   const size_t BLOCK_SIZE = 256;
   const size_t NUM_BLOCKS = (A.nrows() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-  const IndexType* D     = A.diagonal_offsets.data());
+  const IndexType* D     = A.diagonal_offsets.data();
   const ValueType* V     = A.values.data();
   const ValueType* x_ptr = x.data();
   ValueType* y_ptr       = y.data();

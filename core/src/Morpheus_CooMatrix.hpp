@@ -36,7 +36,7 @@
 
 namespace Morpheus {
 
-template <class DataType, class... Properties>
+template <class Datatype, class... Properties>
 class CooMatrix : public Impl::ContainerTraits<Datatype, Properties...> {
  public:
   using type   = CooMatrix<Datatype, Properties...>;

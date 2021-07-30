@@ -25,7 +25,7 @@
 #define MORPHEUS_FWD_CSRMATRIX_HPP
 
 namespace Morpheus {
-template <class DataType, typename... Properties>
+template <class Datatype, typename... Properties>
 class CsrMatrix;
 }  // namespace Morpheus
 
