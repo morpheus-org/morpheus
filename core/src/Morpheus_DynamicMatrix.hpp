@@ -38,11 +38,11 @@
 
 namespace Morpheus {
 
-template <class Datatype, class... Properties>
-class DynamicMatrix : public Impl::ContainerTraits<Datatype, Properties...> {
+template <class ValueType, class... Properties>
+class DynamicMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
  public:
-  using type   = DynamicMatrix<Datatype, Properties...>;
-  using traits = Impl::ContainerTraits<Datatype, Properties...>;
+  using type   = DynamicMatrix<ValueType, Properties...>;
+  using traits = Impl::ContainerTraits<ValueType, Properties...>;
   using tag    = typename MatrixFormatTag<Morpheus::DynamicTag>::tag;
 
   using variant_type = typename MatrixFormats<Properties...>::variant;

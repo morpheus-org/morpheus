@@ -35,11 +35,11 @@
 
 namespace Morpheus {
 
-template <class Datatype, class... Properties>
-class DenseVector : public Impl::ContainerTraits<Datatype, Properties...> {
+template <class ValueType, class... Properties>
+class DenseVector : public Impl::ContainerTraits<ValueType, Properties...> {
  public:
-  using type   = DenseVector<Datatype, Properties...>;
-  using traits = Impl::ContainerTraits<Datatype, Properties...>;
+  using type   = DenseVector<ValueType, Properties...>;
+  using traits = Impl::ContainerTraits<ValueType, Properties...>;
   using tag    = typename VectorFormatTag<Morpheus::DenseVectorTag>::tag;
 
   using value_type   = typename traits::value_type;

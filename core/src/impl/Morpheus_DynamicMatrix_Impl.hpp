@@ -36,12 +36,12 @@
 
 namespace Morpheus {
 
-template <class Datatype, class... Properties>
+template <class ValueType, class... Properties>
 struct MatrixFormats {
   using formats_proxy =
-      typename MatrixFormatsProxy<CooMatrix<Datatype, Properties...>,
-                                  CsrMatrix<Datatype, Properties...>,
-                                  DiaMatrix<Datatype, Properties...>>::type;
+      typename MatrixFormatsProxy<CooMatrix<ValueType, Properties...>,
+                                  CsrMatrix<ValueType, Properties...>,
+                                  DiaMatrix<ValueType, Properties...>>::type;
   using variant   = typename formats_proxy::variant;
   using type_list = typename formats_proxy::type_list;
 };
@@ -50,16 +50,17 @@ enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT };
 
 namespace Impl {
 
-template <class Datatype, class... Properties>
-struct any_type_resize : public Impl::ContainerTraits<Datatype, Properties...> {
-  using traits      = Impl::ContainerTraits<Datatype, Properties...>;
+template <class ValueType, class... Properties>
+struct any_type_resize
+    : public Impl::ContainerTraits<ValueType, Properties...> {
+  using traits      = Impl::ContainerTraits<ValueType, Properties...>;
   using index_type  = typename traits::index_type;
   using value_type  = typename traits::value_type;
   using result_type = void;
 
   // Specialization for Coo resize with three arguments
   template <typename... Args>
-  result_type operator()(CooMatrix<Datatype, Properties...> &mat,
+  result_type operator()(CooMatrix<ValueType, Properties...> &mat,
                          const index_type nrows, const index_type ncols,
                          const index_type nnnz) {
     mat.resize(nrows, ncols, nnnz);
@@ -67,7 +68,7 @@ struct any_type_resize : public Impl::ContainerTraits<Datatype, Properties...> {
 
   // Specialization for Csr resize with three arguments
   template <typename... Args>
-  result_type operator()(CsrMatrix<Datatype, Properties...> &mat,
+  result_type operator()(CsrMatrix<ValueType, Properties...> &mat,
                          const index_type nrows, const index_type ncols,
                          const index_type nnnz) {
     mat.resize(nrows, ncols, nnnz);
@@ -75,7 +76,7 @@ struct any_type_resize : public Impl::ContainerTraits<Datatype, Properties...> {
 
   // Specialization for Dia resize with five arguments
   template <typename... Args>
-  result_type operator()(DiaMatrix<Datatype, Properties...> &mat,
+  result_type operator()(DiaMatrix<ValueType, Properties...> &mat,
                          const index_type nrows, const index_type ncols,
                          const index_type nnnz, const index_type ndiag,
                          const index_type alignment = 32) {
@@ -85,7 +86,7 @@ struct any_type_resize : public Impl::ContainerTraits<Datatype, Properties...> {
   // Constrains any other overloads for supporting formats
   // Unsupported formats won't compile
   template <typename... Args>
-  result_type operator()(CooMatrix<Datatype, Properties...> &mat,
+  result_type operator()(CooMatrix<ValueType, Properties...> &mat,
                          Args &&... args) {
     std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
@@ -95,7 +96,7 @@ struct any_type_resize : public Impl::ContainerTraits<Datatype, Properties...> {
   }
 
   template <typename... Args>
-  result_type operator()(CsrMatrix<Datatype, Properties...> &mat,
+  result_type operator()(CsrMatrix<ValueType, Properties...> &mat,
                          Args &&... args) {
     std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
@@ -105,7 +106,7 @@ struct any_type_resize : public Impl::ContainerTraits<Datatype, Properties...> {
   }
 
   template <typename... Args>
-  result_type operator()(DiaMatrix<Datatype, Properties...> &mat,
+  result_type operator()(DiaMatrix<ValueType, Properties...> &mat,
                          Args &&... args) {
     std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
@@ -144,29 +145,29 @@ struct any_type_get_nnnz {
   }
 };
 
-template <size_t I, class Datatype, typename... Properties>
+template <size_t I, class ValueType, typename... Properties>
 struct activate_impl {
-  using variant   = typename MatrixFormats<Datatype, Properties...>::variant;
-  using type_list = typename MatrixFormats<Datatype, Properties...>::type_list;
+  using variant   = typename MatrixFormats<ValueType, Properties...>::variant;
+  using type_list = typename MatrixFormats<ValueType, Properties...>::type_list;
 
   static void activate(variant &A, size_t idx) {
     if (idx == I - 1) {
       A = typename type_list::template type<I - 1>{};
     } else {
-      activate_impl<I - 1, Datatype, Properties...>::activate(A, idx);
+      activate_impl<I - 1, ValueType, Properties...>::activate(A, idx);
     }
   }
 };
 
 // Base case, activate to the first type in the variant
-template <class Datatype, typename... Properties>
-struct activate_impl<0, Datatype, Properties...> {
-  using variant   = typename MatrixFormats<Datatype, Properties...>::variant;
-  using type_list = typename MatrixFormats<Datatype, Properties...>::type_list;
+template <class ValueType, typename... Properties>
+struct activate_impl<0, ValueType, Properties...> {
+  using variant   = typename MatrixFormats<ValueType, Properties...>::variant;
+  using type_list = typename MatrixFormats<ValueType, Properties...>::type_list;
 
   static void activate(variant &A, size_t idx) {
     idx = 0;
-    activate_impl<1, Datatype, Properties...>::activate(A, idx);
+    activate_impl<1, ValueType, Properties...>::activate(A, idx);
   }
 };
 

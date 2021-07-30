@@ -36,11 +36,11 @@
 
 namespace Morpheus {
 
-template <class Datatype, class... Properties>
-class DiaMatrix : public Impl::ContainerTraits<Datatype, Properties...> {
+template <class ValueType, class... Properties>
+class DiaMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
  public:
-  using type   = DiaMatrix<Datatype, Properties...>;
-  using traits = Impl::ContainerTraits<Datatype, Properties...>;
+  using type   = DiaMatrix<ValueType, Properties...>;
+  using traits = Impl::ContainerTraits<ValueType, Properties...>;
   using tag    = typename MatrixFormatTag<DiaTag>::tag;
 
   using value_type = typename traits::value_type;
