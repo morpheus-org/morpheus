@@ -24,9 +24,18 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
 
-#include <impl/Serial/Morpheus_Multiply_Impl.hpp>
-#include <impl/OpenMP/Morpheus_Multiply_Impl.hpp>
-#include <impl/Cuda/Morpheus_Multiply_Impl.hpp>
+// TODO: Let Cmake autogenerate those
+#include <impl/Coo/Serial/Morpheus_Multiply_Impl.hpp>
+#include <impl/Coo/OpenMP/Morpheus_Multiply_Impl.hpp>
+#include <impl/Coo/Cuda/Morpheus_Multiply_Impl.hpp>
+
+#include <impl/Csr/Serial/Morpheus_Multiply_Impl.hpp>
+#include <impl/Csr/OpenMP/Morpheus_Multiply_Impl.hpp>
+#include <impl/Csr/Cuda/Morpheus_Multiply_Impl.hpp>
+
+#include <impl/Dia/Serial/Morpheus_Multiply_Impl.hpp>
+#include <impl/Dia/OpenMP/Morpheus_Multiply_Impl.hpp>
+#include <impl/Dia/Cuda/Morpheus_Multiply_Impl.hpp>
 
 namespace Morpheus {
 // forward decl

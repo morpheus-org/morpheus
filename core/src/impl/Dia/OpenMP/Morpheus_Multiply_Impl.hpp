@@ -21,8 +21,11 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_SERIAL_MULTIPLY_IMPL_HPP
-#define MORPHEUS_SERIAL_MULTIPLY_IMPL_HPP
+#ifndef MORPHEUS_DIA_OPENMP_MULTIPLY_IMPL_HPP
+#define MORPHEUS_DIA_OPENMP_MULTIPLY_IMPL_HPP
+
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_OPENMP)
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
@@ -34,51 +37,10 @@ template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
 MORPHEUS_INLINE_FUNCTION void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    CooTag, DenseVectorTag, DenseVectorTag,
-    typename std::enable_if_t<
-        Morpheus::is_execution_space_v<ExecSpace> &&
-        Morpheus::is_Serial_space_v<ExecSpace> &&
-        Morpheus::has_access_v<ExecSpace, LinearOperator> &&
-        Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
-        Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
-  using IndexType = typename LinearOperator::index_type;
-
-  for (IndexType n = 0; n < A.nnnz(); n++) {
-    y[A.row_indices[n]] += A.values[n] * x[A.column_indices[n]];
-  }
-}
-
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-MORPHEUS_INLINE_FUNCTION void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    CsrTag, DenseVectorTag, DenseVectorTag,
-    typename std::enable_if_t<
-        Morpheus::is_execution_space_v<ExecSpace> &&
-        Morpheus::is_Serial_space_v<ExecSpace> &&
-        Morpheus::has_access_v<ExecSpace, LinearOperator> &&
-        Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
-        Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
-  using IndexType = typename LinearOperator::index_type;
-  using ValueType = typename LinearOperator::value_type;
-
-  for (IndexType i = 0; i < A.nrows(); i++) {
-    ValueType sum = y[i];
-    for (IndexType jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
-      sum += A.values[jj] * x[A.column_indices[jj]];
-    }
-    y[i] = sum;
-  }
-}
-
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-MORPHEUS_INLINE_FUNCTION void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     DiaTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_execution_space_v<ExecSpace> &&
-        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::is_OpenMP_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, LinearOperator> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
         Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
@@ -87,6 +49,7 @@ MORPHEUS_INLINE_FUNCTION void multiply(
 
   for (IndexType i = 0; i < A.nrows(); i++) y[i] = 0;
 
+#pragma omp parallel for
   for (IndexType i = 0; i < ndiag; i++) {
     const IndexType k = A.diagonal_offsets[i];
 
@@ -105,4 +68,5 @@ MORPHEUS_INLINE_FUNCTION void multiply(
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_SERIAL_MULTIPLY_IMPL_HPP
+#endif  // MORPHEUS_ENABLE_OPENMP
+#endif  // MORPHEUS_DIA_OPENMP_MULTIPLY_IMPL_HPP

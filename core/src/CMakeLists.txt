@@ -19,29 +19,43 @@ append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/*.hpp)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/fwd/*.hpp)
 
-if(MORPHEUS_ENABLE_SERIAL)
+foreach(Fmt DenseVector;DenseMatrix)
   append_glob(MORPHEUS_CORE_SOURCES
-              ${CMAKE_CURRENT_SOURCE_DIR}/impl/Serial/*.cpp)
+                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.cpp)
   append_glob(MORPHEUS_CORE_HEADERS
-              ${CMAKE_CURRENT_SOURCE_DIR}/impl/Serial/*.hpp)
-endif()
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.hpp)
+endforeach()
 
-if(MORPHEUS_ENABLE_OPENMP)
+foreach(Fmt Coo;Csr;Dia)
   append_glob(MORPHEUS_CORE_SOURCES
-              ${CMAKE_CURRENT_SOURCE_DIR}/impl/OpenMP/*.cpp)
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.cpp)
   append_glob(MORPHEUS_CORE_HEADERS
-              ${CMAKE_CURRENT_SOURCE_DIR}/impl/OpenMP/*.hpp)
-endif()
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.hpp)
 
-if(MORPHEUS_ENABLE_CUDA)
-  append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/Cuda/*.cpp)
-  append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/Cuda/*.hpp)
-endif()
+  if(MORPHEUS_ENABLE_SERIAL)
+    append_glob(MORPHEUS_CORE_SOURCES
+                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Serial/*.cpp)
+    append_glob(MORPHEUS_CORE_HEADERS
+                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Serial/*.hpp)
+  endif()
 
-if(MORPHEUS_ENABLE_HIP)
-  append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/HIP/*.cpp)
-  append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/HIP/*.hpp)
-endif()
+  if(MORPHEUS_ENABLE_OPENMP)
+    append_glob(MORPHEUS_CORE_SOURCES
+                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/OpenMP/*.cpp)
+    append_glob(MORPHEUS_CORE_HEADERS
+                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/OpenMP/*.hpp)
+  endif()
+
+  if(MORPHEUS_ENABLE_CUDA)
+    append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Cuda/*.cpp)
+    append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Cuda/*.hpp)
+  endif()
+
+  if(MORPHEUS_ENABLE_HIP)
+    append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/HIP/*.cpp)
+    append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/HIP/*.hpp)
+  endif()
+endforeach()
 
 append_glob(MORPHEUS_CORE_HEADERS
             ${CMAKE_CURRENT_BINARY_DIR}/MorpheusCore_config.hpp)

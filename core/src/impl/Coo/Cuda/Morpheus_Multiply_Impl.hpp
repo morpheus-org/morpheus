@@ -1,5 +1,5 @@
 /**
- * Morpheus_Multiply_Kernels.hpp
+ * Morpheus_Multiply_Impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,21 +21,24 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_CUDA_MULTIPLY_KERNELS_HPP
-#define MORPHEUS_CUDA_MULTIPLY_KERNELS_HPP
+#ifndef MORPHEUS_COO_CUDA_MULTIPLY_IMPL_HPP
+#define MORPHEUS_COO_CUDA_MULTIPLY_IMPL_HPP
 
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_CUDA)
 
+#include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_FormatTags.hpp>
+
 namespace Morpheus {
 namespace Impl {
+
 namespace Kernels {
 
 // COO format SpMV kernel that uses only one thread
 // This is incredibly slow, so it is only useful for testing purposes,
 // *extremely* small matrices, or a few elements at the end of a
 // larger matrix
-
 template <typename IndexType, typename ValueType>
 MORPHEUS_INLINE_FUNCTION void spmv_coo_serial_kernel(
     const IndexType nnnz, const IndexType* I, const IndexType* J,
@@ -45,29 +48,34 @@ MORPHEUS_INLINE_FUNCTION void spmv_coo_serial_kernel(
   }
 }
 
-template <typename IndexType, typename ValueType>
-MORPHEUS_INLINE_FUNCTION void spmv_csr_scalar_kernel(
-    const IndexType nrows, const IndexType* Ap, const IndexType* Aj,
-    const ValueType* Ax, const ValueType* x, ValueType* y) {
-  const IndexType thread_id = blockDim.x * blockIdx.x + threadIdx.x;
-  const IndexType grid_size = gridDim.x * blockDim.x;
+}  // namespace Kernels
 
-  for (IndexType row = thread_id; row < nrows; row += grid_size) {
-    const IndexType row_start = Ap[row];
-    const IndexType row_end   = Ap[row + 1];
+template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
+          typename MatrixOrVector2>
+void multiply(
+    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
+    CooTag, DenseVectorTag, DenseVectorTag,
+    typename std::enable_if_t<
+        Morpheus::is_execution_space_v<ExecSpace> &&
+        Morpheus::is_Cuda_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, LinearOperator> &&
+        Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
+        Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
+  using IndexType    = typename LinearOperator::index_type;
+  using ValueType    = typename LinearOperator::value_type;
+  const IndexType* I = A.row_indices.data();
+  const IndexType* J = A.column_indices.data();
+  const ValueType* V = A.values.data();
 
-    ValueType sum = 0;
+  const ValueType* x_ptr = x.data();
+  ValueType* y_ptr       = y.data();
 
-    for (IndexType jj = row_start; jj < row_end; jj++)
-      sum += Ax[jj] * x[Aj[jj]];
-
-    y[row] = sum;
-  }
+  Morpheus::Impl::Kernels::spmv_coo_serial_kernel<IndexType, ValueType>
+      <<<1, 1>>>(A.nnnz(), I, J, V, x_ptr, y_ptr);
 }
 
-}  // namespace Kernels
 }  // namespace Impl
 }  // namespace Morpheus
-#endif
 
-#endif  // MORPHEUS_CUDA_MULTIPLY_KERNELS_HPP
+#endif  // MORPHEUS_ENABLE_CUDA
+#endif  // MORPHEUS_COO_CUDA_MULTIPLY_IMPL_HPP
