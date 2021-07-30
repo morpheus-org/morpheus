@@ -37,7 +37,7 @@ void stats(Morpheus::DynamicMatrix<Properties...>& mat, std::string name,
 int main() {
   Morpheus::initialize();
   {
-    Morpheus::DynamicMatrix<double, int> A;
+    Morpheus::DynamicMatrix<double, int, Kokkos::Serial> A;
 
     stats(A, "A", "resize(5, 10, 15)");
     A.resize(5, 10, 15);
@@ -49,11 +49,11 @@ int main() {
     }
     stats(A, "A", "resize(5, 10, 15, 20)");
 
-    A = Morpheus::CsrMatrix<double, int>();
+    A = Morpheus::CsrMatrix<double, int, Kokkos::Serial>();
     stats(A, "A", "resize(5, 10, 15)");
     A.resize(5, 10, 15);
 
-    A = Morpheus::DiaMatrix<double, int>();
+    A = Morpheus::DiaMatrix<double, int, Kokkos::Serial>();
     stats(A, "A", "resize(5, 10, 15, 20)");
     A.resize(5, 10, 15, 20);
     A.resize(5, 10, 15, 20, 35);

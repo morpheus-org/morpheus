@@ -23,8 +23,10 @@
 #ifndef MORPHEUS_MATRIXBASE_HPP
 #define MORPHEUS_MATRIXBASE_HPP
 
-#include <impl/Morpheus_ContainerTraits.hpp>
 #include <Morpheus_TypeTraits.hpp>
+
+#include <impl/Morpheus_ContainerTraits.hpp>
+
 #include <string>
 
 namespace Morpheus {

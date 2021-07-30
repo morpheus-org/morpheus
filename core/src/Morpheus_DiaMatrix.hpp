@@ -109,7 +109,7 @@ class DiaMatrix : public Impl::MatrixBase<ValueType, Properties...> {
 
   // Construct from another matrix type
   template <typename MatrixType>
-  DiaMatrix(const MatrixType &matrix) : _name("DiaMatrix") {
+  DiaMatrix(const MatrixType &matrix) {
     Morpheus::copy(matrix, *this);
   }
 

@@ -28,7 +28,7 @@
 #include <Morpheus_Print.hpp>
 #include <Morpheus_FormatTags.hpp>
 
-#include <impl/Morpheus_ContainerTraits.hpp>
+#include <impl/Morpheus_MatrixBase.hpp>
 #include <impl/Morpheus_DynamicMatrix_Impl.hpp>
 
 #include <iostream>
@@ -39,16 +39,18 @@
 namespace Morpheus {
 
 template <class ValueType, class... Properties>
-class DynamicMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
+class DynamicMatrix : public Impl::MatrixBase<ValueType, Properties...> {
  public:
   using type   = DynamicMatrix<ValueType, Properties...>;
   using traits = Impl::ContainerTraits<ValueType, Properties...>;
+  using base   = Impl::MatrixBase<ValueType, Properties...>;
   using tag    = typename MatrixFormatTag<Morpheus::DynamicTag>::tag;
 
-  using variant_type = typename MatrixFormats<Properties...>::variant;
-  using value_type   = typename traits::value_type;
-  using index_type   = typename traits::index_type;
-  using size_type    = typename traits::index_type;
+  using variant_type =
+      typename MatrixFormats<ValueType, Properties...>::variant;
+  using value_type = typename traits::value_type;
+  using index_type = typename traits::index_type;
+  using size_type  = typename traits::index_type;
 
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
@@ -76,37 +78,39 @@ class DynamicMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
   reference operator=(const DynamicMatrix &) = default;
   reference operator=(DynamicMatrix &&) = default;
 
-  inline DynamicMatrix() : _name("DynamicMatrix"), _formats() {}
+  inline DynamicMatrix() : base("DynamicMatrix"), _formats() {}
 
-  template <typename Format>
-  inline DynamicMatrix(const Format &mat)
-      : _name("DynamicMatrix"), _formats(mat) {}
+  template <typename Matrix>
+  inline DynamicMatrix(
+      const Matrix &mat,
+      typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
+          * = 0)
+      : base("DynamicMatrix", mat.nrows(), mat.ncols(), mat.nnnz()),
+        _formats(mat) {}
 
-  template <typename Format>
-  inline DynamicMatrix(const std::string name, const Format &mat)
-      : _name(name + "(DynamicMatrix)"), _formats(mat) {}
+  template <typename Matrix>
+  inline DynamicMatrix(
+      const std::string name, const Matrix &mat,
+      typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
+          * = 0)
+      : base(name + "DynamicMatrix", mat.nrows(), mat.ncols(), mat.nnnz()),
+        _formats(mat) {}
+
+  // Assignment from another matrix type
+  template <typename Matrix>
+  reference operator=(const Matrix &matrix) {
+    activate(matrix);
+    return *this;
+  }
 
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
                      const index_type nnz, Args &&... args) {
-    auto f =
-        std::bind(Impl::any_type_resize<Properties...>(), std::placeholders::_1,
-                  m, n, nnz, std::forward<Args>(args)...);
+    base::resize(m, n, nnz);
+    auto f = std::bind(Impl::any_type_resize<ValueType, Properties...>(),
+                       std::placeholders::_1, m, n, nnz,
+                       std::forward<Args>(args)...);
     return std::visit(f, _formats);
-  }
-
-  inline std::string name() const { return _name; }
-
-  inline index_type nrows() const {
-    return std::visit(Impl::any_type_get_nrows(), _formats);
-  }
-
-  inline index_type ncols() const {
-    return std::visit(Impl::any_type_get_ncols(), _formats);
-  }
-
-  inline index_type nnnz() const {
-    return std::visit(Impl::any_type_get_nnnz(), _formats);
   }
 
   inline std::string active_name() const {
@@ -116,13 +120,16 @@ class DynamicMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
   inline int active_index() const { return _formats.index(); }
 
   template <typename MatrixType>
-  inline void activate(const MatrixType &) {
+  inline void activate(
+      const MatrixType &,
+      typename std::enable_if<
+          is_variant_member_v<MatrixType, variant_type>>::type * = 0) {
     _formats = MatrixType();
   }
 
   inline void activate(const formats_e index) {
-    constexpr int size =
-        std::variant_size_v<typename MatrixFormats<Properties...>::variant>;
+    constexpr int size = std::variant_size_v<
+        typename MatrixFormats<ValueType, Properties...>::variant>;
     const int idx = static_cast<int>(index);
 
     if (idx > size) {
@@ -131,7 +138,8 @@ class DynamicMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
                 << "Selecting to switch to format with index " << idx
                 << " will default to the format with index 0." << std::endl;
     }
-    Impl::activate_impl<size, Properties...>::activate(_formats, idx);
+    Impl::activate_impl<size, ValueType, Properties...>::activate(_formats,
+                                                                  idx);
   }
 
   // Enable switching through direct integer indexing
@@ -145,7 +153,7 @@ class DynamicMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
   }
 
   inline void convert(const formats_e index) {
-    Morpheus::CooMatrix<Properties...> temp;
+    Morpheus::CooMatrix<ValueType, Properties...> temp;
     Morpheus::copy(*this, temp);
     activate(index);
     Morpheus::copy(temp, *this);
@@ -159,7 +167,6 @@ class DynamicMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
   inline variant_type &formats() { return _formats; }
 
  private:
-  std::string _name;
   variant_type _formats;
 };
 }  // namespace Morpheus

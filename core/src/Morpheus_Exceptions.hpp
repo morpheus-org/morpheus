@@ -74,12 +74,15 @@ class FormatConversionException : public Exception {
 
 template <typename T, typename... Ts>
 std::string append_str(T&& first, Ts&&... rest) {
+  std::string msg;
   if constexpr (sizeof...(Ts) == 0) {
-    return std::to_string(first);  // for only 1-arguments
+    msg = std::to_string(first);  // for only 1-arguments
   } else {
-    return std::to_string(first) + std::string(",") +
-           append_str(std::forward<Ts>(rest)...);  // pass the rest further
+    msg = std::to_string(first) + std::string(",") +
+          append_str(std::forward<Ts>(rest)...);  // pass the rest further
   }
+
+  return msg;
 }
 
 }  // namespace Morpheus

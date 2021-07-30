@@ -27,26 +27,11 @@
 #include <string>
 
 #include <Morpheus_Exceptions.hpp>
-#include <Morpheus_CooMatrix.hpp>
-#include <Morpheus_CsrMatrix.hpp>
-#include <Morpheus_DiaMatrix.hpp>
+#include <Morpheus_FormatsRegistry.hpp>
 
-#include <impl/Morpheus_MatrixProxy.hpp>
 #include <impl/Morpheus_ContainerTraits.hpp>
 
 namespace Morpheus {
-
-template <class ValueType, class... Properties>
-struct MatrixFormats {
-  using formats_proxy =
-      typename MatrixFormatsProxy<CooMatrix<ValueType, Properties...>,
-                                  CsrMatrix<ValueType, Properties...>,
-                                  DiaMatrix<ValueType, Properties...>>::type;
-  using variant   = typename formats_proxy::variant;
-  using type_list = typename formats_proxy::type_list;
-};
-// Enums should be in the same order as types in MatrixFormatsProxy
-enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT };
 
 namespace Impl {
 
@@ -121,27 +106,6 @@ struct any_type_get_name {
   template <typename T>
   result_type operator()(const T &mat) const {
     return mat.name();
-  }
-};
-
-struct any_type_get_nrows {
-  template <typename T>
-  typename T::index_type operator()(const T &mat) const {
-    return mat.nrows();
-  }
-};
-
-struct any_type_get_ncols {
-  template <typename T>
-  typename T::index_type operator()(const T &mat) const {
-    return mat.ncols();
-  }
-};
-
-struct any_type_get_nnnz {
-  template <typename T>
-  typename T::index_type operator()(const T &mat) const {
-    return mat.nnnz();
   }
 };
 

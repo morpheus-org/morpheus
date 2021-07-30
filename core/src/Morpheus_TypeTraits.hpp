@@ -23,12 +23,25 @@
 #ifndef MORPHEUS_TYPETRAITS_HPP
 #define MORPHEUS_TYPETRAITS_HPP
 
-#include <type_traits>
-
-#include <Kokkos_Core.hpp>
 #include <Morpheus_FormatTags.hpp>
 
+#include <Kokkos_Core.hpp>
+
+#include <type_traits>
+#include <variant>
+
 namespace Morpheus {
+
+template <typename T, typename Variant>
+struct is_variant_member;
+
+template <typename T, typename... Ts>
+struct is_variant_member<T, std::variant<Ts...>>
+    : public std::disjunction<std::is_same<T, Ts>...> {};
+
+template <typename T, typename Variant>
+inline constexpr bool is_variant_member_v =
+    is_variant_member<T, Variant>::value;
 
 template <typename Tag>
 struct is_matrix
