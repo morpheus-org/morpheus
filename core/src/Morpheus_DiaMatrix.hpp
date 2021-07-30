@@ -24,23 +24,22 @@
 #ifndef MORPHEUS_DIAMATRIX_HPP
 #define MORPHEUS_DIAMATRIX_HPP
 
-#include <string>
-
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_DenseMatrix.hpp>
 #include <Morpheus_Copy.hpp>
 
-#include <impl/Morpheus_ContainerTraits.hpp>
+#include <impl/Morpheus_MatrixBase.hpp>
 
 namespace Morpheus {
 
 template <class ValueType, class... Properties>
-class DiaMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
+class DiaMatrix : public Impl::MatrixBase<ValueType, Properties...> {
  public:
   using type   = DiaMatrix<ValueType, Properties...>;
   using traits = Impl::ContainerTraits<ValueType, Properties...>;
+  using base   = Impl::MatrixBase<ValueType, Properties...>;
   using tag    = typename MatrixFormatTag<DiaTag>::tag;
 
   using value_type = typename traits::value_type;
@@ -84,13 +83,7 @@ class DiaMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
   reference operator=(DiaMatrix &&) = default;
 
   // Construct an empty DiaMatrix
-  inline DiaMatrix()
-      : diagonal_offsets(),
-        values(),
-        _name("DiaMatrix"),
-        _m(0),
-        _n(0),
-        _nnz(0) {}
+  inline DiaMatrix() : base("DiaMatrix"), diagonal_offsets(), values() {}
 
   // Construct a DiaMatrix with:
   //      a specific shape
@@ -100,11 +93,8 @@ class DiaMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
   inline DiaMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries, const index_type num_diagonals,
                    const index_type alignment = 32)
-      : diagonal_offsets(num_diagonals),
-        _name("DiaMatrix"),
-        _m(num_rows),
-        _n(num_cols),
-        _nnz(num_entries) {
+      : base("DiaMatrix", num_rows, num_cols, num_entries),
+        diagonal_offsets(num_diagonals) {
     values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
   }
 
@@ -112,11 +102,8 @@ class DiaMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
                    const index_type num_cols, const index_type num_entries,
                    const index_type num_diagonals,
                    const index_type alignment = 32)
-      : diagonal_offsets(num_diagonals),
-        _name(name + "(DiaMatrix)"),
-        _m(num_rows),
-        _n(num_cols),
-        _nnz(num_entries) {
+      : base(name + "DiaMatrix", num_rows, num_cols, num_entries),
+        diagonal_offsets(num_diagonals) {
     values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
   }
 
@@ -131,9 +118,7 @@ class DiaMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
                      const index_type num_entries,
                      const index_type num_diagonals,
                      const index_type alignment = 32) {
-    _m   = num_rows;
-    _n   = num_cols;
-    _nnz = num_entries;
+    base::resize(num_rows, num_cols, num_entries);
     diagonal_offsets.resize(num_diagonals);
     values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
   }
@@ -145,23 +130,11 @@ class DiaMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
     return *this;
   }
 
-  // Unified routines across all formats
-  inline std::string name() const { return _name; }
-  inline index_type nrows() const { return _m; }
-  inline index_type ncols() const { return _n; }
-  inline index_type nnnz() const { return _nnz; }
-  inline void set_nrows(const index_type rows) { _m = rows; }
-  inline void set_ncols(const index_type cols) { _n = cols; }
-  inline void set_nnnz(const index_type nnz) { _nnz = nnz; }
-
  private:
   // Calculates padding to align the data based on the current diagonal length
   inline const index_type _pad_size(index_type diag_len, index_type alignment) {
     return alignment * ((diag_len + alignment - 1) / alignment);
   }
-
-  std::string _name;
-  index_type _m, _n, _nnz;
 };
 }  // namespace Morpheus
 

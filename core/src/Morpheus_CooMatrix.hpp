@@ -24,23 +24,22 @@
 #ifndef MORPHEUS_COOMATRIX_HPP
 #define MORPHEUS_COOMATRIX_HPP
 
-#include <string>
-
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_Sort.hpp>
 #include <Morpheus_Copy.hpp>
 
-#include <impl/Morpheus_ContainerTraits.hpp>
+#include <impl/Morpheus_MatrixBase.hpp>
 
 namespace Morpheus {
 
 template <class ValueType, class... Properties>
-class CooMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
+class CooMatrix : public Impl::MatrixBase<ValueType, Properties...> {
  public:
   using type   = CooMatrix<ValueType, Properties...>;
   using traits = Impl::ContainerTraits<ValueType, Properties...>;
+  using base   = Impl::MatrixBase<ValueType, Properties...>;
   using tag    = typename MatrixFormatTag<Morpheus::CooTag>::tag;
 
   using value_type = typename traits::value_type;
@@ -83,61 +82,43 @@ class CooMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
 
   // Construct an empty CooMatrix
   inline CooMatrix()
-      : row_indices(0),
-        column_indices(0),
-        values(0),
-        _name("CooMatrix"),
-        _m(0),
-        _n(0),
-        _nnz(0) {}
+      : base("CooMatrix"), row_indices(0), column_indices(0), values(0) {}
 
   // Construct a CooMatrix with a specific shape and number of non-zero entries
   inline CooMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries)
-      : row_indices(num_entries),
+      : base("CooMatrix", num_rows, num_cols, num_entries),
+        row_indices(num_entries),
         column_indices(num_entries),
-        values(num_entries),
-        _name("CooMatrix"),
-        _m(num_rows),
-        _n(num_cols),
-        _nnz(num_entries) {}
+        values(num_entries) {}
 
   inline CooMatrix(const std::string name, const index_array_type &rind,
                    const index_array_type &cind, const value_array_type &vals)
-      : row_indices(rind),
+      : base(name + "CooMatrix", rind.size(), cind.size(), vals.size()),
+        row_indices(rind),
         column_indices(cind),
-        values(vals),
-        _name(name + "(CooMatrix)"),
-        _m(rind.size()),
-        _n(cind.size()),
-        _nnz(vals.size()) {}
+        values(vals) {}
 
-  // Construct from vectors
   inline CooMatrix(const std::string name, const index_type num_rows,
                    const index_type num_cols, const index_type num_entries)
-      : row_indices(num_entries),
+      : base(name + "CooMatrix", num_rows, num_cols, num_entries),
+        row_indices(num_entries),
         column_indices(num_entries),
-        values(num_entries),
-        _name(name + "(CooMatrix)"),
-        _m(num_rows),
-        _n(num_cols),
-        _nnz(num_entries) {}
+        values(num_entries) {}
 
   // Construct from another matrix type
   template <typename MatrixType>
-  CooMatrix(const MatrixType &matrix) : _name("CooMatrix") {
+  CooMatrix(const MatrixType &matrix) {
     Morpheus::copy(matrix, *this);
   }
 
   // Resize matrix dimensions and underlying storage
   inline void resize(const index_type num_rows, const index_type num_cols,
                      const index_type num_entries) {
-    _m   = num_rows;
-    _n   = num_cols;
-    _nnz = num_entries;
-    row_indices.resize(_nnz);
-    column_indices.resize(_nnz);
-    values.resize(_nnz);
+    base::resize(num_rows, num_cols, num_entries);
+    row_indices.resize(num_entries);
+    column_indices.resize(num_entries);
+    values.resize(num_entries);
   }
 
   // Assignment from another matrix type
@@ -165,20 +146,6 @@ class CooMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
 
   // Determine whether matrix elements are sorted by row and column index
   bool is_sorted(void) { return Morpheus::is_sorted(*this); }
-
-  // Unified routines across all formats
-
-  inline std::string name() const { return _name; }
-  inline index_type nrows() const { return _m; }
-  inline index_type ncols() const { return _n; }
-  inline index_type nnnz() const { return _nnz; }
-  inline void set_nrows(const index_type rows) { _m = rows; }
-  inline void set_ncols(const index_type cols) { _n = cols; }
-  inline void set_nnnz(const index_type nnz) { _nnz = nnz; }
-
- private:
-  std::string _name;
-  index_type _m, _n, _nnz;
 };
 }  // namespace Morpheus
 

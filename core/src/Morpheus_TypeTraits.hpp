@@ -25,21 +25,35 @@
 
 #include <type_traits>
 
-#include <Morpheus_Core.hpp>
+#include <Kokkos_Core.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 
-namespace Impl {}
+template <typename Tag>
+struct is_matrix
+    : std::integral_constant<bool,
+                             std::is_base_of<Impl::MatrixTag, Tag>::value> {};
 
-template <class T>
-struct is_sparse_mat {
-  using value =
-      typename std::is_same<typename T::tag, Impl::SparseMatTag>::value;
+template <typename Tag>
+inline constexpr bool is_matrix_v = is_matrix<Tag>::value;
+
+template <typename Tag>
+struct is_sparse_matrix
+    : std::integral_constant<bool,
+                             std::is_base_of<Impl::SparseMatTag, Tag>::value> {
 };
 
-template <class T>
-using is_sparse_mat_v = typename is_sparse_mat<T>::value;
+template <typename Tag>
+inline constexpr bool is_sparse_matrix_v = is_sparse_matrix<Tag>::value;
+
+template <typename Tag>
+struct is_dense_matrix
+    : std::integral_constant<bool,
+                             std::is_base_of<Impl::DenseMatTag, Tag>::value> {};
+
+template <typename Tag>
+inline constexpr bool is_dense_matrix_v = is_dense_matrix<Tag>::value;
 
 template <class T>
 struct remove_cvref {

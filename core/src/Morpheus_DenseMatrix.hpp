@@ -27,19 +27,18 @@
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
 
-#include <impl/Morpheus_ContainerTraits.hpp>
+#include <impl/Morpheus_MatrixBase.hpp>
 
 #include <Kokkos_Core.hpp>
-
-#include <string>
 
 namespace Morpheus {
 
 template <class ValueType, class... Properties>
-class DenseMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
+class DenseMatrix : public Impl::MatrixBase<ValueType, Properties...> {
  public:
   using type   = DenseMatrix<ValueType, Properties...>;
   using traits = Impl::ContainerTraits<ValueType, Properties...>;
+  using base   = Impl::MatrixBase<ValueType, Properties...>;
   using tag    = typename MatrixFormatTag<DenseMatrixTag>::tag;
 
   using value_type   = typename traits::value_type;
@@ -79,23 +78,19 @@ class DenseMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
   reference operator=(DenseMatrix &&) = default;
 
   // Construct an empty DenseMatrix
-  inline DenseMatrix() : _name("DenseMatrix"), _m(0), _n(0), _values() {}
+  inline DenseMatrix() : base("DenseMatrix"), _values() {}
 
   // Construct a DenseMatrix with a specific shape
   inline DenseMatrix(const index_type num_rows, const index_type num_cols,
                      const value_type val = 0)
-      : _name("DenseMatrix"),
-        _m(num_rows),
-        _n(num_cols),
+      : base("DenseMatrix", num_rows, num_cols, num_rows * num_cols),
         _values("DenseMatrix", size_t(num_rows), size_t(num_cols)) {
     assign(num_rows, num_cols, val);
   }
 
   inline DenseMatrix(const std::string name, const index_type num_rows,
                      const index_type num_cols, const value_type val = 0)
-      : _name(name + "(DenseMatrix)"),
-        _m(num_rows),
-        _n(num_cols),
+      : base(name + "DenseMatrix", num_rows, num_cols, num_rows * num_cols),
         _values(name + "(DenseMatrix)", size_t(num_rows), size_t(num_cols)) {
     assign(num_rows, num_cols, val);
   }
@@ -117,9 +112,8 @@ class DenseMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
 
   // Modifiers
   inline void resize(index_type num_rows, index_type num_cols) {
+    base::resize(num_rows, num_cols, num_rows * num_cols);
     Kokkos::resize(_values, size_t(num_rows), size_t(num_cols));
-    _m = num_rows;
-    _n = num_cols;
   }
 
   // Element access
@@ -130,20 +124,6 @@ class DenseMatrix : public Impl::ContainerTraits<ValueType, Properties...> {
   inline value_array_pointer data() const { return _values.data(); }
   inline const value_array_type &view() const { return _values; }
 
-  // Unified routines across all formats
-
-  inline std::string name() const { return _name; }
-  inline index_type nrows() const { return _m; }
-  inline index_type ncols() const { return _n; }
-  inline index_type nnnz() const { return _m * _n; }
-  inline void set_nrows(const index_type rows) { _m = rows; }
-  inline void set_ncols(const index_type cols) { _n = cols; }
-
- private:
-  std::string _name;
-  index_type _m, _n;
-
- public:
   value_array_type _values;
 };
 }  // namespace Morpheus
