@@ -23,12 +23,12 @@ which configures, builds and installs a default Morpheus. Note that `Morpheus` *
 
 Once Morpheus is installed In your `CMakeLists.txt` simply use:
 
-```
+```cmake
 find_package(Morpheus REQUIRED)
 ```
 
 Then for every executable or library in your project:
-```
+```cmake
 target_link_libraries(myTarget Morpheus::morpheus)
 ```
 
@@ -136,7 +136,7 @@ int main(){
 
 Building the tests and examples requires the [GTest](https://github.com/google/googletest) testing framework, which ships together with `Morpheus`.
 
-To build and run the tests and examples add the `-DMorpheus_ENABLE_TESTS=On` and `-DMorpheus_ENABLE_EXAMPLES=On` during configuration stage respectively. Note that tests for different devices are enabled based on how `Kokkos` was configured.
+To build and run the tests add the `-DMorpheus_ENABLE_TESTS=On` during configuration stage respectively. Note that tests for different devices are enabled based on how `Kokkos` was configured.
 
 After configuration, to build and run the `Serial` tests do:
 ```sh
@@ -145,6 +145,8 @@ $ make MorpheusCore_UnitTest_Serial
 $ ${srcdir}/core/tests/MorpheusCore_UnitTest_OpenMP
 ```
 Same process can be followed for `OpenMP`, `Cuda` and `HIP`.
+
+To build and run the examples add the `-DMorpheus_ENABLE_EXAMPLES=On` during configuration. Similar process is followed as building the tests.
 
 # License
 
