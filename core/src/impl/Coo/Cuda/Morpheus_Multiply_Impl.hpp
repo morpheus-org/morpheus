@@ -30,29 +30,14 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 
+#include <impl/Coo/Kernels/Morpheus_Multiply_Impl.hpp>
+
 namespace Morpheus {
 namespace Impl {
 
-namespace Kernels {
-
-// COO format SpMV kernel that uses only one thread
-// This is incredibly slow, so it is only useful for testing purposes,
-// *extremely* small matrices, or a few elements at the end of a
-// larger matrix
-template <typename IndexType, typename ValueType>
-MORPHEUS_INLINE_FUNCTION void spmv_coo_serial_kernel(
-    const IndexType nnnz, const IndexType* I, const IndexType* J,
-    const ValueType* V, const ValueType* x, ValueType* y) {
-  for (IndexType n = 0; n < nnnz; n++) {
-    y[I[n]] += V[n] * x[J[n]];
-  }
-}
-
-}  // namespace Kernels
-
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-void multiply(
+inline void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     CooTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<

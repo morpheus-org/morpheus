@@ -55,6 +55,11 @@ foreach(Fmt Coo;Csr;Dia)
     append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/HIP/*.cpp)
     append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/HIP/*.hpp)
   endif()
+
+  if(MORPHEUS_ENABLE_CUDA OR MORPHEUS_ENABLE_HIP)
+    append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Kernels/*.cpp)
+    append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Kernels/*.hpp)
+  endif()
 endforeach()
 
 append_glob(MORPHEUS_CORE_HEADERS

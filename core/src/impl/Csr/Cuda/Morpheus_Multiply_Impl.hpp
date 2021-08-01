@@ -30,36 +30,14 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 
+#include <impl/Csr/Kernels/Morpheus_Multiply_Impl.hpp>
+
 namespace Morpheus {
 namespace Impl {
 
-namespace Kernels {
-
-template <typename IndexType, typename ValueType>
-MORPHEUS_INLINE_FUNCTION void spmv_csr_scalar_kernel(
-    const IndexType nrows, const IndexType* Ap, const IndexType* Aj,
-    const ValueType* Ax, const ValueType* x, ValueType* y) {
-  const IndexType thread_id = blockDim.x * blockIdx.x + threadIdx.x;
-  const IndexType grid_size = gridDim.x * blockDim.x;
-
-  for (IndexType row = thread_id; row < nrows; row += grid_size) {
-    const IndexType row_start = Ap[row];
-    const IndexType row_end   = Ap[row + 1];
-
-    ValueType sum = 0;
-
-    for (IndexType jj = row_start; jj < row_end; jj++)
-      sum += Ax[jj] * x[Aj[jj]];
-
-    y[row] = sum;
-  }
-}
-
-}  // namespace Kernels
-
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-void multiply(
+inline void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     CsrTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<

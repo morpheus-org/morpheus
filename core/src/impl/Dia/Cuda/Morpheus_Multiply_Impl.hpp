@@ -31,14 +31,14 @@
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
 
+#include <impl/Dia/Kernels/Morpheus_Multiply_Impl.hpp>
+
 namespace Morpheus {
 namespace Impl {
 
-namespace Kernels {}  // namespace Kernels
-
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-void multiply(
+inline void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     DiaTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<

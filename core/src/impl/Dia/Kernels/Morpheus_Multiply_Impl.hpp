@@ -1,5 +1,5 @@
 /**
- * Morpheus_Multiply.hpp
+ * Morpheus_Multiply_Impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,23 +21,20 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_MULTIPLY_HPP
-#define MORPHEUS_MULTIPLY_HPP
+#ifndef MORPHEUS_CSR_KERNELS_MULTIPLY_IMPL_HPP
+#define MORPHEUS_CSR_KERNELS_MULTIPLY_IMPL_HPP
 
-#include <impl/Morpheus_Multiply_Impl.hpp>
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_CUDA) || defined(MORPHEUS_ENABLE_HIP)
 
 namespace Morpheus {
+namespace Impl {
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-inline void multiply(const LinearOperator& A,
-                                       const MatrixOrVector1& x,
-                                       MatrixOrVector2& y) {
-  Impl::multiply<ExecSpace>(A, x, y, typename LinearOperator::tag(),
-                            typename MatrixOrVector1::tag(),
-                            typename MatrixOrVector2::tag());
-}
+namespace Kernels {}  // namespace Kernels
 
+}  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_MULTIPLY_HPP
+#endif
+
+#endif  // MORPHEUS_CSR_KERNELS_MULTIPLY_IMPL_HPP

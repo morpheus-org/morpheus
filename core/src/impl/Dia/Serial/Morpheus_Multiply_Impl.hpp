@@ -32,7 +32,7 @@ namespace Impl {
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
-MORPHEUS_INLINE_FUNCTION void multiply(
+inline void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     DiaTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
