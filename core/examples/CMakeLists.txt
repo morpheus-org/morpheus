@@ -9,5 +9,15 @@ morpheus_include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # SOURCES Examples_Multiply.cpp)
 # morpheus_add_executable_and_test(Examples_DynamicResize SOURCES
 # Examples_DynamicResize.cpp)
-morpheus_add_executable_and_test(Examples_DiaMatrix SOURCES
-                                 Examples_DiaMatrix.cpp)
+# morpheus_add_executable_and_test(Examples_DiaMatrix SOURCES
+#                                  Examples_DiaMatrix.cpp)
+
+
+morpheus_add_executable_and_test(Examples_Cuda_DotProduct SOURCES
+Examples_Cuda_DotProduct.cpp)
+
+# morpheus_add_executable_and_test(Examples_MatrixBase SOURCES
+# Examples_MatrixBase.cpp)
+
+# morpheus_add_executable_and_test(Examples_SwitchInterface SOURCES
+# Examples_SwitchInterface.cpp)

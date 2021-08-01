@@ -41,6 +41,8 @@
 
 #include <Morpheus_MatrixMarket.hpp>
 
+#include <impl/DenseVector/Cuda/Morpheus_Elementwise_Impl.hpp>
+
 namespace Morpheus {
 
 struct InitArguments : public Kokkos::InitArguments {

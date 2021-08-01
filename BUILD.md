@@ -2,13 +2,13 @@
 
 You can either use Morpheus as an installed package (encouraged) or use Morpheus in-tree in your project. Once Morpheus is installed In your `CMakeLists.txt` simply use:
 
-```
+```cmake
 find_package(Morpheus REQUIRED)
 ```
 
 Then for every executable or library in your project:
 
-```
+```cmake
 target_link_libraries(myTarget Morpheus::morpheus)
 ```
 

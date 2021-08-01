@@ -26,6 +26,14 @@ foreach(Fmt DenseVector;DenseMatrix)
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.hpp)
 endforeach()
 
+# ADD ELEMENTWISE for DenseVector
+if(MORPHEUS_ENABLE_CUDA)
+  append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Cuda/*.cpp)
+  append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Cuda/*.hpp)
+  append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Kernels/*.cpp)
+  append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Kernels/*.hpp)
+endif()
+
 foreach(Fmt Coo;Csr;Dia)
   append_glob(MORPHEUS_CORE_SOURCES
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.cpp)

@@ -95,7 +95,7 @@ struct ContainerTraits<typename std::enable_if_t<
                    void>::value,
       "Only one Layout template argument");
 
-  using index_type   = void;
+  using index_type   = typename ContainerTraits<void, Prop...>::index_type;
   using array_layout = ArrayLayout;
   using execution_space =
       typename ContainerTraits<void, Prop...>::execution_space;
@@ -111,17 +111,18 @@ struct ContainerTraits<
   // Specify Space, there should not be any other subsequent arguments.
 
   static_assert(
-      //   TODO: ADD IndexType too
-      std::is_same_v<typename ContainerTraits<void, Prop...>::execution_space,
-                     void> &&
-          std::is_same_v<typename ContainerTraits<void, Prop...>::memory_space,
-                         void> &&
+      std::is_same<typename ContainerTraits<void, Prop...>::index_type,
+                   void>::value &&
+          std::is_same<typename ContainerTraits<void, Prop...>::execution_space,
+                       void>::value &&
+          std::is_same<typename ContainerTraits<void, Prop...>::memory_space,
+                       void>::value &&
           std::is_same<typename ContainerTraits<void, Prop...>::array_layout,
                        void>::value,
       "Space is the final optional template argument for a Container");
 
-  using index_type      = void;
-  using array_layout    = void;
+  using index_type      = typename ContainerTraits<void, Prop...>::index_type;
+  using array_layout    = typename ContainerTraits<void, Prop...>::array_layout;
   using execution_space = typename Space::execution_space;
   using memory_space    = typename Space::memory_space;
   using HostMirrorSpace =
