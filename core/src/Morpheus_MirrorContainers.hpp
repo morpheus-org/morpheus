@@ -23,20 +23,50 @@
 
 #ifndef MORPHEUS_MIRRORCONTAINERS_HPP
 #define MORPHEUS_MIRRORCONTAINERS_HPP
-
-#include <Morpheus_DenseVector.hpp>
-#include <Kokkos_Core.hpp>
+#include <iostream>
 namespace Morpheus {
 
 namespace Impl {}  // namespace Impl
 
-template <class T, class... P>
-typename DenseVector<T, P...>::HostMirror create_mirror(
-    const DenseVector<T, P...>& src) {
-  using src_type = typename Morpheus::DenseVector<T, P...>;
+// TODO: src.size() only valid for vector
+template <template <class, class...> class Container, class T, class... P>
+typename Container<T, P...>::HostMirror create_mirror(
+    const Container<T, P...>& src) {
+  using src_type = Container<T, P...>;
   using dst_type = typename src_type::HostMirror;
-  std::cout << "I am here" << std::endl;
-  return dst_type(src.name(), src.size());
+
+  return dst_type(src.name().append("Mirror_"), src.size());
+}
+
+// FIXME: error: no suitable user-defined conversion from "const
+// Morpheus::DenseVector<double, Kokkos::Serial>" to
+// "Morpheus::DenseVector<double,
+// Kokkos::Device<Kokkos::HostSpace::execution_space,
+// Kokkos::HostSpace::memory_space>>
+template <template <class, class...> class Container, class T, class... P>
+typename Container<T, P...>::HostMirror create_mirror_container(
+    const Container<T, P...>& src,
+    typename std::enable_if<
+        (std::is_same<
+             typename Container<T, P...>::memory_space,
+             typename Container<T, P...>::HostMirror::memory_space>::value &&
+         std::is_same<typename Container<T, P...>::value_type,
+                      typename Container<T, P...>::HostMirror::value_type>::
+             value)>::type* = nullptr) {
+  return src;
+}
+
+template <template <class, class...> class Container, class T, class... P>
+typename Container<T, P...>::HostMirror create_mirror_container(
+    const Container<T, P...>& src,
+    typename std::enable_if<
+        !(std::is_same<
+              typename Container<T, P...>::memory_space,
+              typename Container<T, P...>::HostMirror::memory_space>::value &&
+          std::is_same<typename Container<T, P...>::value_type,
+                       typename Container<T, P...>::HostMirror::value_type>::
+              value)>::type* = nullptr) {
+  return Morpheus::create_mirror(src);
 }
 
 }  // namespace Morpheus
