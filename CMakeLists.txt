@@ -83,7 +83,7 @@ elseif(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 set(Morpheus_VERSION_MAJOR 0)
-set(Morpheus_VERSION_MINOR 2)
+set(Morpheus_VERSION_MINOR 02)
 set(Morpheus_VERSION_PATCH 00)
 set(Morpheus_VERSION
     "${Morpheus_VERSION_MAJOR}.${Morpheus_VERSION_MINOR}.${Morpheus_VERSION_PATCH}"

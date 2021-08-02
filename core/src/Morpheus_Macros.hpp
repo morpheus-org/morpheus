@@ -26,7 +26,7 @@
 
 #include <MorpheusCore_config.hpp>
 
-#if defined(Morpheus_ENABLE_CUDA) || defined(Morpheus_ENABLE_HIP)
+#if defined(MORPHEUS_ENABLE_CUDA) || defined(MORPHEUS_ENABLE_HIP)
 #define MORPHEUS_INLINE_FUNCTION inline __device__ __host__
 #define MORPHEUS_LAMBDA [=] __device__
 #else
