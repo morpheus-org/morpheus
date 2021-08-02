@@ -3,18 +3,13 @@
 namespace Morpheus {
 namespace Impl {
 namespace Kernels {
-// template <typename ValueType>
-// __global__ void elementwise_kernel(const int n, const ValueType* x,
-//                                    const ValueType* y, ValueType* xy) {
-//   const int tid = blockDim.x * blockIdx.x + threadIdx.x;
-//   xy[tid]       = x[tid] * y[tid];
-// }
 
-__global__ void elementwise_kernel(int n, const double* x, const double* y,
-                                   double* xy) {
-  const int tid = blockDim.x * blockIdx.x + threadIdx.x;
-  xy[tid]       = x[tid] * y[tid];
-}
+template __global__ void elementwise_kernel(int n, const double* x,
+                                            const double* y, double* xy);
+
+template __global__ void elementwise_kernel(int n, const float* x,
+                                            const float* y, float* xy);
+
 }  // namespace Kernels
 }  // namespace Impl
 }  // namespace Morpheus

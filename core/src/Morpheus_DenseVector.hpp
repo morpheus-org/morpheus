@@ -27,7 +27,7 @@
 #include <Morpheus_Copy.hpp>
 
 #include <fwd/Morpheus_Fwd_DenseVector.hpp>
-#include <impl/Morpheus_VectorTraits.hpp>
+#include <impl/Morpheus_ContainerTraits.hpp>
 
 #include <Kokkos_Core.hpp>
 #include <Kokkos_Random.hpp>
@@ -37,10 +37,10 @@
 namespace Morpheus {
 
 template <class ValueType, class... Properties>
-class DenseVector : public Impl::VectorTraits<ValueType, Properties...> {
+class DenseVector : public Impl::ContainerTraits<ValueType, Properties...> {
  public:
   using type   = DenseVector<ValueType, Properties...>;
-  using traits = Impl::VectorTraits<ValueType, Properties...>;
+  using traits = Impl::ContainerTraits<ValueType, Properties...>;
   using tag    = typename VectorFormatTag<Morpheus::DenseVectorTag>::tag;
 
   using value_type      = typename traits::value_type;
@@ -67,20 +67,6 @@ class DenseVector : public Impl::VectorTraits<ValueType, Properties...> {
   using value_array_pointer   = typename value_array_type::pointer_type;
   using value_array_reference = typename value_array_type::reference_type;
 
-  // static_assert(
-  //     std::is_same<
-  //         typename value_array_type::execution_space,
-  //         typename Kokkos::DefaultHostExecutionSpace::execution_space>::value
-  //         ||
-  //     std::is_same<typename value_array_type::execution_space,
-  //                  typename Kokkos::Serial::execution_space>::value);
-  // static_assert(
-  //     std::is_same<
-  //         typename value_array_type::memory_space,
-  //         typename Kokkos::DefaultHostExecutionSpace::memory_space>::value ||
-  //     std::is_same<typename value_array_type::memory_space,
-  //                  typename Kokkos::Serial::memory_space>::value);
-
  public:
   //   Member functions
   ~DenseVector()                  = default;
@@ -93,9 +79,7 @@ class DenseVector : public Impl::VectorTraits<ValueType, Properties...> {
 
   inline DenseVector(const std::string name, index_type n, value_type val = 0)
       : _name(name + "Vector"), _size(n), _values(name, size_t(n)) {
-    std::cout << "Before assigning" << std::endl;
     assign(n, val);
-    std::cout << "After assigning" << std::endl;
   }
 
   inline DenseVector(index_type n, value_type val = 0)
@@ -118,11 +102,13 @@ class DenseVector : public Impl::VectorTraits<ValueType, Properties...> {
   }
 
   // Element access
-  inline value_array_reference operator()(index_type i) const {
+  MORPHEUS_INLINE_FUNCTION value_array_reference
+  operator()(index_type i) const {
     return _values(i);
   }
 
-  inline value_array_reference operator[](index_type i) const {
+  MORPHEUS_INLINE_FUNCTION value_array_reference
+  operator[](index_type i) const {
     return _values(i);
   }
 

@@ -27,33 +27,28 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_CUDA)
 
-#include <Morpheus_Core.hpp>
+#include <Morpheus_DenseVector.hpp>
+#include <impl/DenseVector/Kernels/Morpheus_Elementwise_Impl.hpp>
+
+#include <cuda.h>
 
 namespace Morpheus {
 namespace Impl {
 
-void elementwise(const DenseVector<double, Kokkos::Cuda>& x,
-                 const DenseVector<double, Kokkos::Cuda>& y,
-                 DenseVector<double, Kokkos::Cuda>& xy);
-// template <typename ValueType, class... P>
-// KOKKOS_INLINE_FUNCTION void elementwise(const DenseVector<ValueType, P...>&
-// x,
-//                                         const DenseVector<ValueType, P...>&
-//                                         y, DenseVector<ValueType, P...>&
-//                                         xy) {
-//   const size_t BLOCK_SIZE = 256;
-//   const size_t NUM_BLOCKS = (x.size() + BLOCK_SIZE - 1) / BLOCK_SIZE;
+template <typename ValueType, class... Properties>
+void elementwise(const DenseVector<ValueType, Properties...>& x,
+                 const DenseVector<ValueType, Properties...>& y,
+                 DenseVector<ValueType, Properties...>& xy) {
+  const size_t BLOCK_SIZE = 256;
+  const size_t NUM_BLOCKS = (x.size() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-//   const ValueType* x_ptr = x.data();
-//   const ValueType* y_ptr = y.data();
-//   ValueType* xy_ptr      = xy.data();
+  const double* x_ptr = x.data();
+  const double* y_ptr = y.data();
+  double* xy_ptr      = xy.data();
 
-//   //   Morpheus::Impl::Kernels::elementwise_kernel<ValueType>
-//   //       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(x.size(), x_ptr, y_ptr, xy_ptr);
-//   Morpheus::Impl::Kernels::elementwise_kernel<<<NUM_BLOCKS, BLOCK_SIZE,
-//   0>>>(
-//       x.size(), x_ptr, y_ptr, xy_ptr);
-// }
+  Kernels::elementwise_kernel<<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(x.size(), x_ptr,
+                                                             y_ptr, xy_ptr);
+}
 
 }  // namespace Impl
 }  // namespace Morpheus
