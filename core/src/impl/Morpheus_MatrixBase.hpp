@@ -24,7 +24,6 @@
 #define MORPHEUS_MATRIXBASE_HPP
 
 #include <Morpheus_TypeTraits.hpp>
-
 #include <impl/Morpheus_ContainerTraits.hpp>
 
 #include <string>
@@ -33,11 +32,12 @@ namespace Morpheus {
 
 namespace Impl {
 
-template <class ValueType, class... Properties>
-class MatrixBase : public ContainerTraits<ValueType, Properties...> {
+template <template <class, class...> class Container, class ValueType,
+          class... Properties>
+class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
  public:
-  using type   = MatrixBase<ValueType, Properties...>;
-  using traits = ContainerTraits<ValueType, Properties...>;
+  using type   = MatrixBase<Container, ValueType, Properties...>;
+  using traits = ContainerTraits<Container, ValueType, Properties...>;
 
   using value_type = typename traits::value_type;
   using index_type = typename traits::index_type;

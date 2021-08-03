@@ -23,6 +23,7 @@
 #ifndef MORPHEUS_DENSEVECTOR_HPP
 #define MORPHEUS_DENSEVECTOR_HPP
 
+#include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Copy.hpp>
 
@@ -37,10 +38,11 @@
 namespace Morpheus {
 
 template <class ValueType, class... Properties>
-class DenseVector : public Impl::ContainerTraits<ValueType, Properties...> {
+class DenseVector
+    : public Impl::ContainerTraits<DenseVector, ValueType, Properties...> {
  public:
-  using type   = DenseVector<ValueType, Properties...>;
-  using traits = Impl::ContainerTraits<ValueType, Properties...>;
+  using traits = Impl::ContainerTraits<DenseVector, ValueType, Properties...>;
+  using type   = typename traits::type;
   using tag    = typename VectorFormatTag<Morpheus::DenseVectorTag>::tag;
 
   using value_type           = typename traits::value_type;
@@ -53,20 +55,13 @@ class DenseVector : public Impl::ContainerTraits<ValueType, Properties...> {
   using execution_space      = typename traits::execution_space;
   using device_type          = typename traits::device_type;
 
-  using HostMirror = DenseVector<
-      non_const_value_type, non_const_index_type, array_layout,
-      Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
-                     typename traits::host_mirror_space::memory_space>>;
+  using HostMirror       = typename traits::HostMirror;
+  using host_mirror_type = typename traits::host_mirror_type;
 
-  using host_mirror_type = DenseVector<typename traits::non_const_value_type,
-                                       typename traits::non_const_index_type,
-                                       typename traits::array_layout,
-                                       typename traits::host_mirror_space>;
-
-  using pointer         = DenseVector*;
-  using const_pointer   = const DenseVector*;
-  using reference       = DenseVector&;
-  using const_reference = const DenseVector&;
+  using pointer         = typename traits::pointer;
+  using const_pointer   = typename traits::const_pointer;
+  using reference       = typename traits::reference;
+  using const_reference = typename traits::const_reference;
 
   using value_array_type      = Kokkos::View<value_type*, device_type>;
   using value_array_pointer   = typename value_array_type::pointer_type;
@@ -77,8 +72,8 @@ class DenseVector : public Impl::ContainerTraits<ValueType, Properties...> {
   ~DenseVector()                  = default;
   DenseVector(const DenseVector&) = default;
   DenseVector(DenseVector&&)      = default;
-  reference operator=(const DenseVector&) = default;
-  reference operator=(DenseVector&&) = default;
+  DenseVector& operator=(const DenseVector&) = default;
+  DenseVector& operator=(DenseVector&&) = default;
 
   inline DenseVector() : _name("Vector"), _size(0), _values() {}
 
@@ -101,8 +96,7 @@ class DenseVector : public Impl::ContainerTraits<ValueType, Properties...> {
   template <typename Vector>
   inline DenseVector(
       const Vector& src,
-      typename std::enable_if<
-          std::is_same<typename Vector::tag, DenseVectorTag>::value>::type* =
+      typename std::enable_if<is_vector<typename Vector::tag>::value>::type* =
           nullptr)
       : _name("NewVector") {
     Morpheus::copy(src, *this);

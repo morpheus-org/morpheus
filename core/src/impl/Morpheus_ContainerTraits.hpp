@@ -45,10 +45,10 @@ namespace Impl {
  *  - ContainerTraits<ValueType, ArrayLayout, Space>
  */
 template <typename ValueType, class... Properties>
-struct ContainerTraits;
+struct ContainerTraits_Impl;
 
 template <>
-struct ContainerTraits<void> {
+struct ContainerTraits_Impl<void> {
   using index_type      = void;
   using array_layout    = void;
   using execution_space = void;
@@ -57,83 +57,94 @@ struct ContainerTraits<void> {
 };
 
 template <class... Prop>
-struct ContainerTraits<void, void, Prop...> {
+struct ContainerTraits_Impl<void, void, Prop...> {
   // Ignore an extraneous 'void'
 
-  using index_type   = typename ContainerTraits<void, Prop...>::index_type;
-  using array_layout = typename ContainerTraits<void, Prop...>::array_layout;
+  using index_type = typename ContainerTraits_Impl<void, Prop...>::index_type;
+  using array_layout =
+      typename ContainerTraits_Impl<void, Prop...>::array_layout;
   using execution_space =
-      typename ContainerTraits<void, Prop...>::execution_space;
-  using memory_space = typename ContainerTraits<void, Prop...>::memory_space;
+      typename ContainerTraits_Impl<void, Prop...>::execution_space;
+  using memory_space =
+      typename ContainerTraits_Impl<void, Prop...>::memory_space;
   using HostMirrorSpace =
-      typename ContainerTraits<void, Prop...>::HostMirrorSpace;
+      typename ContainerTraits_Impl<void, Prop...>::HostMirrorSpace;
 };
 
 template <typename IndexType, class... Prop>
-struct ContainerTraits<
+struct ContainerTraits_Impl<
     typename std::enable_if_t<std::is_integral<IndexType>::value>, IndexType,
     Prop...> {
   // Specify index type, keep subsequent layout and space arguments
 
-  using index_type   = IndexType;
-  using array_layout = typename ContainerTraits<void, Prop...>::array_layout;
+  using index_type = IndexType;
+  using array_layout =
+      typename ContainerTraits_Impl<void, Prop...>::array_layout;
   using execution_space =
-      typename ContainerTraits<void, Prop...>::execution_space;
-  using memory_space = typename ContainerTraits<void, Prop...>::memory_space;
+      typename ContainerTraits_Impl<void, Prop...>::execution_space;
+  using memory_space =
+      typename ContainerTraits_Impl<void, Prop...>::memory_space;
   using HostMirrorSpace =
-      typename ContainerTraits<void, Prop...>::HostMirrorSpace;
+      typename ContainerTraits_Impl<void, Prop...>::HostMirrorSpace;
 };
 
 template <typename ArrayLayout, class... Prop>
-struct ContainerTraits<typename std::enable_if_t<
-                           Kokkos::Impl::is_array_layout<ArrayLayout>::value>,
-                       ArrayLayout, Prop...> {
+struct ContainerTraits_Impl<
+    typename std::enable_if_t<
+        Kokkos::Impl::is_array_layout<ArrayLayout>::value>,
+    ArrayLayout, Prop...> {
   // Specify Layout, Space should be the only subsequent argument.
 
   static_assert(
-      std::is_same<typename ContainerTraits<void, Prop...>::array_layout,
+      std::is_same<typename ContainerTraits_Impl<void, Prop...>::array_layout,
                    void>::value,
       "Only one Layout template argument");
 
-  using index_type   = typename ContainerTraits<void, Prop...>::index_type;
+  using index_type   = typename ContainerTraits_Impl<void, Prop...>::index_type;
   using array_layout = ArrayLayout;
   using execution_space =
-      typename ContainerTraits<void, Prop...>::execution_space;
-  using memory_space = typename ContainerTraits<void, Prop...>::memory_space;
+      typename ContainerTraits_Impl<void, Prop...>::execution_space;
+  using memory_space =
+      typename ContainerTraits_Impl<void, Prop...>::memory_space;
   using HostMirrorSpace =
-      typename ContainerTraits<void, Prop...>::HostMirrorSpace;
+      typename ContainerTraits_Impl<void, Prop...>::HostMirrorSpace;
 };
 
 template <class Space, class... Prop>
-struct ContainerTraits<
+struct ContainerTraits_Impl<
     typename std::enable_if<Kokkos::Impl::is_space<Space>::value>::type, Space,
     Prop...> {
   // Specify Space, there should not be any other subsequent arguments.
 
   static_assert(
-      std::is_same<typename ContainerTraits<void, Prop...>::index_type,
+      std::is_same<typename ContainerTraits_Impl<void, Prop...>::index_type,
                    void>::value &&
-          std::is_same<typename ContainerTraits<void, Prop...>::execution_space,
-                       void>::value &&
-          std::is_same<typename ContainerTraits<void, Prop...>::memory_space,
-                       void>::value &&
-          std::is_same<typename ContainerTraits<void, Prop...>::array_layout,
-                       void>::value,
+          std::is_same<
+              typename ContainerTraits_Impl<void, Prop...>::execution_space,
+              void>::value &&
+          std::is_same<
+              typename ContainerTraits_Impl<void, Prop...>::memory_space,
+              void>::value &&
+          std::is_same<
+              typename ContainerTraits_Impl<void, Prop...>::array_layout,
+              void>::value,
       "Space is the final optional template argument for a Container");
 
-  using index_type      = typename ContainerTraits<void, Prop...>::index_type;
-  using array_layout    = typename ContainerTraits<void, Prop...>::array_layout;
+  using index_type = typename ContainerTraits_Impl<void, Prop...>::index_type;
+  using array_layout =
+      typename ContainerTraits_Impl<void, Prop...>::array_layout;
   using execution_space = typename Space::execution_space;
   using memory_space    = typename Space::memory_space;
   using HostMirrorSpace =
       typename Kokkos::Impl::HostMirror<Space>::Space::memory_space;
 };
 
-template <class ValueType, class... Properties>
+template <template <class, class...> class Container, class ValueType,
+          class... Properties>
 struct ContainerTraits {
  private:
   // Unpack first the properties arguments
-  using prop = ContainerTraits<void, Properties...>;
+  using prop = ContainerTraits_Impl<void, Properties...>;
 
   using IndexType = typename std::conditional_t<
       !std::is_same_v<typename prop::index_type, void>,
@@ -161,6 +172,8 @@ struct ContainerTraits {
                 "ValueType must be an arithmetic type such as int or double");
 
  public:
+  using type = Container<ValueType, Properties...>;
+
   using value_type           = ValueType;
   using const_value_type     = typename std::add_const<ValueType>::type;
   using non_const_value_type = typename std::remove_const<ValueType>::type;
@@ -174,6 +187,20 @@ struct ContainerTraits {
   using memory_space      = MemorySpace;
   using device_type       = Kokkos::Device<ExecutionSpace, MemorySpace>;
   using host_mirror_space = HostMirrorSpace;
+
+  using HostMirror =
+      Container<non_const_value_type, non_const_index_type, array_layout,
+                Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
+                               typename host_mirror_space::memory_space>>;
+  using host_mirror_type = Container<non_const_value_type, non_const_index_type,
+                                     array_layout, host_mirror_space>;
+
+  using pointer = typename std::add_pointer<type>::type;
+  using const_pointer =
+      typename std::add_pointer<typename std::add_const<type>::type>::type;
+  using reference       = typename std::add_lvalue_reference<type>::type;
+  using const_reference = typename std::add_lvalue_reference<
+      typename std::add_const<type>::type>::type;
 
   enum { is_hostspace = std::is_same<MemorySpace, Kokkos::HostSpace>::value };
 };
