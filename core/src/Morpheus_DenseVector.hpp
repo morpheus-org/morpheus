@@ -46,20 +46,22 @@ class DenseVector : public Impl::ContainerTraits<ValueType, Properties...> {
   using value_type           = typename traits::value_type;
   using non_const_value_type = typename traits::non_const_value_type;
   using size_type            = size_t;
-  using index_type           = int;
+  using index_type           = typename traits::index_type;
   using non_const_index_type = typename traits::non_const_index_type;
+  using array_layout         = typename traits::array_layout;
   using memory_space         = typename traits::memory_space;
   using execution_space      = typename traits::execution_space;
   using device_type          = typename traits::device_type;
 
   using HostMirror = DenseVector<
-      non_const_value_type, non_const_index_type,
+      non_const_value_type, non_const_index_type, array_layout,
       Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
                      typename traits::host_mirror_space::memory_space>>;
 
-  using host_mirror_type =
-      DenseVector<non_const_value_type, non_const_index_type,
-                  typename traits::host_mirror_space>;
+  using host_mirror_type = DenseVector<typename traits::non_const_value_type,
+                                       typename traits::non_const_index_type,
+                                       typename traits::array_layout,
+                                       typename traits::host_mirror_space>;
 
   using pointer         = DenseVector*;
   using const_pointer   = const DenseVector*;

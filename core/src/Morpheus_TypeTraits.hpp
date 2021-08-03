@@ -68,6 +68,14 @@ struct is_dense_matrix
 template <typename Tag>
 inline constexpr bool is_dense_matrix_v = is_dense_matrix<Tag>::value;
 
+template <typename Tag>
+struct is_vector
+    : std::integral_constant<bool,
+                             std::is_base_of<Impl::VectorTag, Tag>::value> {};
+
+template <typename Tag>
+inline constexpr bool is_vector_v = is_vector<Tag>::value;
+
 template <class T>
 struct remove_cvref {
   using type = std::remove_cv_t<std::remove_reference_t<T>>;

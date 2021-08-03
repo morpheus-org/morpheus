@@ -26,7 +26,7 @@
 
 #include <type_traits>
 
-#include <Morpheus_Core.hpp>
+#include <Kokkos_Core.hpp>
 
 namespace Morpheus {
 
