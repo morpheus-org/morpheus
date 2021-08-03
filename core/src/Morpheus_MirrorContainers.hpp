@@ -25,12 +25,15 @@
 #define MORPHEUS_MIRRORCONTAINERS_HPP
 
 #include <Morpheus_DenseVector.hpp>
+#include <Morpheus_TypeTraits.hpp>
 
 namespace Morpheus {
 
 template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror(
-    const Container<T, P...>& src) {
+    const Container<T, P...>& src,
+    typename std::enable_if<
+        is_sparse_matrix<Container<T, P...>>::value>::type* = nullptr) {
   using src_type = Container<T, P...>;
   using dst_type = typename src_type::HostMirror;
 
@@ -54,9 +57,10 @@ typename Container<T, P...>::HostMirror create_mirror_container(
         (std::is_same<
              typename Container<T, P...>::memory_space,
              typename Container<T, P...>::HostMirror::memory_space>::value &&
-         std::is_same<typename Container<T, P...>::value_type,
-                      typename Container<T, P...>::HostMirror::value_type>::
-             value)>::type* = nullptr) {
+         std::is_same<
+             typename Container<T, P...>::value_type,
+             typename Container<T, P...>::HostMirror::value_type>::value &&
+         is_sparse_matrix<Container<T, P...>>::value)>::type* = nullptr) {
   return src;
 }
 
