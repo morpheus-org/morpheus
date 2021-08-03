@@ -165,7 +165,9 @@ struct ContainerTraits {
   using const_value_type     = typename std::add_const<ValueType>::type;
   using non_const_value_type = typename std::remove_const<ValueType>::type;
 
-  using index_type   = IndexType;
+  using index_type           = IndexType;
+  using non_const_index_type = typename std::remove_const<IndexType>::type;
+
   using array_layout = ArrayLayout;
 
   using execution_space   = ExecutionSpace;

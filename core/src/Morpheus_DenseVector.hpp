@@ -43,20 +43,23 @@ class DenseVector : public Impl::ContainerTraits<ValueType, Properties...> {
   using traits = Impl::ContainerTraits<ValueType, Properties...>;
   using tag    = typename VectorFormatTag<Morpheus::DenseVectorTag>::tag;
 
-  using value_type      = typename traits::value_type;
-  using size_type       = size_t;
-  using index_type      = int;
-  using memory_space    = typename traits::memory_space;
-  using execution_space = typename traits::execution_space;
-  using device_type     = typename traits::device_type;
+  using value_type           = typename traits::value_type;
+  using non_const_value_type = typename traits::non_const_value_type;
+  using size_type            = size_t;
+  using index_type           = int;
+  using non_const_index_type = typename traits::non_const_index_type;
+  using memory_space         = typename traits::memory_space;
+  using execution_space      = typename traits::execution_space;
+  using device_type          = typename traits::device_type;
 
   using HostMirror = DenseVector<
-      typename traits::non_const_value_type,
+      non_const_value_type, non_const_index_type,
       Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
                      typename traits::host_mirror_space::memory_space>>;
 
-  using host_mirror_type = DenseVector<typename traits::non_const_value_type,
-                                       typename traits::host_mirror_space>;
+  using host_mirror_type =
+      DenseVector<non_const_value_type, non_const_index_type,
+                  typename traits::host_mirror_space>;
 
   using pointer         = DenseVector*;
   using const_pointer   = const DenseVector*;
@@ -98,7 +101,8 @@ class DenseVector : public Impl::ContainerTraits<ValueType, Properties...> {
       const Vector& src,
       typename std::enable_if<
           std::is_same<typename Vector::tag, DenseVectorTag>::value>::type* =
-          nullptr) {
+          nullptr)
+      : _name("NewVector") {
     Morpheus::copy(src, *this);
   }
 
