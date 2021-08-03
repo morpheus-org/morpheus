@@ -23,26 +23,30 @@
 
 #ifndef MORPHEUS_MIRRORCONTAINERS_HPP
 #define MORPHEUS_MIRRORCONTAINERS_HPP
-#include <iostream>
+
+#include <Morpheus_DenseVector.hpp>
+
 namespace Morpheus {
 
-namespace Impl {}  // namespace Impl
-
-// TODO: src.size() only valid for vector
 template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror(
     const Container<T, P...>& src) {
   using src_type = Container<T, P...>;
   using dst_type = typename src_type::HostMirror;
 
+  return dst_type(src.name().append("Mirror_"), src.nrows(), src.ncols(),
+                  src.nnnz());
+}
+
+template <class T, class... P>
+typename DenseVector<T, P...>::HostMirror create_mirror(
+    const DenseVector<T, P...>& src) {
+  using src_type = DenseVector<T, P...>;
+  using dst_type = typename src_type::HostMirror;
+
   return dst_type(src.name().append("Mirror_"), src.size());
 }
 
-// FIXME: error: no suitable user-defined conversion from "const
-// Morpheus::DenseVector<double, Kokkos::Serial>" to
-// "Morpheus::DenseVector<double,
-// Kokkos::Device<Kokkos::HostSpace::execution_space,
-// Kokkos::HostSpace::memory_space>>
 template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror_container(
     const Container<T, P...>& src,

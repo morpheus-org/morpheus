@@ -93,22 +93,35 @@ class DenseVector : public Impl::ContainerTraits<ValueType, Properties...> {
     assign(n, rand_pool, range_low, range_high);
   }
 
+  template <typename Vector>
+  inline DenseVector(
+      const Vector& src,
+      typename std::enable_if<
+          std::is_same<typename Vector::tag, DenseVectorTag>::value>::type* =
+          nullptr) {
+    Morpheus::copy(src, *this);
+  }
+
+  template <typename Vector>
+  DenseVector& operator=(const Vector& src) {
+    Morpheus::copy(src, *this);
+    return *this;
+  }
+
   inline void assign(const index_type n, const value_type val) {
     /* Resize if necessary (behavior of std:vector) */
-    // this->resize(n);
+    this->resize(n);
 
     set_functor f(_values, val);
     Kokkos::parallel_for("Morpheus::DenseVector::assign", n, f);
   }
 
   // Element access
-  MORPHEUS_INLINE_FUNCTION value_array_reference
-  operator()(index_type i) const {
+  inline value_array_reference operator()(index_type i) const {
     return _values(i);
   }
 
-  MORPHEUS_INLINE_FUNCTION value_array_reference
-  operator[](index_type i) const {
+  inline value_array_reference operator[](index_type i) const {
     return _values(i);
   }
 
