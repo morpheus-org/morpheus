@@ -35,36 +35,31 @@
 namespace Morpheus {
 
 template <class ValueType, class... Properties>
-class DiaMatrix : public Impl::MatrixBase<ValueType, Properties...> {
+class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
  public:
-  using type   = DiaMatrix<ValueType, Properties...>;
-  using traits = Impl::ContainerTraits<ValueType, Properties...>;
-  using base   = Impl::MatrixBase<ValueType, Properties...>;
+  using traits = Impl::ContainerTraits<DiaMatrix, ValueType, Properties...>;
+  using type   = typename traits::type;
+  using base   = Impl::MatrixBase<DiaMatrix, ValueType, Properties...>;
   using tag    = typename MatrixFormatTag<DiaTag>::tag;
 
-  using value_type = typename traits::value_type;
-  using index_type = typename traits::index_type;
-  using size_type  = typename traits::index_type;
+  using value_type           = typename traits::value_type;
+  using non_const_value_type = typename traits::non_const_value_type;
+  using size_type            = typename traits::index_type;
+  using index_type           = typename traits::index_type;
+  using non_const_index_type = typename traits::non_const_index_type;
+  using array_layout         = typename traits::array_layout;
 
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
 
-  using HostMirror = DiaMatrix<
-      typename traits::non_const_value_type, typename traits::index_type,
-      typename traits::array_layout,
-      Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
-                     typename traits::host_mirror_space::memory_space>>;
+  using HostMirror       = typename traits::HostMirror;
+  using host_mirror_type = typename traits::host_mirror_type;
 
-  using host_mirror_type =
-      DiaMatrix<typename traits::non_const_value_type,
-                typename traits::index_type, typename traits::array_layout,
-                typename traits::host_mirror_space>;
-
-  using pointer         = DiaMatrix *;
-  using const_pointer   = const DiaMatrix *;
-  using reference       = DiaMatrix &;
-  using const_reference = const DiaMatrix &;
+  using pointer         = typename traits::pointer;
+  using const_pointer   = typename traits::const_pointer;
+  using reference       = typename traits::reference;
+  using const_reference = typename traits::const_reference;
 
   using index_array_type = Morpheus::vector<index_type, device_type>;
   using value_array_type =
@@ -107,10 +102,34 @@ class DiaMatrix : public Impl::MatrixBase<ValueType, Properties...> {
     values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
   }
 
+  // !FIXME: Remove deep copy and perform shallow copy
+  // Construct from another matrix type
+  template <class VR, class... PR>
+  DiaMatrix(const DiaMatrix<VR, PR...> &matrix) {
+    Morpheus::copy(matrix, *this);
+  }
+
+  // !FIXME: Remove deep copy and perform shallow copy
+  // Assignment from another matrix type
+  template <class VR, class... PR>
+  reference operator=(const DiaMatrix<VR, PR...> &matrix) {
+    Morpheus::copy(matrix, *this);
+    return *this;
+  }
+
+  // !FIXME: Needs to perform conversion
   // Construct from another matrix type
   template <typename MatrixType>
   DiaMatrix(const MatrixType &matrix) {
     Morpheus::copy(matrix, *this);
+  }
+
+  // !FIXME: Needs to perform conversion
+  // Assignment from another matrix type
+  template <typename MatrixType>
+  reference operator=(const MatrixType &matrix) {
+    Morpheus::copy(matrix, *this);
+    return *this;
   }
 
   // Resize matrix dimensions and underlying storage
@@ -121,13 +140,6 @@ class DiaMatrix : public Impl::MatrixBase<ValueType, Properties...> {
     base::resize(num_rows, num_cols, num_entries);
     diagonal_offsets.resize(num_diagonals);
     values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
-  }
-
-  // Assignment from another matrix type
-  template <typename MatrixType>
-  reference operator=(const MatrixType &matrix) {
-    Morpheus::copy(matrix, *this);
-    return *this;
   }
 
  private:

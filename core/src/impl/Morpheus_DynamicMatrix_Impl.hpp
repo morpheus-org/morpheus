@@ -37,8 +37,9 @@ namespace Impl {
 
 template <class ValueType, class... Properties>
 struct any_type_resize
-    : public Impl::ContainerTraits<ValueType, Properties...> {
-  using traits      = Impl::ContainerTraits<ValueType, Properties...>;
+    : public Impl::ContainerTraits<any_type_resize, ValueType, Properties...> {
+  using traits =
+      Impl::ContainerTraits<any_type_resize, ValueType, Properties...>;
   using index_type  = typename traits::index_type;
   using value_type  = typename traits::value_type;
   using result_type = void;

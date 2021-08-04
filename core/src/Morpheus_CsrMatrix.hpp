@@ -36,36 +36,31 @@
 namespace Morpheus {
 
 template <class ValueType, class... Properties>
-class CsrMatrix : public Impl::MatrixBase<ValueType, Properties...> {
+class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
  public:
-  using type   = CsrMatrix<ValueType, Properties...>;
-  using traits = Impl::ContainerTraits<ValueType, Properties...>;
-  using base   = Impl::MatrixBase<ValueType, Properties...>;
+  using traits = Impl::ContainerTraits<CsrMatrix, ValueType, Properties...>;
+  using type   = typename traits::type;
+  using base   = Impl::MatrixBase<CsrMatrix, ValueType, Properties...>;
   using tag    = typename MatrixFormatTag<Morpheus::CsrTag>::tag;
 
-  using value_type = typename traits::value_type;
-  using index_type = typename traits::index_type;
-  using size_type  = typename traits::index_type;
+  using value_type           = typename traits::value_type;
+  using non_const_value_type = typename traits::non_const_value_type;
+  using size_type            = typename traits::index_type;
+  using index_type           = typename traits::index_type;
+  using non_const_index_type = typename traits::non_const_index_type;
+  using array_layout         = typename traits::array_layout;
 
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
 
-  using HostMirror = CsrMatrix<
-      typename traits::non_const_value_type, typename traits::index_type,
-      typename traits::array_layout,
-      Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
-                     typename traits::host_mirror_space::memory_space>>;
+  using HostMirror       = typename traits::HostMirror;
+  using host_mirror_type = typename traits::host_mirror_type;
 
-  using host_mirror_type =
-      CsrMatrix<typename traits::non_const_value_type,
-                typename traits::index_type, typename traits::array_layout,
-                typename traits::host_mirror_space>;
-
-  using pointer         = CsrMatrix *;
-  using const_pointer   = const CsrMatrix *;
-  using reference       = CsrMatrix &;
-  using const_reference = const CsrMatrix &;
+  using pointer         = typename traits::pointer;
+  using const_pointer   = typename traits::const_pointer;
+  using reference       = typename traits::reference;
+  using const_reference = typename traits::const_reference;
 
   using index_array_type      = Morpheus::vector<index_type, device_type>;
   using value_array_type      = Morpheus::vector<value_type, device_type>;
@@ -100,10 +95,34 @@ class CsrMatrix : public Impl::MatrixBase<ValueType, Properties...> {
         column_indices(num_entries),
         values(num_entries) {}
 
+  // !FIXME: Remove deep copy and perform shallow copy
+  // Construct from another matrix type
+  template <class VR, class... PR>
+  CsrMatrix(const CsrMatrix<VR, PR...> &matrix) {
+    Morpheus::copy(matrix, *this);
+  }
+
+  // !FIXME: Remove deep copy and perform shallow copy
+  // Assignment from another matrix type
+  template <class VR, class... PR>
+  reference operator=(const CsrMatrix<VR, PR...> &matrix) {
+    Morpheus::copy(matrix, *this);
+    return *this;
+  }
+
+  // !FIXME: Needs to perform conversion
   // Construct from another matrix type
   template <typename MatrixType>
   CsrMatrix(const MatrixType &matrix) {
     Morpheus::copy(matrix, *this);
+  }
+
+  // !FIXME: Needs to perform conversion
+  // Assignment from another matrix type
+  template <typename MatrixType>
+  reference operator=(const MatrixType &matrix) {
+    Morpheus::copy(matrix, *this);
+    return *this;
   }
 
   // Resize matrix dimensions and underlying storage
@@ -113,13 +132,6 @@ class CsrMatrix : public Impl::MatrixBase<ValueType, Properties...> {
     row_offsets.resize(num_rows + 1);
     column_indices.resize(num_entries);
     values.resize(num_entries);
-  }
-
-  // Assignment from another matrix type
-  template <typename MatrixType>
-  reference operator=(const MatrixType &matrix) {
-    Morpheus::copy(matrix, *this);
-    return *this;
   }
 };
 }  // namespace Morpheus

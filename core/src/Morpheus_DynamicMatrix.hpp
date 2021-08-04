@@ -39,38 +39,35 @@
 namespace Morpheus {
 
 template <class ValueType, class... Properties>
-class DynamicMatrix : public Impl::MatrixBase<ValueType, Properties...> {
+class DynamicMatrix
+    : public Impl::MatrixBase<DynamicMatrix, ValueType, Properties...> {
  public:
-  using type   = DynamicMatrix<ValueType, Properties...>;
-  using traits = Impl::ContainerTraits<ValueType, Properties...>;
-  using base   = Impl::MatrixBase<ValueType, Properties...>;
+  using traits = Impl::ContainerTraits<DynamicMatrix, ValueType, Properties...>;
+  using type   = typename traits::type;
+  using base   = Impl::MatrixBase<DynamicMatrix, ValueType, Properties...>;
   using tag    = typename MatrixFormatTag<Morpheus::DynamicTag>::tag;
 
-  using variant_type =
-      typename MatrixFormats<ValueType, Properties...>::variant;
-  using value_type = typename traits::value_type;
-  using index_type = typename traits::index_type;
-  using size_type  = typename traits::index_type;
+  using value_type           = typename traits::value_type;
+  using non_const_value_type = typename traits::non_const_value_type;
+  using size_type            = typename traits::index_type;
+  using index_type           = typename traits::index_type;
+  using non_const_index_type = typename traits::non_const_index_type;
+  using array_layout         = typename traits::array_layout;
 
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
 
-  using HostMirror = DynamicMatrix<
-      typename traits::non_const_value_type, typename traits::index_type,
-      typename traits::array_layout,
-      Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
-                     typename traits::host_mirror_space::memory_space>>;
+  using HostMirror       = typename traits::HostMirror;
+  using host_mirror_type = typename traits::host_mirror_type;
 
-  using host_mirror_type =
-      DynamicMatrix<typename traits::non_const_value_type,
-                    typename traits::index_type, typename traits::array_layout,
-                    typename traits::host_mirror_space>;
+  using pointer         = typename traits::pointer;
+  using const_pointer   = typename traits::const_pointer;
+  using reference       = typename traits::reference;
+  using const_reference = typename traits::const_reference;
 
-  using pointer         = DynamicMatrix *;
-  using const_pointer   = const DynamicMatrix *;
-  using reference       = DynamicMatrix &;
-  using const_reference = const DynamicMatrix &;
+  using variant_type =
+      typename MatrixFormats<ValueType, Properties...>::variant;
 
   ~DynamicMatrix()                     = default;
   DynamicMatrix(const DynamicMatrix &) = default;
@@ -95,6 +92,23 @@ class DynamicMatrix : public Impl::MatrixBase<ValueType, Properties...> {
           * = 0)
       : base(name + "DynamicMatrix", mat.nrows(), mat.ncols(), mat.nnnz()),
         _formats(mat) {}
+
+  // !CHECK_IF_VALID
+  // !FIXME: Remove deep copy and perform shallow copy
+  // Construct from another matrix type
+  template <class VR, class... PR>
+  DynamicMatrix(const DynamicMatrix<VR, PR...> &matrix) {
+    Morpheus::copy(matrix, *this);
+  }
+
+  // !CHECK_IF_VALID
+  // !FIXME: Remove deep copy and perform shallow copy
+  // Assignment from another matrix type
+  template <class VR, class... PR>
+  reference operator=(const DynamicMatrix<VR, PR...> &matrix) {
+    Morpheus::copy(matrix, *this);
+    return *this;
+  }
 
   // Assignment from another matrix type
   template <typename Matrix>

@@ -50,10 +50,11 @@ class DenseVector
   using size_type            = size_t;
   using index_type           = typename traits::index_type;
   using non_const_index_type = typename traits::non_const_index_type;
-  using array_layout         = typename traits::array_layout;
-  using memory_space         = typename traits::memory_space;
-  using execution_space      = typename traits::execution_space;
-  using device_type          = typename traits::device_type;
+
+  using array_layout    = typename traits::array_layout;
+  using memory_space    = typename traits::memory_space;
+  using execution_space = typename traits::execution_space;
+  using device_type     = typename traits::device_type;
 
   using HostMirror       = typename traits::HostMirror;
   using host_mirror_type = typename traits::host_mirror_type;
@@ -98,13 +99,18 @@ class DenseVector
       const Vector& src,
       typename std::enable_if<is_vector<typename Vector::tag>::value>::type* =
           nullptr)
-      : _name("NewVector") {
-    Morpheus::copy(src, *this);
+      : _name("ShallowVector") {
+    _size   = src.size();
+    _values = src.view();
   }
 
   template <typename Vector>
   DenseVector& operator=(const Vector& src) {
-    Morpheus::copy(src, *this);
+    if (this != &src) {
+      _name   = src.name();
+      _size   = src.size();
+      _values = src.view();
+    }
     return *this;
   }
 

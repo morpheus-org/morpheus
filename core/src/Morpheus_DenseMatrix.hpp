@@ -34,37 +34,32 @@
 namespace Morpheus {
 
 template <class ValueType, class... Properties>
-class DenseMatrix : public Impl::MatrixBase<ValueType, Properties...> {
+class DenseMatrix
+    : public Impl::MatrixBase<DenseMatrix, ValueType, Properties...> {
  public:
-  using type   = DenseMatrix<ValueType, Properties...>;
-  using traits = Impl::ContainerTraits<ValueType, Properties...>;
-  using base   = Impl::MatrixBase<ValueType, Properties...>;
-  using tag    = typename MatrixFormatTag<DenseMatrixTag>::tag;
+  using traits = Impl::ContainerTraits<DenseMatrix, ValueType, Properties...>;
+  using type   = typename traits::type;
+  using base   = Impl::MatrixBase<DenseMatrix, ValueType, Properties...>;
+  using tag    = typename MatrixFormatTag<Morpheus::DenseMatrixTag>::tag;
 
-  using value_type   = typename traits::value_type;
-  using index_type   = typename traits::index_type;
-  using size_type    = typename traits::index_type;
-  using array_layout = typename traits::array_layout;
+  using value_type           = typename traits::value_type;
+  using non_const_value_type = typename traits::non_const_value_type;
+  using size_type            = typename traits::index_type;
+  using index_type           = typename traits::index_type;
+  using non_const_index_type = typename traits::non_const_index_type;
+  using array_layout         = typename traits::array_layout;
 
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
 
-  using HostMirror = DenseMatrix<
-      typename traits::non_const_value_type, typename traits::index_type,
-      typename traits::array_layout,
-      Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
-                     typename traits::host_mirror_space::memory_space>>;
+  using HostMirror       = typename traits::HostMirror;
+  using host_mirror_type = typename traits::host_mirror_type;
 
-  using host_mirror_type =
-      DenseMatrix<typename traits::non_const_value_type,
-                  typename traits::index_type, typename traits::array_layout,
-                  typename traits::host_mirror_space>;
-
-  using pointer         = DenseMatrix *;
-  using const_pointer   = const DenseMatrix *;
-  using reference       = DenseMatrix &;
-  using const_reference = const DenseMatrix &;
+  using pointer         = typename traits::pointer;
+  using const_pointer   = typename traits::const_pointer;
+  using reference       = typename traits::reference;
+  using const_reference = typename traits::const_reference;
 
   using value_array_type =
       Kokkos::View<value_type **, array_layout, memory_space>;
@@ -93,6 +88,36 @@ class DenseMatrix : public Impl::MatrixBase<ValueType, Properties...> {
       : base(name + "DenseMatrix", num_rows, num_cols, num_rows * num_cols),
         _values(name + "(DenseMatrix)", size_t(num_rows), size_t(num_cols)) {
     assign(num_rows, num_cols, val);
+  }
+
+  // !FIXME: Remove deep copy and perform shallow copy
+  // Construct from another dense matrix type
+  template <class VR, class... PR>
+  DenseMatrix(const DenseMatrix<VR, PR...> &matrix) {
+    Morpheus::copy(matrix, *this);
+  }
+
+  // !FIXME: Remove deep copy and perform shallow copy
+  // Assignment from another dense matrix type
+  template <class VR, class... PR>
+  reference operator=(const DenseMatrix<VR, PR...> &matrix) {
+    Morpheus::copy(matrix, *this);
+    return *this;
+  }
+
+  // !FIXME: Needs to perform conversion
+  // Construct from another matrix type
+  template <class MatrixType>
+  DenseMatrix(const MatrixType &matrix) {
+    Morpheus::copy(matrix, *this);
+  }
+
+  // !FIXME: Needs to perform conversion
+  // Assignment from another matrix type
+  template <class MatrixType>
+  reference operator=(const MatrixType &matrix) {
+    Morpheus::copy(matrix, *this);
+    return *this;
   }
 
   inline void assign(index_type num_rows, index_type num_cols,
