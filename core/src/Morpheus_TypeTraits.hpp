@@ -91,6 +91,14 @@ struct remove_cvref {
 template <class T>
 using remove_cvref_t = typename remove_cvref<T>::type;
 
+template <class T>
+struct is_arithmetic {
+  static_assert(std::is_arithmetic<typename remove_cvref<T>::type>::value,
+                "Morpheus: Invalid arithmetic type.");
+  using container = is_arithmetic;
+  using type      = T;
+};
+
 template <class ExecSpace, class T>
 inline constexpr bool has_access_v =
     Kokkos::Impl::SpaceAccessibility<ExecSpace,
@@ -99,6 +107,11 @@ inline constexpr bool has_access_v =
 template <class ExecSpace>
 inline constexpr bool is_execution_space_v =
     Kokkos::Impl::is_execution_space<ExecSpace>::value;
+
+template <class Space>
+inline constexpr bool is_Host_Memoryspace_v =
+    std::is_same<Kokkos::HostSpace::memory_space,
+                 typename Space::memory_space>::value;
 
 template <class ExecSpace>
 inline constexpr bool is_Serial_space_v =

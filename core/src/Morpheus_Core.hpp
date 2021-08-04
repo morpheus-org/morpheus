@@ -35,6 +35,8 @@
 #include <Morpheus_DiaMatrix.hpp>
 #include <Morpheus_DynamicMatrix.hpp>
 
+#include <Morpheus_MirrorContainers.hpp>
+
 #include <Morpheus_Multiply.hpp>
 #include <Morpheus_Print.hpp>
 #include <Morpheus_Sort.hpp>
