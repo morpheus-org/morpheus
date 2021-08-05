@@ -47,7 +47,6 @@ class DenseVector
 
   using value_type           = typename traits::value_type;
   using non_const_value_type = typename traits::non_const_value_type;
-  using size_type            = size_t;
   using index_type           = typename traits::index_type;
   using non_const_index_type = typename traits::non_const_index_type;
 
@@ -64,7 +63,8 @@ class DenseVector
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
-  using value_array_type      = Kokkos::View<value_type*, device_type>;
+  using value_array_type =
+      Kokkos::View<value_type*, Kokkos::LayoutRight, device_type>;
   using value_array_pointer   = typename value_array_type::pointer_type;
   using value_array_reference = typename value_array_type::reference_type;
 
@@ -94,18 +94,12 @@ class DenseVector
     assign(n, rand_pool, range_low, range_high);
   }
 
-  template <typename Vector>
-  inline DenseVector(
-      const Vector& src,
-      typename std::enable_if<is_vector<typename Vector::tag>::value>::type* =
-          nullptr)
-      : _name("ShallowVector") {
-    _size   = src.size();
-    _values = src.view();
-  }
+  template <class VR, class... PR>
+  inline DenseVector(const DenseVector<VR, PR...>& src)
+      : _name("ShallowVector"), _size(src.size()), _values(src.view()) {}
 
-  template <typename Vector>
-  DenseVector& operator=(const Vector& src) {
+  template <class VR, class... PR>
+  DenseVector& operator=(const DenseVector<VR, PR...>& src) {
     if (this != &src) {
       _name   = src.name();
       _size   = src.size();

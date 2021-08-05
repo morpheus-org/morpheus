@@ -61,12 +61,18 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
-  using index_array_type = Morpheus::vector<index_type, device_type>;
+  using index_array_type    = Morpheus::vector<index_type, index_type,
+                                            Kokkos::LayoutRight, device_type>;
+  using index_array_pointer = typename index_array_type::value_array_pointer;
+  using index_array_reference =
+      typename index_array_type::value_array_reference;
+
   using value_array_type =
       Morpheus::DenseMatrix<value_type, index_type, Kokkos::LayoutLeft,
                             device_type>;
-  using value_array_pointer   = typename value_array_type::pointer;
-  using value_array_reference = typename value_array_type::reference;
+  using value_array_pointer = typename value_array_type::value_array_pointer;
+  using value_array_reference =
+      typename value_array_type::value_array_reference;
 
   index_array_type diagonal_offsets;
   value_array_type values;
@@ -74,8 +80,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   ~DiaMatrix()                 = default;
   DiaMatrix(const DiaMatrix &) = default;
   DiaMatrix(DiaMatrix &&)      = default;
-  reference operator=(const DiaMatrix &) = default;
-  reference operator=(DiaMatrix &&) = default;
+  DiaMatrix &operator=(const DiaMatrix &) = default;
+  DiaMatrix &operator=(DiaMatrix &&) = default;
 
   // Construct an empty DiaMatrix
   inline DiaMatrix() : base("DiaMatrix"), diagonal_offsets(), values() {}
@@ -102,35 +108,37 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
     values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
   }
 
-  // !FIXME: Remove deep copy and perform shallow copy
-  // Construct from another matrix type
+  // Construct from another matrix type (Shallow)
   template <class VR, class... PR>
-  DiaMatrix(const DiaMatrix<VR, PR...> &matrix) {
-    Morpheus::copy(matrix, *this);
-  }
+  DiaMatrix(const DiaMatrix<VR, PR...> &src)
+      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
+             src.nnnz()),
+        diagonal_offsets(src.diagonal_offsets.view()),
+        values(src.values.view()) {}
 
-  // !FIXME: Remove deep copy and perform shallow copy
-  // Assignment from another matrix type
+  // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
-  reference operator=(const DiaMatrix<VR, PR...> &matrix) {
-    Morpheus::copy(matrix, *this);
+  reference operator=(const DiaMatrix<VR, PR...> &src) {
+    if (this != &src) {
+      set_name(src.name());
+      set_nrows(src.nrows());
+      set_ncols(src.ncols());
+      set_nnnz(src.nnnz());
+      diagonal_offsets = src.diagonal_offsets.view();
+      values           = src.values.view();
+    }
     return *this;
   }
 
   // !FIXME: Needs to perform conversion
   // Construct from another matrix type
   template <typename MatrixType>
-  DiaMatrix(const MatrixType &matrix) {
-    Morpheus::copy(matrix, *this);
-  }
+  DiaMatrix(const MatrixType &src) = delete;
 
   // !FIXME: Needs to perform conversion
   // Assignment from another matrix type
   template <typename MatrixType>
-  reference operator=(const MatrixType &matrix) {
-    Morpheus::copy(matrix, *this);
-    return *this;
-  }
+  reference operator=(const MatrixType &src) = delete;
 
   // Resize matrix dimensions and underlying storage
   inline void resize(const index_type num_rows, const index_type num_cols,

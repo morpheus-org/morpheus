@@ -61,10 +61,17 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
-  using index_array_type      = Morpheus::vector<index_type, device_type>;
-  using value_array_type      = Morpheus::vector<value_type, device_type>;
-  using value_array_pointer   = typename value_array_type::pointer;
-  using value_array_reference = typename value_array_type::reference;
+  using index_array_type    = Morpheus::vector<index_type, index_type,
+                                            Kokkos::LayoutRight, device_type>;
+  using index_array_pointer = typename index_array_type::value_array_pointer;
+  using index_array_reference =
+      typename index_array_type::value_array_reference;
+
+  using value_array_type    = Morpheus::vector<value_type, index_type,
+                                            Kokkos::LayoutRight, device_type>;
+  using value_array_pointer = typename value_array_type::value_array_pointer;
+  using value_array_reference =
+      typename value_array_type::value_array_reference;
 
   index_array_type row_indices, column_indices;
   value_array_type values;
@@ -72,8 +79,8 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   ~CooMatrix()                 = default;
   CooMatrix(const CooMatrix &) = default;
   CooMatrix(CooMatrix &&)      = default;
-  reference operator=(const CooMatrix &) = default;
-  reference operator=(CooMatrix &&) = default;
+  CooMatrix &operator=(const CooMatrix &) = default;
+  CooMatrix &operator=(CooMatrix &&) = default;
 
   // Construct an empty CooMatrix
   inline CooMatrix()
@@ -101,35 +108,39 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
         column_indices(num_entries),
         values(num_entries) {}
 
-  // !FIXME: Remove deep copy and perform shallow copy
-  // Construct from another matrix type
+  // Construct from another matrix type (Shallow)
   template <class VR, class... PR>
-  CooMatrix(const CooMatrix<VR, PR...> &matrix) {
-    Morpheus::copy(matrix, *this);
-  }
+  CooMatrix(const CooMatrix<VR, PR...> &src)
+      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
+             src.nnnz()),
+        row_indices(src.row_indices.view()),
+        column_indices(src.column_indices.view()),
+        values(src.values.view()) {}
 
-  // !FIXME: Remove deep copy and perform shallow copy
-  // Assignment from another matrix type
+  // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
-  reference operator=(const CooMatrix<VR, PR...> &matrix) {
-    Morpheus::copy(matrix, *this);
+  reference operator=(const CooMatrix<VR, PR...> &src) {
+    if (this != &src) {
+      set_name(src.name());
+      set_nrows(src.nrows());
+      set_ncols(src.ncols());
+      set_nnnz(src.nnnz());
+      row_indices    = src.row_indices.view();
+      column_indices = src.column_indices.view();
+      values         = src.values.view();
+    }
     return *this;
   }
 
   // !FIXME: Needs to perform conversion
   // Construct from another matrix type
   template <typename MatrixType>
-  CooMatrix(const MatrixType &matrix) {
-    Morpheus::copy(matrix, *this);
-  }
+  CooMatrix(const MatrixType &src) = delete;
 
   // !FIXME: Needs to perform conversion
   // Assignment from another matrix type
   template <typename MatrixType>
-  reference operator=(const MatrixType &matrix) {
-    Morpheus::copy(matrix, *this);
-    return *this;
-  }
+  reference operator=(const MatrixType &src) = delete;
 
   // Resize matrix dimensions and underlying storage
   inline void resize(const index_type num_rows, const index_type num_cols,

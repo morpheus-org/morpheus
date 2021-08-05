@@ -69,8 +69,8 @@ class DenseMatrix
   ~DenseMatrix()                   = default;
   DenseMatrix(const DenseMatrix &) = default;
   DenseMatrix(DenseMatrix &&)      = default;
-  reference operator=(const DenseMatrix &) = default;
-  reference operator=(DenseMatrix &&) = default;
+  DenseMatrix &operator=(const DenseMatrix &) = default;
+  DenseMatrix &operator=(DenseMatrix &&) = default;
 
   // Construct an empty DenseMatrix
   inline DenseMatrix() : base("DenseMatrix"), _values() {}
@@ -90,35 +90,35 @@ class DenseMatrix
     assign(num_rows, num_cols, val);
   }
 
-  // !FIXME: Remove deep copy and perform shallow copy
-  // Construct from another dense matrix type
+  // Construct from another dense matrix type (Shallow)
   template <class VR, class... PR>
-  DenseMatrix(const DenseMatrix<VR, PR...> &matrix) {
-    Morpheus::copy(matrix, *this);
-  }
+  DenseMatrix(const DenseMatrix<VR, PR...> &src)
+      : base("ShallowDenseMatrix" + src.name(), src.nrows(), src.ncols(),
+             src.nrows() * src.ncols()),
+        _values(src.view()) {}
 
-  // !FIXME: Remove deep copy and perform shallow copy
-  // Assignment from another dense matrix type
+  // Assignment from another dense matrix type (Shallow)
   template <class VR, class... PR>
-  reference operator=(const DenseMatrix<VR, PR...> &matrix) {
-    Morpheus::copy(matrix, *this);
+  reference operator=(const DenseMatrix<VR, PR...> &src) {
+    if (this != &src) {
+      set_name(src.name());
+      set_nrows(src.nrows());
+      set_ncols(src.ncols());
+      set_nnnz(src.nnnz());
+      _values = src.view();
+    }
     return *this;
   }
 
   // !FIXME: Needs to perform conversion
   // Construct from another matrix type
   template <class MatrixType>
-  DenseMatrix(const MatrixType &matrix) {
-    Morpheus::copy(matrix, *this);
-  }
+  DenseMatrix(const MatrixType &src) = delete;
 
   // !FIXME: Needs to perform conversion
   // Assignment from another matrix type
   template <class MatrixType>
-  reference operator=(const MatrixType &matrix) {
-    Morpheus::copy(matrix, *this);
-    return *this;
-  }
+  reference operator=(const MatrixType &src) = delete;
 
   inline void assign(index_type num_rows, index_type num_cols,
                      const value_type val) {

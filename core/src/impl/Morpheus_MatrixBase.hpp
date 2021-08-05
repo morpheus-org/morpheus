@@ -70,6 +70,7 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
   inline index_type nnnz() const { return _nnz; }
+  inline void set_name(const std::string name) { _name = name; }
   inline void set_nrows(const index_type rows) { _m = rows; }
   inline void set_ncols(const index_type cols) { _n = cols; }
   inline void set_nnnz(const index_type nnz) { _nnz = nnz; }
