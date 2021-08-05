@@ -31,6 +31,7 @@ morpheus_include_directories(${CMAKE_CURRENT_BINARY_DIR})
 morpheus_include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/category_files)
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/format_files)
+morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/Cuda)
 
 # Do test independent of formats
 foreach(Tag Serial;OpenMP;Cuda;HIP)
@@ -39,54 +40,57 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
 
   set(${Tag}_SOURCES)
   if(MORPHEUS_ENABLE_${DEVICE})
-      set(testdir ${CMAKE_CURRENT_BINARY_DIR}/${dir})
-      file(MAKE_DIRECTORY ${testdir})
+    set(testdir ${CMAKE_CURRENT_BINARY_DIR}/${dir})
+    file(MAKE_DIRECTORY ${testdir})
 
-      foreach(Name DenseVector)
-        set(file ${testdir}/Test${Tag}_${Name}.cpp)
-        # Write to a temporary intermediate file and call configure_file to
-        # avoid updating timestamps triggering unnecessary rebuilds on
-        # subsequent cmake runs.
-        file(
-          WRITE ${testdir}/dummy.cpp
-          "#include <Test${Tag}_Category.hpp>\n"
-          "#define TESTSUITE_NAME ${Tag}\n"
-          "#include <Test_${Name}.hpp>\n")
-        configure_file(${testdir}/dummy.cpp ${file})
-        list(APPEND ${Tag}_SOURCES ${file})
-      endforeach()
-    endif()
+    foreach(Name DenseVectorTraits MirrorContainers)
+      set(file ${testdir}/Test${Tag}_${Name}.cpp)
+      # Write to a temporary intermediate file and call configure_file to avoid
+      # updating timestamps triggering unnecessary rebuilds on subsequent cmake
+      # runs.
+      file(
+        WRITE ${testdir}/dummy.cpp
+        "#include <Test${Tag}_Category.hpp>\n"
+        "#include <TestDenseVector_Format.hpp>\n"
+        "#define TESTSUITE_NAME ${Tag}\n" "#include <Test_${Name}.hpp>\n")
+      configure_file(${testdir}/dummy.cpp ${file})
+      list(APPEND ${Tag}_SOURCES ${file})
+    endforeach()
+  endif()
 endforeach()
 
-# Do for each available format
-foreach(Tag Serial;OpenMP;Cuda;HIP)
-  string(TOUPPER ${Tag} DEVICE)
-  string(TOLOWER ${Tag} dir)
+if(MORPHEUS_ENABLE_CUDA)
+  set(testdir ${CMAKE_CURRENT_BINARY_DIR}/cuda/cuda})
+  file(MAKE_DIRECTORY ${testdir})
 
-  foreach(Fmt Coo;Csr;Dia)
-    string(TOUPPER ${Fmt} FORMAT)
-    string(TOLOWER ${Fmt} fmtdir)
-    if(MORPHEUS_ENABLE_${DEVICE})
-      set(testdir ${CMAKE_CURRENT_BINARY_DIR}/${dir}/${fmtdir})
-      file(MAKE_DIRECTORY ${testdir})
-
-      foreach(Name Multiply Copy)
-        set(file ${testdir}/Test${Tag}_${Fmt}_${Name}.cpp)
-        # Write to a temporary intermediate file and call configure_file to
-        # avoid updating timestamps triggering unnecessary rebuilds on
-        # subsequent cmake runs.
-        file(
-          WRITE ${testdir}/dummy.cpp
-          "#include <Test${Tag}_Category.hpp>\n"
-          "#include <Test${Fmt}Matrix_Format.hpp>\n"
-          "#define TESTSUITE_NAME ${Tag}${Fmt}\n"
-          "#include <Test_${Name}.hpp>\n")
-        configure_file(${testdir}/dummy.cpp ${file})
-        list(APPEND ${Tag}_SOURCES ${file})
-      endforeach()
-    endif()
+  foreach(Name Cuda_MirrorContainers)
+    set(file ${testdir}/TestCuda_${Name}.cpp)
+    # Write to a temporary intermediate file and call configure_file to avoid
+    # updating timestamps triggering unnecessary rebuilds on subsequent cmake
+    # runs.
+    file(WRITE ${testdir}/dummy.cpp
+         "#include <TestCuda_Category.hpp>\n" "#define TESTSUITE_NAME Cuda\n"
+         "#include <Test_${Name}.hpp>\n")
+    configure_file(${testdir}/dummy.cpp ${file})
+    list(APPEND Cuda_SOURCES ${file})
   endforeach()
-endforeach()
+endif()
+
+# # Do for each available format foreach(Tag Serial;OpenMP;Cuda;HIP)
+# string(TOUPPER ${Tag} DEVICE) string(TOLOWER ${Tag} dir)
+
+# foreach(Fmt Coo;Csr;Dia) string(TOUPPER ${Fmt} FORMAT) string(TOLOWER ${Fmt}
+# fmtdir) if(MORPHEUS_ENABLE_${DEVICE}) set(testdir
+# ${CMAKE_CURRENT_BINARY_DIR}/${dir}/${fmtdir}) file(MAKE_DIRECTORY ${testdir})
+
+# foreach(Name Multiply Copy) set(file ${testdir}/Test${Tag}_${Fmt}_${Name}.cpp)
+# # Write to a temporary intermediate file and call configure_file to # avoid
+# updating timestamps triggering unnecessary rebuilds on # subsequent cmake
+# runs. file( WRITE ${testdir}/dummy.cpp "#include <Test${Tag}_Category.hpp>\n"
+# "#include <Test${Fmt}Matrix_Format.hpp>\n" "#define TESTSUITE_NAME
+# ${Tag}${Fmt}\n" "#include <Test_${Name}.hpp>\n")
+# configure_file(${testdir}/dummy.cpp ${file}) list(APPEND ${Tag}_SOURCES
+# ${file}) endforeach() endif() endforeach() endforeach()
 
 if(MORPHEUS_ENABLE_SERIAL)
   morpheus_add_executable_and_test(UnitTest_Serial SOURCES TestMain.cpp
