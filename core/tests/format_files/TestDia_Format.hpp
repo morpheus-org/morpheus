@@ -1,5 +1,5 @@
 /**
- * TestCooMatrix_Format.hpp
+ * TestDiaMatrix_Format.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,13 +21,15 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_CORE_TEST_COO_MATRIX_HPP
-#define MORPHEUS_CORE_TEST_COO_MATRIX_HPP
+#ifndef MORPHEUS_CORE_TEST_DIA_MATRIX_HPP
+#define MORPHEUS_CORE_TEST_DIA_MATRIX_HPP
 
 #include <gtest/gtest.h>
 
-#define TEST_FORMAT coo
-#define TEST_FORMAT_NUMBER 0
-#define TEST_FORMAT_FIXTURE(name) coo_##name
+#define TEST_FORMAT dia
+#define TEST_FORMAT_NUMBER 2
+#define TEST_CONTAINER Morpheus::DiaMatrix
+#define TEST_CONTAINER_TAG Morpheus::DiaTag
+#define TEST_FORMAT_FIXTURE(name) dia_##name
 
-#endif  // MORPHEUS_CORE_TEST_COO_MATRIX_HPP
+#endif  // MORPHEUS_CORE_TEST_DIA_MATRIX_HPP

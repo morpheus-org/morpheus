@@ -1,5 +1,5 @@
 /**
- * TestCsrMatrix_Format.hpp
+ * TestDenseMatrix_Format.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,13 +21,15 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_CORE_TEST_CSR_MATRIX_HPP
-#define MORPHEUS_CORE_TEST_CSR_MATRIX_HPP
+#ifndef MORPHEUS_CORE_TEST_DENSE_MATRIX_HPP
+#define MORPHEUS_CORE_TEST_DENSE_MATRIX_HPP
 
 #include <gtest/gtest.h>
 
-#define TEST_FORMAT csr
-#define TEST_FORMAT_NUMBER 1
-#define TEST_FORMAT_FIXTURE(name) csr_##name
+#define TEST_FORMAT densematrix
+#define TEST_FORMAT_NUMBER 3
+#define TEST_CONTAINER Morpheus::DenseMatrix
+#define TEST_CONTAINER_TAG Morpheus::DenseMatrixTag
+#define TEST_FORMAT_FIXTURE(name) densematrix_##name
 
-#endif  // MORPHEUS_CORE_TEST_CSR_MATRIX_HPP
+#endif  // MORPHEUS_CORE_TEST_DENSE_MATRIX_HPP
