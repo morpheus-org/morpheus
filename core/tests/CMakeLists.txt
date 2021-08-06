@@ -31,6 +31,7 @@ morpheus_include_directories(${CMAKE_CURRENT_BINARY_DIR})
 morpheus_include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/category_files)
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/format_files)
+morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/test_utils)
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/Cuda)
 
 # Unary tests
@@ -56,6 +57,7 @@ foreach(Fmt DenseVector;DenseMatrix;Coo;Csr;Dia)
           WRITE ${testdir}/dummy.cpp
           "#include <Test${Tag}_Category.hpp>\n"
           "#include <Test${Fmt}_Format.hpp>\n"
+          "#include <Test${Fmt}_Utils.hpp>\n"
           "#define TESTSUITE_NAME ${Tag}${Fmt}\n"
           "#include <Test_${Name}.hpp>\n")
         configure_file(${testdir}/dummy.cpp ${file})
