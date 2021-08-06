@@ -39,8 +39,12 @@ void test_container_traits() {
       std::is_same<typename Container::index_type, IndexTypeRef>::value);
   static_assert(std::is_same<typename Container::non_const_index_type,
                              IndexTypeRef>::value);
+
   static_assert(
-      std::is_same<typename Container::array_layout, LayoutRef>::value);
+      std::is_same<
+          typename Container::array_layout,
+          typename std::conditional_t<Morpheus::is_dense_matrix<Tag>::value,
+                                      LayoutRef, void>>::value);
 
   // Space Traits
   static_assert(std::is_same<typename Container::memory_space,
@@ -53,23 +57,30 @@ void test_container_traits() {
                                   typename Container::memory_space>>::value);
 
   //  HostMirror Traits
+  static_assert(std::is_same<typename Container::HostMirror::value_type,
+                             typename Container::non_const_value_type>::value);
+  static_assert(std::is_same<typename Container::HostMirror::index_type,
+                             typename Container::non_const_index_type>::value);
+  static_assert(std::is_same<typename Container::HostMirror::array_layout,
+                             typename Container::array_layout>::value);
+  static_assert(std::is_same<typename Container::HostMirror::execution_space,
+                             Kokkos::DefaultHostExecutionSpace>::value);
   static_assert(
-      std::is_same<
-          typename Container::HostMirror,
-          TEST_CONTAINER<typename Container::non_const_value_type,
-                         typename Container::non_const_index_type,
-                         typename Container::array_layout,
-                         Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
-                                        typename Container::host_mirror_space::
-                                            memory_space>>>::value);
+      std::is_same<typename Container::HostMirror::memory_space,
+                   typename Container::host_mirror_space::memory_space>::value);
+
+  static_assert(std::is_same<typename Container::host_mirror_type::value_type,
+                             typename Container::non_const_value_type>::value);
+  static_assert(std::is_same<typename Container::host_mirror_type::index_type,
+                             typename Container::non_const_index_type>::value);
+  static_assert(std::is_same<typename Container::host_mirror_type::array_layout,
+                             typename Container::array_layout>::value);
+  static_assert(std::is_same<
+                typename Container::host_mirror_type::execution_space,
+                typename Container::host_mirror_space::execution_space>::value);
   static_assert(
-      std::is_same<
-          typename Container::host_mirror_type,
-          TEST_CONTAINER<typename Container::non_const_value_type,
-                         typename Container::non_const_index_type,
-                         typename Container::array_layout,
-                         typename Container::host_mirror_space::memory_space>>::
-          value);
+      std::is_same<typename Container::HostMirror::memory_space,
+                   typename Container::host_mirror_space::memory_space>::value);
 
   // Pointer Traits
   static_assert(
@@ -214,5 +225,4 @@ TEST(TESTSUITE_NAME, ContainersTraits) {
                 TEST_EXECSPACE>();
   }
 }
-
 }  // namespace Test

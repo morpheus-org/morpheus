@@ -194,19 +194,12 @@ struct ContainerTraits {
   using device_type       = Kokkos::Device<ExecutionSpace, MemorySpace>;
   using host_mirror_space = HostMirrorSpace;
 
-  using HostMirror = typename std::conditional_t<
-      is_dense_matrix_container<Container, ValueType, Properties...>::value,
+  using HostMirror =
       Container<non_const_value_type, non_const_index_type, array_layout,
                 Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
-                               typename host_mirror_space::memory_space>>,
-      Container<non_const_value_type, non_const_index_type,
-                Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
-                               typename host_mirror_space::memory_space>>>;
-  using host_mirror_type = typename std::conditional_t<
-      is_dense_matrix_container<Container, ValueType, Properties...>::value,
-      Container<non_const_value_type, non_const_index_type, array_layout,
-                host_mirror_space>,
-      Container<non_const_value_type, non_const_index_type, host_mirror_space>>;
+                               typename host_mirror_space::memory_space>>;
+  using host_mirror_type = Container<non_const_value_type, non_const_index_type,
+                                     array_layout, host_mirror_space>;
 
   using pointer = typename std::add_pointer<type>::type;
   using const_pointer =
