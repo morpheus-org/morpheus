@@ -47,7 +47,6 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   using size_type            = typename traits::index_type;
   using index_type           = typename traits::index_type;
   using non_const_index_type = typename traits::non_const_index_type;
-  using array_layout         = typename traits::array_layout;
 
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;

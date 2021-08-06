@@ -24,6 +24,7 @@
 #ifndef MORPHEUS_CONTAINERTRAITS_HPP
 #define MORPHEUS_CONTAINERTRAITS_HPP
 
+#include <Morpheus_TypeTraits.hpp>
 #include <type_traits>
 
 #include <Kokkos_Core.hpp>
@@ -158,9 +159,14 @@ struct ContainerTraits {
       !std::is_same_v<typename prop::memory_space, void>,
       typename prop::memory_space, typename ExecutionSpace::memory_space>;
 
+  // Needed for DenseMatrix, otherwise set to void
+  // NOTE: If set for another container it won't have any effect
   using ArrayLayout = typename std::conditional_t<
-      !std::is_same_v<typename prop::array_layout, void>,
-      typename prop::array_layout, typename ExecutionSpace::array_layout>;
+      is_dense_matrix_container<Container, ValueType, Properties...>::value,
+      typename std::conditional_t<
+          !std::is_same_v<typename prop::array_layout, void>,
+          typename prop::array_layout, typename ExecutionSpace::array_layout>,
+      void>;
 
   using HostMirrorSpace = typename std::conditional<
       !std::is_same<typename prop::HostMirrorSpace, void>::value,
@@ -188,12 +194,19 @@ struct ContainerTraits {
   using device_type       = Kokkos::Device<ExecutionSpace, MemorySpace>;
   using host_mirror_space = HostMirrorSpace;
 
-  using HostMirror =
+  using HostMirror = typename std::conditional_t<
+      is_dense_matrix_container<Container, ValueType, Properties...>::value,
       Container<non_const_value_type, non_const_index_type, array_layout,
                 Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
-                               typename host_mirror_space::memory_space>>;
-  using host_mirror_type = Container<non_const_value_type, non_const_index_type,
-                                     array_layout, host_mirror_space>;
+                               typename host_mirror_space::memory_space>>,
+      Container<non_const_value_type, non_const_index_type,
+                Kokkos::Device<Kokkos::DefaultHostExecutionSpace,
+                               typename host_mirror_space::memory_space>>>;
+  using host_mirror_type = typename std::conditional_t<
+      is_dense_matrix_container<Container, ValueType, Properties...>::value,
+      Container<non_const_value_type, non_const_index_type, array_layout,
+                host_mirror_space>,
+      Container<non_const_value_type, non_const_index_type, host_mirror_space>>;
 
   using pointer = typename std::add_pointer<type>::type;
   using const_pointer =

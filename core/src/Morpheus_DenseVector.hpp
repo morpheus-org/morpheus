@@ -50,7 +50,6 @@ class DenseVector
   using index_type           = typename traits::index_type;
   using non_const_index_type = typename traits::non_const_index_type;
 
-  using array_layout    = typename traits::array_layout;
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
@@ -63,8 +62,7 @@ class DenseVector
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
-  using value_array_type =
-      Kokkos::View<value_type*, Kokkos::LayoutRight, device_type>;
+  using value_array_type      = Kokkos::View<value_type*, device_type>;
   using value_array_pointer   = typename value_array_type::pointer_type;
   using value_array_reference = typename value_array_type::reference_type;
 

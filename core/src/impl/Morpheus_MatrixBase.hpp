@@ -36,16 +36,9 @@ template <template <class, class...> class Container, class ValueType,
           class... Properties>
 class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
  public:
-  using type   = MatrixBase<Container, ValueType, Properties...>;
-  using traits = ContainerTraits<Container, ValueType, Properties...>;
-
-  using value_type = typename traits::value_type;
+  using type       = MatrixBase<Container, ValueType, Properties...>;
+  using traits     = ContainerTraits<Container, ValueType, Properties...>;
   using index_type = typename traits::index_type;
-  using size_type  = size_t;
-
-  using memory_space    = typename traits::memory_space;
-  using execution_space = typename traits::execution_space;
-  using device_type     = typename traits::device_type;
 
   MatrixBase() : _name("Matrix"), _m(0), _n(0), _nnz(0) {}
 

@@ -25,7 +25,7 @@
 
 #include <Morpheus_FormatTags.hpp>
 #include <fwd/Morpheus_Fwd_MatrixBase.hpp>
-
+#include <fwd/Morpheus_Fwd_DenseMatrix.hpp>
 #include <Kokkos_Core.hpp>
 
 #include <type_traits>
@@ -63,6 +63,12 @@ struct is_sparse_matrix_class
     : std::integral_constant<
           bool, std::is_base_of<Impl::MatrixBase<Container, T, P...>,
                                 Container<T, P...>>::value> {};
+
+template <template <class T, class... P> class Container, class T, class... P>
+struct is_dense_matrix_container
+    : std::integral_constant<
+          bool, std::is_same<DenseMatrix<T, P...>, Container<T, P...>>::value> {
+};
 
 template <typename Tag>
 inline constexpr bool is_sparse_matrix_v = is_sparse_matrix<Tag>::value;
