@@ -92,12 +92,19 @@ class DenseVector
     assign(n, rand_pool, range_low, range_high);
   }
 
+  // Need to make sure two containers are of compatible type for shallow copy
   template <class VR, class... PR>
-  inline DenseVector(const DenseVector<VR, PR...>& src)
+  inline DenseVector(
+      const DenseVector<VR, PR...>& src,
+      typename std::enable_if<is_compatible_type<
+          DenseVector, DenseVector<VR, PR...>>::value>::type* = nullptr)
       : _name("ShallowVector"), _size(src.size()), _values(src.view()) {}
 
   template <class VR, class... PR>
-  DenseVector& operator=(const DenseVector<VR, PR...>& src) {
+  typename std::enable_if<
+      is_compatible_type<DenseVector, DenseVector<VR, PR...>>::value,
+      DenseVector&>::type
+  operator=(const DenseVector<VR, PR...>& src) {
     if (this != &src) {
       _name   = src.name();
       _size   = src.size();

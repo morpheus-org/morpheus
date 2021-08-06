@@ -108,7 +108,9 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
 
   // Construct from another matrix type (Shallow)
   template <class VR, class... PR>
-  DiaMatrix(const DiaMatrix<VR, PR...> &src)
+  DiaMatrix(const DiaMatrix<VR, PR...> &src,
+            typename std::enable_if<is_compatible_type<
+                DiaMatrix, DiaMatrix<VR, PR...>>::value>::type * = nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()),
         diagonal_offsets(src.diagonal_offsets.view()),
@@ -116,7 +118,10 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
 
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
-  reference operator=(const DiaMatrix<VR, PR...> &src) {
+  typename std::enable_if<
+      is_compatible_type<DiaMatrix, DiaMatrix<VR, PR...>>::value,
+      DiaMatrix &>::type
+  operator=(const DiaMatrix<VR, PR...> &src) {
     if (this != &src) {
       set_name(src.name());
       set_nrows(src.nrows());

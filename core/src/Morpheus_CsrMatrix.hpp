@@ -102,8 +102,11 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
         values(num_entries) {}
 
   // Construct from another matrix type (Shallow)
+  // Needs to be a compatible type
   template <class VR, class... PR>
-  CsrMatrix(const CsrMatrix<VR, PR...> &src)
+  CsrMatrix(const CsrMatrix<VR, PR...> &src,
+            typename std::enable_if<is_compatible_type<
+                CsrMatrix, CsrMatrix<VR, PR...>>::value>::type * = nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()),
         row_offsets(src.row_offsets.view()),
@@ -112,7 +115,10 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
 
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
-  reference operator=(const CsrMatrix<VR, PR...> &src) {
+  typename std::enable_if<
+      is_compatible_type<CsrMatrix, CsrMatrix<VR, PR...>>::value,
+      CsrMatrix &>::type
+  operator=(const CsrMatrix<VR, PR...> &src) {
     if (this != &src) {
       set_name(src.name());
       set_nrows(src.nrows());
