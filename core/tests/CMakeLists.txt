@@ -35,6 +35,7 @@ morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/test_utils)
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/Cuda)
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/generic)
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/DenseVector)
+morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/Coo)
 
 # Set sources for each format and device combination
 foreach(Fmt DenseVector;DenseMatrix;Coo;Csr;Dia)
@@ -45,8 +46,9 @@ foreach(Fmt DenseVector;DenseMatrix;Coo;Csr;Dia)
   endforeach()
 endforeach()
 
-add_subdirectory(DenseVector)
 add_subdirectory(generic)
+add_subdirectory(DenseVector)
+add_subdirectory(Coo)
 
 # TODO: Create a single build for all formats per device
 foreach(Fmt DenseVector;DenseMatrix;Coo;Csr;Dia)

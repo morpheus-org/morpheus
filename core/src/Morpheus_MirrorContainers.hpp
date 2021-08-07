@@ -43,12 +43,11 @@ struct MirrorContainerType {
         std::is_same<memory_space,
                      typename src_container_type::memory_space>::value
   };
-  // The array_layout
-  using array_layout = typename src_container_type::array_layout;
   // The data type (we probably want it non-const since otherwise we can't even
   // deep_copy to it.
-  using value_type = typename src_container_type::non_const_value_type;
-  using index_type = typename src_container_type::index_type;
+  using value_type   = typename src_container_type::non_const_value_type;
+  using index_type   = typename src_container_type::index_type;
+  using array_layout = typename src_container_type::array_layout;
   // The destination container type if it is not the same memory space
   using dest_container_type =
       Container<value_type, index_type, array_layout, Space>;
@@ -71,11 +70,10 @@ struct MirrorType {
         std::is_same<memory_space,
                      typename src_container_type::memory_space>::value
   };
-  // The array_layout
-  using array_layout = typename src_container_type::array_layout;
   // we want it non-const to allow deep_copy.
-  using value_type = typename src_container_type::non_const_value_type;
-  using index_type = typename src_container_type::non_const_index_type;
+  using value_type   = typename src_container_type::non_const_value_type;
+  using index_type   = typename src_container_type::non_const_index_type;
+  using array_layout = typename src_container_type::array_layout;
   // The destination container type if it is not the same memory space
   using container_type = Container<value_type, index_type, array_layout, Space>;
 };
@@ -85,7 +83,7 @@ template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror(
     const Container<T, P...>& src,
     typename std::enable_if<
-        is_sparse_matrix_class<Container, T, P...>::value>::type* = nullptr) {
+        is_matrix<typename Container<T, P...>::tag>::value>::type* = nullptr) {
   using src_type = Container<T, P...>;
   using dst_type = typename src_type::HostMirror;
 
@@ -111,7 +109,7 @@ typename Impl::MirrorType<Space, Container, T, P...>::container_type
 create_mirror(
     const Container<T, P...>& src,
     typename std::enable_if<
-        is_sparse_matrix_class<Container, T, P...>::value>::type* = nullptr) {
+        is_matrix<typename Container<T, P...>::tag>::value>::type* = nullptr) {
   return typename Impl::MirrorType<Space, Container, T, P...>::container_type(
       src.name().append("Mirror_"), src.nrows(), src.ncols(), src.nnnz());
 }
@@ -135,8 +133,8 @@ typename Container<T, P...>::HostMirror create_mirror_container(
          std::is_same<
              typename Container<T, P...>::value_type,
              typename Container<T, P...>::HostMirror::value_type>::value &&
-         std::is_same<typename Container<T, P...>::array_layout,
-                      typename Container<T, P...>::HostMirror::array_layout>::
+         std::is_same<typename Container<T, P...>::index_type,
+                      typename Container<T, P...>::HostMirror::index_type>::
              value)>::type* = nullptr) {
   return src;
 }
@@ -151,8 +149,8 @@ typename Container<T, P...>::HostMirror create_mirror_container(
           std::is_same<
               typename Container<T, P...>::value_type,
               typename Container<T, P...>::HostMirror::value_type>::value &&
-          std::is_same<typename Container<T, P...>::array_layout,
-                       typename Container<T, P...>::HostMirror::array_layout>::
+          std::is_same<typename Container<T, P...>::index_type,
+                       typename Container<T, P...>::HostMirror::index_type>::
               value)>::type* = nullptr) {
   return Morpheus::create_mirror(src);
 }
@@ -177,7 +175,7 @@ create_mirror_container(
     typename std::enable_if<
         !Impl::MirrorContainerType<Space, Container, T,
                                    P...>::is_same_memspace &&
-        is_sparse_matrix<Container<T, P...>>::value>::type* = nullptr) {
+        is_matrix<typename Container<T, P...>::tag>::value>::type* = nullptr) {
   return typename Impl::MirrorContainerType<Space, Container, T, P...>::
       container_type(src.name().append("MirrorContainer_"), src.nrows(),
                      src.ncols(), src.nnnz());

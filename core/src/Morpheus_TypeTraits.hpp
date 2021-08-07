@@ -125,10 +125,9 @@ template <class ExecSpace>
 inline constexpr bool is_execution_space_v =
     Kokkos::Impl::is_execution_space<ExecSpace>::value;
 
-template <class Space>
+template <class MemorySpace>
 inline constexpr bool is_Host_Memoryspace_v =
-    std::is_same<Kokkos::HostSpace::memory_space,
-                 typename Space::memory_space>::value;
+    std::is_same<typename Kokkos::HostSpace::memory_space, MemorySpace>::value;
 
 template <class ExecSpace>
 inline constexpr bool is_Serial_space_v =

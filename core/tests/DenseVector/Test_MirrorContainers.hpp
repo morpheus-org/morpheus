@@ -24,7 +24,7 @@
 #include <Morpheus_Core.hpp>
 
 namespace Test {
-TEST(TESTSUITE_NAME, Mirror_DenseVector_same_space) {
+TEST(TESTSUITE_NAME, Mirror_DenseVector_HostMirror) {
   using vector = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
                                        TEST_EXECSPACE>;
 
@@ -37,20 +37,21 @@ TEST(TESTSUITE_NAME, Mirror_DenseVector_same_space) {
       "Mirror type should match the HostMirror type of the original container "
       "as we are creating a mirror in the same space.");
 
-  ASSERT_EQ(x.size(), x_mirror.size());
-  for (typename mirror::index_type i = 0; i < x_mirror.size(); i++) {
-    ASSERT_EQ(x_mirror[i], 0) << "Value of the mirror should be the default "
-                                 "(0) i.e no copy was performed";
+  if (Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
+    ASSERT_EQ(x.size(), x_mirror.size());
+    for (typename mirror::index_type i = 0; i < x_mirror.size(); i++) {
+      ASSERT_EQ(x_mirror[i], 0) << "Value of the mirror should be the default "
+                                   "(0) i.e no copy was performed";
+    }
   }
 }
 
 TEST(TESTSUITE_NAME, Mirror_DenseVector_explicit_space) {
   using vector = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
                                        TEST_EXECSPACE>;
-  //  !FIXME: Find a way to also include HIP space
-  using mirror_space =
-      std::conditional_t<std::is_same<TEST_EXECSPACE, Kokkos::Cuda>::value,
-                         Kokkos::DefaultHostExecutionSpace, Kokkos::Cuda>;
+  using mirror_space = std::conditional_t<
+      Morpheus::is_Host_Memoryspace_v<typename TEST_EXECSPACE::memory_space>,
+      Kokkos::Cuda, Kokkos::DefaultHostExecutionSpace>;
   using dst_type =
       Morpheus::DenseVector<typename vector::value_type,
                             typename vector::index_type,
@@ -66,13 +67,15 @@ TEST(TESTSUITE_NAME, Mirror_DenseVector_explicit_space) {
       "space.");
 
   ASSERT_EQ(x.size(), x_mirror.size());
-  for (typename mirror::index_type i = 0; i < x_mirror.size(); i++) {
-    ASSERT_EQ(x_mirror[i], 0) << "Value of the mirror should be the default "
-                                 "(0) i.e no copy was performed";
+  if (Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
+    for (typename mirror::index_type i = 0; i < x_mirror.size(); i++) {
+      ASSERT_EQ(x_mirror[i], 0) << "Value of the mirror should be the default "
+                                   "(0) i.e no copy was performed";
+    }
   }
 }
 
-TEST(TESTSUITE_NAME, MirrorContainer_DenseVector_same_space) {
+TEST(TESTSUITE_NAME, MirrorContainer_DenseVector_HostMirror) {
   using vector = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
                                        TEST_EXECSPACE>;
 
@@ -85,16 +88,19 @@ TEST(TESTSUITE_NAME, MirrorContainer_DenseVector_same_space) {
                 "Source and mirror types must be the same as we are creating a "
                 "mirror in the same space.");
 
-  ASSERT_EQ(x.size(), x_mirror.size());
-  // Change the value to main container to check if we did shallow copy
-  for (typename vector::index_type i = 0; i < x_mirror.size(); i++) {
-    x[i] = -4;
-  }
+  if (Morpheus::is_Host_Memoryspace_v<typename vector::memory_space> &&
+      Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
+    ASSERT_EQ(x.size(), x_mirror.size());
+    // Change the value to main container to check if we did shallow copy
+    for (typename vector::index_type i = 0; i < x_mirror.size(); i++) {
+      x[i] = -4;
+    }
 
-  for (typename vector::index_type i = 0; i < x_mirror.size(); i++) {
-    ASSERT_EQ(x_mirror[i], -4)
-        << "Value of the mirror should be equal to the new value of the vector "
-           "container for shallow copy to be valid";
+    for (typename vector::index_type i = 0; i < x_mirror.size(); i++) {
+      ASSERT_EQ(x_mirror[i], -4) << "Value of the mirror should be equal to "
+                                    "the new value of the vector "
+                                    "container for shallow copy to be valid";
+    }
   }
 }
 
@@ -111,26 +117,28 @@ TEST(TESTSUITE_NAME, MirrorContainer_DenseVector_explicit_same_space) {
       "Source and mirror types must be the same as we are creating a "
       "mirror in the same space.");
 
-  ASSERT_EQ(x.size(), x_mirror.size());
-  // Change the value to main container to check if we did shallow copy
-  for (typename vector::index_type i = 0; i < x_mirror.size(); i++) {
-    x[i] = -4;
-  }
+  if (Morpheus::is_Host_Memoryspace_v<typename vector::memory_space> &&
+      Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
+    ASSERT_EQ(x.size(), x_mirror.size());
+    // Change the value to main container to check if we did shallow copy
+    for (typename vector::index_type i = 0; i < x_mirror.size(); i++) {
+      x[i] = -4;
+    }
 
-  for (typename vector::index_type i = 0; i < x_mirror.size(); i++) {
-    ASSERT_EQ(x_mirror[i], -4)
-        << "Value of the mirror should be equal to the new value of the vector "
-           "container for shallow copy to be valid";
+    for (typename vector::index_type i = 0; i < x_mirror.size(); i++) {
+      ASSERT_EQ(x_mirror[i], -4) << "Value of the mirror should be equal to "
+                                    "the new value of the vector "
+                                    "container for shallow copy to be valid";
+    }
   }
 }
 
 TEST(TESTSUITE_NAME, MirrorContainer_DenseVector_explicit_new_space) {
   using vector = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
                                        TEST_EXECSPACE>;
-  //  !FIXME: Find a way to also include HIP space
-  using mirror_space =
-      std::conditional_t<std::is_same<TEST_EXECSPACE, Kokkos::Cuda>::value,
-                         Kokkos::DefaultHostExecutionSpace, Kokkos::Cuda>;
+  using mirror_space = std::conditional_t<
+      Morpheus::is_Host_Memoryspace_v<typename TEST_EXECSPACE::memory_space>,
+      Kokkos::Cuda, Kokkos::DefaultHostExecutionSpace>;
   using dst_type =
       Morpheus::DenseVector<typename vector::value_type,
                             typename vector::index_type,

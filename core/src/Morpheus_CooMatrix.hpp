@@ -93,9 +93,11 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
         column_indices(num_entries),
         values(num_entries) {}
 
-  inline CooMatrix(const std::string name, const index_array_type &rind,
-                   const index_array_type &cind, const value_array_type &vals)
-      : base(name + "CooMatrix", rind.size(), cind.size(), vals.size()),
+  inline CooMatrix(const std::string name, const index_type num_rows,
+                   const index_type num_cols, const index_type num_entries,
+                   const index_array_type &rind, const index_array_type &cind,
+                   const value_array_type &vals)
+      : base(name + "CooMatrix", num_rows, num_cols, num_entries),
         row_indices(rind),
         column_indices(cind),
         values(vals) {}
@@ -115,9 +117,9 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
                 CooMatrix, CooMatrix<VR, PR...>>::value>::type * = nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()),
-        row_indices(src.row_indices.view()),
-        column_indices(src.column_indices.view()),
-        values(src.values.view()) {}
+        row_indices(src.row_indices),
+        column_indices(src.column_indices),
+        values(src.values) {}
 
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
@@ -130,9 +132,9 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
       set_nrows(src.nrows());
       set_ncols(src.ncols());
       set_nnnz(src.nnnz());
-      row_indices    = src.row_indices.view();
-      column_indices = src.column_indices.view();
-      values         = src.values.view();
+      row_indices    = src.row_indices;
+      column_indices = src.column_indices;
+      values         = src.values;
     }
     return *this;
   }
