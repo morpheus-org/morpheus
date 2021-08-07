@@ -23,24 +23,6 @@
 
 #include <Morpheus_Core.hpp>
 
-// // Create a mirror container in a new space (specialization for same space)
-// template <class Space, template <class, class...> class Container, class T,
-//           class... P>
-// typename Impl::MirrorContainerType<Space, Container, T, P...>::container_type
-// create_mirror_container(
-//     const Container<T, P...>& src,
-//     typename std::enable_if<Impl::MirrorContainerType<
-//         Space, Container, T, P...>::is_same_memspace>::type* = nullptr);
-
-// // Create a mirror DenseVector in a new space (specialization for different
-// // space)
-// template <class Space, class T, class... P>
-// typename Impl::MirrorContainerType<Space, DenseVector, T,
-// P...>::container_type create_mirror_container(
-//     const DenseVector<T, P...>& src,
-//     typename std::enable_if<!Impl::MirrorContainerType<
-//         Space, DenseVector, T, P...>::is_same_memspace>::type* = nullptr);
-
 namespace Test {
 TEST(TESTSUITE_NAME, Mirror_DenseVector_same_space) {
   using vector = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
@@ -48,12 +30,14 @@ TEST(TESTSUITE_NAME, Mirror_DenseVector_same_space) {
 
   vector x(10, -2);
   auto x_mirror = Morpheus::create_mirror(x);
+  using mirror  = decltype(x_mirror);
 
-  using mirror = decltype(x_mirror);
-  ::testing::StaticAssertTypeEq<typename mirror::type,
-                                typename vector::HostMirror>();
+  static_assert(
+      std::is_same<typename mirror::type, typename vector::HostMirror>::value,
+      "Mirror type should match the HostMirror type of the original container "
+      "as we are creating a mirror in the same space.");
+
   ASSERT_EQ(x.size(), x_mirror.size());
-
   for (typename mirror::index_type i = 0; i < x_mirror.size(); i++) {
     ASSERT_EQ(x_mirror[i], 0) << "Value of the mirror should be the default "
                                  "(0) i.e no copy was performed";
@@ -63,22 +47,25 @@ TEST(TESTSUITE_NAME, Mirror_DenseVector_same_space) {
 TEST(TESTSUITE_NAME, Mirror_DenseVector_explicit_space) {
   using vector = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
                                        TEST_EXECSPACE>;
-  using mirror_space = Kokkos::DefaultHostExecutionSpace;
-  using res_vector =
-      Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft, mirror_space>;
+  //  !FIXME: Find a way to also include HIP space
+  using mirror_space =
+      std::conditional_t<std::is_same<TEST_EXECSPACE, Kokkos::Cuda>::value,
+                         Kokkos::DefaultHostExecutionSpace, Kokkos::Cuda>;
+  using dst_type =
+      Morpheus::DenseVector<typename vector::value_type,
+                            typename vector::index_type,
+                            typename vector::array_layout, mirror_space>;
 
   vector x(10, -2);
   auto x_mirror = Morpheus::create_mirror<mirror_space>(x);
   using mirror  = decltype(x_mirror);
 
-  ::testing::StaticAssertTypeEq<
-      typename Morpheus::Impl::MirrorType<mirror_space, Morpheus::DenseVector,
-                                          float, long long, Kokkos::LayoutLeft,
-                                          TEST_EXECSPACE>::container_type,
-      typename mirror::type>();
+  static_assert(
+      std::is_same<typename mirror::type, typename dst_type::type>::value,
+      "Mirror type should be the same as the source type but in the new mirror "
+      "space.");
 
   ASSERT_EQ(x.size(), x_mirror.size());
-
   for (typename mirror::index_type i = 0; i < x_mirror.size(); i++) {
     ASSERT_EQ(x_mirror[i], 0) << "Value of the mirror should be the default "
                                  "(0) i.e no copy was performed";
@@ -87,28 +74,18 @@ TEST(TESTSUITE_NAME, Mirror_DenseVector_explicit_space) {
 
 TEST(TESTSUITE_NAME, MirrorContainer_DenseVector_same_space) {
   using vector = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
-                                       Kokkos::DefaultHostExecutionSpace>;
-  using mirror_space = Kokkos::DefaultHostExecutionSpace;
-  using res_vector =
-      Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft, mirror_space>;
-
-  static_assert(
-      std::is_same<typename vector::memory_space,
-                   typename vector::HostMirror::memory_space>::value &&
-          std::is_same<typename vector::value_type,
-                       typename vector::HostMirror::value_type>::value,
-      "Source and mirror space must be the same and vectors should have the "
-      "same value type");
+                                       TEST_EXECSPACE>;
 
   vector x(10, -2);
   auto x_mirror = Morpheus::create_mirror_container(x);
   using mirror  = decltype(x_mirror);
 
-  ::testing::StaticAssertTypeEq<typename mirror::type,
-                                typename vector::HostMirror::type>();
+  static_assert(std::is_same<typename mirror::type,
+                             typename vector::HostMirror::type>::value,
+                "Source and mirror types must be the same as we are creating a "
+                "mirror in the same space.");
 
   ASSERT_EQ(x.size(), x_mirror.size());
-
   // Change the value to main container to check if we did shallow copy
   for (typename vector::index_type i = 0; i < x_mirror.size(); i++) {
     x[i] = -4;
@@ -121,8 +98,52 @@ TEST(TESTSUITE_NAME, MirrorContainer_DenseVector_same_space) {
   }
 }
 
-TEST(TESTSUITE_NAME, MirrorContainer_DenseVector_explicit_same_space) {}
+TEST(TESTSUITE_NAME, MirrorContainer_DenseVector_explicit_same_space) {
+  using vector = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
+                                       TEST_EXECSPACE>;
 
-TEST(TESTSUITE_NAME, MirrorContainer_DenseVector_explicit_new_space) {}
+  vector x(10, -2);
+  auto x_mirror = Morpheus::create_mirror_container<TEST_EXECSPACE>(x);
+  using mirror  = decltype(x_mirror);
+
+  static_assert(
+      std::is_same<typename mirror::type, typename vector::type>::value,
+      "Source and mirror types must be the same as we are creating a "
+      "mirror in the same space.");
+
+  ASSERT_EQ(x.size(), x_mirror.size());
+  // Change the value to main container to check if we did shallow copy
+  for (typename vector::index_type i = 0; i < x_mirror.size(); i++) {
+    x[i] = -4;
+  }
+
+  for (typename vector::index_type i = 0; i < x_mirror.size(); i++) {
+    ASSERT_EQ(x_mirror[i], -4)
+        << "Value of the mirror should be equal to the new value of the vector "
+           "container for shallow copy to be valid";
+  }
+}
+
+TEST(TESTSUITE_NAME, MirrorContainer_DenseVector_explicit_new_space) {
+  using vector = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
+                                       TEST_EXECSPACE>;
+  //  !FIXME: Find a way to also include HIP space
+  using mirror_space =
+      std::conditional_t<std::is_same<TEST_EXECSPACE, Kokkos::Cuda>::value,
+                         Kokkos::DefaultHostExecutionSpace, Kokkos::Cuda>;
+  using dst_type =
+      Morpheus::DenseVector<typename vector::value_type,
+                            typename vector::index_type,
+                            typename vector::array_layout, mirror_space>;
+
+  vector x(10, -2);
+  auto x_mirror = Morpheus::create_mirror_container<mirror_space>(x);
+  using mirror  = decltype(x_mirror);
+
+  static_assert(
+      std::is_same<typename mirror::type, typename dst_type::type>::value,
+      "Mirror type should be the same as the source type but in the new mirror "
+      "space.");
+}
 
 }  // namespace Test
