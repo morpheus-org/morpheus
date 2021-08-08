@@ -37,9 +37,9 @@ namespace Kernels {
 // *extremely* small matrices, or a few elements at the end of a
 // larger matrix
 template <typename IndexType, typename ValueType>
-MORPHEUS_INLINE_FUNCTION void spmv_coo_serial_kernel(
-    const IndexType nnnz, const IndexType* I, const IndexType* J,
-    const ValueType* V, const ValueType* x, ValueType* y) {
+__global__ void spmv_coo_serial_kernel(const IndexType nnnz, const IndexType* I,
+                                       const IndexType* J, const ValueType* V,
+                                       const ValueType* x, ValueType* y) {
   for (IndexType n = 0; n < nnnz; n++) {
     y[I[n]] += V[n] * x[J[n]];
   }

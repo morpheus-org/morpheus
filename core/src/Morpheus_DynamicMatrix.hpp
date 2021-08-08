@@ -72,8 +72,8 @@ class DynamicMatrix
   ~DynamicMatrix()                     = default;
   DynamicMatrix(const DynamicMatrix &) = default;
   DynamicMatrix(DynamicMatrix &&)      = default;
-  reference operator=(const DynamicMatrix &) = default;
-  reference operator=(DynamicMatrix &&) = default;
+  DynamicMatrix &operator=(const DynamicMatrix &) = default;
+  DynamicMatrix &operator=(DynamicMatrix &&) = default;
 
   inline DynamicMatrix() : base("DynamicMatrix"), _formats() {}
 
