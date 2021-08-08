@@ -41,64 +41,6 @@ void copy(const SourceType& src, DestinationType& dst, CsrTag, CsrTag) {
   Morpheus::copy(src.values, dst.values);
 }
 
-template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, CsrTag, CooTag) {
-  // Complexity: Linear.  Specifically O(nnz(csr) + max(n_row,n_col))
-  using IndexType = typename SourceType::index_type;
-
-  dst.resize(src.nrows(), src.ncols(), src.nnnz());
-
-  // expand compressed indices
-  for (IndexType i = 0; i < src.nrows(); i++) {
-    for (IndexType jj = src.row_offsets[i]; jj < src.row_offsets[i + 1]; jj++) {
-      dst.row_indices[jj] = i;
-    }
-  }
-
-  Morpheus::copy(src.column_indices, dst.column_indices);
-  Morpheus::copy(src.values, dst.values);
-}
-
-template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, CooTag, CsrTag) {
-  // Complexity: Linear.  Specifically O(nnz(coo) + max(n_row,n_col))
-  using IndexType = typename SourceType::index_type;
-
-  dst.resize(src.nrows(), src.ncols(), src.nnnz());
-
-  // compute number of non-zero entries per row of coo src
-  for (IndexType n = 0; n < src.nnnz(); n++) {
-    dst.row_offsets[src.row_indices[n]]++;
-  }
-
-  // cumsum the nnz per row to get csr row_offsets
-  for (IndexType i = 0, cumsum = 0; i < src.nrows(); i++) {
-    IndexType temp     = dst.row_offsets[i];
-    dst.row_offsets[i] = cumsum;
-    cumsum += temp;
-  }
-  dst.row_offsets[src.nrows()] = src.nnnz();
-
-  // write coo column indices and values into csr
-  for (IndexType n = 0; n < src.nnnz(); n++) {
-    IndexType row  = src.row_indices[n];
-    IndexType dest = dst.row_offsets[row];
-
-    dst.column_indices[dest] = src.column_indices[n];
-    dst.values[dest]         = src.values[n];
-
-    dst.row_offsets[row]++;
-  }
-
-  for (IndexType i = 0, last = 0; i <= src.nrows(); i++) {
-    IndexType temp     = dst.row_offsets[i];
-    dst.row_offsets[i] = last;
-    last               = temp;
-  }
-
-  // TODO: remove duplicates, if any?
-}
-
 }  // namespace Impl
 }  // namespace Morpheus
 

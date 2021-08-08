@@ -33,10 +33,12 @@
 #include <Morpheus_CooMatrix.hpp>
 #include <Morpheus_CsrMatrix.hpp>
 #include <Morpheus_DiaMatrix.hpp>
-// #include <Morpheus_DynamicMatrix.hpp>
+#include <Morpheus_DynamicMatrix.hpp>
 
 #include <Morpheus_MirrorContainers.hpp>
 
+#include <Morpheus_Convert.hpp>
+#include <Morpheus_Copy.hpp>
 #include <Morpheus_Multiply.hpp>
 #include <Morpheus_Print.hpp>
 #include <Morpheus_Sort.hpp>

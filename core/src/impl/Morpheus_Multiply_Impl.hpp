@@ -37,37 +37,6 @@
 #include <impl/Dia/OpenMP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Dia/Cuda/Morpheus_Multiply_Impl.hpp>
 
-namespace Morpheus {
-// forward decl
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-                     MatrixOrVector2& y);
-
-namespace Impl {
-
-template <typename ExecSpace>
-struct multiply_fn {
-  using result_type = void;
-
-  template <typename LinearOperator, typename MatOrVec1, typename MatrOrVec2>
-  inline result_type operator()(const LinearOperator& A, const MatOrVec1& x,
-                                MatrOrVec2& y) const {
-    Morpheus::multiply<ExecSpace>(A, x, y);
-  }
-};
-
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-                     MatrixOrVector2& y, Morpheus::DynamicTag,
-                     Morpheus::DenseVectorTag, Morpheus::DenseVectorTag) {
-  std::visit(std::bind(Impl::multiply_fn<ExecSpace>(), std::placeholders::_1,
-                       std::cref(x), std::ref(y)),
-             A.formats());
-}
-
-}  // namespace Impl
-}  // namespace Morpheus
+#include <impl/Dynamic/Morpheus_Multiply_Impl.hpp>
 
 #endif  // MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP

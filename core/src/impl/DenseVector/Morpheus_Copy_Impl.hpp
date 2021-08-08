@@ -24,6 +24,7 @@
 #ifndef MORPHEUS_DENSEVECTOR_COPY_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_COPY_IMPL_HPP
 
+#include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 #include <Kokkos_Core.hpp>
@@ -39,9 +40,7 @@ namespace Impl {
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DenseVectorTag,
           DenseVectorTag) {
-  using IndexType      = typename SourceType::index_type;
-  const IndexType size = src.size();
-  dst.resize(size);
+  dst.resize(src.size());
   // Kokkos has src and dst the other way round
   Kokkos::deep_copy(dst.view(), src.view());
 }

@@ -34,43 +34,6 @@
 #include <impl/Csr/Morpheus_Print_Impl.hpp>
 #include <impl/Dia/Morpheus_Print_Impl.hpp>
 
-#include <variant>  // visit
-
-namespace Morpheus {
-
-// forward decl
-template <typename Printable>
-void print(const Printable& p);
-
-template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s);
-
-namespace Impl {
-
-struct print_fn {
-  using result_type = void;
-  // TODO: Specify the stream to print to
-  // template <typename T, typename S>
-  // result_type operator()(const T& mat, S& s) const {
-  //   Morpheus::print(mat, s);
-  // }
-  template <typename Printable>
-  result_type operator()(const Printable& p) const {
-    Morpheus::print(p);
-  }
-};
-
-template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, DynamicTag) {
-  print_matrix_header(p, s);
-  // TODO: Using a stream in this way doesn't seem to work
-  // std::visit(std::bind(Impl::print_fn(), std::placeholders::_1,
-  // std::ref(s)),
-  //            p.formats());
-  std::visit(Impl::print_fn(), p.formats());
-}
-
-}  // namespace Impl
-}  // namespace Morpheus
+#include <impl/Dynamic/Morpheus_Print_Impl.hpp>
 
 #endif  // MORPHEUS_PRINT_IMPL_HPP

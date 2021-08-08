@@ -32,57 +32,10 @@ namespace Impl {
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DenseMatrixTag,
-          DenseVectorTag) {
-  using IndexType = typename SourceType::index_type;
-
-  dst.resize(src.nrows() * src.ncols());
-
-  for (IndexType i = 0; i < src.nrows(); i++) {
-    for (IndexType j = 0; j < src.ncols(); j++) {
-      IndexType idx = i * src.ncols() + j;
-      dst(idx)      = src(i, j);
-    }
-  }
-}
-
-template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, DenseMatrixTag, CooTag) {
-  using IndexType = typename SourceType::index_type;
-  using ValueType = typename SourceType::value_type;
-
-  // Count non-zeros
-  IndexType nnz = 0;
-  for (IndexType i = 0; i < src.nrows(); i++) {
-    for (IndexType j = 0; j < src.ncols(); j++) {
-      if (src(i, j) != ValueType(0)) nnz = nnz + 1;
-    }
-  }
-
-  dst.resize(src.nrows(), src.ncols(), nnz);
-
-  for (IndexType i = 0, n = 0; i < src.nrows(); i++) {
-    for (IndexType j = 0; j < src.ncols(); j++) {
-      if (src(i, j) != ValueType(0)) {
-        dst.row_indices[n]    = i;
-        dst.column_indices[n] = j;
-        dst.values[n]         = src(i, j);
-        n                     = n + 1;
-      }
-    }
-  }
-}
-
-template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, CooTag, DenseMatrixTag) {
-  using IndexType = typename SourceType::index_type;
-
-  dst.resize(src.nrows(), src.ncols(), src.nrows() * src.ncols());
-
-  for (IndexType n = 0; n < src.nnnz(); n++) {
-    IndexType i = src.row_indices[n];
-    IndexType j = src.column_indices[n];
-    dst(i, j)   = src.values[n];
-  }
+          DenseMatrixTag) {
+  dst.resize(src.nrows(), src.ncols());
+  // Kokkos has src and dst the other way round
+  Kokkos::deep_copy(dst.view(), src.view());
 }
 
 }  // namespace Impl

@@ -1,5 +1,5 @@
 /**
- * Morpheus_Copy_Impl.hpp
+ * Morpheus_Convert.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,24 +21,18 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_DIA_COPY_IMPL_HPP
-#define MORPHEUS_DIA_COPY_IMPL_HPP
+#ifndef MORPHEUS_CONVERT_HPP
+#define MORPHEUS_CONVERT_HPP
 
-#include <Morpheus_FormatTags.hpp>
-#include <impl/DenseVector/Morpheus_Copy_Impl.hpp>
+#include <impl/Morpheus_Convert_Impl.hpp>
 
 namespace Morpheus {
-namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, DiaTag, DiaTag) {
-  dst.resize(src.nrows(), src.ncols(), src.nnnz(), src.diagonal_offsets.size());
-
-  Morpheus::copy(src.diagonal_offsets, dst.diagonal_offsets);
-  Morpheus::copy(src.values, dst.values);
+void convert(const SourceType& src, DestinationType& dst) {
+  Impl::convert(src, dst, typename SourceType::tag(),
+                typename DestinationType::tag());
 }
-
-}  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_DIA_COPY_IMPL_HPP
+#endif  // MORPHEUS_CONVERT_HPP
