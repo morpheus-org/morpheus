@@ -33,10 +33,12 @@
 #include <impl/Csr/Serial/Morpheus_Multiply_Impl.hpp>
 #include <impl/Csr/OpenMP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Csr/Cuda/Morpheus_Multiply_Impl.hpp>
+#include <impl/Csr/Kokkos/Morpheus_Multiply_Impl.hpp>
 
 #include <impl/Dia/Serial/Morpheus_Multiply_Impl.hpp>
 #include <impl/Dia/OpenMP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Dia/Cuda/Morpheus_Multiply_Impl.hpp>
+#include <impl/Dia/Kokkos/Morpheus_Multiply_Impl.hpp>
 
 #include <impl/Dynamic/Morpheus_Multiply_Impl.hpp>
 
