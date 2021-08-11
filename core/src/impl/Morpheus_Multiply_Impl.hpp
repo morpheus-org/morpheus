@@ -28,6 +28,7 @@
 #include <impl/Coo/Serial/Morpheus_Multiply_Impl.hpp>
 #include <impl/Coo/OpenMP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Coo/Cuda/Morpheus_Multiply_Impl.hpp>
+#include <impl/Coo/Kokkos/Morpheus_Multiply_Impl.hpp>
 
 #include <impl/Csr/Serial/Morpheus_Multiply_Impl.hpp>
 #include <impl/Csr/OpenMP/Morpheus_Multiply_Impl.hpp>

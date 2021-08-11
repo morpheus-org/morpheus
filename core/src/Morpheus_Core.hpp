@@ -44,6 +44,7 @@
 #include <Morpheus_Sort.hpp>
 
 #include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_KokkosSpace.hpp>
 
 #include <Morpheus_MatrixMarket.hpp>
 

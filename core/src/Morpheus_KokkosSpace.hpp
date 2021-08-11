@@ -1,5 +1,5 @@
 /**
- * Morpheus_Multiply.hpp
+ * Morpheus_KokkosSpace.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,22 +21,27 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_MULTIPLY_HPP
-#define MORPHEUS_MULTIPLY_HPP
+#ifndef MORPHEUS_KOKKOSSPACE_HPP
+#define MORPHEUS_KOKKOSSPACE_HPP
 
-#include <impl/Morpheus_Multiply_Impl.hpp>
+#include <Morpheus_TypeTraits.hpp>
 
 namespace Morpheus {
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-                     MatrixOrVector2& y) {
-  Impl::multiply<ExecSpace>(A, x, y, typename LinearOperator::tag(),
-                            typename MatrixOrVector1::tag(),
-                            typename MatrixOrVector2::tag());
-}
+// Wrapper of different Kokkos execution spaces to pass around and distinguish
+// between custom and Kokkos Kernels
+template <typename Space>
+struct KokkosSpace {
+  static_assert(is_execution_space_v<Space>,
+                "Space needs to be a valid Kokkos ExecutionSpace!");
+  using kokkos_space = KokkosSpace;
+  using type         = Space;
+
+  using execution_space = typename Space::execution_space;
+  using memory_space    = typename Space::memory_space;
+  using device_type     = typename Space::device_type;
+};
 
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_MULTIPLY_HPP
+#endif  // MORPHEUS_KOKKOSSPACE_HPP

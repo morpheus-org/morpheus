@@ -32,6 +32,18 @@
 #include <variant>
 
 namespace Morpheus {
+// forward decl
+template <typename Space>
+struct KokkosSpace;
+
+namespace Impl {
+template <typename T>
+struct is_kokkos_space_helper : std::false_type {};
+
+template <typename Space>
+struct is_kokkos_space_helper<KokkosSpace<Space>> : std::true_type {};
+
+}  // namespace Impl
 
 template <typename T, typename Variant>
 struct is_variant_member;
@@ -116,11 +128,6 @@ struct is_arithmetic {
   using type      = T;
 };
 
-template <class ExecSpace, class T>
-inline constexpr bool has_access_v =
-    Kokkos::Impl::SpaceAccessibility<ExecSpace,
-                                     typename T::memory_space>::accessible;
-
 template <class ExecSpace>
 inline constexpr bool is_execution_space_v =
     Kokkos::Impl::is_execution_space<ExecSpace>::value;
@@ -147,6 +154,45 @@ inline constexpr bool is_Cuda_space_v =
     std::is_same<typename ExecSpace::execution_space,
                  Kokkos::Cuda::execution_space>::value;
 #endif  // MORPHEUS_ENABLE_CUDA
+
+// Takes arbitrary number of containers and checks if ExecSpace has access to
+// all of them
+template <typename ExecSpace, typename... Ts>
+struct has_access;
+
+template <typename ExecSpace, typename T, typename... Ts>
+struct has_access<ExecSpace, T, Ts...> {
+  static const bool value =
+      Kokkos::Impl::SpaceAccessibility<ExecSpace,
+                                       typename T::memory_space>::accessible &&
+      has_access<ExecSpace, Ts...>::value;
+};
+
+template <typename ExecSpace, typename T>
+struct has_access<ExecSpace, T> {
+  static_assert(is_execution_space_v<ExecSpace>,
+                "ExecSpace must be a valid execution space");
+  static const bool value =
+      Kokkos::Impl::SpaceAccessibility<ExecSpace,
+                                       typename T::memory_space>::accessible;
+};
+
+template <class ExecSpace, class... T>
+inline constexpr bool has_access_v = has_access<ExecSpace, T...>::value;
+
+template <typename T, typename = void>
+struct has_kokkos_space : std::false_type {};
+
+template <typename T>
+struct has_kokkos_space<T, std::void_t<typename T::kokkos_space>>
+    : std::true_type {};
+
+template <typename T>
+using is_kokkos_space = typename Impl::is_kokkos_space_helper<
+    typename std::remove_cv<T>::type>::type;
+
+template <class T>
+inline constexpr bool is_kokkos_space_v = is_kokkos_space<T>::value;
 
 }  // namespace Morpheus
 
