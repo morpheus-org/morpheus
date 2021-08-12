@@ -25,12 +25,14 @@
 #define MORPHEUS_DYNAMIC_MULTIPLY_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_AlgorithmTags.hpp>
+
 #include <variant>
 
 namespace Morpheus {
 // forward decl
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Algorithm, typename LinearOperator,
+          typename MatrixOrVector1, typename MatrixOrVector2>
 inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
                      MatrixOrVector2& y);
 
@@ -40,20 +42,21 @@ template <typename ExecSpace>
 struct multiply_fn {
   using result_type = void;
 
-  template <typename LinearOperator, typename MatOrVec1, typename MatrOrVec2>
+  template <typename Algorithm, typename LinearOperator, typename MatOrVec1,
+            typename MatrOrVec2>
   inline result_type operator()(const LinearOperator& A, const MatOrVec1& x,
                                 MatrOrVec2& y) const {
-    Morpheus::multiply<ExecSpace>(A, x, y);
+    Morpheus::multiply<ExecSpace>(A, x, y, Algorithm{});
   }
 };
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Algorithm, typename LinearOperator,
+          typename MatrixOrVector1, typename MatrixOrVector2>
 inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
                      MatrixOrVector2& y, Morpheus::DynamicTag,
                      Morpheus::DenseVectorTag, Morpheus::DenseVectorTag) {
   std::visit(std::bind(Impl::multiply_fn<ExecSpace>(), std::placeholders::_1,
-                       std::cref(x), std::ref(y)),
+                       std::cref(x), std::ref(y), Algorithm{}),
              A.formats());
 }
 

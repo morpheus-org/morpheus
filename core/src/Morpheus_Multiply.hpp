@@ -24,17 +24,28 @@
 #ifndef MORPHEUS_MULTIPLY_HPP
 #define MORPHEUS_MULTIPLY_HPP
 
+#include <Morpheus_AlgorithmTags.hpp>
 #include <impl/Morpheus_Multiply_Impl.hpp>
 
 namespace Morpheus {
 
+template <typename ExecSpace, typename Algorithm, typename LinearOperator,
+          typename MatrixOrVector1, typename MatrixOrVector2>
+inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
+                     MatrixOrVector2& y) {
+  Impl::multiply<ExecSpace>(A, x, y, typename LinearOperator::tag{},
+                            typename MatrixOrVector1::tag{},
+                            typename MatrixOrVector2::tag{}, Algorithm{});
+}
+
+// Default algorithm to run with multiply is always Alg0
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
 inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
                      MatrixOrVector2& y) {
-  Impl::multiply<ExecSpace>(A, x, y, typename LinearOperator::tag(),
-                            typename MatrixOrVector1::tag(),
-                            typename MatrixOrVector2::tag());
+  Impl::multiply<ExecSpace>(A, x, y, typename LinearOperator::tag{},
+                            typename MatrixOrVector1::tag{},
+                            typename MatrixOrVector2::tag{}, Alg0{});
 }
 
 }  // namespace Morpheus

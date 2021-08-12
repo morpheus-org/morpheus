@@ -28,8 +28,9 @@
 #if defined(MORPHEUS_ENABLE_CUDA)
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_AlgorithmTags.hpp>
+#include <Morpheus_Exceptions.hpp>
 
 #include <impl/Dia/Kernels/Morpheus_Multiply_Impl.hpp>
 
@@ -40,7 +41,7 @@ template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
 inline void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    DiaTag, DenseVectorTag, DenseVectorTag,
+    DiaTag, DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
@@ -57,6 +58,8 @@ inline void multiply(
   const ValueType* V     = A.values.data();
   const ValueType* x_ptr = x.data();
   ValueType* y_ptr       = y.data();
+
+  throw NotImplementedException("GPU spmv for DIA not yet implemented.");
 }
 
 }  // namespace Impl
