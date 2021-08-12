@@ -39,11 +39,11 @@ inline void multiply(
     const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
     CsrTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
-        Morpheus::is_execution_space_v<ExecSpace> &&
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
-        Morpheus::has_access_v<ExecSpace, LinearOperator> &&
-        Morpheus::has_access_v<ExecSpace, MatrixOrVector1> &&
-        Morpheus::has_access_v<ExecSpace, MatrixOrVector2>>* = nullptr) {
+        Morpheus::has_access_v<typename ExecSpace::execution_space,
+                               LinearOperator, MatrixOrVector1,
+                               MatrixOrVector2>>* = nullptr) {
   using IndexType = typename LinearOperator::index_type;
   using ValueType = typename LinearOperator::value_type;
 

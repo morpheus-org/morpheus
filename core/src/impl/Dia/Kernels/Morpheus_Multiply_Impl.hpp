@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_CSR_KERNELS_MULTIPLY_IMPL_HPP
-#define MORPHEUS_CSR_KERNELS_MULTIPLY_IMPL_HPP
+#ifndef MORPHEUS_DIA_KERNELS_MULTIPLY_IMPL_HPP
+#define MORPHEUS_DIA_KERNELS_MULTIPLY_IMPL_HPP
 
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_CUDA) || defined(MORPHEUS_ENABLE_HIP)
@@ -37,4 +37,4 @@ namespace Kernels {}  // namespace Kernels
 
 #endif
 
-#endif  // MORPHEUS_CSR_KERNELS_MULTIPLY_IMPL_HPP
+#endif  // MORPHEUS_DIA_KERNELS_MULTIPLY_IMPL_HPP

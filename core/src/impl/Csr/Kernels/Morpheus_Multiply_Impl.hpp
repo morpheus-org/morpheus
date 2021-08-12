@@ -33,9 +33,10 @@ namespace Impl {
 namespace Kernels {
 
 template <typename IndexType, typename ValueType>
-MORPHEUS_INLINE_FUNCTION void spmv_csr_scalar_kernel(
-    const IndexType nrows, const IndexType* Ap, const IndexType* Aj,
-    const ValueType* Ax, const ValueType* x, ValueType* y) {
+__global__ void spmv_csr_scalar_kernel(const IndexType nrows,
+                                       const IndexType* Ap, const IndexType* Aj,
+                                       const ValueType* Ax, const ValueType* x,
+                                       ValueType* y) {
   const IndexType thread_id = blockDim.x * blockIdx.x + threadIdx.x;
   const IndexType grid_size = gridDim.x * blockDim.x;
 
