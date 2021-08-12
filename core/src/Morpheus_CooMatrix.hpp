@@ -109,6 +109,24 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
         column_indices(num_entries),
         values(num_entries) {}
 
+  inline CooMatrix(const std::string name, const CooMatrix &src)
+      : base(name + "CooMatrix", src.nrows(), src.ncols(), src.nnnz()),
+        row_indices(src.row_indices.view()),
+        column_indices(src.column_indices.view()),
+        values(src.values.view()) {}
+
+  // Construct from another matrix type in different memory space
+  // Only ALLOCATES the matrix
+  template <class VR, class... PR>
+  CooMatrix(const std::string name, const CooMatrix<VR, PR...> &src,
+            typename std::enable_if<is_compatible_from_different_space<
+                CooMatrix, CooMatrix<VR, PR...>>::value>::type * = nullptr)
+      : base(name + "CooMatrix_AllocOnly", src.nrows(), src.ncols(),
+             src.nnnz()),
+        row_indices(src.nnnz()),
+        column_indices(src.nnnz()),
+        values(src.nnnz()) {}
+
   // Construct from another matrix type (Shallow)
   // Needs to be a compatible type
   template <class VR, class... PR>

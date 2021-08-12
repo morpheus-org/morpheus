@@ -65,6 +65,13 @@ template <typename Tag>
 inline constexpr bool is_matrix_v = is_matrix<Tag>::value;
 
 template <typename Tag>
+struct is_container
+    : std::integral_constant<bool,
+                             std::is_base_of<Impl::MatrixTag, Tag>::value ||
+                                 std::is_base_of<Impl::VectorTag, Tag>::value> {
+};
+
+template <typename Tag>
 struct is_sparse_matrix
     : std::integral_constant<bool,
                              std::is_base_of<Impl::SparseMatTag, Tag>::value> {
@@ -107,6 +114,17 @@ struct is_compatible_type
           bool, std::is_same<typename T1::tag, typename T2::tag>::value &&
                     std::is_same<typename T1::memory_space,
                                  typename T2::memory_space>::value &&
+                    std::is_same<typename T1::value_type,
+                                 typename T2::value_type>::value &&
+                    std::is_same<typename T1::index_type,
+                                 typename T2::index_type>::value> {};
+
+template <typename T1, typename T2>
+struct is_compatible_from_different_space
+    : std::integral_constant<
+          bool, std::is_same<typename T1::tag, typename T2::tag>::value &&
+                    !std::is_same<typename T1::memory_space,
+                                  typename T2::memory_space>::value &&
                     std::is_same<typename T1::value_type,
                                  typename T2::value_type>::value &&
                     std::is_same<typename T1::index_type,

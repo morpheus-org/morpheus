@@ -90,9 +90,24 @@ class DenseMatrix
     assign(num_rows, num_cols, val);
   }
 
+  inline DenseMatrix(const std::string name, const DenseMatrix &src)
+      : base(name + "CooMatrix", src.nrows(), src.ncols(), src.nnnz()),
+        _values(src.view()) {}
+
+  // Construct from another matrix type in different memory space
+  // Only allocates the matrix
+  template <class VR, class... PR>
+  inline DenseMatrix(
+      const std::string name, const DenseMatrix<VR, PR...> &src,
+      typename std::enable_if<is_compatible_from_different_space<
+          DenseMatrix, DenseMatrix<VR, PR...>>::value>::type * = nullptr)
+      : base(name + "DenseMatrix", src.nrows(), src.ncols(), src.nnnz()),
+        _values(name + "DenseMatrix_AllocOnly", size_t(src.nrows()),
+                size_t(src.ncols())) {}
+
   // Construct from another dense matrix type (Shallow)
   template <class VR, class... PR>
-  DenseMatrix(
+  inline DenseMatrix(
       const DenseMatrix<VR, PR...> &src,
       typename std::enable_if<is_compatible_type<
           DenseMatrix, DenseMatrix<VR, PR...>>::value>::type * = nullptr)

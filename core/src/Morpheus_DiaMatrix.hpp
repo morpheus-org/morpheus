@@ -72,6 +72,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   using value_array_reference =
       typename value_array_type::value_array_reference;
 
+  index_type ndiags, nalign;
   index_array_type diagonal_offsets;
   value_array_type values;
 
@@ -94,6 +95,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
                    const index_type alignment = 32)
       : base("DiaMatrix", num_rows, num_cols, num_entries),
         diagonal_offsets(num_diagonals) {
+    ndiags = num_diagonals;
+    nalign = alignment;
     values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
   }
 
@@ -103,7 +106,30 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
                    const index_type alignment = 32)
       : base(name + "DiaMatrix", num_rows, num_cols, num_entries),
         diagonal_offsets(num_diagonals) {
+    ndiags = num_diagonals;
+    nalign = alignment;
     values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
+  }
+
+  inline DiaMatrix(const std::string name, const DiaMatrix &src)
+      : base(name + "DiaMatrix", src.nrows(), src.ncols(), src.nnnz()),
+        ndiags(src.ndiags),
+        nalign(src.nalign),
+        diagonal_offsets(src.diagonal_offsets.view()),
+        values(src.values.view()) {}
+
+  // Construct from another matrix type in different memory space
+  // Only ALLOCATES the matrix
+  template <class VR, class... PR>
+  DiaMatrix(const std::string name, const DiaMatrix<VR, PR...> &src,
+            typename std::enable_if<is_compatible_from_different_space<
+                DiaMatrix, DiaMatrix<VR, PR...>>::value>::type * = nullptr)
+      : base(name + "DiaMatrix_AllocOnly", src.nrows(), src.ncols(),
+             src.nnnz()),
+        diagonal_offsets(src.ndiags) {
+    ndiags = src.ndiags;
+    nalign = src.nalign;
+    values.resize(this->_pad_size(src.nrows(), src.nalign), src.ndiags);
   }
 
   // Construct from another matrix type (Shallow)
@@ -113,6 +139,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
                 DiaMatrix, DiaMatrix<VR, PR...>>::value>::type * = nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()),
+        ndiags(src.ndiags),
+        nalign(src.nalign),
         diagonal_offsets(src.diagonal_offsets.view()),
         values(src.values.view()) {}
 
@@ -123,6 +151,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
       DiaMatrix &>::type
   operator=(const DiaMatrix<VR, PR...> &src) {
     if (this != &src) {
+      ndiags = src.ndiags;
+      nalign = src.nalign;
       set_name(src.name());
       set_nrows(src.nrows());
       set_ncols(src.ncols());
@@ -149,6 +179,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
                      const index_type num_diagonals,
                      const index_type alignment = 32) {
     base::resize(num_rows, num_cols, num_entries);
+    ndiags = num_diagonals;
+    nalign = alignment;
     diagonal_offsets.resize(num_diagonals);
     values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
   }

@@ -24,7 +24,6 @@
 #ifndef MORPHEUS_MIRRORCONTAINERS_HPP
 #define MORPHEUS_MIRRORCONTAINERS_HPP
 
-#include <Morpheus_DenseVector.hpp>
 #include <Morpheus_TypeTraits.hpp>
 
 namespace Morpheus {
@@ -83,44 +82,23 @@ template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror(
     const Container<T, P...>& src,
     typename std::enable_if<
-        is_matrix<typename Container<T, P...>::tag>::value>::type* = nullptr) {
+        is_container<typename Container<T, P...>::tag>::value>::type* =
+        nullptr) {
   using src_type = Container<T, P...>;
   using dst_type = typename src_type::HostMirror;
 
-  return dst_type(src.name().append("Mirror_"), src.nrows(), src.ncols(),
-                  src.nnnz());
-}
-
-// Allocates a mirror vector with the same characteristics as source
-// Doesn't copy elements from source to mirror
-template <class T, class... P>
-typename DenseVector<T, P...>::HostMirror create_mirror(
-    const DenseVector<T, P...>& src) {
-  using src_type = DenseVector<T, P...>;
-  using dst_type = typename src_type::HostMirror;
-
-  return dst_type(src.name().append("Mirror_"), src.size());
+  return dst_type(src.name().append("Mirror_"), src);
 }
 
 // Create a mirror in a new space (specialization for different space)
 template <class Space, template <class, class...> class Container, class T,
           class... P>
 typename Impl::MirrorType<Space, Container, T, P...>::container_type
-create_mirror(
-    const Container<T, P...>& src,
-    typename std::enable_if<
-        is_matrix<typename Container<T, P...>::tag>::value>::type* = nullptr) {
+create_mirror(const Container<T, P...>& src,
+              typename std::enable_if<is_container<
+                  typename Container<T, P...>::tag>::value>::type* = nullptr) {
   return typename Impl::MirrorType<Space, Container, T, P...>::container_type(
-      src.name().append("Mirror_"), src.nrows(), src.ncols(), src.nnnz());
-}
-
-// Allocates a mirror vector with the same characteristics as source but in new
-// Space. Doesn't copy elements from source to mirror
-template <class Space, class T, class... P>
-typename Impl::MirrorType<Space, DenseVector, T, P...>::container_type
-create_mirror(const DenseVector<T, P...>& src) {
-  return typename Impl::MirrorType<Space, DenseVector, T, P...>::container_type(
-      src.name().append("Mirror"), src.size());
+      src.name().append("Mirror_"), src);
 }
 
 template <template <class, class...> class Container, class T, class... P>
@@ -175,22 +153,10 @@ create_mirror_container(
     typename std::enable_if<
         !Impl::MirrorContainerType<Space, Container, T,
                                    P...>::is_same_memspace &&
-        is_matrix<typename Container<T, P...>::tag>::value>::type* = nullptr) {
+        is_container<typename Container<T, P...>::tag>::value>::type* =
+        nullptr) {
   return typename Impl::MirrorContainerType<Space, Container, T, P...>::
-      container_type(src.name().append("MirrorContainer_"), src.nrows(),
-                     src.ncols(), src.nnnz());
-}
-
-// Create a mirror DenseVector in a new space (specialization for different
-// space)
-template <class Space, class T, class... P>
-typename Impl::MirrorContainerType<Space, DenseVector, T, P...>::container_type
-create_mirror_container(
-    const DenseVector<T, P...>& src,
-    typename std::enable_if<!Impl::MirrorContainerType<
-        Space, DenseVector, T, P...>::is_same_memspace>::type* = nullptr) {
-  return typename Impl::MirrorContainerType<Space, DenseVector, T, P...>::
-      container_type(src.name().append("MirrorContainer_"), src.size());
+      container_type(src.name().append("MirrorContainer_"), src);
 }
 
 }  // namespace Morpheus

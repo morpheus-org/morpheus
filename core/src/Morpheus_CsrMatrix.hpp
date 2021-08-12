@@ -101,6 +101,24 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
         column_indices(num_entries),
         values(num_entries) {}
 
+  inline CsrMatrix(const std::string name, const CsrMatrix &src)
+      : base(name + "CsrMatrix", src.nrows(), src.ncols(), src.nnnz()),
+        row_offsets(src.row_offsets.view()),
+        column_indices(src.column_indices.view()),
+        values(src.values.view()) {}
+
+  // Construct from another matrix type in different memory space
+  // Only ALLOCATES the matrix
+  template <class VR, class... PR>
+  CsrMatrix(const std::string name, const CsrMatrix<VR, PR...> &src,
+            typename std::enable_if<is_compatible_from_different_space<
+                CsrMatrix, CsrMatrix<VR, PR...>>::value>::type * = nullptr)
+      : base(name + "CsrMatrix_AllocOnly", src.nrows(), src.ncols(),
+             src.nnnz()),
+        row_offsets(src.nrows() + 1),
+        column_indices(src.nnnz()),
+        values(src.nnnz()) {}
+
   // Construct from another matrix type (Shallow)
   // Needs to be a compatible type
   template <class VR, class... PR>
