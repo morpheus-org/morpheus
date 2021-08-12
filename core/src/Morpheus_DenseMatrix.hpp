@@ -90,21 +90,6 @@ class DenseMatrix
     assign(num_rows, num_cols, val);
   }
 
-  inline DenseMatrix(const std::string name, const DenseMatrix &src)
-      : base(name + "CooMatrix", src.nrows(), src.ncols(), src.nnnz()),
-        _values(src.view()) {}
-
-  // Construct from another matrix type in different memory space
-  // Only allocates the matrix
-  template <class VR, class... PR>
-  inline DenseMatrix(
-      const std::string name, const DenseMatrix<VR, PR...> &src,
-      typename std::enable_if<is_compatible_from_different_space<
-          DenseMatrix, DenseMatrix<VR, PR...>>::value>::type * = nullptr)
-      : base(name + "DenseMatrix", src.nrows(), src.ncols(), src.nnnz()),
-        _values(name + "DenseMatrix_AllocOnly", size_t(src.nrows()),
-                size_t(src.ncols())) {}
-
   // Construct from another dense matrix type (Shallow)
   template <class VR, class... PR>
   inline DenseMatrix(
@@ -160,6 +145,14 @@ class DenseMatrix
   inline void resize(index_type num_rows, index_type num_cols) {
     base::resize(num_rows, num_cols, num_rows * num_cols);
     Kokkos::resize(_values, size_t(num_rows), size_t(num_cols));
+  }
+
+  template <class VR, class... PR>
+  inline DenseMatrix &allocate(const std::string name,
+                               const DenseMatrix<VR, PR...> &src) {
+    this->set_name(name);
+    resize(src.nrows(), src.ncols());
+    return *this;
   }
 
   // Element access

@@ -92,18 +92,25 @@ class DenseVector
     assign(n, rand_pool, range_low, range_high);
   }
 
-  inline DenseVector(const std::string name, const DenseVector& src)
-      : _name(name + "Vector"), _size(src.size()), _values(src.view()) {}
+  // inline DenseVector(const std::string name, const DenseVector& src)
+  //     : _name(name + "Vector"), _size(src.size()), _values(src.view()) {}
 
-  // Construct from another vector type in different memory space
-  // Only allocates the vector
-  template <class VR, class... PR>
-  DenseVector(const std::string name, const DenseVector<VR, PR...>& vec,
-              typename std::enable_if<is_compatible_from_different_space<
-                  DenseVector, DenseVector<VR, PR...>>::value>::type* = nullptr)
-      : _name(name + "Vector_AllocOnly"),
-        _size(vec.size()),
-        _values(name + "Vector_AllocOnly", size_t(vec.size())) {}
+  // inline DenseVector(const std::string name, const DenseVector& src,
+  // MirrorTag)
+  //     : _name(name + "MirrorVector"),
+  //       _size(src.size()),
+  //       _values(name + "MirrorVector", size_t(src.size())) {}
+
+  // // Construct from another vector type in different memory space
+  // // Only allocates the vector
+  // template <class VR, class... PR>
+  // DenseVector(const std::string name, const DenseVector<VR, PR...>& vec,
+  //             typename std::enable_if<is_compatible_from_different_space<
+  //                 DenseVector, DenseVector<VR, PR...>>::value>::type* =
+  //                 nullptr)
+  //     : _name(name + "Vector_AllocOnly"),
+  //       _size(vec.size()),
+  //       _values(name + "Vector_AllocOnly", size_t(vec.size())) {}
 
   // Need to make sure two containers are of compatible type for shallow copy
   template <class VR, class... PR>
@@ -123,6 +130,17 @@ class DenseVector
       _size   = src.size();
       _values = src.view();
     }
+    return *this;
+  }
+
+  // Allocates a vector based on the shape of the source vector
+  // Needed for Mirror operations
+  template <class VR, class... PR>
+  inline DenseVector& allocate(const std::string name,
+                               const DenseVector<VR, PR...>& src) {
+    _name = name + "_Allocated";
+    _size = src.size();
+    this->resize(src.size());
     return *this;
   }
 

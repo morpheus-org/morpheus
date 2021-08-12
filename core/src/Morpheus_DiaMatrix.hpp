@@ -111,27 +111,6 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
     values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
   }
 
-  inline DiaMatrix(const std::string name, const DiaMatrix &src)
-      : base(name + "DiaMatrix", src.nrows(), src.ncols(), src.nnnz()),
-        ndiags(src.ndiags),
-        nalign(src.nalign),
-        diagonal_offsets(src.diagonal_offsets.view()),
-        values(src.values.view()) {}
-
-  // Construct from another matrix type in different memory space
-  // Only ALLOCATES the matrix
-  template <class VR, class... PR>
-  DiaMatrix(const std::string name, const DiaMatrix<VR, PR...> &src,
-            typename std::enable_if<is_compatible_from_different_space<
-                DiaMatrix, DiaMatrix<VR, PR...>>::value>::type * = nullptr)
-      : base(name + "DiaMatrix_AllocOnly", src.nrows(), src.ncols(),
-             src.nnnz()),
-        diagonal_offsets(src.ndiags) {
-    ndiags = src.ndiags;
-    nalign = src.nalign;
-    values.resize(this->_pad_size(src.nrows(), src.nalign), src.ndiags);
-  }
-
   // Construct from another matrix type (Shallow)
   template <class VR, class... PR>
   DiaMatrix(const DiaMatrix<VR, PR...> &src,
@@ -183,6 +162,14 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
     nalign = alignment;
     diagonal_offsets.resize(num_diagonals);
     values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
+  }
+
+  template <class VR, class... PR>
+  inline DiaMatrix &allocate(const std::string name,
+                             const DiaMatrix<VR, PR...> &src) {
+    this->set_name(name);
+    resize(src.nrows(), src.ncols(), src.nnnz(), src.ndiags, src.nalign);
+    return *this;
   }
 
  private:

@@ -78,6 +78,8 @@ struct MirrorType {
 };
 }  // namespace Impl
 
+// Allocates a mirror container with the same characteristics as source
+// Doesn't copy elements from source to mirror
 template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror(
     const Container<T, P...>& src,
@@ -87,7 +89,7 @@ typename Container<T, P...>::HostMirror create_mirror(
   using src_type = Container<T, P...>;
   using dst_type = typename src_type::HostMirror;
 
-  return dst_type(src.name().append("Mirror_"), src);
+  return dst_type().allocate(src.name().append("Mirror_"), src);
 }
 
 // Create a mirror in a new space (specialization for different space)
@@ -97,8 +99,8 @@ typename Impl::MirrorType<Space, Container, T, P...>::container_type
 create_mirror(const Container<T, P...>& src,
               typename std::enable_if<is_container<
                   typename Container<T, P...>::tag>::value>::type* = nullptr) {
-  return typename Impl::MirrorType<Space, Container, T, P...>::container_type(
-      src.name().append("Mirror_"), src);
+  return typename Impl::MirrorType<Space, Container, T, P...>::container_type()
+      .allocate(src.name().append("Mirror_"), src);
 }
 
 template <template <class, class...> class Container, class T, class... P>
@@ -155,8 +157,9 @@ create_mirror_container(
                                    P...>::is_same_memspace &&
         is_container<typename Container<T, P...>::tag>::value>::type* =
         nullptr) {
-  return typename Impl::MirrorContainerType<Space, Container, T, P...>::
-      container_type(src.name().append("MirrorContainer_"), src);
+  return typename Impl::MirrorContainerType<Space, Container, T,
+                                            P...>::container_type()
+      .allocate(src.name().append("MirrorContainer_"), src);
 }
 
 }  // namespace Morpheus
