@@ -30,8 +30,8 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
-#include <Morpheus_Exceptions.hpp>
 
+#include <impl/Morpheus_CudaUtils.hpp>
 #include <impl/Dia/Kernels/Morpheus_Multiply_Impl.hpp>
 
 namespace Morpheus {
@@ -52,14 +52,28 @@ inline void multiply(
   using ValueType = typename LinearOperator::value_type;
 
   const size_t BLOCK_SIZE = 256;
-  const size_t NUM_BLOCKS = (A.nrows() + BLOCK_SIZE - 1) / BLOCK_SIZE;
+  const size_t MAX_BLOCKS = max_active_blocks(
+      Kernels::spmv_dia_kernel<IndexType, ValueType, BLOCK_SIZE>, BLOCK_SIZE,
+      (size_t)sizeof(IndexType) * BLOCK_SIZE);
+  const size_t NUM_BLOCKS =
+      std::min<size_t>(MAX_BLOCKS, DIVIDE_INTO(A.nrows(), BLOCK_SIZE));
 
   const IndexType* D     = A.diagonal_offsets.data();
   const ValueType* V     = A.values.data();
   const ValueType* x_ptr = x.data();
   ValueType* y_ptr       = y.data();
 
-  throw NotImplementedException("GPU spmv for DIA not yet implemented.");
+  const IndexType num_diagonals = A.values.ncols();
+  const IndexType pitch         = A.values.nrows();
+
+  if (num_diagonals == 0) {
+    // empty matrix
+    return;
+  }
+
+  Kernels::spmv_dia_kernel<IndexType, ValueType, BLOCK_SIZE>
+      <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), A.ncols(), num_diagonals,
+                                      pitch, D, V, x_ptr, y_ptr);
 }
 
 }  // namespace Impl
