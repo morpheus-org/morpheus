@@ -97,7 +97,18 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
         diagonal_offsets(num_diagonals) {
     ndiags = num_diagonals;
     nalign = alignment;
-    values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
+    values.resize(_pad_size(num_rows, alignment), num_diagonals);
+  }
+
+  inline DiaMatrix(const std::string name, const index_type num_rows,
+                   const index_type num_cols, const index_type num_entries,
+                   const index_array_type &diag_offsets,
+                   const value_array_type &vals)
+      : base(name + "DiaMatrix", num_rows, num_cols, num_entries),
+        diagonal_offsets(diag_offsets),
+        values(vals) {
+    ndiags = diagonal_offsets.size();
+    nalign = values.nrows();
   }
 
   inline DiaMatrix(const std::string name, const index_type num_rows,
@@ -108,7 +119,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
         diagonal_offsets(num_diagonals) {
     ndiags = num_diagonals;
     nalign = alignment;
-    values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
+    values.resize(_pad_size(num_rows, alignment), num_diagonals);
   }
 
   // Construct from another matrix type (Shallow)
@@ -120,8 +131,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
              src.nnnz()),
         ndiags(src.ndiags),
         nalign(src.nalign),
-        diagonal_offsets(src.diagonal_offsets.view()),
-        values(src.values.view()) {}
+        diagonal_offsets(src.diagonal_offsets),
+        values(src.values) {}
 
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
@@ -136,8 +147,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
       set_nrows(src.nrows());
       set_ncols(src.ncols());
       set_nnnz(src.nnnz());
-      diagonal_offsets = src.diagonal_offsets.view();
-      values           = src.values.view();
+      diagonal_offsets = src.diagonal_offsets;
+      values           = src.values;
     }
     return *this;
   }

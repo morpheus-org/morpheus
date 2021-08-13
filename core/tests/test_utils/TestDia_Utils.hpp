@@ -43,4 +43,19 @@ void test_traits(Morpheus::DiaTag) {
                                  typename Container::value_type>::type>::value);
 }
 
+template <typename T1, typename T2>
+void check_shapes(const T1& A, const T2& A_mirror, Morpheus::DiaTag) {
+  ASSERT_EQ(A.nrows(), A_mirror.nrows());
+  ASSERT_EQ(A.ncols(), A_mirror.ncols());
+  ASSERT_EQ(A.nnnz(), A_mirror.nnnz());
+  ASSERT_EQ(A.diagonal_offsets.size(), A.ndiags);
+  ASSERT_EQ(A.values.nrows(), A.nrows());
+  ASSERT_EQ(A.values.ncols(), A.diagonal_offsets.size());
+  ASSERT_EQ(A.diagonal_offsets.size(), A_mirror.ndiags);
+  ASSERT_EQ(A.values.nrows(), A_mirror.nrows());
+  ASSERT_EQ(A.values.ncols(), A_mirror.diagonal_offsets.size());
+  ASSERT_EQ(A.ndiags, A_mirror.ndiags);
+  ASSERT_EQ(A.nalign, A_mirror.nalign);
+}
+
 #endif  // MORPHEUS_CORE_TEST_DIA_UTILS_HPP

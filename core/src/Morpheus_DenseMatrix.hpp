@@ -132,13 +132,8 @@ class DenseMatrix
     using I = index_type;
     this->resize(num_rows, num_cols);
 
-    Kokkos::RangePolicy<execution_space, size_type> range(0, num_rows);
-    Kokkos::parallel_for(
-        "Morpheus::DenseMatrix::assign", range, KOKKOS_LAMBDA(const I i) {
-          for (I j = 0; j < num_cols; j++) {
-            _values(i, j) = val;
-          }
-        });
+    set_functor f(_values, val, num_cols);
+    Kokkos::parallel_for("Morpheus::DenseMatrix::assign", num_rows, f);
   }
 
   // Modifiers
@@ -164,6 +159,24 @@ class DenseMatrix
   inline const value_array_type &view() const { return _values; }
 
   value_array_type _values;
+
+ public:
+  struct set_functor {
+    using execution_space = typename traits::execution_space;
+    value_array_type _data;
+    value_type _val;
+    index_type _ncols;
+
+    set_functor(value_array_type data, value_type val, index_type ncols)
+        : _data(data), _val(val), _ncols(ncols) {}
+
+    KOKKOS_INLINE_FUNCTION
+    void operator()(const index_type &i) const {
+      for (index_type j = 0; j < _ncols; j++) {
+        _data(i, j) = _val;
+      }
+    }
+  };
 };
 }  // namespace Morpheus
 

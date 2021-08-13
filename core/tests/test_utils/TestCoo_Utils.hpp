@@ -43,4 +43,17 @@ void test_traits(Morpheus::CooTag) {
                                  typename Container::value_type>::type>::value);
 }
 
+template <typename T1, typename T2>
+void check_shapes(const T1& A, const T2& A_mirror, Morpheus::CooTag) {
+  ASSERT_EQ(A.nrows(), A_mirror.nrows());
+  ASSERT_EQ(A.ncols(), A_mirror.ncols());
+  ASSERT_EQ(A.nnnz(), A_mirror.nnnz());
+  ASSERT_EQ(A.row_indices.size(), A.nnnz());
+  ASSERT_EQ(A.column_indices.size(), A.nnnz());
+  ASSERT_EQ(A.values.size(), A.nnnz());
+  ASSERT_EQ(A.row_indices.size(), A_mirror.row_indices.size());
+  ASSERT_EQ(A.column_indices.size(), A_mirror.column_indices.size());
+  ASSERT_EQ(A.values.size(), A_mirror.values.size());
+}
+
 #endif  // MORPHEUS_CORE_TEST_COO_UTILS_HPP

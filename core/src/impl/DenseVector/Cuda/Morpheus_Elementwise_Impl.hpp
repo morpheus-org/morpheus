@@ -30,7 +30,7 @@
 #include <Morpheus_DenseVector.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_Elementwise_Impl.hpp>
 
-#include <cuda.h>
+// #include <cuda.h>
 
 namespace Morpheus {
 namespace Impl {
@@ -46,8 +46,8 @@ void elementwise(const DenseVector<ValueType, Properties...>& x,
   const double* y_ptr = y.data();
   double* xy_ptr      = xy.data();
 
-  Kernels::elementwise_kernel<<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(x.size(), x_ptr,
-                                                             y_ptr, xy_ptr);
+  Kernels::elementwise_kernel<ValueType>
+      <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(x.size(), x_ptr, y_ptr, xy_ptr);
 }
 
 }  // namespace Impl

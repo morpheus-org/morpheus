@@ -1,4 +1,4 @@
-set(Fmt Coo)
+set(Fmt Csr)
 string(TOUPPER ${Fmt} FORMAT)
 string(TOLOWER ${Fmt} fmtdir)
 
