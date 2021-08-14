@@ -284,6 +284,58 @@ TEST(TESTSUITE_NAME, DeepCopy_CsrMatrix_HostDevice_MirrorContainer) {
   }
 }
 
+// Creates two mirror containers on device from host
+// Issues a copy between host to device and then a copy between
+// the two device mirrors. Then sends the result back to host
+// to be compared which should match the initial state of Ar.
+TEST(TESTSUITE_NAME, DeepCopy_CsrMatrix_DeviecDevice_MirrorContainer) {
+  using container = Morpheus::CsrMatrix<float, long long, Kokkos::LayoutLeft,
+                                        Kokkos::HostSpace>;
+  using index_array_type = typename container::index_array_type;
+  using value_array_type = typename container::value_array_type;
+  using index_type       = typename container::index_type;
+
+  index_array_type A_roff(5, 1), A_cind(2, 2);
+  value_array_type A_val(2, 5);
+  container A("Csr", 4, 3, 2, A_roff, A_cind, A_val);
+
+  index_array_type Ar_rind(5, 0), Ar_cind(2, 1);
+  value_array_type Ar_val(2, -1);
+  container Ar("Csr", 4, 3, 2, Ar_rind, Ar_cind, Ar_val);
+
+  auto A_mirror_dev1 = Morpheus::create_mirror_container<Kokkos::Cuda>(A);
+  auto A_mirror_dev2 = Morpheus::create_mirror_container<Kokkos::Cuda>(Ar);
+  auto Ares          = Morpheus::create_mirror(A_mirror_dev1);
+
+  Morpheus::copy(A, A_mirror_dev1);              // HtoD
+  Morpheus::copy(Ar, A_mirror_dev2);             // HtoD
+  Morpheus::copy(A_mirror_dev2, A_mirror_dev1);  // DtoD
+  Morpheus::copy(A_mirror_dev1, Ares);           // DtoH
+
+  check_shapes(A, Ares, Morpheus::CsrTag{});
+  // Change the value to main container to check if we did shallow copy
+  A.row_offsets.assign(A.row_offsets.size(), 3);
+  A.column_indices.assign(A.column_indices.size(), 8);
+  A.values.assign(A.values.size(), 9);
+  Ar.row_offsets.assign(A.row_offsets.size(), 3);
+  Ar.column_indices.assign(A.column_indices.size(), 8);
+  Ar.values.assign(A.values.size(), 9);
+
+  for (index_type i = 0; i < Ares.row_offsets.size(); i++) {
+    ASSERT_EQ(Ares.row_offsets[i], 0)
+        << "Value of the Ares.row_offsets should be the same as the initial "
+           "value of Ar.row_offsets during deep copy (0)";
+  }
+  for (index_type i = 0; i < Ares.nnnz(); i++) {
+    ASSERT_EQ(Ares.column_indices[i], 1)
+        << "Value of the Ares.column_indices should be the same as the "
+           "initial value of Ar.column_indices during deep copy (1)";
+    ASSERT_EQ(Ares.values[i], -1)
+        << "Value of the Ares.values should be the "
+           "same as the initial value of Ar.values during deep copy (-1)";
+  }
+}
+
 #endif  // MORPHEUS_ENABLE_CUDA
 
 }  // namespace Test

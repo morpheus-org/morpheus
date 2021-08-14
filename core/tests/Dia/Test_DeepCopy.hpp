@@ -231,7 +231,8 @@ TEST(TESTSUITE_NAME, DeepCopy_DiaMatrix_HostDevice) {
 
   for (index_type i = 0; i < A_mirror_host.diagonal_offsets.size(); i++) {
     ASSERT_EQ(A_mirror_host.diagonal_offsets[i], 1)
-        << "Value of the mirror row offsets should be the same as the value "
+        << "Value of the mirror diagonal offsets should be the same as the "
+           "value "
            "of A.diagonal_offsets during deep copy (1)";
   }
   for (index_type j = 0; j < A_mirror_host.values.ncols(); j++) {
@@ -272,7 +273,8 @@ TEST(TESTSUITE_NAME, DeepCopy_DiaMatrix_HostDevice_MirrorContainer) {
 
   for (index_type i = 0; i < A_mirror_host.diagonal_offsets.size(); i++) {
     ASSERT_EQ(A_mirror_host.diagonal_offsets[i], 1)
-        << "Value of the mirror row offsets should be the same as the value "
+        << "Value of the mirror diagonal offsets should be the same as the "
+           "value "
            "of A.diagonal_offsets during deep copy (1)";
   }
   for (index_type j = 0; j < A_mirror_host.values.ncols(); j++) {
@@ -283,6 +285,59 @@ TEST(TESTSUITE_NAME, DeepCopy_DiaMatrix_HostDevice_MirrorContainer) {
     }
   }
 }
+
+// Creates two mirror containers on device from host
+// Issues a copy between host to device and then a copy between
+// the two device mirrors. Then sends the result back to host
+// to be compared which should match the initial state of Ar.
+TEST(TESTSUITE_NAME, DeepCopy_DiaMatrix_DeviecDevice_MirrorContainer) {
+  using container = Morpheus::DiaMatrix<float, long long, Kokkos::LayoutLeft,
+                                        Kokkos::HostSpace>;
+  using index_array_type = typename container::index_array_type;
+  using value_array_type = typename container::value_array_type;
+  using index_type       = typename container::index_type;
+
+  index_array_type A_diags(2, 1);
+  // Need to consider alignment for values
+  value_array_type A_val(Morpheus::Impl::get_pad_size<index_type>(4, 32), 2, 5);
+  container A("Dia", 4, 3, 2, A_diags, A_val);
+
+  index_array_type Ar_diags(2, 4);
+  value_array_type Ar_val(Morpheus::Impl::get_pad_size<index_type>(4, 32), 2,
+                          -1);
+  container Ar("Dia", 4, 3, 2, Ar_diags, Ar_val);
+
+  auto A_mirror_dev1 = Morpheus::create_mirror_container<Kokkos::Cuda>(A);
+  auto A_mirror_dev2 = Morpheus::create_mirror_container<Kokkos::Cuda>(Ar);
+  auto Ares          = Morpheus::create_mirror(A_mirror_dev1);
+
+  Morpheus::copy(A, A_mirror_dev1);              // HtoD
+  Morpheus::copy(Ar, A_mirror_dev2);             // HtoD
+  Morpheus::copy(A_mirror_dev2, A_mirror_dev1);  // DtoD
+  Morpheus::copy(A_mirror_dev1, Ares);           // DtoH
+
+  check_shapes(A, Ares, Morpheus::DiaTag{});
+  // Change the value to main container to check if we did shallow copy
+  A.diagonal_offsets.assign(A.diagonal_offsets.size(), 3);
+  A.values.assign(A.values.nrows(), A.values.ncols(), 8);
+  Ar.diagonal_offsets.assign(Ar.diagonal_offsets.size(), 3);
+  Ar.values.assign(Ar.values.nrows(), Ar.values.ncols(), 8);
+
+  for (index_type i = 0; i < Ares.diagonal_offsets.size(); i++) {
+    ASSERT_EQ(Ares.diagonal_offsets[i], 4)
+        << "Value of the Ares.diagonal_offsets should be the same as the "
+           "initial "
+           "value of Ar.diagonal_offsets during deep copy (4)";
+  }
+  for (index_type j = 0; j < Ares.values.ncols(); j++) {
+    for (index_type i = 0; i < Ares.values.nrows(); i++) {
+      ASSERT_EQ(Ares.values(i, j), -1)
+          << "Value of the Ares.values should be the same as the initial "
+             "value of Ar.values during deep copy (-1)";
+    }
+  }
+}
+
 #endif  // MORPHEUS_ENABLE_CUDA
 
 }  // namespace Test

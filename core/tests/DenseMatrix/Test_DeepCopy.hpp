@@ -213,6 +213,40 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_HostDevice_MirrorContainer) {
   }
 }
 
+// Creates two mirror containers on device from host
+// Issues a copy between host to device and then a copy between
+// the two device mirrors. Then sends the result back to host
+// to be compared which should match the initial state of Ar.
+TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_DeviecDevice_MirrorContainer) {
+  using container = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
+                                          Kokkos::HostSpace>;
+  using value_array_type = typename container::value_array_type;
+  using index_type       = typename container::index_type;
+
+  container A("DenseMatrix", 4, 3, 1);
+  container Ar("DenseMatrix", 4, 3, 2);
+
+  auto A_mirror_dev1 = Morpheus::create_mirror_container<Kokkos::Cuda>(A);
+  auto A_mirror_dev2 = Morpheus::create_mirror_container<Kokkos::Cuda>(Ar);
+  auto Ares          = Morpheus::create_mirror(A_mirror_dev1);
+
+  Morpheus::copy(A, A_mirror_dev1);              // HtoD
+  Morpheus::copy(Ar, A_mirror_dev2);             // HtoD
+  Morpheus::copy(A_mirror_dev2, A_mirror_dev1);  // DtoD
+  Morpheus::copy(A_mirror_dev1, Ares);           // DtoH
+
+  check_shapes(A, Ares, Morpheus::DenseMatrixTag{});
+  // Change the value to main container to check if we did shallow copy
+  A.assign(A.nrows(), A.ncols(), 3);
+  Ar.assign(Ar.nrows(), Ar.ncols(), 3);
+  for (index_type i = 0; i < Ares.nrows(); i++) {
+    for (index_type j = 0; j < Ares.ncols(); j++) {
+      ASSERT_EQ(Ares(i, j), 2) << "Value of the Ares should be the same as the "
+                                  "initial value of Ar during deep copy (2)";
+    }
+  }
+}
+
 #endif  // MORPHEUS_ENABLE_CUDA
 
 }  // namespace Test
