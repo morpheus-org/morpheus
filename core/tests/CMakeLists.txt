@@ -32,43 +32,41 @@ morpheus_include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/category_files)
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/format_files)
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/test_utils)
-morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/Cuda)
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/generic)
-morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/DenseVector)
+# morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/DenseVector)
+morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/DenseMatrix)
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/Coo)
+morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/Csr)
+morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/Dia)
 
-# Set sources for each format and device combination
-foreach(Fmt DenseVector;DenseMatrix;Coo;Csr;Dia)
-  string(TOUPPER ${Fmt} FORMAT)
-  foreach(Tag Serial;OpenMP;Cuda;HIP)
-    string(TOUPPER ${Tag} DEVICE)
-    global_set(${Fmt}_${Tag}_SOURCES)
-  endforeach()
+foreach(Tag Serial;OpenMP;Cuda;HIP)
+  string(TOUPPER ${Tag} DEVICE)
+  global_set(${Tag}_SOURCES)
 endforeach()
 
 add_subdirectory(generic)
-add_subdirectory(DenseVector)
+# add_subdirectory(DenseVector)
+add_subdirectory(DenseMatrix)
 add_subdirectory(Coo)
+add_subdirectory(Csr)
+add_subdirectory(Dia)
 
-# TODO: Create a single build for all formats per device
-foreach(Fmt DenseVector;DenseMatrix;Coo;Csr;Dia)
-  if(MORPHEUS_ENABLE_SERIAL)
-    morpheus_add_executable_and_test(UnitTest_${Fmt}_Serial SOURCES
-                                     TestMain.cpp ${${Fmt}_Serial_SOURCES})
-  endif()
+if(MORPHEUS_ENABLE_SERIAL)
+  morpheus_add_executable_and_test(UnitTest_Serial SOURCES TestMain.cpp
+                                   ${Serial_SOURCES})
+endif()
 
-  if(MORPHEUS_ENABLE_OPENMP)
-    morpheus_add_executable_and_test(UnitTest_${Fmt}_OpenMP SOURCES
-                                     TestMain.cpp ${${Fmt}_OpenMP_SOURCES})
-  endif()
+if(MORPHEUS_ENABLE_OPENMP)
+  morpheus_add_executable_and_test(UnitTest_OpenMP SOURCES TestMain.cpp
+                                   ${OpenMP_SOURCES})
+endif()
 
-  if(MORPHEUS_ENABLE_CUDA)
-    morpheus_add_executable_and_test(UnitTest_${Fmt}_Cuda SOURCES TestMain.cpp
-                                     ${${Fmt}_Cuda_SOURCES})
-  endif()
+if(MORPHEUS_ENABLE_CUDA)
+  morpheus_add_executable_and_test(UnitTest_Cuda SOURCES TestMain.cpp
+                                   ${Cuda_SOURCES})
+endif()
 
-  if(MORPHEUS_ENABLE_HIP)
-    morpheus_add_executable_and_test(UnitTest_${Fmt}_HIP SOURCES TestMain.cpp
-                                     ${${Fmt}_HIP_SOURCES})
-  endif()
-endforeach()
+if(MORPHEUS_ENABLE_HIP)
+  morpheus_add_executable_and_test(UnitTest_HIP SOURCES TestMain.cpp
+                                   ${HIP_SOURCES})
+endif()

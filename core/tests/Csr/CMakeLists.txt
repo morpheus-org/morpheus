@@ -23,7 +23,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
         "#define TESTSUITE_NAME ${Fmt}${Tag}\n"
         "#include <${Fmt}/Test_${Name}.hpp>\n")
       configure_file(${testdir}/dummy.cpp ${file})
-      global_append(${Fmt}_${Tag}_SOURCES ${file})
+      global_append(${Tag}_SOURCES ${file})
     endforeach()
   endif()
 endforeach()
