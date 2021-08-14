@@ -19,9 +19,11 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
         WRITE ${testdir}/dummy.cpp
         "#include <Test${Fmt}_Format.hpp>\n"
         "#include <Test${Tag}_Category.hpp>\n"
-        "#define TESTSUITE_NAME ${Fmt}${Tag}\n" "#include <Test_${Name}.hpp>\n")
+        "#include <Test${Fmt}_Utils.hpp>\n"
+        "#define TESTSUITE_NAME ${Fmt}${Tag}\n"
+        "#include <Test_${Name}.hpp>\n")
       configure_file(${testdir}/dummy.cpp ${file})
-      global_append(${Fmt}_${Tag}_SOURCES ${file})
+      global_append(${Tag}_SOURCES ${file})
     endforeach()
   endif()
 endforeach()

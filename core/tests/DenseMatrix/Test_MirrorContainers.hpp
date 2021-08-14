@@ -126,7 +126,7 @@ TEST(TESTSUITE_NAME, MirrorContainer_DenseMatrix_explicit_same_space) {
     for (index_type i = 0; i < A_mirror.nrows(); i++) {
       for (index_type j = 0; j < A_mirror.ncols(); j++) {
         ASSERT_EQ(A_mirror(i, j), 5)
-            << "Value of the Mirror DenseMatrix values should be (-1)";
+            << "Value of the Mirror DenseMatrix values should be (5)";
       }
     }
   }
