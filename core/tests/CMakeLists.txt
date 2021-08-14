@@ -51,22 +51,30 @@ add_subdirectory(Coo)
 add_subdirectory(Csr)
 add_subdirectory(Dia)
 
+set(ALL_SOURCES)
+
 if(MORPHEUS_ENABLE_SERIAL)
   morpheus_add_executable_and_test(UnitTest_Serial SOURCES TestMain.cpp
                                    ${Serial_SOURCES})
+  list(APPEND ALL_SOURCES ${Serial_SOURCES})
 endif()
 
 if(MORPHEUS_ENABLE_OPENMP)
   morpheus_add_executable_and_test(UnitTest_OpenMP SOURCES TestMain.cpp
                                    ${OpenMP_SOURCES})
+  list(APPEND ALL_SOURCES ${OpenMP_SOURCES})
 endif()
 
 if(MORPHEUS_ENABLE_CUDA)
   morpheus_add_executable_and_test(UnitTest_Cuda SOURCES TestMain.cpp
                                    ${Cuda_SOURCES})
+  list(APPEND ALL_SOURCES ${Cuda_SOURCES})
 endif()
 
 if(MORPHEUS_ENABLE_HIP)
   morpheus_add_executable_and_test(UnitTest_HIP SOURCES TestMain.cpp
                                    ${HIP_SOURCES})
+  list(APPEND ALL_SOURCES ${HIP_SOURCES})
 endif()
+
+morpheus_add_executable_and_test(UnitTest SOURCES TestMain.cpp ${ALL_SOURCES})
