@@ -36,4 +36,13 @@ void test_traits(Morpheus::DenseMatrixTag) {
                                  typename Container::value_type>::type>::value);
 }
 
+template <typename T1, typename T2>
+void check_shapes(const T1& A, const T2& A_mirror, Morpheus::DenseMatrixTag) {
+  ASSERT_EQ(A.nrows(), A_mirror.nrows());
+  ASSERT_EQ(A.ncols(), A_mirror.ncols());
+  ASSERT_EQ(A.nnnz(), A_mirror.nnnz());
+  ASSERT_EQ(A.view().extent(0), A.nrows());
+  ASSERT_EQ(A.view().extent(1), A.ncols());
+}
+
 #endif  // MORPHEUS_CORE_TEST_DENSEMATRIX_UTILS_HPP
