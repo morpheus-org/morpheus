@@ -31,6 +31,7 @@
 #include <Morpheus_Copy.hpp>
 
 #include <impl/Morpheus_MatrixBase.hpp>
+#include <impl/Morpheus_Utils.hpp>
 
 namespace Morpheus {
 
@@ -97,7 +98,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
         diagonal_offsets(num_diagonals) {
     ndiags = num_diagonals;
     nalign = alignment;
-    values.resize(_pad_size(num_rows, alignment), num_diagonals);
+    values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
+                  num_diagonals);
   }
 
   inline DiaMatrix(const std::string name, const index_type num_rows,
@@ -119,7 +121,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
         diagonal_offsets(num_diagonals) {
     ndiags = num_diagonals;
     nalign = alignment;
-    values.resize(_pad_size(num_rows, alignment), num_diagonals);
+    values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
+                  num_diagonals);
   }
 
   // Construct from another matrix type (Shallow)
@@ -172,7 +175,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
     ndiags = num_diagonals;
     nalign = alignment;
     diagonal_offsets.resize(num_diagonals);
-    values.resize(this->_pad_size(num_rows, alignment), num_diagonals);
+    values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
+                  num_diagonals);
   }
 
   template <class VR, class... PR>
@@ -181,12 +185,6 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
     this->set_name(name);
     resize(src.nrows(), src.ncols(), src.nnnz(), src.ndiags, src.nalign);
     return *this;
-  }
-
- private:
-  // Calculates padding to align the data based on the current diagonal length
-  inline const index_type _pad_size(index_type diag_len, index_type alignment) {
-    return alignment * ((diag_len + alignment - 1) / alignment);
   }
 };
 }  // namespace Morpheus

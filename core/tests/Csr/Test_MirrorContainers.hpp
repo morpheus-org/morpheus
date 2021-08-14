@@ -32,7 +32,7 @@ namespace Test {
 TEST(TESTSUITE_NAME, Mirror_CsrMatrix_HostMirror) {
   using container =
       Morpheus::CsrMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
-  using I = typename container::index_type;
+  using index_type = typename container::index_type;
 
   typename container::index_array_type roff(5, 1), cind(2, 2);
   typename container::value_array_type val(2, 5);
@@ -48,63 +48,18 @@ TEST(TESTSUITE_NAME, Mirror_CsrMatrix_HostMirror) {
       "as we are creating a mirror in the same space.");
 
   check_shapes(A, A_mirror, Morpheus::CsrTag{});
-  for (I i = 0; i < A_mirror.row_offsets.size(); i++) {
+  for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
     ASSERT_EQ(A_mirror.row_offsets[i], 0)
         << "Value of the mirror row offsets should be the default "
            "(0) i.e no copy was performed";
   }
-  for (I i = 0; i < A_mirror.nnnz(); i++) {
+  for (index_type i = 0; i < A_mirror.nnnz(); i++) {
     ASSERT_EQ(A_mirror.column_indices[i], 0)
         << "Value of the mirror column indices should be the default "
            "(0) i.e no copy was performed";
     ASSERT_EQ(A_mirror.values[i], 0)
         << "Value of the mirror values should be the default "
            "(0) i.e no copy was performed";
-  }
-}
-
-// Creates a mirror in explicit space
-// Checks shapes
-// If on host checks that only allocation happened and values are not copied
-TEST(TESTSUITE_NAME, Mirror_CsrMatrix_explicit_space) {
-  using container =
-      Morpheus::CsrMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
-  using mirror_space = std::conditional_t<
-      Morpheus::is_Host_Memoryspace_v<typename TEST_EXECSPACE::memory_space>,
-      Kokkos::Cuda, Kokkos::DefaultHostExecutionSpace>;
-  using dst_type =
-      Morpheus::CsrMatrix<typename container::value_type,
-                          typename container::index_type,
-                          typename container::array_layout, mirror_space>;
-  using I = typename container::index_type;
-
-  typename container::index_array_type roff(5, 1), cind(2, 2);
-  typename container::value_array_type val(2, 5);
-  container A("Csr", 4, 3, 2, roff, cind, val);
-
-  auto A_mirror = Morpheus::create_mirror<mirror_space>(A);
-  using mirror  = decltype(A_mirror);
-
-  static_assert(
-      std::is_same<typename mirror::type, typename dst_type::type>::value,
-      "Mirror type should be the same as the source type but in the new mirror "
-      "space.");
-
-  check_shapes(A, A_mirror, Morpheus::CsrTag{});
-  if (Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
-    for (I i = 0; i < A_mirror.row_offsets.size(); i++) {
-      ASSERT_EQ(A_mirror.row_offsets[i], 0)
-          << "Value of the mirror row offsets should be the default "
-             "(0) i.e no copy was performed";
-    }
-    for (I i = 0; i < A_mirror.nnnz(); i++) {
-      ASSERT_EQ(A_mirror.column_indices[i], 0)
-          << "Value of the mirror column indices should be the default "
-             "(0) i.e no copy was performed";
-      ASSERT_EQ(A_mirror.values[i], 0)
-          << "Value of the mirror values should be the default "
-             "(0) i.e no copy was performed";
-    }
   }
 }
 
@@ -116,7 +71,7 @@ TEST(TESTSUITE_NAME, Mirror_CsrMatrix_explicit_space) {
 TEST(TESTSUITE_NAME, MirrorContainer_CsrMatrix_HostMirror) {
   using container =
       Morpheus::CsrMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
-  using I = typename container::index_type;
+  using index_type = typename container::index_type;
 
   typename container::index_array_type roff(5, 1), cind(2, 2);
   typename container::value_array_type val(2, 5);
@@ -139,12 +94,12 @@ TEST(TESTSUITE_NAME, MirrorContainer_CsrMatrix_HostMirror) {
 
   if (Morpheus::is_Host_Memoryspace_v<typename container::memory_space> &&
       Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
-    for (I i = 0; i < A_mirror.row_offsets.size(); i++) {
+    for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
       ASSERT_EQ(A_mirror.row_offsets[i], 0)
           << "Value of the mirror row offsets should be (0) due to Shallow "
              "Copy";
     }
-    for (I i = 0; i < A_mirror.nnnz(); i++) {
+    for (index_type i = 0; i < A_mirror.nnnz(); i++) {
       ASSERT_EQ(A_mirror.column_indices[i], 1)
           << "Value of the mirror column indices should be (1) due to Shallow "
              "Copy";
@@ -152,12 +107,12 @@ TEST(TESTSUITE_NAME, MirrorContainer_CsrMatrix_HostMirror) {
           << "Value of the mirror values should be (-1) due to Shallow Copy";
     }
   } else {
-    for (I i = 0; i < A_mirror.row_offsets.size(); i++) {
+    for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
       ASSERT_EQ(A_mirror.row_offsets[i], 0)
           << "Value of the mirror row offsets should be the default "
              "(0) i.e no copy was performed";
     }
-    for (I i = 0; i < A_mirror.nnnz(); i++) {
+    for (index_type i = 0; i < A_mirror.nnnz(); i++) {
       ASSERT_EQ(A_mirror.column_indices[i], 0)
           << "Value of the mirror column indices should be the default "
              "(0) i.e no copy was performed";
@@ -175,7 +130,7 @@ TEST(TESTSUITE_NAME, MirrorContainer_CsrMatrix_HostMirror) {
 TEST(TESTSUITE_NAME, MirrorContainer_CsrMatrix_explicit_same_space) {
   using container =
       Morpheus::CsrMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
-  using I = typename container::index_type;
+  using index_type = typename container::index_type;
 
   typename container::index_array_type roff(5, 1), cind(2, 2);
   typename container::value_array_type val(2, 5);
@@ -197,12 +152,12 @@ TEST(TESTSUITE_NAME, MirrorContainer_CsrMatrix_explicit_same_space) {
 
   if (Morpheus::is_Host_Memoryspace_v<typename container::memory_space> &&
       Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
-    for (I i = 0; i < A_mirror.row_offsets.size(); i++) {
+    for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
       ASSERT_EQ(A_mirror.row_offsets[i], 0)
           << "Value of the mirror row offsets should be (0) due to Shallow "
              "Copy";
     }
-    for (I i = 0; i < A_mirror.nnnz(); i++) {
+    for (index_type i = 0; i < A_mirror.nnnz(); i++) {
       ASSERT_EQ(A_mirror.column_indices[i], 1)
           << "Value of the mirror column indices should be (1) due to Shallow "
              "Copy";
@@ -212,6 +167,55 @@ TEST(TESTSUITE_NAME, MirrorContainer_CsrMatrix_explicit_same_space) {
   }
 }
 
+#if defined(MORPHEUS_ENABLE_CUDA)
+
+// Creates a mirror in explicit space
+// Checks shapes
+// If on host checks that only allocation happened and values are not copied
+TEST(TESTSUITE_NAME, Mirror_CsrMatrix_explicit_space) {
+  using container =
+      Morpheus::CsrMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+  using mirror_space = std::conditional_t<
+      Morpheus::is_Host_Memoryspace_v<typename TEST_EXECSPACE::memory_space>,
+      Kokkos::Cuda, Kokkos::DefaultHostExecutionSpace>;
+  using dst_type =
+      Morpheus::CsrMatrix<typename container::value_type,
+                          typename container::index_type,
+                          typename container::array_layout, mirror_space>;
+  using index_type = typename container::index_type;
+
+  typename container::index_array_type roff(5, 1), cind(2, 2);
+  typename container::value_array_type val(2, 5);
+  container A("Csr", 4, 3, 2, roff, cind, val);
+
+  auto A_mirror = Morpheus::create_mirror<mirror_space>(A);
+  using mirror  = decltype(A_mirror);
+
+  static_assert(
+      std::is_same<typename mirror::type, typename dst_type::type>::value,
+      "Mirror type should be the same as the source type but in the new mirror "
+      "space.");
+
+  check_shapes(A, A_mirror, Morpheus::CsrTag{});
+  if (Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
+    for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
+      ASSERT_EQ(A_mirror.row_offsets[i], 0)
+          << "Value of the mirror row offsets should be the default "
+             "(0) i.e no copy was performed";
+    }
+    for (index_type i = 0; i < A_mirror.nnnz(); i++) {
+      ASSERT_EQ(A_mirror.column_indices[i], 0)
+          << "Value of the mirror column indices should be the default "
+             "(0) i.e no copy was performed";
+      ASSERT_EQ(A_mirror.values[i], 0)
+          << "Value of the mirror values should be the default "
+             "(0) i.e no copy was performed";
+    }
+  }
+}
+
+// Creates a mirror container in other space from container
+// Checks types are the same for both mirror and container
 TEST(TESTSUITE_NAME, MirrorContainer_CsrMatrix_explicit_new_space) {
   using container =
       Morpheus::CsrMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
@@ -235,5 +239,7 @@ TEST(TESTSUITE_NAME, MirrorContainer_CsrMatrix_explicit_new_space) {
       "Mirror type should be the same as the source type but in the new mirror "
       "space.");
 }
+
+#endif  // MORPHEUS_ENABLE_CUDA
 
 }  // namespace Test

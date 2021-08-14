@@ -36,6 +36,12 @@ void print_matrix_header(const Printable& p, Stream& s) {
     << p.nnnz() << " entries\n";
 }
 
+// Calculates padding to align the data based on the current length
+template <typename T>
+inline const T get_pad_size(T len, T alignment) {
+  return alignment * ((len + alignment - 1) / alignment);
+}
+
 }  // namespace Impl
 }  // namespace Morpheus
 

@@ -44,18 +44,21 @@ void test_traits(Morpheus::DiaTag) {
 }
 
 template <typename T1, typename T2>
-void check_shapes(const T1& A, const T2& A_mirror, Morpheus::DiaTag) {
-  ASSERT_EQ(A.nrows(), A_mirror.nrows());
-  ASSERT_EQ(A.ncols(), A_mirror.ncols());
-  ASSERT_EQ(A.nnnz(), A_mirror.nnnz());
+inline void check_shapes(const T1& A, const T2& A_mirror, Morpheus::DiaTag) {
   ASSERT_EQ(A.diagonal_offsets.size(), A.ndiags);
-  ASSERT_EQ(A.values.nrows(), A.nrows());
+  ASSERT_EQ(A.values.nrows(),
+            Morpheus::Impl::get_pad_size<typename T1::index_type>(A.nrows(),
+                                                                  A.nalign));
   ASSERT_EQ(A.values.ncols(), A.diagonal_offsets.size());
-  ASSERT_EQ(A.diagonal_offsets.size(), A_mirror.ndiags);
-  ASSERT_EQ(A.values.nrows(), A_mirror.nrows());
-  ASSERT_EQ(A.values.ncols(), A_mirror.diagonal_offsets.size());
-  ASSERT_EQ(A.ndiags, A_mirror.ndiags);
-  ASSERT_EQ(A.nalign, A_mirror.nalign);
+  // Mirror should match A
+  ASSERT_EQ(A_mirror.nrows(), A.nrows());
+  ASSERT_EQ(A_mirror.ncols(), A.ncols());
+  ASSERT_EQ(A_mirror.nnnz(), A.nnnz());
+  ASSERT_EQ(A_mirror.diagonal_offsets.size(), A.diagonal_offsets.size());
+  ASSERT_EQ(A_mirror.values.nrows(), A.values.nrows());
+  ASSERT_EQ(A_mirror.values.ncols(), A.values.ncols());
+  ASSERT_EQ(A_mirror.ndiags, A.ndiags);
+  ASSERT_EQ(A_mirror.nalign, A.nalign);
 }
 
 #endif  // MORPHEUS_CORE_TEST_DIA_UTILS_HPP
