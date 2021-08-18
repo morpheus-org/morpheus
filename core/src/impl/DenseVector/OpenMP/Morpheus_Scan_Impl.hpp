@@ -44,7 +44,7 @@ void incl_scan(
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
   using IndexType = typename Vector::index_type;
-
+// TODO: Scan semantics require OpenMP5
 #pragma omp simd reduction(inscan, + : initial)
   for (IndexType i = 0; i < size; i++) {
     initial += in[i];
@@ -65,6 +65,7 @@ void excl_scan(
   using IndexType = typename Vector::index_type;
 
   if (size > 0) {
+    // TODO: Scan semantics require OpenMP5
 #pragma omp simd reduction(inscan, + : initial)
     for (IndexType i = 0; i < size - 1; i++) {
       out[i] = initial;
@@ -78,4 +79,5 @@ void excl_scan(
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_OPENMP
 #endif  // MORPHEUS_DENSEVECTOR_OPENMP_SCAN_IMPL_HPP
