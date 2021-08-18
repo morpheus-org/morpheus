@@ -42,6 +42,7 @@
 #include <Morpheus_Multiply.hpp>
 #include <Morpheus_Print.hpp>
 #include <Morpheus_Sort.hpp>
+#include <Morpheus_Scan.hpp>
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_KokkosSpace.hpp>

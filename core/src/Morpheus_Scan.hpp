@@ -33,7 +33,7 @@ template <typename ExecSpace, typename Algorithm, typename Vector>
 void scan_inclusive(const Vector& in, Vector& out,
                     typename Vector::index_type size,
                     typename Vector::value_type initial) {
-  Impl::incl_scan<ExecSpace>(in, out, size, typename Vector::tag{},
+  Impl::incl_scan<ExecSpace>(in, out, size, initial, typename Vector::tag{},
                              typename Vector::tag{}, Algorithm{});
 }
 
@@ -41,7 +41,7 @@ template <typename ExecSpace, typename Vector>
 void scan_inclusive(const Vector& in, Vector& out,
                     typename Vector::index_type size,
                     typename Vector::value_type initial) {
-  Impl::incl_scan<ExecSpace>(in, out, size, typename Vector::tag{},
+  Impl::incl_scan<ExecSpace>(in, out, size, initial, typename Vector::tag{},
                              typename Vector::tag{}, Alg0{});
 }
 
@@ -49,7 +49,7 @@ template <typename ExecSpace, typename Algorithm, typename Vector>
 void scan_exclusive(const Vector& in, Vector& out,
                     typename Vector::index_type size,
                     typename Vector::value_type initial) {
-  Impl::excl_scan<ExecSpace>(in, out, size, typename Vector::tag{},
+  Impl::excl_scan<ExecSpace>(in, out, size, initial, typename Vector::tag{},
                              typename Vector::tag{}, Algorithm{});
 }
 
@@ -57,7 +57,7 @@ template <typename ExecSpace, typename Vector>
 void scan_exclusive(const Vector& in, Vector& out,
                     typename Vector::index_type size,
                     typename Vector::value_type initial) {
-  Impl::excl_scan<ExecSpace>(in, out, size, typename Vector::tag{},
+  Impl::excl_scan<ExecSpace>(in, out, size, initial, typename Vector::tag{},
                              typename Vector::tag{}, Alg0{});
 }
 
