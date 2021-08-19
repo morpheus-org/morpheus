@@ -25,6 +25,5 @@
 #define MORPHEUS_SCAN_IMPL_HPP
 
 #include <impl/DenseVector/Serial/Morpheus_Scan_Impl.hpp>
-#include <impl/DenseVector/OpenMP/Morpheus_Scan_Impl.hpp>
 
 #endif  // MORPHEUS_SCAN_IMPL_HPP

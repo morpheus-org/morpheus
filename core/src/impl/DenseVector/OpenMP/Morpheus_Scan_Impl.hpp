@@ -35,15 +35,18 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename Vector>
-void incl_scan(
+void inclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::value_type initial, DenseVectorTag, DenseVectorTag, Alg0,
+    DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
   using IndexType = typename Vector::index_type;
+  using ValueType = typename Vector::value_type;
+
+  ValueType initial = 0;
 // TODO: Scan semantics require OpenMP5
 #pragma omp simd reduction(inscan, + : initial)
   for (IndexType i = 0; i < size; i++) {
@@ -54,17 +57,19 @@ void incl_scan(
 }
 
 template <typename ExecSpace, typename Vector>
-void excl_scan(
+void exclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::value_type initial, DenseVectorTag, DenseVectorTag, Alg0,
+    DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
   using IndexType = typename Vector::index_type;
+  using ValueType = typename Vector::value_type;
 
   if (size > 0) {
+    ValueType initial = 0;
     // TODO: Scan semantics require OpenMP5
 #pragma omp simd reduction(inscan, + : initial)
     for (IndexType i = 0; i < size - 1; i++) {
