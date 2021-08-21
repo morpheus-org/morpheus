@@ -53,8 +53,9 @@ T _split_work(const T load, const T workers, const T worker_id) {
   return bound;
 }
 
-int threads() {
-  int t = 1;
+template <typename T>
+T threads() {
+  T t = 1;
 #pragma omp parallel
   { t = omp_get_num_threads(); }
 
@@ -62,15 +63,8 @@ int threads() {
 }
 
 template <typename T>
-int is_row_stop(T container, typename T::index_type idx,
-                typename T::index_type len = 0) {
-  return container[idx] != container[idx + len + 1];
-}
-
-template <typename T>
-int is_first_row_stop_in_workgroup(T container,
-                                   typename T::index_type start_idx,
-                                   typename T::index_type cur_index) {
+int is_row_stop(T container, typename T::index_type start_idx,
+                typename T::index_type cur_index) {
   return container[start_idx] != container[cur_index];
 }
 
@@ -90,11 +84,14 @@ inline void multiply(
   using KeyType   = typename LinearOperator::index_type;
   using vector    = MatrixOrVector1;
 
-  const IndexType nthreads = threads();
-  vector out("out", A.nnnz(), 0), last_partial_sums(nthreads, 0);
+  if (A.nnnz() < threads<IndexType>()) {
+    omp_set_num_threads(A.nnnz());
+  }
+  const IndexType nthreads = threads<IndexType>();
+  const ValueType max_val  = std::numeric_limits<ValueType>::max();
+  vector out("out", A.nnnz(), 0);
   // Initialize to special value
-  vector grp_sum(nthreads,
-                 std::numeric_limits<typename vector::value_type>::max());
+  vector grp_sum(nthreads, max_val);
 
 #pragma omp parallel
   {
@@ -106,6 +103,9 @@ inline void multiply(
     const IndexType start = _split_work(A.nnnz(), nthreads, tid);
     const IndexType stop  = _split_work(A.nnnz(), nthreads, tid + 1);
     const IndexType last  = stop - 1;
+#pragma omp critical
+    std::cout << "[" << tid << "/" << nthreads << "]"
+              << " (" << start << "," << stop << ")" << std::endl;
 
     // multiply value arrays with the corresponding vector values
     // indexed by the colum_indices array;
@@ -117,28 +117,41 @@ inline void multiply(
     Morpheus::inclusive_scan_by_key<Kokkos::Serial>(A.row_indices, out, out,
                                                     stop - start, start);
 
-    // Check if last value is at a row stop and write partial_sum_out
-    if (tid == nthreads - 1) {
-      // Always row stop at the end of array
-      last_partial_sums[tid] = ValueType(0);
+    const IndexType has_row_stop =
+        (tid == nthreads - 1)
+            ? 1
+            : is_row_stop(A.row_indices, start, last) ||
+                  is_row_stop(A.row_indices, start, start + 1);
+    IndexType spans_threads =
+        (tid == 0) ? ValueType(0)
+                   : !is_row_stop(A.row_indices, start - 1, start);
+
+    // adjacent synchronization between threads
+    if (spans_threads && !has_row_stop && tid != 0) {
+      while (grp_sum[tid - 1] == max_val) {
+        // wait for the previous group to update its sum
+      };
+      grp_sum[tid] = out[last] + grp_sum[tid - 1];
     } else {
-      if (is_row_stop(A.row_indices, last))
-        last_partial_sums[tid] = ValueType(0);  // Zero at row stop
-      else
-        last_partial_sums[tid] = out[last];
+      grp_sum[tid] = out[last];
     }
 
-#pragma omp barrier  // partial_sum_out and out must be available to all
-
-    ValueType partial_sum =
-        (tid == 0) ? ValueType(0) : last_partial_sums[tid - 1];
-
-    for (IndexType n = start; n < last; n++) {
-      if(is_row_stop(A.row_indices,n){
-        if (is_first_row_stop_in_workgroup(A.row_indices, start, n)) {
-          // TODO: A row might span multiple threads, need to get the partial
-          // sum from those too.
-          y[A.row_indices[n]] = out[n] + partial_sum;
+    IndexType is_first_stop = 1;
+    for (IndexType n = start; n < stop; n++) {
+      IndexType is_stop = (tid == nthreads - 1 && n == last)
+                              ? 1
+                              : is_row_stop(A.row_indices, n, n + 1);
+      if (is_stop) {
+        if (is_first_stop) {  // in workgroup
+          is_first_stop = 0;
+          if (spans_threads) {  // might span multiple threads
+            while (grp_sum[tid - 1] == max_val) {
+              // wait for the previous group to update its sum
+            };
+            y[A.row_indices[n]] = out[n] + grp_sum[tid - 1];
+          } else {
+            y[A.row_indices[n]] = out[n];
+          }
         } else {
           y[A.row_indices[n]] = out[n];
         }
