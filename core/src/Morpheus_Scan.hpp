@@ -52,15 +52,17 @@ namespace Morpheus {
  */
 template <typename ExecSpace, typename Algorithm, typename Vector>
 void inclusive_scan(const Vector& in, Vector& out,
-                    typename Vector::index_type size) {
-  Impl::inclusive_scan<ExecSpace>(in, out, size, typename Vector::tag{},
+                    typename Vector::index_type size,
+                    typename Vector::index_type start = 0) {
+  Impl::inclusive_scan<ExecSpace>(in, out, size, start, typename Vector::tag{},
                                   typename Vector::tag{}, Algorithm{});
 }
 
 template <typename ExecSpace, typename Vector>
 void inclusive_scan(const Vector& in, Vector& out,
-                    typename Vector::index_type size) {
-  Impl::inclusive_scan<ExecSpace>(in, out, size, typename Vector::tag{},
+                    typename Vector::index_type size,
+                    typename Vector::index_type start = 0) {
+  Impl::inclusive_scan<ExecSpace>(in, out, size, start, typename Vector::tag{},
                                   typename Vector::tag{}, Alg0{});
 }
 
@@ -89,15 +91,17 @@ void inclusive_scan(const Vector& in, Vector& out,
 
 template <typename ExecSpace, typename Algorithm, typename Vector>
 void exclusive_scan(const Vector& in, Vector& out,
-                    typename Vector::index_type size) {
-  Impl::exclusive_scan<ExecSpace>(in, out, size, typename Vector::tag{},
+                    typename Vector::index_type size,
+                    typename Vector::index_type start = 0) {
+  Impl::exclusive_scan<ExecSpace>(in, out, size, start, typename Vector::tag{},
                                   typename Vector::tag{}, Algorithm{});
 }
 
 template <typename ExecSpace, typename Vector>
 void exclusive_scan(const Vector& in, Vector& out,
-                    typename Vector::index_type size) {
-  Impl::exclusive_scan<ExecSpace>(in, out, size, typename Vector::tag{},
+                    typename Vector::index_type size,
+                    typename Vector::index_type start = 0) {
+  Impl::exclusive_scan<ExecSpace>(in, out, size, start, typename Vector::tag{},
                                   typename Vector::tag{}, Alg0{});
 }
 
@@ -131,18 +135,20 @@ void exclusive_scan(const Vector& in, Vector& out,
 template <typename ExecSpace, typename Algorithm, typename Vector1,
           typename Vector2>
 void inclusive_scan_by_key(const Vector1& keys, const Vector2& in, Vector2& out,
-                           typename Vector2::index_type size) {
-  Impl::inclusive_scan_by_key<ExecSpace>(in, out, size, typename Vector1::tag{},
-                                         typename Vector2::tag{},
-                                         typename Vector2::tag{}, Algorithm{});
+                           typename Vector2::index_type size,
+                           typename Vector2::index_type start = 0) {
+  Impl::inclusive_scan_by_key<ExecSpace>(
+      in, out, size, start, typename Vector1::tag{}, typename Vector2::tag{},
+      typename Vector2::tag{}, Algorithm{});
 }
 
 template <typename ExecSpace, typename Vector1, typename Vector2>
 void inclusive_scan_by_key(const Vector1& keys, const Vector2& in, Vector2& out,
-                           typename Vector2::index_type size) {
+                           typename Vector2::index_type size,
+                           typename Vector2::index_type start = 0) {
   Impl::inclusive_scan_by_key<ExecSpace>(
-      keys, in, out, size, typename Vector1::tag{}, typename Vector2::tag{},
-      typename Vector2::tag{}, Alg0{});
+      keys, in, out, size, start, typename Vector1::tag{},
+      typename Vector2::tag{}, typename Vector2::tag{}, Alg0{});
 }
 
 /*
@@ -176,18 +182,20 @@ void inclusive_scan_by_key(const Vector1& keys, const Vector2& in, Vector2& out,
 template <typename ExecSpace, typename Algorithm, typename Vector1,
           typename Vector2>
 void exclusive_scan_by_key(const Vector1& keys, const Vector2& in, Vector2& out,
-                           typename Vector2::index_type size) {
-  Impl::exclusive_scan_by_key<ExecSpace>(in, out, size, typename Vector1::tag{},
-                                         typename Vector2::tag{},
-                                         typename Vector2::tag{}, Algorithm{});
+                           typename Vector2::index_type size,
+                           typename Vector2::index_type start = 0) {
+  Impl::exclusive_scan_by_key<ExecSpace>(
+      in, out, size, start, typename Vector1::tag{}, typename Vector2::tag{},
+      typename Vector2::tag{}, Algorithm{});
 }
 
 template <typename ExecSpace, typename Vector1, typename Vector2>
 void exclusive_scan_by_key(const Vector1& keys, const Vector2& in, Vector2& out,
-                           typename Vector2::index_type size) {
+                           typename Vector2::index_type size,
+                           typename Vector2::index_type start = 0) {
   Impl::exclusive_scan_by_key<ExecSpace>(
-      keys, in, out, size, typename Vector1::tag{}, typename Vector2::tag{},
-      typename Vector2::tag{}, Alg0{});
+      keys, in, out, size, start, typename Vector1::tag{},
+      typename Vector2::tag{}, typename Vector2::tag{}, Alg0{});
 }
 
 }  // namespace Morpheus

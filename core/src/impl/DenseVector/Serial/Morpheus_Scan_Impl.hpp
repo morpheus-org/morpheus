@@ -34,7 +34,7 @@ namespace Impl {
 template <typename ExecSpace, typename Vector>
 void inclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    DenseVectorTag, DenseVectorTag, Alg0,
+    typename Vector::index_type start, DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
@@ -42,8 +42,8 @@ void inclusive_scan(
         nullptr) {
   using IndexType = typename Vector::index_type;
 
-  out[0] = in[0];
-  for (IndexType i = 1; i < size; i++) {
+  out[start] = in[start];
+  for (IndexType i = start + 1; i < start + size; i++) {
     out[i] = out[i - 1] + in[i];
   }
 }
@@ -51,7 +51,7 @@ void inclusive_scan(
 template <typename ExecSpace, typename Vector>
 void exclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    DenseVectorTag, DenseVectorTag, Alg0,
+    typename Vector::index_type start, DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
@@ -61,8 +61,8 @@ void exclusive_scan(
   using ValueType = typename Vector::value_type;
 
   if (size > 0) {
-    out[0] = ValueType(0);
-    for (IndexType i = 1; i < size; i++) {
+    out[start] = ValueType(0);
+    for (IndexType i = start + 1; i < start + size; i++) {
       out[i] = out[i - 1] + in[i - 1];
     }
   }
@@ -71,8 +71,8 @@ void exclusive_scan(
 template <typename ExecSpace, typename Vector1, typename Vector2>
 void inclusive_scan_by_key(
     const Vector1& keys, const Vector2& in, Vector2& out,
-    typename Vector2::index_type size, DenseVectorTag, DenseVectorTag,
-    DenseVectorTag, Alg0,
+    typename Vector2::index_type size, typename Vector2::index_type start,
+    DenseVectorTag, DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
@@ -82,11 +82,11 @@ void inclusive_scan_by_key(
   using KeyType   = typename Vector1::value_type;
   using ValueType = typename Vector2::value_type;
 
-  KeyType prev_key     = keys[0];
-  ValueType prev_value = in[0];
-  out[0]               = in[0];
+  KeyType prev_key     = keys[start];
+  ValueType prev_value = in[start];
+  out[start]           = in[start];
 
-  for (IndexType i = 1; i < size; i++) {
+  for (IndexType i = start + 1; i < start + size; i++) {
     KeyType key = keys[i];
 
     if (prev_key == key)
@@ -101,8 +101,8 @@ void inclusive_scan_by_key(
 template <typename ExecSpace, typename Vector1, typename Vector2>
 void exclusive_scan_by_key(
     const Vector1& keys, const Vector2& in, Vector2& out,
-    typename Vector2::index_type size, DenseVectorTag, DenseVectorTag,
-    DenseVectorTag, Alg0,
+    typename Vector2::index_type size, typename Vector2::index_type start,
+    DenseVectorTag, DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
@@ -112,15 +112,15 @@ void exclusive_scan_by_key(
   using KeyType   = typename Vector1::value_type;
   using ValueType = typename Vector2::value_type;
 
-  KeyType temp_key     = keys[0];
-  ValueType temp_value = in[0];
+  KeyType temp_key     = keys[start];
+  ValueType temp_value = in[start];
   ValueType next       = ValueType(0);
 
   // first one is init
-  out[0] = next;
-  next   = next + temp_value;
+  out[start] = next;
+  next       = next + temp_value;
 
-  for (IndexType i = 1; i < size; i++) {
+  for (IndexType i = start + 1; i < start + size; i++) {
     KeyType key = keys[i];
 
     // use temp to permit in-place scans
