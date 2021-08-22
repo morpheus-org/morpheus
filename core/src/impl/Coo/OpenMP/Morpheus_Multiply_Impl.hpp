@@ -103,9 +103,6 @@ inline void multiply(
     const IndexType start = _split_work(A.nnnz(), nthreads, tid);
     const IndexType stop  = _split_work(A.nnnz(), nthreads, tid + 1);
     const IndexType last  = stop - 1;
-#pragma omp critical
-    std::cout << "[" << tid << "/" << nthreads << "]"
-              << " (" << start << "," << stop << ")" << std::endl;
 
     // multiply value arrays with the corresponding vector values
     // indexed by the colum_indices array;
