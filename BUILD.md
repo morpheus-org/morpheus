@@ -85,9 +85,18 @@ $ make install
 ```sh
 $ module load cmake
 $ module load intel-20.4/compilers
+$ module swap gcc/6.3.0 gcc/10.2.0
 $ CXX_COMPILER=/lustre/sw/intel/compilers_and_libraries_2020.4.304/linux/bin/intel64/icpc
 $ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/intel
 $ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/intel
+```
+### Setup environment - GNU
+```sh
+$ module load cmake
+$ module load gcc/10.2.0
+$ CXX_COMPILER=/lustre/sw/gcc/10.2.0/bin/g++
+$ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/gnu
+$ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/gnu
 ```
 
 ### Installing Kokkos
