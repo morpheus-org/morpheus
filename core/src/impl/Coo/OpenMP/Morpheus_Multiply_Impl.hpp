@@ -32,35 +32,12 @@
 #include <Morpheus_AlgorithmTags.hpp>
 #include <Morpheus_Scan.hpp>
 
+#include <impl/Morpheus_OpenMPUtils.hpp>
+
 #include <limits>
 
 namespace Morpheus {
 namespace Impl {
-
-template <typename T>
-T _split_work(const T load, const T workers, const T worker_id) {
-  const T unifload = load / workers;  // uniform distribution
-  const T rem      = load - unifload * workers;
-  T bound;
-
-  //  round-robin assignment of the remaining work
-  if (worker_id <= rem) {
-    bound = (unifload + 1) * worker_id;
-  } else {
-    bound = (unifload + 1) * rem + unifload * (worker_id - rem);
-  }
-
-  return bound;
-}
-
-template <typename T>
-T threads() {
-  T t = 1;
-#pragma omp parallel
-  { t = omp_get_num_threads(); }
-
-  return t;
-}
 
 template <typename T>
 int is_row_stop(T container, typename T::index_type start_idx,
@@ -98,7 +75,6 @@ inline void multiply(
 
     // evenly divide workload based on nnz elements
     // each workgroup is assigned to one thread
-    const IndexType chunk = A.nnnz() / nthreads;
     const IndexType start = _split_work(A.nnnz(), nthreads, tid);
     const IndexType stop  = _split_work(A.nnnz(), nthreads, tid + 1);
     const IndexType last  = stop - 1;
