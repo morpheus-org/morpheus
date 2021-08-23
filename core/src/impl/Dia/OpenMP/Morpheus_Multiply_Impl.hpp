@@ -46,23 +46,23 @@ inline void multiply(
                                LinearOperator, MatrixOrVector1,
                                MatrixOrVector2>>* = nullptr) {
   using IndexType       = typename LinearOperator::index_type;
+  using ValueType       = typename LinearOperator::value_type;
   const IndexType ndiag = A.values.ncols();
 
-  for (IndexType i = 0; i < A.nrows(); i++) y[i] = 0;
-
 #pragma omp parallel for
-  for (IndexType i = 0; i < ndiag; i++) {
-    const IndexType k = A.diagonal_offsets[i];
+  for (IndexType row = 0; row < A.nrows(); row++) {
+    ValueType sum = ValueType(0);
 
-    const IndexType i_start = std::max<IndexType>(0, -k);
-    const IndexType j_start = std::max<IndexType>(0, k);
+    for (IndexType n = 0; n < ndiag; n++) {
+      const IndexType col = row + A.diagonal_offsets[n];
 
-    // number of elements to process in this diagonal
-    const IndexType N = std::min(A.nrows() - i_start, A.ncols() - j_start);
-
-    for (IndexType n = 0; n < N; n++) {
-      y[i_start + n] += A.values(i_start + n, i) * x[j_start + n];
+      if (col >= 0 && col < A.ncols()) {
+        // FIXME: Inefficient accesses to A as it is forced to be column major
+        // due to deep copy
+        sum += A.values(row, n) * x[col];
+      }
     }
+    y[row] = sum;
   }
 }
 

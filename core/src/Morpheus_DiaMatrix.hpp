@@ -60,8 +60,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
-  using index_array_type    = Morpheus::vector<index_type, index_type,
-                                            Kokkos::LayoutRight, device_type>;
+  using index_array_type =
+      Morpheus::vector<index_type, index_type, device_type>;
   using index_array_pointer = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
