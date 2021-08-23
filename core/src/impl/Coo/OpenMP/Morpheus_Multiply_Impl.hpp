@@ -81,7 +81,6 @@ inline void multiply(
                                MatrixOrVector2>>* = nullptr) {
   using ValueType = typename LinearOperator::value_type;
   using IndexType = typename LinearOperator::index_type;
-  using KeyType   = typename LinearOperator::index_type;
   using vector    = MatrixOrVector1;
 
   if (A.nnnz() < threads<IndexType>()) {

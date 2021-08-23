@@ -31,7 +31,6 @@ namespace Impl {
 
 template <typename Printable, typename Stream>
 void print_matrix_header(const Printable& p, Stream& s) {
-  using IndexType = typename Printable::index_type;
   s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
     << p.nnnz() << " entries\n";
 }

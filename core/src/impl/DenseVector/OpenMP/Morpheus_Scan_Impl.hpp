@@ -37,7 +37,7 @@ namespace Impl {
 template <typename ExecSpace, typename Vector>
 void inclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    DenseVectorTag, DenseVectorTag, Alg0,
+    typename Vector::index_type start, DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
@@ -46,20 +46,24 @@ void inclusive_scan(
   using IndexType = typename Vector::index_type;
   using ValueType = typename Vector::value_type;
 
+#if _OPENMP >= 201511
   ValueType initial = 0;
 // TODO: Scan semantics require OpenMP5
 #pragma omp simd reduction(inscan, + : initial)
-  for (IndexType i = 0; i < size; i++) {
+  for (IndexType i = start; i < size; i++) {
     initial += in[i];
 #pragma omp scan inclusive(initial)
     out[i] = initial;
   }
+#else
+  static_assert("Requires OpenMP4.5 and above");
+#endif
 }
 
 template <typename ExecSpace, typename Vector>
 void exclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    DenseVectorTag, DenseVectorTag, Alg0,
+    typename Vector::index_type start, DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
@@ -68,17 +72,21 @@ void exclusive_scan(
   using IndexType = typename Vector::index_type;
   using ValueType = typename Vector::value_type;
 
+#if _OPENMP >= 201511
   if (size > 0) {
     ValueType initial = 0;
     // TODO: Scan semantics require OpenMP5
 #pragma omp simd reduction(inscan, + : initial)
-    for (IndexType i = 0; i < size - 1; i++) {
+    for (IndexType i = start; i < size - 1; i++) {
       out[i] = initial;
 #pragma omp scan exclusive(initial)
       initial += in[i];
     }
     out[size - 1] = initial;
   }
+#else
+  static_assert("Requires OpenMP4.5 and above");
+#endif
 }
 
 }  // namespace Impl

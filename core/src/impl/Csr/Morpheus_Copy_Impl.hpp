@@ -32,8 +32,6 @@ namespace Impl {
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, CsrTag, CsrTag) {
-  using IndexType = typename SourceType::index_type;
-
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
   Morpheus::copy(src.row_offsets, dst.row_offsets);

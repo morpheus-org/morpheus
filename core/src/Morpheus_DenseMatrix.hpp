@@ -129,7 +129,6 @@ class DenseMatrix
   inline void assign(index_type num_rows, index_type num_cols,
                      const value_type val) {
     /* Resize if necessary */
-    using I = index_type;
     this->resize(num_rows, num_cols);
 
     set_functor f(_values, val, num_cols);
