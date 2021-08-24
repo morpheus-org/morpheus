@@ -43,13 +43,15 @@
 #include <Morpheus_Print.hpp>
 #include <Morpheus_Sort.hpp>
 #include <Morpheus_Scan.hpp>
+#include <Morpheus_Dot.hpp>
+#include <Morpheus_WAXPBY.hpp>
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_KokkosSpace.hpp>
 
 #include <Morpheus_MatrixMarket.hpp>
 
-#include <impl/DenseVector/Cuda/Morpheus_Elementwise_Impl.hpp>
+// #include <impl/DenseVector/Cuda/Morpheus_Elementwise_Impl.hpp>
 
 namespace Morpheus {
 
