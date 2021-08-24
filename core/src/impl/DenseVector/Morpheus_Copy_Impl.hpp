@@ -42,7 +42,7 @@ void copy(const SourceType& src, DestinationType& dst, DenseVectorTag,
           DenseVectorTag) {
   dst.resize(src.size());
   // Kokkos has src and dst the other way round
-  Kokkos::deep_copy(dst.view(), src.view());
+  Kokkos::deep_copy(dst.view(), src.const_view());
 }
 
 }  // namespace Impl

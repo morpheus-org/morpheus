@@ -33,13 +33,16 @@ namespace Impl {
 
 template <typename ValueArray, typename IndexArray>
 struct csr_spmv_inner_functor {
-  ValueArray values, x_view, y_view;
-  IndexArray column_indices, row_offsets;
+  const ValueArray values, x_view;
+  const IndexArray column_indices, row_offsets;
+  ValueArray y_view;
+
   using V = typename ValueArray::value_type;
   using I = typename IndexArray::value_type;
 
-  csr_spmv_inner_functor(IndexArray _row_offsets, IndexArray _column_indices,
-                         ValueArray _values, ValueArray _x_view,
+  csr_spmv_inner_functor(const IndexArray _row_offsets,
+                         const IndexArray _column_indices,
+                         const ValueArray _values, const ValueArray _x_view,
                          ValueArray _y_view)
       : row_offsets(_row_offsets),
         column_indices(_column_indices),
@@ -73,9 +76,9 @@ inline void multiply(
   range_policy policy(0, A.nrows());
 
   Kokkos::parallel_for(
-      policy,
-      csr_spmv_inner_functor(A.row_offsets.view(), A.column_indices.view(),
-                             A.values.view(), x.view(), y.view()));
+      policy, csr_spmv_inner_functor(
+                  A.row_offsets.const_view(), A.column_indices.const_view(),
+                  A.values.const_view(), x.const_view(), y.view()));
 }
 
 }  // namespace Impl

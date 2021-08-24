@@ -144,7 +144,8 @@ class DenseVector
   inline index_type size() const { return _size; }
 
   inline value_array_pointer data() const { return _values.data(); }
-  inline const value_array_type& view() const { return _values; }
+  inline value_array_type& view() { return _values; }
+  inline const value_array_type& const_view() const { return _values; }
 
   // Modifiers
   inline void resize(index_type n) {
