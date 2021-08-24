@@ -31,34 +31,6 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ValueArray, typename IndexArray>
-struct csr_spmv_inner_functor {
-  const ValueArray values, x_view;
-  const IndexArray column_indices, row_offsets;
-  ValueArray y_view;
-
-  using V = typename ValueArray::value_type;
-  using I = typename IndexArray::value_type;
-
-  csr_spmv_inner_functor(const IndexArray _row_offsets,
-                         const IndexArray _column_indices,
-                         const ValueArray _values, const ValueArray _x_view,
-                         ValueArray _y_view)
-      : row_offsets(_row_offsets),
-        column_indices(_column_indices),
-        values(_values),
-        x_view(_x_view),
-        y_view(_y_view) {}
-
-  KOKKOS_INLINE_FUNCTION
-  void operator()(const I& i) const {
-    V sum = y_view[i];
-    for (I jj = row_offsets[i]; jj < row_offsets[i + 1]; jj++) {
-      sum += values[jj] * x_view[column_indices[jj]];
-    }
-    y_view[i] = sum;
-  }
-};
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
 inline void multiply(
@@ -72,13 +44,28 @@ inline void multiply(
   using execution_space = typename ExecSpace::execution_space;
   using index_type   = Kokkos::IndexType<typename LinearOperator::index_type>;
   using range_policy = Kokkos::RangePolicy<index_type, execution_space>;
+  using ValueArray =
+      typename LinearOperator::value_array_type::value_array_type;
+  using IndexArray =
+      typename LinearOperator::index_array_type::value_array_type;
+  using V = typename ValueArray::value_type;
+  using I = typename IndexArray::value_type;
+
+  const ValueArray values = A.values.const_view(), x_view = x.const_view();
+  const IndexArray column_indices = A.column_indices.const_view(),
+                   row_offsets    = A.row_offsets.const_view();
+  ValueArray y_view               = y.view();
 
   range_policy policy(0, A.nrows());
 
   Kokkos::parallel_for(
-      policy, csr_spmv_inner_functor(
-                  A.row_offsets.const_view(), A.column_indices.const_view(),
-                  A.values.const_view(), x.const_view(), y.view()));
+      policy, KOKKOS_LAMBDA(const I i) {
+        V sum = y_view[i];
+        for (I jj = row_offsets[i]; jj < row_offsets[i + 1]; jj++) {
+          sum += values[jj] * x_view[column_indices[jj]];
+        }
+        y_view[i] = sum;
+      });
 }
 
 }  // namespace Impl
