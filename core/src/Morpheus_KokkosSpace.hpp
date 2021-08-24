@@ -42,6 +42,18 @@ struct KokkosSpace {
   using device_type     = typename Space::device_type;
 };
 
+#if defined(MORPHEUS_ENABLE_SERIAL)
+using Serial = Morpheus::KokkosSpace<Kokkos::Serial>;
+#endif
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+using OpenMP = Morpheus::KokkosSpace<Kokkos::OpenMP>;
+#endif
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+using Cuda = Morpheus::KokkosSpace<Kokkos::Cuda>;
+#endif
+
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_KOKKOSSPACE_HPP

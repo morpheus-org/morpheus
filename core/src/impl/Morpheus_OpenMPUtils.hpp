@@ -46,7 +46,7 @@ T _split_work(const T load, const T workers, const T worker_id) {
   return bound;
 }
 
-template <typename T>
+template <typename T = int>
 T threads() {
   T t = 1;
 #pragma omp parallel
