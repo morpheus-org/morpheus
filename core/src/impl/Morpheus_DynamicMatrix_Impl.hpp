@@ -109,7 +109,7 @@ struct any_type_allocate {
   result_type operator()(
       const T1 &src, T2 &dst,
       typename std::enable_if<std::is_same<T1, T2>::value>::type * = nullptr) {
-    dst = T1().allocate("skata", src);
+    dst = T1().allocate("from" + src.name(), src);
   }
 
   template <typename T1, typename T2>
@@ -117,8 +117,8 @@ struct any_type_allocate {
       const T1 &src, T2 &dst,
       typename std::enable_if<!std::is_same<T1, T2>::value>::type * = nullptr) {
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic allocate interface. Src type and dst type "
-        "must be the same");
+        "Invalid use of the dynamic allocate interface. Src type " +
+        src.name() + " and dst type " + dst.name() + " must be the same");
   }
 };
 

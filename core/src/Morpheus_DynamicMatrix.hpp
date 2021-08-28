@@ -167,9 +167,9 @@ class DynamicMatrix
           * = nullptr) {
     this->set_name(name);
     base::resize(src.nrows(), src.ncols(), src.nnnz());
-    auto f = std::bind(Impl::any_type_allocate(), std::cref(src),
+    auto f   = std::bind(Impl::any_type_allocate(), std::cref(src),
                        std::placeholders::_1);
-
+    _formats = Matrix();  // switch to src format
     std::visit(f, _formats);
 
     return *this;
