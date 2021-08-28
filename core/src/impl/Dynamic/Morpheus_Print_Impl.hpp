@@ -55,10 +55,7 @@ template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, DynamicTag) {
   print_matrix_header(p, s);
   // TODO: Using a stream in this way doesn't seem to work
-  // std::visit(std::bind(Impl::print_fn(), std::placeholders::_1,
-  // std::ref(s)),
-  //            p.formats());
-  std::visit(Impl::print_fn(), p.formats());
+  std::visit([&](auto&& arg) { Morpheus::print(arg); }, p.const_formats());
 }
 
 }  // namespace Impl

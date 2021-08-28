@@ -32,7 +32,7 @@ namespace Morpheus {
 template <typename ExecSpace, typename Algorithm, typename LinearOperator,
           typename MatrixOrVector1, typename MatrixOrVector2>
 inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-                     MatrixOrVector2& y) {
+                     MatrixOrVector2& y, Algorithm) {
   Impl::multiply<ExecSpace>(A, x, y, typename LinearOperator::tag{},
                             typename MatrixOrVector1::tag{},
                             typename MatrixOrVector2::tag{}, Algorithm{});

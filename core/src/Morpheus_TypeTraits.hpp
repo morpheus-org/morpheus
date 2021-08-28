@@ -109,9 +109,14 @@ template <typename Tag>
 inline constexpr bool is_vector_v = is_vector<Tag>::value;
 
 template <typename T1, typename T2>
+struct is_same_format
+    : std::integral_constant<
+          bool, std::is_same<typename T1::tag, typename T2::tag>::value> {};
+
+template <typename T1, typename T2>
 struct is_compatible_type
     : std::integral_constant<
-          bool, std::is_same<typename T1::tag, typename T2::tag>::value &&
+          bool, is_same_format<T1, T2>::value &&
                     std::is_same<typename T1::memory_space,
                                  typename T2::memory_space>::value &&
                     std::is_same<typename T1::value_type,
@@ -122,7 +127,7 @@ struct is_compatible_type
 template <typename T1, typename T2>
 struct is_compatible_from_different_space
     : std::integral_constant<
-          bool, std::is_same<typename T1::tag, typename T2::tag>::value &&
+          bool, is_same_format<T1, T2>::value &&
                     !std::is_same<typename T1::memory_space,
                                   typename T2::memory_space>::value &&
                     std::is_same<typename T1::value_type,

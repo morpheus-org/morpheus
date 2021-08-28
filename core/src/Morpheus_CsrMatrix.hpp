@@ -140,12 +140,10 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
     return *this;
   }
 
-  // !FIXME: Needs to perform conversion
   // Construct from another matrix type
   template <typename MatrixType>
   CsrMatrix(const MatrixType &src) = delete;
 
-  // !FIXME: Needs to perform conversion
   // Assignment from another matrix type
   template <typename MatrixType>
   reference operator=(const MatrixType &src) = delete;

@@ -79,43 +79,67 @@ class DynamicMatrix
 
   template <typename Matrix>
   inline DynamicMatrix(
-      const Matrix &mat,
+      const Matrix &src,
       typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
-          * = 0)
-      : base("DynamicMatrix", mat.nrows(), mat.ncols(), mat.nnnz()),
-        _formats(mat) {}
+          * = nullptr)
+      : base("DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()),
+        _formats(src) {}
 
   template <typename Matrix>
   inline DynamicMatrix(
-      const std::string name, const Matrix &mat,
+      const std::string name, const Matrix &src,
       typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
-          * = 0)
-      : base(name + "DynamicMatrix", mat.nrows(), mat.ncols(), mat.nnnz()),
-        _formats(mat) {}
+          * = nullptr)
+      : base(name + "DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()),
+        _formats(src) {}
+
+  // Assignment from another matrix type
+  template <typename Matrix>
+  typename std::enable_if<is_variant_member_v<Matrix, variant_type>,
+                          DynamicMatrix &>::type
+  operator=(const Matrix &matrix) {
+    _formats = matrix;
+    return *this;
+  }
+
+  // template <typename Matrix>
+  // inline DynamicMatrix(
+  //     const std::string name, const Matrix &src,
+  //     typename std::enable_if<is_variant_member_v<Matrix,
+  //     variant_type>>::type
+  //         * = nullptr)
+  //     : base(name + "DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()),
+  //       _formats(src) {}
 
   // !CHECK_IF_VALID
   // !FIXME: Remove deep copy and perform shallow copy
   // Construct from another matrix type
   template <class VR, class... PR>
-  DynamicMatrix(const DynamicMatrix<VR, PR...> &matrix) {
-    Morpheus::copy(matrix, *this);
-  }
+  DynamicMatrix(
+      const DynamicMatrix<VR, PR...> &src,
+      typename std::enable_if<is_compatible_type<
+          DynamicMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr)
+      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
+             src.nnnz()),
+        _formats(src.formats()) {}
 
-  // !CHECK_IF_VALID
-  // !FIXME: Remove deep copy and perform shallow copy
-  // Assignment from another matrix type
-  template <class VR, class... PR>
-  reference operator=(const DynamicMatrix<VR, PR...> &matrix) {
-    Morpheus::copy(matrix, *this);
-    return *this;
-  }
-
-  // Assignment from another matrix type
-  template <typename Matrix>
-  reference operator=(const Matrix &matrix) {
-    activate(matrix);
-    return *this;
-  }
+  // // !CHECK_IF_VALID
+  // // !FIXME: Remove deep copy and perform shallow copy
+  // // Assignment from another matrix type
+  // template <class VR, class... PR>
+  // typename std::enable_if<
+  //     is_compatible_type<DynamicMatrix, DynamicMatrix<VR, PR...>>::value,
+  //     DynamicMatrix &>::type
+  // operator=(const DynamicMatrix<VR, PR...> &src) {
+  //   if (this != &src) {
+  //     set_name(src.name());
+  //     set_nrows(src.nrows());
+  //     set_ncols(src.ncols());
+  //     set_nnnz(src.nnnz());
+  //     _formats = src.formats();
+  //   }
+  //   return *this;
+  // }
 
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
@@ -127,19 +151,35 @@ class DynamicMatrix
     return std::visit(f, _formats);
   }
 
+  // template <class VR, class... PR>
+  // inline DynamicMatrix &allocate(const std::string name,
+  //                                const DynamicMatrix<VR, PR...> &src) {
+  //   this->set_name(name);
+  //   base::resize(src.nrows(), src.ncols(), src.nnnz());
+  //   auto f   = std::bind(Impl::any_type_allocate(), std::placeholders::_1,
+  //   src); _formats = std::visit(f, _formats); return *this;
+  // }
+
+  template <typename Matrix>
+  inline DynamicMatrix &allocate(
+      const std::string name, const Matrix &src,
+      typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
+          * = nullptr) {
+    this->set_name(name);
+    base::resize(src.nrows(), src.ncols(), src.nnnz());
+    auto f = std::bind(Impl::any_type_allocate(), std::cref(src),
+                       std::placeholders::_1);
+
+    std::visit(f, _formats);
+
+    return *this;
+  }
+
   inline std::string active_name() const {
     return std::visit(Impl::any_type_get_name(), _formats);
   }
 
   inline int active_index() const { return _formats.index(); }
-
-  template <typename MatrixType>
-  inline void activate(
-      const MatrixType &,
-      typename std::enable_if<
-          is_variant_member_v<MatrixType, variant_type>>::type * = 0) {
-    _formats = MatrixType();
-  }
 
   inline void activate(const formats_e index) {
     constexpr int size = std::variant_size_v<
@@ -161,23 +201,23 @@ class DynamicMatrix
     activate(static_cast<formats_e>(index));
   }
 
-  template <typename MatrixType>
-  inline void convert(const MatrixType &matrix) {
-    _formats = matrix;
-  }
+  // template <typename MatrixType>
+  // inline void convert(const MatrixType &matrix) {
+  //   _formats = matrix;
+  // }
 
-  inline void convert(const formats_e index) {
-    Morpheus::CooMatrix<ValueType, Properties...> temp;
-    Morpheus::copy(*this, temp);
-    activate(index);
-    Morpheus::copy(temp, *this);
-  }
+  // inline void convert(const formats_e index) {
+  //   Morpheus::CooMatrix<ValueType, Properties...> temp;
+  //   Morpheus::copy(*this, temp);
+  //   activate(index);
+  //   Morpheus::copy(temp, *this);
+  // }
 
-  inline void convert(const int index) {
-    convert(static_cast<formats_e>(index));
-  }
+  // inline void convert(const int index) {
+  //   convert(static_cast<formats_e>(index));
+  // }
 
-  inline const variant_type &formats() const { return _formats; }
+  inline const variant_type &const_formats() const { return _formats; }
   inline variant_type &formats() { return _formats; }
 
  private:

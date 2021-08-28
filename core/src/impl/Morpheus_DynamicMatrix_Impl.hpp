@@ -102,6 +102,26 @@ struct any_type_resize
   }
 };
 
+struct any_type_allocate {
+  using result_type = void;
+
+  template <typename T1, typename T2>
+  result_type operator()(
+      const T1 &src, T2 &dst,
+      typename std::enable_if<std::is_same<T1, T2>::value>::type * = nullptr) {
+    dst = T1().allocate("skata", src);
+  }
+
+  template <typename T1, typename T2>
+  result_type operator()(
+      const T1 &src, T2 &dst,
+      typename std::enable_if<!std::is_same<T1, T2>::value>::type * = nullptr) {
+    throw Morpheus::RuntimeException(
+        "Invalid use of the dynamic allocate interface. Src type and dst type "
+        "must be the same");
+  }
+};
+
 struct any_type_get_name {
   using result_type = std::string;
   template <typename T>
