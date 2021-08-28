@@ -25,9 +25,8 @@
 #define MORPHEUS_DENSEVECTOR_CONVERT_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_Copy.hpp>
 
-#include <Kokkos_Core.hpp>
+#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 
 namespace Morpheus {
 

@@ -26,16 +26,11 @@
 
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
+#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 
 #include <variant>
 
 namespace Morpheus {
-// forward decl
-template <typename ExecSpace, typename Algorithm, typename LinearOperator,
-          typename MatrixOrVector1, typename MatrixOrVector2>
-inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-                     MatrixOrVector2& y, Algorithm);
-
 namespace Impl {
 
 template <typename ExecSpace, typename Algorithm, typename LinearOperator,

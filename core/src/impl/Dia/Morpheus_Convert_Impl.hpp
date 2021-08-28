@@ -25,7 +25,8 @@
 #define MORPHEUS_DIA_CONVERT_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_Copy.hpp>
+
+#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 
 // TODO: Remove use of set during Coo to Dia Conversion
 #include <set>

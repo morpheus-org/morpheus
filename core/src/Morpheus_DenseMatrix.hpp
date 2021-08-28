@@ -157,6 +157,7 @@ class DenseMatrix
   inline value_array_pointer data() const { return _values.data(); }
   inline const value_array_type &view() const { return _values; }
 
+ private:
   value_array_type _values;
 
  public:

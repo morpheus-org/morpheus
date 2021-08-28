@@ -1,5 +1,5 @@
 /**
- * Morpheus_Copy_Impl.hpp
+ * Morpheus_Fwd_Sort.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,25 +21,20 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_COO_COPY_IMPL_HPP
-#define MORPHEUS_COO_COPY_IMPL_HPP
-
-#include <Morpheus_FormatTags.hpp>
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
+#ifndef MORPHEUS_FWD_SORT_HPP
+#define MORPHEUS_FWD_SORT_HPP
 
 namespace Morpheus {
-namespace Impl {
 
-template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, CooTag, CooTag) {
-  dst.resize(src.nrows(), src.ncols(), src.nnnz());
+template <typename Matrix>
+void sort_by_row_and_column(Matrix& mat, typename Matrix::index_type min_row,
+                            typename Matrix::index_type max_row,
+                            typename Matrix::index_type min_col,
+                            typename Matrix::index_type max_col);
 
-  Morpheus::copy(src.row_indices, dst.row_indices);
-  Morpheus::copy(src.column_indices, dst.column_indices);
-  Morpheus::copy(src.values, dst.values);
-}
+template <typename Matrix>
+bool is_sorted(Matrix& mat);
 
-}  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_COO_COPY_IMPL_HPP
+#endif  // MORPHEUS_FWD_SORT_HPP

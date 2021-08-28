@@ -26,15 +26,14 @@
 
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_TypeTraits.hpp>
+#include <fwd/Morpheus_Fwd_Algorithms.hpp>
+
 #include <variant>
 
 namespace Morpheus {
-
-// forward decl
-template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst);
-
 namespace Impl {
+
 struct copy_fn {
   using result_type = void;
 
@@ -42,9 +41,9 @@ struct copy_fn {
   result_type operator()(
       const SourceType& src, DestinationType& dst,
       typename std::enable_if<
-          std::is_same<typename SourceType::tag,
-                       typename DestinationType::tag>::value>::type* =
-          nullptr) {
+          is_compatible_type<SourceType, DestinationType>::value ||
+          is_compatible_from_different_space<
+              SourceType, DestinationType>::value>::type* = nullptr) {
     Morpheus::copy(src, dst);
   }
 
@@ -53,12 +52,15 @@ struct copy_fn {
   result_type operator()(
       const SourceType& src, DestinationType& dst,
       typename std::enable_if<
-          !std::is_same<typename SourceType::tag,
-                        typename DestinationType::tag>::value>::type* =
-          nullptr) {
+          !(is_compatible_type<SourceType, DestinationType>::value ||
+            is_compatible_from_different_space<
+                SourceType, DestinationType>::value)>::type* = nullptr) {
     throw Morpheus::FormatConversionException(
         "Morpheus::copy() is only available between the same container types. "
-        "Please use Morpheus::convert() instead to perform conversions between "
+        "(" +
+        src.name() + " != " + dst.name() + ")" +
+        "Please use Morpheus::convert() instead to perform conversions "
+        "between "
         "different types.");
   }
 };
@@ -67,7 +69,7 @@ template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DynamicTag,
           SparseMatTag) {
   auto f = std::bind(Impl::copy_fn(), std::placeholders::_1, std::ref(dst));
-  std::visit(f, src.formats());
+  std::visit(f, src.const_formats());
 }
 
 template <typename SourceType, typename DestinationType>
@@ -79,7 +81,7 @@ void copy(const SourceType& src, DestinationType& dst, SparseMatTag,
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DynamicTag, DynamicTag) {
-  std::visit(Impl::copy_fn(), src.formats(), dst.formats());
+  std::visit(Impl::copy_fn(), src.const_formats(), dst.formats());
 }
 
 }  // namespace Impl

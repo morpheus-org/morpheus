@@ -1,5 +1,5 @@
 /**
- * Morpheus_Copy_Impl.hpp
+ * Morpheus_Fwd_Containers.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,25 +21,15 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_COO_COPY_IMPL_HPP
-#define MORPHEUS_COO_COPY_IMPL_HPP
+#ifndef MORPHEUS_FWD_CONTAINERS_HPP
+#define MORPHEUS_FWD_CONTAINERS_HPP
 
-#include <Morpheus_FormatTags.hpp>
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
+#include <fwd/containers/Morpheus_Fwd_MatrixBase.hpp>
+#include <fwd/containers/Morpheus_Fwd_CooMatrix.hpp>
+#include <fwd/containers/Morpheus_Fwd_CsrMatrix.hpp>
+#include <fwd/containers/Morpheus_Fwd_DenseMatrix.hpp>
+#include <fwd/containers/Morpheus_Fwd_DenseVector.hpp>
+#include <fwd/containers/Morpheus_Fwd_DiaMatrix.hpp>
+#include <fwd/containers/Morpheus_Fwd_DynamicMatrix.hpp>
 
-namespace Morpheus {
-namespace Impl {
-
-template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, CooTag, CooTag) {
-  dst.resize(src.nrows(), src.ncols(), src.nnnz());
-
-  Morpheus::copy(src.row_indices, dst.row_indices);
-  Morpheus::copy(src.column_indices, dst.column_indices);
-  Morpheus::copy(src.values, dst.values);
-}
-
-}  // namespace Impl
-}  // namespace Morpheus
-
-#endif  // MORPHEUS_COO_COPY_IMPL_HPP
+#endif  // MORPHEUS_FWD_CONTAINERS_HPP

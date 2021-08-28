@@ -27,7 +27,7 @@
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_Copy.hpp>
+#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 
 namespace Morpheus {
 namespace Impl {

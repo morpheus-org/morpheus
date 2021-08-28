@@ -28,7 +28,6 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_DenseMatrix.hpp>
-#include <Morpheus_Copy.hpp>
 
 #include <impl/Morpheus_MatrixBase.hpp>
 #include <impl/Morpheus_Utils.hpp>

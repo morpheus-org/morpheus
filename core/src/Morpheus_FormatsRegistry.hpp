@@ -24,10 +24,7 @@
 #ifndef MORPHEUS_FORMATSREGISTRY_HPP
 #define MORPHEUS_FORMATSREGISTRY_HPP
 
-#include <Morpheus_CooMatrix.hpp>
-#include <Morpheus_CsrMatrix.hpp>
-#include <Morpheus_DiaMatrix.hpp>
-
+#include <fwd/Morpheus_Fwd_Containers.hpp>
 #include <impl/Morpheus_MatrixProxy.hpp>
 
 namespace Morpheus {

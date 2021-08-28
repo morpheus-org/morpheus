@@ -25,7 +25,7 @@
 #define MORPHEUS_CSR_COPY_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
-#include <impl/DenseVector/Morpheus_Copy_Impl.hpp>
+#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 
 namespace Morpheus {
 namespace Impl {

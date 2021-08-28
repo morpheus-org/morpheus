@@ -30,11 +30,6 @@
 #include <Kokkos_Core.hpp>
 
 namespace Morpheus {
-
-// forward decl
-template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst);
-
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>

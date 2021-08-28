@@ -25,17 +25,11 @@
 #define MORPHEUS_DYNAMIC_PRINT_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
+#include <fwd/Morpheus_Fwd_Algorithms.hpp>
+
 #include <variant>
 
 namespace Morpheus {
-
-// forward decl
-template <typename Printable>
-void print(const Printable& p);
-
-template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s);
-
 namespace Impl {
 
 struct print_fn {

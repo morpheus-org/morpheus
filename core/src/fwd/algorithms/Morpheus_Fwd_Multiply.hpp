@@ -1,5 +1,5 @@
 /**
- * Morpheus_Copy_Impl.hpp
+ * Morpheus_Fwd_Multiply.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,25 +21,21 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_COO_COPY_IMPL_HPP
-#define MORPHEUS_COO_COPY_IMPL_HPP
-
-#include <Morpheus_FormatTags.hpp>
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
+#ifndef MORPHEUS_FWD_MULTIPLY_HPP
+#define MORPHEUS_FWD_MULTIPLY_HPP
 
 namespace Morpheus {
-namespace Impl {
 
-template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, CooTag, CooTag) {
-  dst.resize(src.nrows(), src.ncols(), src.nnnz());
+template <typename ExecSpace, typename Algorithm, typename LinearOperator,
+          typename MatrixOrVector1, typename MatrixOrVector2>
+void multiply(const LinearOperator& A, const MatrixOrVector1& x,
+              MatrixOrVector2& y, Algorithm);
 
-  Morpheus::copy(src.row_indices, dst.row_indices);
-  Morpheus::copy(src.column_indices, dst.column_indices);
-  Morpheus::copy(src.values, dst.values);
-}
+template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
+          typename MatrixOrVector2>
+void multiply(const LinearOperator& A, const MatrixOrVector1& x,
+              MatrixOrVector2& y);
 
-}  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_COO_COPY_IMPL_HPP
+#endif  // MORPHEUS_FWD_MULTIPLY_HPP

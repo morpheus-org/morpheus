@@ -25,15 +25,13 @@
 #define MORPHEUS_DYNAMIC_CONVERT_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
+#include <fwd/Morpheus_Fwd_Algorithms.hpp>
+
 #include <variant>
 
 namespace Morpheus {
-
-// forward decl
-template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst);
-
 namespace Impl {
+
 struct convert_fn {
   using result_type = void;
 

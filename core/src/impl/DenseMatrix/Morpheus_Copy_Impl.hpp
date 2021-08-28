@@ -25,7 +25,8 @@
 #define MORPHEUS_DENSEMATRIX_COPY_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
-#include <impl/DenseVector/Morpheus_Copy_Impl.hpp>
+
+#include <Kokkos_Core.hpp>
 
 namespace Morpheus {
 namespace Impl {

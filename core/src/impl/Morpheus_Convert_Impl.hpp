@@ -26,7 +26,7 @@
 
 #include <Morpheus_FormatTags.hpp>
 
-#include <fwd/Morpheus_Fwd_CooMatrix.hpp>
+#include <fwd/Morpheus_Fwd_Containers.hpp>
 
 #include <impl/DenseVector/Morpheus_Convert_Impl.hpp>
 #include <impl/DenseMatrix/Morpheus_Convert_Impl.hpp>
