@@ -68,19 +68,31 @@ struct copy_fn {
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DynamicTag,
           SparseMatTag) {
-  auto f = std::bind(Impl::copy_fn(), std::placeholders::_1, std::ref(dst));
-  std::visit(f, src.const_formats());
+  if (std::holds_alternative<DestinationType>(src.const_formats())) {
+    auto f = std::bind(Impl::copy_fn(), std::placeholders::_1, std::ref(dst));
+    std::visit(f, src.const_formats());
+  } else {
+    throw Morpheus::FormatConversionException(
+        "Morpheus::copy() is only available between the same container types. "
+        "Active type of dynamic matrix (" +
+        src.active_name() + ") should match the type of destination matrix (" +
+        dst.name() +
+        "). Please use Morpheus::convert() instead to perform conversions "
+        "between different types.");
+  }
 }
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, SparseMatTag,
           DynamicTag) {
+  dst    = SourceType();
   auto f = std::bind(Impl::copy_fn(), std::cref(src), std::placeholders::_1);
   std::visit(f, dst.formats());
 }
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DynamicTag, DynamicTag) {
+  dst.activate(src.active_index());
   std::visit(Impl::copy_fn(), src.const_formats(), dst.formats());
 }
 
