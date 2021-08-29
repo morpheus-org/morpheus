@@ -30,8 +30,9 @@ namespace Test {
 // Checks that only allocation happened and values are not copied
 // (Mirror always lives on host here)
 TEST(TESTSUITE_NAME, Mirror_DiaMatrix_HostMirror) {
-  using container =
-      Morpheus::DiaMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+  using test_memory_space = typename TEST_EXECSPACE::memory_space;
+  using container  = Morpheus::DiaMatrix<float, long long, Kokkos::LayoutLeft,
+                                        test_memory_space>;
   using index_type = typename container::index_type;
 
   typename container::index_array_type diags(2, 1);
@@ -68,8 +69,9 @@ TEST(TESTSUITE_NAME, Mirror_DiaMatrix_HostMirror) {
 //  Shallow copy
 // Otherwise only allocation
 TEST(TESTSUITE_NAME, MirrorContainer_DiaMatrix_HostMirror) {
-  using container =
-      Morpheus::DiaMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+  using test_memory_space = typename TEST_EXECSPACE::memory_space;
+  using container  = Morpheus::DiaMatrix<float, long long, Kokkos::LayoutLeft,
+                                        test_memory_space>;
   using index_type = typename container::index_type;
 
   typename container::index_array_type diags(2, 1);
@@ -123,8 +125,9 @@ TEST(TESTSUITE_NAME, MirrorContainer_DiaMatrix_HostMirror) {
 // Checks that Shallow copy was performed for the mirror
 // (only check on host as otherwise will return access error)
 TEST(TESTSUITE_NAME, MirrorContainer_DiaMatrix_explicit_same_space) {
-  using container =
-      Morpheus::DiaMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+  using test_memory_space = typename TEST_EXECSPACE::memory_space;
+  using container  = Morpheus::DiaMatrix<float, long long, Kokkos::LayoutLeft,
+                                        test_memory_space>;
   using index_type = typename container::index_type;
 
   typename container::index_array_type diags(2, 1);
@@ -166,11 +169,13 @@ TEST(TESTSUITE_NAME, MirrorContainer_DiaMatrix_explicit_same_space) {
 // Checks shapes
 // If on host checks that only allocation happened and values are not copied
 TEST(TESTSUITE_NAME, Mirror_DiaMatrix_explicit_space) {
-  using container =
-      Morpheus::DiaMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+  using test_memory_space = typename TEST_EXECSPACE::memory_space;
+  using container    = Morpheus::DiaMatrix<float, long long, Kokkos::LayoutLeft,
+                                        test_memory_space>;
   using mirror_space = std::conditional_t<
-      Morpheus::is_Host_Memoryspace_v<typename TEST_EXECSPACE::memory_space>,
-      Kokkos::Cuda, Kokkos::DefaultHostExecutionSpace>;
+      Morpheus::is_Host_Memoryspace_v<test_memory_space>,
+      typename Kokkos::Cuda::memory_space,
+      typename Kokkos::DefaultHostExecutionSpace::memory_space>;
   using dst_type =
       Morpheus::DiaMatrix<typename container::value_type,
                           typename container::index_type,
@@ -209,11 +214,13 @@ TEST(TESTSUITE_NAME, Mirror_DiaMatrix_explicit_space) {
 // Creates a mirror container in other space from container
 // Checks types are the same for both mirror and container
 TEST(TESTSUITE_NAME, MirrorContainer_DiaMatrix_explicit_new_space) {
-  using container =
-      Morpheus::DiaMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+  using test_memory_space = typename TEST_EXECSPACE::memory_space;
+  using container    = Morpheus::DiaMatrix<float, long long, Kokkos::LayoutLeft,
+                                        test_memory_space>;
   using mirror_space = std::conditional_t<
-      Morpheus::is_Host_Memoryspace_v<typename TEST_EXECSPACE::memory_space>,
-      Kokkos::Cuda, Kokkos::DefaultHostExecutionSpace>;
+      Morpheus::is_Host_Memoryspace_v<test_memory_space>,
+      typename Kokkos::Cuda::memory_space,
+      typename Kokkos::DefaultHostExecutionSpace::memory_space>;
   using dst_type =
       Morpheus::DiaMatrix<typename container::value_type,
                           typename container::index_type,

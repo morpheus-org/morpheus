@@ -50,11 +50,8 @@ class DenseMatrix
   using array_layout         = typename traits::array_layout;
 
   using memory_space    = typename traits::memory_space;
-  using execution_space = typename traits::execution_space;
-  using device_type     = typename traits::device_type;
-
-  using HostMirror       = typename traits::HostMirror;
-  using host_mirror_type = typename traits::host_mirror_type;
+  using execution_space = typename memory_space::execution_space;
+  using HostMirror      = typename traits::HostMirror;
 
   using pointer         = typename traits::pointer;
   using const_pointer   = typename traits::const_pointer;
@@ -128,11 +125,13 @@ class DenseMatrix
 
   inline void assign(index_type num_rows, index_type num_cols,
                      const value_type val) {
+    using range_policy = Kokkos::RangePolicy<index_type, execution_space>;
     /* Resize if necessary */
     this->resize(num_rows, num_cols);
 
+    range_policy policy(0, num_rows);
     set_functor f(_values, val, num_cols);
-    Kokkos::parallel_for("Morpheus::DenseMatrix::assign", num_rows, f);
+    Kokkos::parallel_for("Morpheus::DenseMatrix::assign", policy, f);
   }
 
   // Modifiers
@@ -162,7 +161,6 @@ class DenseMatrix
 
  public:
   struct set_functor {
-    using execution_space = typename traits::execution_space;
     value_array_type _data;
     value_type _val;
     index_type _ncols;

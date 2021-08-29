@@ -30,6 +30,7 @@
 #include <fwd/algorithms/Morpheus_Fwd_Multiply.hpp>
 #include <fwd/algorithms/Morpheus_Fwd_Print.hpp>
 #include <fwd/algorithms/Morpheus_Fwd_Scan.hpp>
+#include <fwd/algorithms/Morpheus_Fwd_Sort.hpp>
 #include <fwd/algorithms/Morpheus_Fwd_WAXPBY.hpp>
 
 #endif  // MORPHEUS_FWD_ALGORITHMS_HPP

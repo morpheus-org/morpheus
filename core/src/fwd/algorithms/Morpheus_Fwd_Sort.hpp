@@ -27,10 +27,10 @@
 namespace Morpheus {
 
 template <typename Matrix>
-void sort_by_row_and_column(Matrix& mat, typename Matrix::index_type min_row,
-                            typename Matrix::index_type max_row,
-                            typename Matrix::index_type min_col,
-                            typename Matrix::index_type max_col);
+void sort_by_row_and_column(Matrix& mat, typename Matrix::index_type min_row=0,
+                            typename Matrix::index_type max_row=0,
+                            typename Matrix::index_type min_col=0,
+                            typename Matrix::index_type max_col=0);
 
 template <typename Matrix>
 bool is_sorted(Matrix& mat);

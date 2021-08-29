@@ -50,18 +50,15 @@ class DenseVector
   using non_const_index_type = typename traits::non_const_index_type;
 
   using memory_space    = typename traits::memory_space;
-  using execution_space = typename traits::execution_space;
-  using device_type     = typename traits::device_type;
-
-  using HostMirror       = typename traits::HostMirror;
-  using host_mirror_type = typename traits::host_mirror_type;
+  using execution_space = typename memory_space::execution_space;
+  using HostMirror      = typename traits::HostMirror;
 
   using pointer         = typename traits::pointer;
   using const_pointer   = typename traits::const_pointer;
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
-  using value_array_type      = Kokkos::View<value_type*, device_type>;
+  using value_array_type      = Kokkos::View<value_type*, memory_space>;
   using value_array_pointer   = typename value_array_type::pointer_type;
   using value_array_reference = typename value_array_type::reference_type;
 
@@ -97,7 +94,7 @@ class DenseVector
       const DenseVector<VR, PR...>& src,
       typename std::enable_if<is_compatible_type<
           DenseVector, DenseVector<VR, PR...>>::value>::type* = nullptr)
-      : _name("ShallowVector"), _size(src.size()), _values(src.view()) {}
+      : _name("ShallowVector"), _size(src.size()), _values(src.const_view()) {}
 
   template <class VR, class... PR>
   typename std::enable_if<
@@ -124,11 +121,14 @@ class DenseVector
   }
 
   inline void assign(const index_type n, const value_type val) {
+    using range_policy = Kokkos::RangePolicy<index_type, execution_space>;
+
     /* Resize if necessary (behavior of std:vector) */
     this->resize(n);
 
+    range_policy policy(0, n);
     set_functor f(_values, val);
-    Kokkos::parallel_for("Morpheus::DenseVector::assign", n, f);
+    Kokkos::parallel_for("Morpheus::DenseVector::assign", policy, f);
   }
 
   // Element access
@@ -166,7 +166,6 @@ class DenseVector
 
  public:
   struct set_functor {
-    using execution_space = typename traits::execution_space;
     value_array_type _data;
     value_type _val;
 

@@ -30,7 +30,7 @@ namespace Impl {
 struct VectorTag {};
 }  // namespace Impl
 
-// Matrix Format Tag Wrapper
+// Vector Format Tag Wrapper
 template <class T>
 struct VectorFormatTag {
   static_assert(std::is_base_of<Impl::VectorTag, T>::value,

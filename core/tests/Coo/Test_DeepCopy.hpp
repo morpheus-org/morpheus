@@ -30,8 +30,9 @@ namespace Test {
 // Therefore checking the mirror container, it should maintain it's own
 // state.
 TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_SameSpace_Mirror) {
-  using container =
-      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+  using test_memory_space = typename TEST_EXECSPACE::memory_space;
+  using container = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
+                                        test_memory_space>;
   using index_array_type = typename container::index_array_type;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;
@@ -77,8 +78,9 @@ TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_SameSpace_Mirror) {
 // state when the initial container lives in different state, otherwise
 // it should have a shared state.
 TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_SameSpace_MirrorContainer) {
-  using container =
-      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+  using test_memory_space = typename TEST_EXECSPACE::memory_space;
+  using container = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
+                                        test_memory_space>;
   using index_array_type = typename container::index_array_type;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;
@@ -136,8 +138,8 @@ TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_SameSpace_MirrorContainer) {
 // Creates a mirror on host from device
 // Issues a copy between device and host, which is always deep
 TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_DeviceHost) {
-  using container =
-      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft, Kokkos::Cuda>;
+  using container = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
+                                        typename Kokkos::Cuda::memory_space>;
   using index_array_type = typename container::index_array_type;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;
@@ -167,8 +169,8 @@ TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_DeviceHost) {
 // Creates a mirror container on host from device
 // Issues a copy between device and host, which is always deep
 TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_DeviceHost_MirrorCotnainer) {
-  using container =
-      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft, Kokkos::Cuda>;
+  using container = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
+                                        typename Kokkos::Cuda::memory_space>;
   using index_array_type = typename container::index_array_type;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;
@@ -198,8 +200,9 @@ TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_DeviceHost_MirrorCotnainer) {
 // Creates a mirror on device from host
 // Issues a copy between host to device and back (both should always be deep)
 TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_HostDevice) {
-  using container = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
-                                        Kokkos::HostSpace>;
+  using container =
+      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
+                          typename Kokkos::HostSpace::memory_space>;
   using index_array_type = typename container::index_array_type;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;
@@ -237,8 +240,9 @@ TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_HostDevice) {
 // Creates a mirror container on device from host
 // Issues a copy between host to device and back (both should always be deep)
 TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_HostDevice_MirrorContainer) {
-  using container = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
-                                        Kokkos::HostSpace>;
+  using container =
+      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
+                          typename Kokkos::HostSpace::memory_space>;
   using index_array_type = typename container::index_array_type;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;
@@ -278,8 +282,9 @@ TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_HostDevice_MirrorContainer) {
 // the two device mirrors. Then sends the result back to host
 // to be compared which should match the initial state of Ar.
 TEST(TESTSUITE_NAME, DeepCopy_CooMatrix_DeviecDevice_MirrorContainer) {
-  using container = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
-                                        Kokkos::HostSpace>;
+  using container =
+      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
+                          typename Kokkos::HostSpace::memory_space>;
   using index_array_type = typename container::index_array_type;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;

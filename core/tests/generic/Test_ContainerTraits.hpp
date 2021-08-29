@@ -49,13 +49,6 @@ void test_container_traits() {
   // Space Traits
   static_assert(std::is_same<typename Container::memory_space,
                              typename SpaceRef::memory_space>::value);
-  static_assert(std::is_same<typename Container::execution_space,
-                             typename SpaceRef::execution_space>::value);
-  static_assert(
-      std::is_same<typename Container::device_type,
-                   Kokkos::Device<typename Container::execution_space,
-                                  typename Container::memory_space>>::value);
-
   //  HostMirror Traits
   static_assert(std::is_same<typename Container::HostMirror::value_type,
                              typename Container::non_const_value_type>::value);
@@ -63,24 +56,10 @@ void test_container_traits() {
                              typename Container::non_const_index_type>::value);
   static_assert(std::is_same<typename Container::HostMirror::array_layout,
                              typename Container::array_layout>::value);
-  static_assert(std::is_same<typename Container::HostMirror::execution_space,
-                             Kokkos::DefaultHostExecutionSpace>::value);
   static_assert(
-      std::is_same<typename Container::HostMirror::memory_space,
-                   typename Container::host_mirror_space::memory_space>::value);
-
-  static_assert(std::is_same<typename Container::host_mirror_type::value_type,
-                             typename Container::non_const_value_type>::value);
-  static_assert(std::is_same<typename Container::host_mirror_type::index_type,
-                             typename Container::non_const_index_type>::value);
-  static_assert(std::is_same<typename Container::host_mirror_type::array_layout,
-                             typename Container::array_layout>::value);
-  static_assert(std::is_same<
-                typename Container::host_mirror_type::execution_space,
-                typename Container::host_mirror_space::execution_space>::value);
-  static_assert(
-      std::is_same<typename Container::HostMirror::memory_space,
-                   typename Container::host_mirror_space::memory_space>::value);
+      std::is_same<
+          typename Container::HostMirror::memory_space,
+          typename Kokkos::DefaultHostExecutionSpace::memory_space>::value);
 
   // Pointer Traits
   static_assert(
@@ -114,74 +93,82 @@ namespace Test {
 TEST(TESTSUITE_NAME, ContainersTraits) {
   // ContainerTraits_dlr
   {
-    using container =
-        TEST_CONTAINER<double, long long, Kokkos::LayoutRight, TEST_EXECSPACE>;
+    using test_memory_space = typename TEST_EXECSPACE::memory_space;
+    using container = TEST_CONTAINER<double, long long, Kokkos::LayoutRight,
+                                     test_memory_space>;
 
     test_traits<container, TEST_CONTAINER_TAG, double, long long,
-                Kokkos::LayoutRight, TEST_EXECSPACE>();
+                Kokkos::LayoutRight, test_memory_space>();
   }
 
   // ContainerTraits_dll
   {
-    using container =
-        TEST_CONTAINER<double, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+    using test_memory_space = typename TEST_EXECSPACE::memory_space;
+    using container = TEST_CONTAINER<double, long long, Kokkos::LayoutLeft,
+                                     test_memory_space>;
 
     test_traits<container, TEST_CONTAINER_TAG, double, long long,
-                Kokkos::LayoutLeft, TEST_EXECSPACE>();
+                Kokkos::LayoutLeft, test_memory_space>();
   }
 
   // ContainerTraits_dir
   {
+    using test_memory_space = typename TEST_EXECSPACE::memory_space;
     using container =
-        TEST_CONTAINER<double, int, Kokkos::LayoutRight, TEST_EXECSPACE>;
+        TEST_CONTAINER<double, int, Kokkos::LayoutRight, test_memory_space>;
 
     test_traits<container, TEST_CONTAINER_TAG, double, int, Kokkos::LayoutRight,
-                TEST_EXECSPACE>();
+                test_memory_space>();
   }
 
   // ContainerTraits_dil
   {
+    using test_memory_space = typename TEST_EXECSPACE::memory_space;
     using container =
-        TEST_CONTAINER<double, int, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+        TEST_CONTAINER<double, int, Kokkos::LayoutLeft, test_memory_space>;
 
     test_traits<container, TEST_CONTAINER_TAG, double, int, Kokkos::LayoutLeft,
-                TEST_EXECSPACE>();
+                test_memory_space>();
   }
 
   // ContainerTraits_flr
   {
-    using container =
-        TEST_CONTAINER<float, long long, Kokkos::LayoutRight, TEST_EXECSPACE>;
+    using test_memory_space = typename TEST_EXECSPACE::memory_space;
+    using container = TEST_CONTAINER<float, long long, Kokkos::LayoutRight,
+                                     test_memory_space>;
 
     test_traits<container, TEST_CONTAINER_TAG, float, long long,
-                Kokkos::LayoutRight, TEST_EXECSPACE>();
+                Kokkos::LayoutRight, test_memory_space>();
   }
 
   // ContainerTraits_fll
   {
+    using test_memory_space = typename TEST_EXECSPACE::memory_space;
     using container =
-        TEST_CONTAINER<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+        TEST_CONTAINER<float, long long, Kokkos::LayoutLeft, test_memory_space>;
 
     test_traits<container, TEST_CONTAINER_TAG, float, long long,
-                Kokkos::LayoutLeft, TEST_EXECSPACE>();
+                Kokkos::LayoutLeft, test_memory_space>();
   }
 
   // ContainerTraits_fir
   {
+    using test_memory_space = typename TEST_EXECSPACE::memory_space;
     using container =
-        TEST_CONTAINER<float, int, Kokkos::LayoutRight, TEST_EXECSPACE>;
+        TEST_CONTAINER<float, int, Kokkos::LayoutRight, test_memory_space>;
 
     test_traits<container, TEST_CONTAINER_TAG, float, int, Kokkos::LayoutRight,
-                TEST_EXECSPACE>();
+                test_memory_space>();
   }
 
   // ContainerTraits_fil
   {
+    using test_memory_space = typename TEST_EXECSPACE::memory_space;
     using container =
-        TEST_CONTAINER<float, int, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+        TEST_CONTAINER<float, int, Kokkos::LayoutLeft, test_memory_space>;
 
     test_traits<container, TEST_CONTAINER_TAG, float, int, Kokkos::LayoutLeft,
-                TEST_EXECSPACE>();
+                test_memory_space>();
   }
 
   // ContainerTraits_f___
@@ -190,7 +177,7 @@ TEST(TESTSUITE_NAME, ContainersTraits) {
 
     test_traits<container, TEST_CONTAINER_TAG, float, int,
                 typename Kokkos::DefaultExecutionSpace::array_layout,
-                Kokkos::DefaultExecutionSpace>();
+                typename Kokkos::DefaultExecutionSpace::memory_space>();
   }
 
   // ContainerTraits_f_l_
@@ -198,15 +185,17 @@ TEST(TESTSUITE_NAME, ContainersTraits) {
     using container = TEST_CONTAINER<float, Kokkos::LayoutLeft>;
 
     test_traits<container, TEST_CONTAINER_TAG, float, int,
-                typename Kokkos::LayoutLeft, Kokkos::DefaultExecutionSpace>();
+                typename Kokkos::LayoutLeft,
+                typename Kokkos::DefaultExecutionSpace::memory_space>();
   }
 
   // ContainerTraits_fl_s
   {
-    using container = TEST_CONTAINER<float, long long, TEST_EXECSPACE>;
+    using test_memory_space = typename TEST_EXECSPACE::memory_space;
+    using container = TEST_CONTAINER<float, long long, test_memory_space>;
 
     test_traits<container, TEST_CONTAINER_TAG, float, long long,
-                typename TEST_EXECSPACE::array_layout, TEST_EXECSPACE>();
+                typename TEST_EXECSPACE::array_layout, test_memory_space>();
   }
 
   // ContainerTraits_fil_
@@ -214,15 +203,18 @@ TEST(TESTSUITE_NAME, ContainersTraits) {
     using container = TEST_CONTAINER<float, long long, Kokkos::LayoutLeft>;
 
     test_traits<container, TEST_CONTAINER_TAG, float, long long,
-                Kokkos::LayoutLeft, Kokkos::DefaultExecutionSpace>();
+                Kokkos::LayoutLeft,
+                typename Kokkos::DefaultExecutionSpace::memory_space>();
   }
 
   // Container_f_ls
   {
-    using container = TEST_CONTAINER<float, Kokkos::LayoutLeft, TEST_EXECSPACE>;
+    using test_memory_space = typename TEST_EXECSPACE::memory_space;
+    using container =
+        TEST_CONTAINER<float, Kokkos::LayoutLeft, test_memory_space>;
 
     test_traits<container, TEST_CONTAINER_TAG, float, int, Kokkos::LayoutLeft,
-                TEST_EXECSPACE>();
+                test_memory_space>();
   }
 }
 }  // namespace Test

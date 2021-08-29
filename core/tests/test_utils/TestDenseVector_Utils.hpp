@@ -39,7 +39,7 @@ void test_traits(Morpheus::DenseVectorTag) {
 template <typename T1, typename T2>
 void check_shapes(const T1& x, const T2& x_mirror, Morpheus::DenseVectorTag) {
   ASSERT_EQ(x.size(), x_mirror.size());
-  ASSERT_EQ(x_mirror.view().extent(0), x.size());
+  ASSERT_EQ(x_mirror.const_view().extent(0), x.size());
 }
 
 #endif  // MORPHEUS_CORE_TEST_DENSEVECTOR_UTILS_HPP

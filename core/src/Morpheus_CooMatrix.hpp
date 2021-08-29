@@ -47,26 +47,22 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   using index_type           = typename traits::index_type;
   using non_const_index_type = typename traits::non_const_index_type;
 
-  using memory_space    = typename traits::memory_space;
-  using execution_space = typename traits::execution_space;
-  using device_type     = typename traits::device_type;
-
-  using HostMirror       = typename traits::HostMirror;
-  using host_mirror_type = typename traits::host_mirror_type;
+  using memory_space = typename traits::memory_space;
+  using HostMirror   = typename traits::HostMirror;
 
   using pointer         = typename traits::pointer;
   using const_pointer   = typename traits::const_pointer;
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
-  using index_array_type    = Morpheus::vector<index_type, index_type,
-                                            Kokkos::LayoutRight, device_type>;
+  using index_array_type =
+      Morpheus::DenseVector<index_type, index_type, memory_space>;
   using index_array_pointer = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
 
-  using value_array_type    = Morpheus::vector<value_type, index_type,
-                                            Kokkos::LayoutRight, device_type>;
+  using value_array_type =
+      Morpheus::DenseVector<value_type, index_type, memory_space>;
   using value_array_pointer = typename value_array_type::value_array_pointer;
   using value_array_reference =
       typename value_array_type::value_array_reference;
