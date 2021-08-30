@@ -45,12 +45,15 @@ template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, DynamicTag,
              SparseMatTag) {
   auto f = std::bind(Impl::convert_fn(), std::placeholders::_1, std::ref(dst));
-  std::visit(f, src.formats());
+  std::visit(f, src.const_formats());
 }
 
 template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, SparseMatTag,
              DynamicTag) {
+  dst.set_nrows(src.nrows());
+  dst.set_ncols(src.ncols());
+  dst.set_nnnz(src.nnnz());
   auto f = std::bind(Impl::convert_fn(), std::cref(src), std::placeholders::_1);
   std::visit(f, dst.formats());
 }
@@ -58,7 +61,10 @@ void convert(const SourceType& src, DestinationType& dst, SparseMatTag,
 template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, DynamicTag,
              DynamicTag) {
-  std::visit(Impl::convert_fn(), src.formats(), dst.formats());
+  dst.set_nrows(src.nrows());
+  dst.set_ncols(src.ncols());
+  dst.set_nnnz(src.nnnz());
+  std::visit(Impl::convert_fn(), src.const_formats(), dst.formats());
 }
 
 }  // namespace Impl

@@ -38,7 +38,7 @@ typename Vector::value_type find_max_element(const Vector& vec) {
   IndexType max   = 0;
 
   for (IndexType i = 0; i < vec.size(); i++) {
-    if (size_t(vec[i]) > max) max = size_t(vec[i]);
+    if (vec[i] > max) max = vec[i];
   }
 
   return max;
@@ -48,6 +48,7 @@ template <typename Vector1, typename Vector2>
 void counting_sort_by_key(Vector1& keys, Vector2& vals,
                           typename Vector1::value_type min,
                           typename Vector1::value_type max, DenseVectorTag) {
+  using IndexType = typename Vector1::index_type;
   if (min < 0)
     throw Morpheus::InvalidInputException(
         "counting_sort_by_key min element less than 0");
@@ -63,7 +64,7 @@ void counting_sort_by_key(Vector1& keys, Vector2& vals,
   if (min > 0) min = 0;
 
   // compute the number of bins
-  size_t size = max - min;
+  IndexType size = max - min;
 
   // allocate temporary arrays
   Vector1 counts(size + 2, 0), temp_keys, temp_vals;
@@ -71,13 +72,13 @@ void counting_sort_by_key(Vector1& keys, Vector2& vals,
   Morpheus::copy(vals, temp_vals);
 
   // count the number of occurences of each key
-  for (size_t i = 0; i < keys.size(); i++) counts[keys[i] + 1]++;
+  for (IndexType i = 0; i < keys.size(); i++) counts[keys[i] + 1]++;
 
   // scan the sum of each bin
-  for (size_t i = 0; i < size; i++) counts[i + 1] += counts[i];
+  for (IndexType i = 0; i < size; i++) counts[i + 1] += counts[i];
 
   // generate output in sorted order
-  for (size_t i = 0; i < keys.size(); i++) {
+  for (IndexType i = 0; i < keys.size(); i++) {
     keys[counts[temp_keys[i]]]   = temp_keys[i];
     vals[counts[temp_keys[i]]++] = temp_vals[i];
   }

@@ -25,13 +25,18 @@
 #define MORPHEUS_COO_CONVERT_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_Copy.hpp>
+#include <Morpheus_TypeTraits.hpp>
+#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, CooTag, CooTag) {
+void convert(const SourceType& src, DestinationType& dst, CooTag, CooTag,
+             typename std::enable_if<
+                 is_compatible_type<SourceType, DestinationType>::value ||
+                 is_compatible_from_different_space<
+                     SourceType, DestinationType>::value>::type* = nullptr) {
   Morpheus::copy(src, dst);
 }
 

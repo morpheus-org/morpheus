@@ -24,6 +24,7 @@
 #ifndef MORPHEUS_CONVERT_HPP
 #define MORPHEUS_CONVERT_HPP
 
+#include <Morpheus_DynamicMatrix.hpp>
 #include <impl/Morpheus_Convert_Impl.hpp>
 
 namespace Morpheus {
@@ -32,6 +33,20 @@ template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst) {
   Impl::convert(src, dst, typename SourceType::tag(),
                 typename DestinationType::tag());
+}
+
+template <typename ValueType, typename... Properties>
+void convert(DynamicMatrix<ValueType, Properties...>& src,
+             const formats_e index) {
+  Morpheus::CooMatrix<ValueType, Properties...> temp;
+  Morpheus::convert(src, temp);
+  src.activate(index);
+  Morpheus::convert(temp, src);
+}
+
+template <typename ValueType, typename... Properties>
+void convert(DynamicMatrix<ValueType, Properties...>& src, const int index) {
+  convert(src, static_cast<formats_e>(index));
 }
 }  // namespace Morpheus
 

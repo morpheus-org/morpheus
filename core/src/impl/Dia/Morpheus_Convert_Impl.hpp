@@ -25,7 +25,7 @@
 #define MORPHEUS_DIA_CONVERT_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
-
+#include <Morpheus_TypeTraits.hpp>
 #include <fwd/Morpheus_Fwd_Algorithms.hpp>
 
 // TODO: Remove use of set during Coo to Dia Conversion
@@ -35,7 +35,11 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, DiaTag, DiaTag) {
+void convert(const SourceType& src, DestinationType& dst, DiaTag, DiaTag,
+             typename std::enable_if<
+                 is_compatible_type<SourceType, DestinationType>::value ||
+                 is_compatible_from_different_space<
+                     SourceType, DestinationType>::value>::type* = nullptr) {
   Morpheus::copy(src, dst);
 }
 
@@ -85,7 +89,7 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
     return;
   }
 
-  IndexArrayType diag_map(src.nnnz(), 0);
+  std::vector<IndexType> diag_map(src.nnnz(), 0);
 
   // Find on which diagonal each entry sits on
   for (IndexType n = 0; n < IndexType(src.nnnz()); n++) {
