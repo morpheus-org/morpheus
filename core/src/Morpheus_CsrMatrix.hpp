@@ -123,15 +123,15 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
       is_compatible_type<CsrMatrix, CsrMatrix<VR, PR...>>::value,
       CsrMatrix &>::type
   operator=(const CsrMatrix<VR, PR...> &src) {
-    if (this != &src) {
-      set_name(src.name());
-      set_nrows(src.nrows());
-      set_ncols(src.ncols());
-      set_nnnz(src.nnnz());
-      row_offsets    = src.row_offsets;
-      column_indices = src.column_indices;
-      values         = src.values;
-    }
+    this->set_name(src.name());
+    this->set_nrows(src.nrows());
+    this->set_ncols(src.ncols());
+    this->set_nnnz(src.nnnz());
+
+    row_offsets    = src.row_offsets;
+    column_indices = src.column_indices;
+    values         = src.values;
+
     return *this;
   }
 

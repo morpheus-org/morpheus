@@ -108,17 +108,45 @@ struct any_type_allocate {
   template <typename T1, typename T2>
   result_type operator()(
       const T1 &src, T2 &dst,
-      typename std::enable_if<std::is_same<T1, T2>::value>::type * = nullptr) {
-    dst = T1().allocate("from" + src.name(), src);
+      typename std::enable_if<
+          std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
+          nullptr) {
+    dst = T2().allocate("from" + src.name(), src);
   }
 
   template <typename T1, typename T2>
   result_type operator()(
       const T1 &src, T2 &dst,
-      typename std::enable_if<!std::is_same<T1, T2>::value>::type * = nullptr) {
+      typename std::enable_if<
+          !std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
+          nullptr) {
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic allocate interface. Src type " +
-        src.name() + " and dst type " + dst.name() + " must be the same");
+        "Invalid use of the dynamic allocate interface. Src tag " + src.name() +
+        " and dst tag " + dst.name() + " must be the same");
+  }
+};
+
+struct any_type_assign {
+  using result_type = void;
+
+  template <typename T1, typename T2>
+  result_type operator()(
+      const T1 &src, T2 &dst,
+      typename std::enable_if<
+          std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
+          nullptr) {
+    dst = src;
+  }
+
+  template <typename T1, typename T2>
+  result_type operator()(
+      const T1 &src, T2 &dst,
+      typename std::enable_if<
+          !std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
+          nullptr) {
+    throw Morpheus::RuntimeException(
+        "Invalid use of the dynamic allocate interface. Src tag " + src.name() +
+        " and dst tag " + dst.name() + " must be the same");
   }
 };
 

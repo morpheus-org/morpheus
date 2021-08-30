@@ -138,25 +138,23 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
       is_compatible_type<DiaMatrix, DiaMatrix<VR, PR...>>::value,
       DiaMatrix &>::type
   operator=(const DiaMatrix<VR, PR...> &src) {
-    if (this != &src) {
-      ndiags = src.ndiags;
-      nalign = src.nalign;
-      set_name(src.name());
-      set_nrows(src.nrows());
-      set_ncols(src.ncols());
-      set_nnnz(src.nnnz());
-      diagonal_offsets = src.diagonal_offsets;
-      values           = src.values;
-    }
+    this->set_name(src.name());
+    this->set_nrows(src.nrows());
+    this->set_ncols(src.ncols());
+    this->set_nnnz(src.nnnz());
+
+    ndiags           = src.ndiags;
+    nalign           = src.nalign;
+    diagonal_offsets = src.diagonal_offsets;
+    values           = src.values;
+
     return *this;
   }
 
-  // !FIXME: Needs to perform conversion
   // Construct from another matrix type
   template <typename MatrixType>
   DiaMatrix(const MatrixType &src) = delete;
 
-  // !FIXME: Needs to perform conversion
   // Assignment from another matrix type
   template <typename MatrixType>
   reference operator=(const MatrixType &src) = delete;

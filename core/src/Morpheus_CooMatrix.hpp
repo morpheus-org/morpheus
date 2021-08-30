@@ -122,15 +122,15 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
       is_compatible_type<CooMatrix, CooMatrix<VR, PR...>>::value,
       CooMatrix &>::type
   operator=(const CooMatrix<VR, PR...> &src) {
-    if (this != &src) {
-      set_name(src.name());
-      set_nrows(src.nrows());
-      set_ncols(src.ncols());
-      set_nnnz(src.nnnz());
-      row_indices    = src.row_indices;
-      column_indices = src.column_indices;
-      values         = src.values;
-    }
+    this->set_name(src.name());
+    this->set_nrows(src.nrows());
+    this->set_ncols(src.ncols());
+    this->set_nnnz(src.nnnz());
+
+    row_indices    = src.row_indices;
+    column_indices = src.column_indices;
+    values         = src.values;
+
     return *this;
   }
 
