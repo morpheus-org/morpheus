@@ -28,6 +28,7 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_DenseMatrix.hpp>
+#include <Morpheus_DynamicMatrix.hpp>
 
 #include <impl/Morpheus_MatrixBase.hpp>
 #include <impl/Morpheus_Utils.hpp>
@@ -147,6 +148,35 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
     nalign           = src.nalign;
     diagonal_offsets = src.diagonal_offsets;
     values           = src.values;
+
+    return *this;
+  }
+
+  // Construct from a compatible dynamic matrix type (Shallow)
+  // Throws when active type of dynamic matrix not same to concrete type
+  template <class VR, class... PR>
+  DiaMatrix(const DynamicMatrix<VR, PR...> &src,
+            typename std::enable_if<is_compatible_container<
+                DiaMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr)
+      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
+             src.nnnz()) {
+    auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
+                       std::ref(*this));
+
+    std::visit(f, src.const_formats());
+  }
+
+  // Assignment from a compatible dynamic matrix type (Shallow)
+  // Throws when active type of dynamic matrix not same to concrete type
+  template <class VR, class... PR>
+  typename std::enable_if<
+      is_compatible_container<DiaMatrix, DynamicMatrix<VR, PR...>>::value,
+      DiaMatrix &>::type
+  operator=(const DynamicMatrix<VR, PR...> &src) {
+    auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
+                       std::ref(*this));
+
+    std::visit(f, src.const_formats());
 
     return *this;
   }

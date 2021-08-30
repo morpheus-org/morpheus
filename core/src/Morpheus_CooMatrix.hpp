@@ -27,6 +27,7 @@
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_DenseVector.hpp>
+#include <Morpheus_DynamicMatrix.hpp>
 
 #include <fwd/Morpheus_Fwd_Algorithms.hpp>
 #include <impl/Morpheus_MatrixBase.hpp>
@@ -134,12 +135,39 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
     return *this;
   }
 
-  // !FIXME: Needs to perform conversion
+  // Construct from a compatible dynamic matrix type (Shallow)
+  // Throws when active type of dynamic matrix not same to concrete type
+  template <class VR, class... PR>
+  CooMatrix(const DynamicMatrix<VR, PR...> &src,
+            typename std::enable_if<is_compatible_container<
+                CooMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr)
+      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
+             src.nnnz()) {
+    auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
+                       std::ref(*this));
+
+    std::visit(f, src.const_formats());
+  }
+
+  // Assignment from a compatible dynamic matrix type (Shallow)
+  // Throws when active type of dynamic matrix not same to concrete type
+  template <class VR, class... PR>
+  typename std::enable_if<
+      is_compatible_container<CooMatrix, DynamicMatrix<VR, PR...>>::value,
+      CooMatrix &>::type
+  operator=(const DynamicMatrix<VR, PR...> &src) {
+    auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
+                       std::ref(*this));
+
+    std::visit(f, src.const_formats());
+
+    return *this;
+  }
+
   // Construct from another matrix type
   template <typename MatrixType>
   CooMatrix(const MatrixType &src) = delete;
 
-  // !FIXME: Needs to perform conversion
   // Assignment from another matrix type
   template <typename MatrixType>
   reference operator=(const MatrixType &src) = delete;

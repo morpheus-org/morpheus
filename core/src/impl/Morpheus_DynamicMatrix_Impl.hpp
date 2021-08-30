@@ -145,7 +145,7 @@ struct any_type_assign {
           !std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
           nullptr) {
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic allocate interface. Src tag " + src.name() +
+        "Invalid use of the dynamic assign interface. Src tag " + src.name() +
         " and dst tag " + dst.name() + " must be the same");
   }
 };

@@ -113,6 +113,17 @@ struct is_same_format
           bool, std::is_same<typename T1::tag, typename T2::tag>::value> {};
 
 template <typename T1, typename T2>
+struct is_compatible_container
+    : std::integral_constant<bool,
+                             std::is_same<typename T1::memory_space,
+                                          typename T2::memory_space>::value &&
+                                 std::is_same<typename T1::value_type,
+                                              typename T2::value_type>::value &&
+                                 std::is_same<typename T1::index_type,
+                                              typename T2::index_type>::value> {
+};
+
+template <typename T1, typename T2>
 struct is_compatible_type
     : std::integral_constant<
           bool, is_same_format<T1, T2>::value &&
