@@ -33,8 +33,12 @@ namespace Kernels {
 template <typename ValueType, typename IndexType>
 __global__ void dot_kernel(IndexType n, const ValueType* x, const ValueType* y,
                            ValueType* res) {
-  return;
+  const IndexType tid = blockDim.x * blockIdx.x + threadIdx.x;
+  if (tid > n) return;
+
+  res[tid] = x[tid] * y[tid];
 }
+
 }  // namespace Kernels
 }  // namespace Impl
 }  // namespace Morpheus

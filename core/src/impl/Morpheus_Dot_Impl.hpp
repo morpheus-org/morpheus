@@ -27,7 +27,7 @@
 // TODO: Let Cmake autogenerate those
 #include <impl/DenseVector/Serial/Morpheus_Dot_Impl.hpp>
 #include <impl/DenseVector/OpenMP/Morpheus_Dot_Impl.hpp>
-// #include <impl/DenseVector/Cuda/Morpheus_Dot_Impl.hpp>
+#include <impl/DenseVector/Cuda/Morpheus_Dot_Impl.hpp>
 #include <impl/DenseVector/Kokkos/Morpheus_Dot_Impl.hpp>
 
 #endif  // MORPHEUS_ALGORITHMS_IMPL_DOT_IMPL_HPP

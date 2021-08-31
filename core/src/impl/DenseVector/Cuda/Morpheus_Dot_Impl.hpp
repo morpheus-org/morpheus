@@ -31,6 +31,7 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
 
+#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 #include <impl/Morpheus_CudaUtils.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_Dot_Impl.hpp>
 
@@ -52,15 +53,13 @@ typename Vector::value_type dot(
   const size_t BLOCK_SIZE = 256;
   const size_t NUM_BLOCKS = (x.size() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-  ValueType result = ValueType(0);
-  Vector temp_res(NUM_BLOCKS, 0);
+  Vector res_vec(n, 0);
 
-  Kernels::dot_kernel<IndexType, ValueType><<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(
-      x.size(), x.data(), y.data(), temp_res.data());
+  // execute the dot product kernel
+  Kernels::dot_kernel<ValueType, IndexType><<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(
+      x.size(), x.data(), y.data(), res_vec.data());
 
-  cudaMemcpy(&result, temp_res, sizeof(ValueType), cudaMemcpyDeviceToHost);
-
-  return result;
+  return Morpheus::reduce<ExecSpace>(res_vec, n);
 }
 
 }  // namespace Impl
