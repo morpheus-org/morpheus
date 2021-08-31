@@ -34,7 +34,7 @@ namespace Impl {
 // Compute sum reduction using Kahan summation for an accurate sum of large
 // arrays. http://en.wikipedia.org/wiki/Kahan_summation_algorithm
 template <typename ExecSpace, typename Vector>
-ValueType reduce(
+typename Vector::value_type reduce(
     const Vector& in, typename Vector::index_type size, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
@@ -43,11 +43,11 @@ ValueType reduce(
         nullptr) {
   using ValueType = typename Vector::value_type;
   using IndexType = typename Vector::index_type;
-  ValueType sum   = data[0];
+  ValueType sum   = in[0];
   ValueType c     = (ValueType)0.0;
 
   for (IndexType i = 1; i < size; i++) {
-    ValueType y = data[i] - c;
+    ValueType y = in[i] - c;
     ValueType t = sum + y;
     c           = (t - sum) - y;
     sum         = t;

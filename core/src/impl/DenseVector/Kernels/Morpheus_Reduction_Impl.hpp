@@ -99,10 +99,10 @@ __device__ __forceinline__ int warpReduceSum<int>(unsigned int mask,
     - only works for power-of-2 arrays
 */
 
-template <typename T, unsigned int blockSize, bool nIsPow2>
-__global__ void reduce_kernel(const T *__restrict__ g_idata,
-                              T *__restrict__ g_odata, unsigned int n) {
-  T *sdata = SharedMemory<T>();
+template <typename ValueType, unsigned int blockSize, bool nIsPow2>
+__global__ void reduce_kernel(const ValueType *__restrict__ g_idata,
+                              ValueType *__restrict__ g_odata, unsigned int n) {
+  ValueType *sdata = SharedMemory<ValueType>();
 
   // perform first level of reduction,
   // reading from global memory, writing to shared memory
@@ -112,7 +112,7 @@ __global__ void reduce_kernel(const T *__restrict__ g_idata,
   maskLength              = (maskLength > 0) ? (32 - maskLength) : maskLength;
   const unsigned int mask = (0xffffffff) >> maskLength;
 
-  T mySum = 0;
+  ValueType mySum = 0;
 
   // we reduce multiple elements per thread.  The number is determined by the
   // number of active thread blocks (via gridDim).  More blocks will result
@@ -140,7 +140,7 @@ __global__ void reduce_kernel(const T *__restrict__ g_idata,
 
   // Reduce within warp using shuffle or reduce_add if T==int & CUDA_ARCH ==
   // SM 8.0
-  mySum = warpReduceSum<T>(mask, mySum);
+  mySum = warpReduceSum<ValueType>(mask, mySum);
 
   // each thread puts its local sum into shared memory
   if ((tid % warpSize) == 0) {
@@ -156,7 +156,7 @@ __global__ void reduce_kernel(const T *__restrict__ g_idata,
     mySum = sdata[tid];
     // Reduce final warp using shuffle or reduce_add if T==int & CUDA_ARCH ==
     // SM 8.0
-    mySum = warpReduceSum<T>(ballot_result, mySum);
+    mySum = warpReduceSum<ValueType>(ballot_result, mySum);
   }
 
   // write result for this block to global mem

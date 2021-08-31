@@ -17,21 +17,29 @@ append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/*.cpp)
 set(MORPHEUS_CORE_HEADERS)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/*.hpp)
+append_glob(MORPHEUS_CORE_HEADERS
+            ${CMAKE_CURRENT_SOURCE_DIR}/fwd/algorithms/*.hpp)
+append_glob(MORPHEUS_CORE_HEADERS
+            ${CMAKE_CURRENT_SOURCE_DIR}/fwd/containers/*.hpp)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/fwd/*.hpp)
 
 foreach(Fmt DenseVector;DenseMatrix)
   append_glob(MORPHEUS_CORE_SOURCES
-                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.cpp)
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.cpp)
   append_glob(MORPHEUS_CORE_HEADERS
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.hpp)
 endforeach()
 
 # ADD ELEMENTWISE for DenseVector
 if(MORPHEUS_ENABLE_CUDA)
-  append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Cuda/*.cpp)
-  append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Cuda/*.hpp)
-  append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Kernels/*.cpp)
-  append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Kernels/*.hpp)
+  append_glob(MORPHEUS_CORE_SOURCES
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Cuda/*.cpp)
+  append_glob(MORPHEUS_CORE_HEADERS
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Cuda/*.hpp)
+  append_glob(MORPHEUS_CORE_SOURCES
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Kernels/*.cpp)
+  append_glob(MORPHEUS_CORE_HEADERS
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Kernels/*.hpp)
 endif()
 
 foreach(Fmt Coo;Csr;Dia)
@@ -55,18 +63,24 @@ foreach(Fmt Coo;Csr;Dia)
   endif()
 
   if(MORPHEUS_ENABLE_CUDA)
-    append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Cuda/*.cpp)
-    append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Cuda/*.hpp)
+    append_glob(MORPHEUS_CORE_SOURCES
+                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Cuda/*.cpp)
+    append_glob(MORPHEUS_CORE_HEADERS
+                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Cuda/*.hpp)
   endif()
 
   if(MORPHEUS_ENABLE_HIP)
-    append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/HIP/*.cpp)
-    append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/HIP/*.hpp)
+    append_glob(MORPHEUS_CORE_SOURCES
+                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/HIP/*.cpp)
+    append_glob(MORPHEUS_CORE_HEADERS
+                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/HIP/*.hpp)
   endif()
 
   if(MORPHEUS_ENABLE_CUDA OR MORPHEUS_ENABLE_HIP)
-    append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Kernels/*.cpp)
-    append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Kernels/*.hpp)
+    append_glob(MORPHEUS_CORE_SOURCES
+                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Kernels/*.cpp)
+    append_glob(MORPHEUS_CORE_HEADERS
+                ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Kernels/*.hpp)
   endif()
 endforeach()
 
@@ -101,10 +115,8 @@ endforeach()
 target_include_directories(
   morpheuscore PUBLIC $<INSTALL_INTERFACE:${MORPHEUS_HEADER_INSTALL_DIR}>)
 
-# morpheus_link_tpl(morpheuscore PUBLIC BLAS)
-# morpheus_link_tpl(morpheuscore PUBLIC CBLAS)
-# morpheus_link_tpl(morpheuscore PUBLIC MKL)
-# morpheus_link_tpl(morpheuscore PUBLIC CUBLAS)
-# morpheus_link_tpl(morpheuscore PUBLIC CUSPARSE)
-# morpheus_link_tpl(morpheuscore PUBLIC METIS)
+# morpheus_link_tpl(morpheuscore PUBLIC BLAS) morpheus_link_tpl(morpheuscore
+# PUBLIC CBLAS) morpheus_link_tpl(morpheuscore PUBLIC MKL)
+# morpheus_link_tpl(morpheuscore PUBLIC CUBLAS) morpheus_link_tpl(morpheuscore
+# PUBLIC CUSPARSE) morpheus_link_tpl(morpheuscore PUBLIC METIS)
 # morpheus_link_tpl(morpheuscore PUBLIC ARMPL)

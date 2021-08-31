@@ -27,14 +27,72 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_CUDA)
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <cuda.h>
 
 namespace Morpheus {
 namespace Impl {
 
 // maximum number of co-resident threads
-const int CUDA_MAX_THREADS = (30 * 1024);
-const int CUDA_WARP_SIZE   = 32;
+const int CUDA_MAX_BLOCK_DIM_SIZE = 65535;
+const int CUDA_MAX_THREADS        = (30 * 1024);
+const int CUDA_WARP_SIZE          = 32;
+
+template <typename IndexType>
+bool isPow2(IndexType x,
+            typename std::enable_if<std::is_integral<IndexType>::value>::type
+                * = nullptr) {
+  return ((x & (x - 1)) == 0);
+}
+
+template <typename IndexType>
+IndexType nextPow2(
+    IndexType x,
+    typename std::enable_if<std::is_integral<IndexType>::value>::type * =
+        nullptr) {
+  --x;
+  x |= x >> 1;
+  x |= x >> 2;
+  x |= x >> 4;
+  x |= x >> 8;
+  x |= x >> 16;
+  return ++x;
+}
+
+template <typename T>
+static const char *_cudaGetErrorEnum(T error) {
+  return cudaGetErrorName(error);
+}
+
+template <typename T>
+void check(T result, char const *const func, const char *const file,
+           int const line) {
+  if (result) {
+    fprintf(stderr, "CUDA error at %s:%d code=%d(%s) \"%s\" \n", file, line,
+            static_cast<unsigned int>(result), _cudaGetErrorEnum(result), func);
+    exit(EXIT_FAILURE);
+  }
+}
+
+#define checkCudaErrors(val) check((val), #val, __FILE__, __LINE__)
+
+// This will output the proper error string when calling cudaGetLastError
+#define getLastCudaError(msg) __getLastCudaError(msg, __FILE__, __LINE__)
+
+inline void __getLastCudaError(const char *errorMessage, const char *file,
+                               const int line) {
+  cudaError_t err = cudaGetLastError();
+
+  if (cudaSuccess != err) {
+    fprintf(stderr,
+            "%s(%i) : getLastCudaError() CUDA error :"
+            " %s : (%d) %s.\n",
+            file, line, errorMessage, static_cast<int>(err),
+            cudaGetErrorString(err));
+    exit(EXIT_FAILURE);
+  }
+}
 
 template <typename Size1, typename Size2>
 __host__ __device__ Size1 DIVIDE_INTO(Size1 N, Size2 granularity) {
@@ -50,26 +108,26 @@ size_t max_active_blocks(KernelFunction kernel, const size_t CTA_SIZE,
   return (size_t)MAX_BLOCKS;
 }
 
-extern "C" bool isPow2(unsigned int x) { return ((x & (x - 1)) == 0); }
-
-unsigned int nextPow2(unsigned int x) {
-  --x;
-  x |= x >> 1;
-  x |= x >> 2;
-  x |= x >> 4;
-  x |= x >> 8;
-  x |= x >> 16;
-  return ++x;
+template <typename T>
+__host__ __device__ T min(T x, T y) {
+  return x < y ? x : y;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+template <typename T>
+__host__ __device__ T max(T x, T y) {
+  return x > y ? y : x;
+}
+
 // Compute the number of threads and blocks to use for the given reduction
 // kernel. We set threads / block to the minimum of maxThreads and n/2.
 // We observe the maximum specified number of blocks, because
 // each thread in that kernel can process a variable number of elements.
-////////////////////////////////////////////////////////////////////////////////
-void getNumBlocksAndThreads(int whichKernel, int n, int maxBlocks,
-                            int maxThreads, int &blocks, int &threads) {
+template <typename IndexType>
+void getNumBlocksAndThreads(
+    IndexType n, IndexType maxBlocks, IndexType maxThreads, IndexType &blocks,
+    IndexType &threads,
+    typename std::enable_if<std::is_integral<IndexType>::value>::type * =
+        nullptr) {
   // get device capability, to avoid block/grid size exceed the upper bound
   cudaDeviceProp prop;
   int device;
@@ -94,17 +152,7 @@ void getNumBlocksAndThreads(int whichKernel, int n, int maxBlocks,
     threads *= 2;
   }
 
-  blocks = MIN(maxBlocks, blocks);
-}
-
-template <typename T>
-__device__ T min(T x, T y) {
-  return x < y ? x : y;
-}
-
-template <typename T>
-__device__ T max(T x, T y) {
-  return x > y ? y : x;
+  blocks = min(maxBlocks, blocks);
 }
 
 }  // namespace Impl

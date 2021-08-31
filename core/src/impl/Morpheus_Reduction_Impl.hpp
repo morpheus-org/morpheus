@@ -1,5 +1,5 @@
 /**
- * Morpheus_Fwd_Algorithms.hpp
+ * Morpheus_Reduction_Impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,17 +21,11 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_FWD_ALGORITHMS_HPP
-#define MORPHEUS_FWD_ALGORITHMS_HPP
+#ifndef MORPHEUS_ALGORITHMS_IMPL_REDUCTION_IMPL_HPP
+#define MORPHEUS_ALGORITHMS_IMPL_REDUCTION_IMPL_HPP
 
-#include <fwd/algorithms/Morpheus_Fwd_Convert.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Copy.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Dot.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Multiply.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Print.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Scan.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Reduction.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Sort.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_WAXPBY.hpp>
+// TODO: Let Cmake autogenerate those
+#include <impl/DenseVector/Serial/Morpheus_Reduction_Impl.hpp>
+#include <impl/DenseVector/Cuda/Morpheus_Reduction_Impl.hpp>
 
-#endif  // MORPHEUS_FWD_ALGORITHMS_HPP
+#endif  // MORPHEUS_ALGORITHMS_IMPL_REDUCTION_IMPL_HPP

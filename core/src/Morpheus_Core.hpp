@@ -28,27 +28,31 @@
 
 #include <Kokkos_Core.hpp>
 
-#include <Morpheus_DenseMatrix.hpp>
-#include <Morpheus_DenseVector.hpp>
+// Containers
 #include <Morpheus_CooMatrix.hpp>
 #include <Morpheus_CsrMatrix.hpp>
+#include <Morpheus_DenseMatrix.hpp>
+#include <Morpheus_DenseVector.hpp>
 #include <Morpheus_DiaMatrix.hpp>
 #include <Morpheus_DynamicMatrix.hpp>
 
-#include <Morpheus_MirrorContainers.hpp>
-
+// Algorithms
 #include <Morpheus_Convert.hpp>
 #include <Morpheus_Copy.hpp>
+#include <Morpheus_Dot.hpp>
 #include <Morpheus_Multiply.hpp>
 #include <Morpheus_Print.hpp>
-#include <Morpheus_Sort.hpp>
+#include <Morpheus_Reduction.hpp>
 #include <Morpheus_Scan.hpp>
-#include <Morpheus_Dot.hpp>
+#include <Morpheus_Sort.hpp>
 #include <Morpheus_WAXPBY.hpp>
 
-#include <Morpheus_TypeTraits.hpp>
+// Functionality
 #include <Morpheus_KokkosSpace.hpp>
+#include <Morpheus_MirrorContainers.hpp>
+#include <Morpheus_TypeTraits.hpp>
 
+// I/O
 #include <Morpheus_MatrixMarket.hpp>
 
 namespace Morpheus {
