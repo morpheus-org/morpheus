@@ -146,15 +146,10 @@ struct ContainerTraits {
       typename prop::memory_space,
       typename Kokkos::DefaultExecutionSpace::memory_space>;
 
-  // Needed for DenseMatrix, otherwise set to void
-  // NOTE: If set for another container it won't have any effect
   using ArrayLayout = typename std::conditional_t<
-      is_dense_matrix_container<Container, ValueType, Properties...>::value,
-      typename std::conditional_t<
-          !std::is_same_v<typename prop::array_layout, void>,
-          typename prop::array_layout,
-          typename MemorySpace::execution_space::array_layout>,
-      void>;
+      !std::is_same_v<typename prop::array_layout, void>,
+      typename prop::array_layout,
+      typename MemorySpace::execution_space::array_layout>;
 
   using HostMirrorSpace = typename std::conditional<
       !std::is_same<typename prop::HostMirrorSpace, void>::value,

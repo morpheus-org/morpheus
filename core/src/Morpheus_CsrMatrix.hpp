@@ -49,6 +49,7 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   using index_type           = typename traits::index_type;
   using non_const_index_type = typename traits::non_const_index_type;
 
+  using array_layout = typename traits::array_layout;
   using memory_space = typename traits::memory_space;
   using HostMirror   = typename traits::HostMirror;
 
@@ -58,13 +59,13 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   using const_reference = typename traits::const_reference;
 
   using index_array_type =
-      Morpheus::DenseVector<index_type, index_type, memory_space>;
+      Morpheus::DenseVector<index_type, index_type, array_layout, memory_space>;
   using index_array_pointer = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
 
   using value_array_type =
-      Morpheus::DenseVector<value_type, index_type, memory_space>;
+      Morpheus::DenseVector<value_type, index_type, array_layout, memory_space>;
   using value_array_pointer = typename value_array_type::value_array_pointer;
   using value_array_reference =
       typename value_array_type::value_array_reference;

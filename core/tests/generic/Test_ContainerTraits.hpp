@@ -41,10 +41,7 @@ void test_container_traits() {
                              IndexTypeRef>::value);
 
   static_assert(
-      std::is_same<
-          typename Container::array_layout,
-          typename std::conditional_t<Morpheus::is_dense_matrix<Tag>::value,
-                                      LayoutRef, void>>::value);
+      std::is_same<typename Container::array_layout, LayoutRef>::value);
 
   // Space Traits
   static_assert(std::is_same<typename Container::memory_space,

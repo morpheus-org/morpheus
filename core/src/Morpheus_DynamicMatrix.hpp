@@ -51,8 +51,8 @@ class DynamicMatrix
   using size_type            = typename traits::index_type;
   using index_type           = typename traits::index_type;
   using non_const_index_type = typename traits::non_const_index_type;
-  using array_layout         = typename traits::array_layout;
 
+  using array_layout = typename traits::array_layout;
   using memory_space = typename traits::memory_space;
   using HostMirror   = typename traits::HostMirror;
 
