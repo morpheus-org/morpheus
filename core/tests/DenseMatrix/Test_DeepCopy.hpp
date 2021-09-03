@@ -31,10 +31,9 @@ namespace Test {
 // state.
 TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_SameSpace_Mirror) {
   using test_memory_space = typename TEST_EXECSPACE::memory_space;
-  using container = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
+  using container  = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
                                           test_memory_space>;
-  using value_array_type = typename container::value_array_type;
-  using index_type       = typename container::index_type;
+  using index_type = typename container::index_type;
 
   container A("DenseMatrix", 4, 3, 1);
   container Ar("DenseMatrix", 4, 3, 2);
@@ -67,17 +66,15 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_SameSpace_Mirror) {
 // it should have a shared state.
 TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_SameSpace_MirrorContainer) {
   using test_memory_space = typename TEST_EXECSPACE::memory_space;
-  using container = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
+  using container  = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
                                           test_memory_space>;
-  using value_array_type = typename container::value_array_type;
-  using index_type       = typename container::index_type;
+  using index_type = typename container::index_type;
 
   container A("DenseMatrix", 4, 3, 1);
   container Ar("DenseMatrix", 4, 3, 2);
 
   // Might perform shallow copy if already on host
   auto A_mirror = Morpheus::create_mirror_container(A);
-  using mirror  = decltype(A_mirror);
 
   // if on host x_mirror should be a shallow copy of x
   Morpheus::copy(A, A_mirror);

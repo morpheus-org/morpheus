@@ -45,7 +45,6 @@ inline void waxpby(
   using index_type      = Kokkos::IndexType<typename Vector::index_type>;
   using range_policy    = Kokkos::RangePolicy<index_type, execution_space>;
   using ValueArray      = typename Vector::value_array_type;
-  using V               = typename Vector::value_type;
   using I               = typename Vector::index_type;
 
   const ValueArray x_view = x.const_view(), y_view = y.const_view();

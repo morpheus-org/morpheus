@@ -68,7 +68,6 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseVector_SameSpace_MirrorContainer) {
 
   // Might perform shallow copy if already on host
   auto x_mirror = Morpheus::create_mirror_container(x);
-  using mirror  = decltype(x_mirror);
 
   // if on host x_mirror should be a shallow copy of x
   Morpheus::copy(x, x_mirror);
