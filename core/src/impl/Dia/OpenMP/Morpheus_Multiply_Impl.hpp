@@ -57,8 +57,6 @@ inline void multiply(
       const IndexType col = row + A.diagonal_offsets[n];
 
       if (col >= 0 && col < A.ncols()) {
-        // FIXME: Inefficient accesses to A as it is forced to be column major
-        // due to deep copy
         sum += A.values(row, n) * x[col];
       }
     }

@@ -41,10 +41,32 @@ inline void multiply(
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                LinearOperator, MatrixOrVector1,
                                MatrixOrVector2>>* = nullptr) {
+  using IndexType       = typename LinearOperator::index_type;
+  using ValueType       = typename LinearOperator::value_type;
   using execution_space = typename ExecSpace::execution_space;
+  using member_type = typename Kokkos::TeamPolicy<execution_space>::member_type;
 
-  throw NotImplementedException(
-      "Dispatch based on Kokkos not yet implemented.");
+  const IndexType ndiag = A.values.ncols();
+  const Kokkos::TeamPolicy<execution_space> policy(A.nrows(), Kokkos::AUTO,
+                                                   Kokkos::AUTO);
+
+  Kokkos::parallel_for(
+      policy, KOKKOS_LAMBDA(const member_type& team_member) {
+        const IndexType row = team_member.league_rank();
+
+        ValueType sum = 0;
+        Kokkos::parallel_reduce(
+            Kokkos::TeamThreadRange(team_member, ndiag),
+            [=](const int& n, ValueType& lsum) {
+              const IndexType col = row + A.diagonal_offsets[n];
+
+              if (col >= 0 && col < A.ncols()) {
+                lsum += A.values(row, n) * x[col];
+              }
+            },
+            sum);
+        y[row] = sum;
+      });
 }
 
 }  // namespace Impl
