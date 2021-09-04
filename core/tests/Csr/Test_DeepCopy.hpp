@@ -93,7 +93,6 @@ TEST(TESTSUITE_NAME, DeepCopy_CsrMatrix_SameSpace_MirrorContainer) {
 
   // Might perform shallow copy if already on host
   auto A_mirror = Morpheus::create_mirror_container(A);
-  using mirror  = decltype(A_mirror);
 
   // if on host x_mirror should be a shallow copy of x
   Morpheus::copy(A, A_mirror);
