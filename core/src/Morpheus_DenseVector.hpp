@@ -87,7 +87,7 @@ class DenseVector
   inline DenseVector(const std::string name, index_type n, Generator rand_pool,
                      const value_type range_low, const value_type range_high)
       : _name(name + "Vector"), _size(n), _values(name + "Vector", size_t(n)) {
-    assign(n, rand_pool, range_low, range_high);
+    Kokkos::fill_random(_values, rand_pool, range_low, range_high);
   }
 
   // Need to make sure two containers are of compatible type for shallow copy

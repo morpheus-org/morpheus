@@ -102,11 +102,11 @@ void read_matrix_market_banner(matrix_market_banner& banner, Stream& input) {
                                 banner.symmetry + "]");
 }
 
-template <typename ValueType, typename IndexType, typename Space,
-          typename Stream>
-void read_coordinate_stream(
-    Morpheus::CooMatrix<ValueType, IndexType, Space>& coo, Stream& input,
-    const matrix_market_banner& banner) {
+template <typename ValueType, typename... Properties, typename Stream>
+void read_coordinate_stream(Morpheus::CooMatrix<ValueType, Properties...>& coo,
+                            Stream& input, const matrix_market_banner& banner) {
+  using IndexType =
+      typename Morpheus::CooMatrix<ValueType, Properties...>::index_type;
   // read file contents line by line
   std::string line;
 
@@ -140,7 +140,9 @@ void read_coordinate_stream(
       num_entries_read++;
     }
 
-    std::fill(coo.values.begin(), coo.values.end(), ValueType(1));
+    auto values_begin = coo.values.data();
+    auto values_end   = coo.values.data() + coo.values.size();
+    std::fill(values_begin, values_end, ValueType(1));
   } else if (banner.type == "real" || banner.type == "integer") {
     while (num_entries_read < coo.nnnz() && !input.eof()) {
       ValueType real;
@@ -167,14 +169,20 @@ void read_coordinate_stream(
 
   // check validity of row and column index data
   if (coo.nnnz() > 0) {
+    auto row_indices_begin = coo.row_indices.data();
+    auto row_indices_end   = coo.row_indices.data() + coo.row_indices.size();
     IndexType min_row_index =
-        *std::min_element(coo.row_indices.begin(), coo.row_indices.end());
+        *std::min_element(row_indices_begin, row_indices_end);
     IndexType max_row_index =
-        *std::max_element(coo.row_indices.begin(), coo.row_indices.end());
+        *std::max_element(row_indices_begin, row_indices_end);
+
+    auto column_indices_begin = coo.column_indices.data();
+    auto column_indices_end =
+        coo.column_indices.data() + coo.column_indices.size();
     IndexType min_col_index =
-        *std::min_element(coo.column_indices.begin(), coo.column_indices.end());
+        *std::min_element(column_indices_begin, column_indices_end);
     IndexType max_col_index =
-        *std::max_element(coo.column_indices.begin(), coo.column_indices.end());
+        *std::max_element(column_indices_begin, column_indices_end);
 
     if (min_row_index < 1)
       throw Morpheus::IOException("found invalid row index (index < 1)");
@@ -202,8 +210,8 @@ void read_coordinate_stream(
 
     IndexType general_num_entries = coo.nnnz() + off_diagonals;
 
-    Morpheus::CooMatrix<ValueType, IndexType, Space> general(
-        num_rows, num_cols, general_num_entries);
+    Morpheus::CooMatrix<ValueType, Properties...> general(num_rows, num_cols,
+                                                          general_num_entries);
 
     if (banner.symmetry == "symmetric") {
       IndexType nnz = 0;
@@ -242,9 +250,11 @@ void read_coordinate_stream(
   Morpheus::sort_by_row_and_column(coo);
 }
 
-template <typename ValueType, typename Space, typename Stream>
-void read_array_stream(Morpheus::DenseMatrix<ValueType, Space>& mtx,
+template <typename ValueType, typename... Properties, typename Stream>
+void read_array_stream(Morpheus::DenseMatrix<ValueType, Properties...>& mtx,
                        Stream& input, const matrix_market_banner& banner) {
+  using IndexType =
+      typename Morpheus::DenseMatrix<ValueType, Properties...>::index_type;
   // read file contents line by line
   std::string line;
 
@@ -259,16 +269,16 @@ void read_array_stream(Morpheus::DenseMatrix<ValueType, Space>& mtx,
   if (tokens.size() != 2)
     throw Morpheus::IOException("invalid MatrixMarket array format");
 
-  size_t num_rows, num_cols;
+  IndexType num_rows, num_cols;
 
   std::istringstream(tokens[0]) >> num_rows;
   std::istringstream(tokens[1]) >> num_cols;
 
-  Morpheus::DenseMatrix<ValueType, Space> dense(num_rows, num_cols);
+  Morpheus::DenseMatrix<ValueType, Properties...> dense(num_rows, num_cols);
 
-  size_t num_entries = num_rows * num_cols;
-
-  size_t num_entries_read = 0, nrows = 0, ncols = 0;
+  size_t num_entries      = num_rows * num_cols;
+  size_t num_entries_read = 0;
+  IndexType nrows = 0, ncols = 0;
 
   // read file contents
   if (banner.type == "pattern") {
@@ -280,7 +290,7 @@ void read_array_stream(Morpheus::DenseMatrix<ValueType, Space>& mtx,
 
       input >> real;
 
-      dense(nrows, ncols) = real;
+      dense(nrows, ncols) = ValueType(real);
 
       num_entries_read++;
       ncols++;
@@ -306,26 +316,31 @@ void read_array_stream(Morpheus::DenseMatrix<ValueType, Space>& mtx,
   Morpheus::copy(dense, mtx);
 }
 
-template <typename Matrix, typename Stream, typename Format>
-void read_matrix_market_stream(Matrix& mtx, Stream& input, Format) {
+template <template <class, class...> class Container, class T, class... P,
+          typename Stream>
+void read_matrix_market_stream(
+    Container<T, P...>& mtx, Stream& input, Morpheus::Impl::SparseMatTag,
+    typename std::enable_if<
+        is_container<typename Container<T, P...>::tag>::value &&
+        is_Host_Memoryspace_v<typename Container<T, P...>::memory_space>>::
+        type* = nullptr) {
   // general case
-  using IndexType = typename Matrix::index_type;
-  using ValueType = typename Matrix::value_type;
-  using Space     = Kokkos::Serial;
+  using IndexType = typename Container<T, P...>::index_type;
+  using ValueType = typename Container<T, P...>::value_type;
 
   // read banner
   matrix_market_banner banner;
   read_matrix_market_banner(banner, input);
 
   if (banner.storage == "coordinate") {
-    Morpheus::CooMatrix<ValueType, IndexType, Space> temp;
+    Morpheus::CooMatrix<T, P...> temp;
     read_coordinate_stream(temp, input, banner);
-    Morpheus::copy(temp, mtx);
+    Morpheus::convert(temp, mtx);
   } else  // banner.storage == "array"
   {
-    Morpheus::DenseMatrix<ValueType, Space> temp;
+    Morpheus::DenseMatrix<T, P...> temp;
     read_array_stream(temp, input, banner);
-    Morpheus::copy(temp, mtx);
+    Morpheus::convert(temp, mtx);
   }
 }
 
@@ -348,11 +363,9 @@ void write_value(Stream& output, const ScalarType& value) {
   output << value;
 }
 
-template <typename ValueType, typename IndexType, typename Space,
-          typename Stream>
+template <typename ValueType, typename... Properties, typename Stream>
 void write_coordinate_stream(
-    const Morpheus::CooMatrix<ValueType, IndexType, Space>& coo,
-    Stream& output) {
+    const Morpheus::CooMatrix<ValueType, Properties...>& coo, Stream& output) {
   if (std::is_floating_point_v<ValueType> || std::is_integral_v<ValueType>) {
     output << "%%MatrixMarket matrix coordinate real general\n";
   } else {
@@ -371,15 +384,17 @@ void write_coordinate_stream(
   }
 }
 
-template <typename Matrix, typename Stream>
-void write_matrix_market_stream(const Matrix& mtx, Stream& output,
-                                Morpheus::Impl::SparseMatTag) {
+template <template <class, class...> class Container, class T, class... P,
+          typename Stream>
+void write_matrix_market_stream(
+    const Container<T, P...>& mtx, Stream& output, Morpheus::Impl::SparseMatTag,
+    typename std::enable_if<
+        is_container<typename Container<T, P...>::tag>::value &&
+        is_Host_Memoryspace_v<typename Container<T, P...>::memory_space>>::
+        type* = nullptr) {
   // general sparse case
-  using IndexType = typename Matrix::index_type;
-  using ValueType = typename Matrix::value_type;
-  using Space     = Kokkos::Serial;
-
-  Morpheus::CooMatrix<ValueType, IndexType, Space> coo(mtx);
+  Morpheus::CooMatrix<T, P...> coo;
+  Morpheus::convert(mtx, coo);
 
   Morpheus::Io::Impl::write_coordinate_stream(coo, output);
 }
