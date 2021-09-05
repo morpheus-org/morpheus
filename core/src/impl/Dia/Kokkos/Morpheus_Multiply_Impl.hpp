@@ -31,52 +31,6 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecutionSpace, typename LinearOperator,
-          typename MatrixOrVector1, typename MatrixOrVector2>
-struct DiaSpmv_Kokkos {
-  using member_type = typename Kokkos::TeamPolicy<ExecutionSpace>::member_type;
-  using value_array_type =
-      typename LinearOperator::value_array_type::value_array_type;
-  using index_array_type =
-      typename LinearOperator::index_array_type::value_array_type;
-  using array_type1 = typename MatrixOrVector1::value_array_type;
-  using array_type2 = typename MatrixOrVector2::value_array_type;
-  using index_type  = typename LinearOperator::index_type;
-  using value_type  = typename LinearOperator::value_type;
-
-  value_array_type values;
-  array_type1 x;
-  array_type2 y;
-  index_array_type diagonal_offsets;
-  index_type ndiag, ncols;
-
-  DiaSpmv_Kokkos(LinearOperator A, MatrixOrVector1 _x, MatrixOrVector2 _y)
-      : values(A.values.const_view()),
-        diagonal_offsets(A.diagonal_offsets.const_view()),
-        x(_x.const_view()),
-        y(_y.view()) {
-    ndiag = A.values.ncols();
-    ncols = A.ncols();
-  }
-
-  KOKKOS_INLINE_FUNCTION void operator()(const member_type& team_member) const {
-    const index_type row = team_member.league_rank();
-
-    value_type sum = 0;
-    Kokkos::parallel_reduce(
-        Kokkos::TeamThreadRange(team_member, ndiag),
-        [=](const int& n, value_type& lsum) {
-          const index_type col = row + diagonal_offsets[n];
-
-          if (col >= 0 && col < ncols) {
-            lsum += values(row, n) * x[col];
-          }
-        },
-        sum);
-    y[row] = sum;
-  }
-};
-
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>
 inline void multiply(
@@ -88,13 +42,88 @@ inline void multiply(
                                LinearOperator, MatrixOrVector1,
                                MatrixOrVector2>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
+  using value_array_type =
+      typename LinearOperator::value_array_type::value_array_type;
+  using index_array_type =
+      typename LinearOperator::index_array_type::value_array_type;
+  using array_type1 = typename MatrixOrVector1::value_array_type;
+  using array_type2 = typename MatrixOrVector2::value_array_type;
+  using index_type  = typename LinearOperator::index_type;
+  using value_type  = typename LinearOperator::value_type;
+  using member_type = typename Kokkos::TeamPolicy<execution_space>::member_type;
+
+  const value_array_type values           = A.values.const_view();
+  const array_type1 x_view                = x.const_view();
+  const index_array_type diagonal_offsets = A.diagonal_offsets.const_view();
+  array_type2 y_view                      = y.view();
+  index_type ndiag = A.values.ncols(), ncols = A.ncols();
 
   const Kokkos::TeamPolicy<execution_space> policy(A.nrows(), Kokkos::AUTO,
                                                    Kokkos::AUTO);
 
   Kokkos::parallel_for(
-      policy, DiaSpmv_Kokkos<execution_space, LinearOperator, MatrixOrVector1,
-                             MatrixOrVector2>(A, x, y));
+      policy, KOKKOS_LAMBDA(const member_type& team_member) {
+        const index_type row = team_member.league_rank();
+
+        value_type sum = 0;
+        Kokkos::parallel_reduce(
+            Kokkos::TeamThreadRange(team_member, ndiag),
+            [=](const int& n, value_type& lsum) {
+              const index_type col = row + diagonal_offsets[n];
+
+              if (col >= 0 && col < ncols) {
+                lsum += values(row, n) * x_view[col];
+              }
+            },
+            sum);
+        y_view[row] = sum;
+      });
+}
+
+template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
+          typename MatrixOrVector2>
+inline void multiply(
+    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
+    DiaTag, DenseVectorTag, DenseVectorTag, Alg1,
+    typename std::enable_if_t<
+        Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space,
+                               LinearOperator, MatrixOrVector1,
+                               MatrixOrVector2>>* = nullptr) {
+  using execution_space = typename ExecSpace::execution_space;
+  using value_array_type =
+      typename LinearOperator::value_array_type::value_array_type;
+  using index_array_type =
+      typename LinearOperator::index_array_type::value_array_type;
+  using array_type1 = typename MatrixOrVector1::value_array_type;
+  using array_type2 = typename MatrixOrVector2::value_array_type;
+  using index_type  = typename LinearOperator::index_type;
+  using value_type  = typename LinearOperator::value_type;
+  using range_policy =
+      Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
+
+  const value_array_type values           = A.values.const_view();
+  const array_type1 x_view                = x.const_view();
+  const index_array_type diagonal_offsets = A.diagonal_offsets.const_view();
+  array_type2 y_view                      = y.view();
+  index_type ndiag = A.values.ncols(), ncols = A.ncols();
+
+  range_policy policy(0, A.nrows());
+
+  Kokkos::parallel_for(
+      policy, KOKKOS_LAMBDA(const index_type row) {
+        value_type sum = y_view[row];
+
+        for (index_type n = 0; n < ndiag; n++) {
+          const index_type col = row + diagonal_offsets[n];
+
+          if (col >= 0 && col < ncols) {
+            sum += values(row, n) * x_view[col];
+          }
+        }
+
+        y_view[row] = sum;
+      });
 }
 
 }  // namespace Impl
