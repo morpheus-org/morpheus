@@ -1,5 +1,5 @@
 /**
- * Morpheus_Fwd_Algorithms.hpp
+ * Morpheus_Fwd_MatrixOperations.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,18 +21,19 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_FWD_ALGORITHMS_HPP
-#define MORPHEUS_FWD_ALGORITHMS_HPP
+#ifndef MORPHEUS_FWD_MATRIXOPERATIONS_HPP
+#define MORPHEUS_FWD_MATRIXOPERATIONS_HPP
 
-#include <fwd/algorithms/Morpheus_Fwd_Convert.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Copy.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Dot.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_MatrixOperations.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Multiply.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Print.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Scan.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Reduction.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_Sort.hpp>
-#include <fwd/algorithms/Morpheus_Fwd_WAXPBY.hpp>
+namespace Morpheus {
 
-#endif  // MORPHEUS_FWD_ALGORITHMS_HPP
+template <typename ExecSpace, typename Algorithm, typename SparseMatrix,
+          typename Vector>
+inline void update_diagonal(SparseMatrix& A, const Vector& diagonal);
+
+// Default algorithm to run with update_diagonal is always Alg0
+template <typename ExecSpace, typename SparseMatrix, typename Vector>
+inline void update_diagonal(SparseMatrix& A, const Vector& diagonal);
+
+}  // namespace Morpheus
+
+#endif  // MORPHEUS_FWD_MATRIXOPERATIONS_HPP

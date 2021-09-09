@@ -40,6 +40,7 @@
 #include <Morpheus_Convert.hpp>
 #include <Morpheus_Copy.hpp>
 #include <Morpheus_Dot.hpp>
+#include <Morpheus_MatrixOperations.hpp>
 #include <Morpheus_Multiply.hpp>
 #include <Morpheus_Print.hpp>
 #include <Morpheus_Reduction.hpp>
