@@ -60,7 +60,7 @@ inline void multiply(
 
   Kokkos::parallel_for(
       policy, KOKKOS_LAMBDA(const I i) {
-        V sum = y_view[i];
+        V sum = 0;
         for (I jj = row_offsets[i]; jj < row_offsets[i + 1]; jj++) {
           sum += values[jj] * x_view[column_indices[jj]];
         }

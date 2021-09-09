@@ -46,7 +46,7 @@ inline void multiply(
   using ValueType = typename LinearOperator::value_type;
 
   for (IndexType i = 0; i < A.nrows(); i++) {
-    ValueType sum = y[i];
+    ValueType sum = 0;
     for (IndexType jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
       sum += A.values[jj] * x[A.column_indices[jj]];
     }

@@ -41,7 +41,7 @@ inline void multiply(
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                LinearOperator, MatrixOrVector1,
                                MatrixOrVector2>>* = nullptr) {
-  using execution_space = typename ExecSpace::execution_space;
+  //   using execution_space = typename ExecSpace::execution_space;
 
   throw NotImplementedException(
       "Dispatch based on Kokkos not yet implemented.");
