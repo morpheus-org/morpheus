@@ -12,3 +12,16 @@
 - Kokkos integration to use the different memory and execution spaces.
 - Interface for dispatching `multiply` and `print` operations using tag dispatching to distinguish amonst formats.
 - Extended interface to dispatch operations to different architectures using SFINAE. Each container should reside in the same execution space.
+
+## Version 0.3.0
+- Build `morpheus` as a package with different subpackages.
+- Enabled test environment for the core functionality using `googletest` framework.
+- Enabled GPU support through the Host-Device model.
+- Support for container mirroring through `create_mirror` and `create_mirror_container` as well as `HostMirror` trait.
+- Efficient deep copies for containers across same/different memory spaces through the `Morpheus::copy` routine.
+- Added `Dot` and `WAXPBY` alogirhtms for `DenseVector`.
+- Added `Reduction` and `Scan` routines for `DenseVector`.
+- Added `convert` algorithms for conversion across different containers on Host space.
+- Algorithm dispatch through `Kokkos::Serial`, `Kokkos::OpenMP` and `Kokkos::Cuda` for the custom kernels.
+- Added `Morpheus::Serial`, `Morpheus::OpenMP` and `Morpheus::Cuda` to be used for dispatching Kokkos kernels in algorithms.
+- `SpMV` implementation for `CooMatrix`, `CsrMatrix` and `DiaMatrix` available for `Kokkos::Serial`, `Kokkos::OpenMP`, `Kokkos::Cuda` and Kokkos equivalent spaces - except for currently the Kokkos implementation for `CooMatrix`.

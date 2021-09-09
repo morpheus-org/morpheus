@@ -38,7 +38,8 @@ cmake_policy(SET CMP0057 NEW)
 # Is this build a subdirectory of another project
 get_directory_property(MORPHEUS_HAS_PARENT PARENT_DIRECTORY)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+                      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
@@ -83,7 +84,7 @@ elseif(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 set(Morpheus_VERSION_MAJOR 0)
-set(Morpheus_VERSION_MINOR 02)
+set(Morpheus_VERSION_MINOR 03)
 set(Morpheus_VERSION_PATCH 00)
 set(Morpheus_VERSION
     "${Morpheus_VERSION_MAJOR}.${Morpheus_VERSION_MINOR}.${Morpheus_VERSION_PATCH}"
