@@ -1,5 +1,9 @@
 .idea
 .vscode
+
+data/*/*.mtx
+data/*/*.mat
+
 # Created by .ignore support plugin (hsz.mobi)
 ### CMake template
 CMakeLists.txt.user

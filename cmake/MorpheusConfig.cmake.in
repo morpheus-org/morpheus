@@ -1,24 +1,22 @@
-@PACKAGE_INIT@
+@PACKAGE_INIT@ 
 
-cmake_minimum_required(VERSION 3.12)
-
-@Morpheus_BUILD_DIR_EXPORT_SETTINGS@
-
-# make the bundled find modules in this directory available
-list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+# Compute paths
+GET_FILENAME_COMPONENT(Morpheus_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 include(CMakeFindDependencyMacro)
 
-include("${CMAKE_CURRENT_LIST_DIR}/MorpheusTargets.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/MorpheusConfigVersion.cmake")
+@MORPHEUS_TPL_EXPORTS@
 
-find_dependency(Kokkos REQUIRED)
+find_dependency(Kokkos HINTS @Kokkos_DIR@)
 
-list(POP_FRONT CMAKE_MODULE_PATH)
+SET(Morpheus_VERSION_MAJOR  @Morpheus_VERSION_MAJOR@)
+SET(Morpheus_VERSION_MINOR   @Morpheus_VERSION_MINOR@)
+SET(Morpheus_VERSION_PATCH   @Morpheus_VERSION_PATCH@)
+SET(MORPHEUS_VERSION  @MORPHEUS_VERSION@)
 
-check_required_components(morpheus)
+SET(MORPHEUS_ENABLE_OPENMP  @Kokkos_ENABLE_OPENMP@)
+SET(MORPHEUS_ENABLE_CUDA    @Kokkos_ENABLE_CUDA@)
+SET(MORPHEUS_ENABLE_HIP     @Kokkos_ENABLE_HIP@)
+SET(MORPHEUS_ENABLE_SERIAL  @Kokkos_ENABLE_SERIAL@)
 
-set(${CMAKE_FIND_PACKAGE_NAME}_CONFIG "${CMAKE_CURRENT_LIST_FILE}")
-
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(${CMAKE_FIND_PACKAGE_NAME} CONFIG_MODE)
+INCLUDE("${Morpheus_CMAKE_DIR}/MorpheusTargets.cmake")
