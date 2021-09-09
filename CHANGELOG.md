@@ -25,3 +25,5 @@
 - Algorithm dispatch through `Kokkos::Serial`, `Kokkos::OpenMP` and `Kokkos::Cuda` for the custom kernels.
 - Added `Morpheus::Serial`, `Morpheus::OpenMP` and `Morpheus::Cuda` to be used for dispatching Kokkos kernels in algorithms.
 - `SpMV` implementation for `CooMatrix`, `CsrMatrix` and `DiaMatrix` available for `Kokkos::Serial`, `Kokkos::OpenMP`, `Kokkos::Cuda` and Kokkos equivalent spaces - except for currently the Kokkos implementation for `CooMatrix`.
+- Enabled shallow copy semantics between `DynamicMatrix` and concrete containers based on the active type of the `DynamicMatrix`.
+- Enabled mirroring and deep copy semantics for the `DynamicMatrix`.
