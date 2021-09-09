@@ -40,11 +40,11 @@ Currently `Morpheus` is under development so no documentation is available yet. 
 
 ### Supported Formats
 
-| Format | Container | Serial | OpenMP | CUDA | HIP |
-| ------ | --------- | ------ | ------ | ---- | --- |
-| Coo    | CooMatrix | yes    | yes    | no   | no  |
-| Csr    | CsrMatrix | yes    | yes    | no   | no  |
-| Dia    | DiaMatrix | tes    | yes    | no   | no  |
+| Format | Container | Serial | OpenMP | CUDA | HIP | Kokkos |
+| ------ | --------- | ------ | ------ | ---- | --- | --- |
+| Coo    | CooMatrix | yes    | yes    | yes   | no  | no |
+| Csr    | CsrMatrix | yes    | yes    | yes   | no  | yes |
+| Dia    | DiaMatrix | tes    | yes    | yes   | no  | yes |
 
 ### Specifying a container
 
@@ -52,7 +52,7 @@ To define a container we need to specify four template parameters:
 - `ValueType`: The type of the values the container will hold. Valid types must satisfy `std::is_arithmetic` i.e to be an arithmetic type.
 - `IndexType`: The type of the indices the container will hold. Valid types must satisfy `std::is_integral` i.e to be an integral type.
 - `Layout`: Orientation of data in memory. Valid layouts are either  `Kokkos::LayoutLeft` (Column-Major) or `Kokkos::LayoutRight` (Row-Major).
-- `Space`: Either an execution or memory space supported by Kokkos. Valid *Memory* Spaces are `Kokkos::HostSpace`, `Kokkos::CudaSpace` and `Kokkos::HipSpace`. Valid *Execution* Spaces are `Kokkos::Serial`, `Kokkos::OpenMP`, `Kokkos::Cuda` and `Kokkos::HIP`.
+- `MemorySpace`: A memory space supported by Kokkos. Valid *Memory* Spaces are `Kokkos::HostSpace`, `Kokkos::CudaSpace` and `Kokkos::HipSpace` or `Kokkos::Serial::memory_spae`, `Kokkos::OpenMP::memory_spae`, `Kokkos::Cuda::memory_spae` and `Kokkos::HIP::memory_spae`.
 
 Note that only `ValueType` is mandatory. For the rest of the arguments, if not provided, sensible defaults will be selected.
 
@@ -64,9 +64,9 @@ int main(){
      * ValueType : double
      * IndexType : long long
      * Layout    : Kokkos::LayoutRight
-     * Space     : Kokkos::Serial 
+     * Space     : Kokkos::Serial::memory_spae 
      */
-    Morpheus::CooMatirx<double, long long, Kokkos::LayoutRight, Kokkos::Serial> A;  
+    Morpheus::CooMatirx<double, long long, Kokkos::LayoutRight, typename Kokkos::Serial::memory_spae> A;  
 
     /* 
      * ValueType : double
@@ -90,12 +90,13 @@ For each algorithm the same interface is used across different formats. Algorith
 #include <Morpheus_Core.hpp>
 
 using serial = Kokkos::Serial;
+using host = Kokkos::Serial::memory_spae;
 
 int main(){
     // [ 3.5   *   * ]
     // [  *   1.5  * ]
-    Morpheus::CooMatirx<double, serial> A(2, 3, 2);  
-    Morpheus::DenseVector<double, serial> x(3, 0), y(2, 0); 
+    Morpheus::CooMatirx<double, host> A(2, 3, 2);  
+    Morpheus::DenseVector<double, host> x(3, 0), y(2, 0); 
     
     // Initializing A
     A.row_indices[0] = 0;
@@ -142,10 +143,16 @@ After configuration, to build and run the `Serial` tests do:
 ```sh
 $ cd  ${srcdir}
 $ make MorpheusCore_UnitTest_Serial
-$ ${srcdir}/core/tests/MorpheusCore_UnitTest_OpenMP
+$ ${srcdir}/core/tests/MorpheusCore_UnitTest_Serial
 ```
 Same process can be followed for `OpenMP`, `Cuda` and `HIP`.
 
+To build and run all the available tests then do:
+```sh
+$ cd  ${srcdir}
+$ make MorpheusCore_UnitTest
+$ ${srcdir}/core/tests/MorpheusCore_UnitTest
+```
 To build and run the examples add the `-DMorpheus_ENABLE_EXAMPLES=On` during configuration. Similar process is followed as building the tests.
 
 # License

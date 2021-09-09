@@ -121,6 +121,13 @@ $ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/cuda-11.0
 $ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/cuda-11.0
 ```
 
+## Local Machine
+```sh
+$ CXX_COMPILER=/usr/local/bin/g++-11
+$ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/gnu
+$ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/gnu
+```
+
 ### Installing Kokkos
 ```sh
 $ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_INSTALL_DIR} \
