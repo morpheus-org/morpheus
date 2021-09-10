@@ -61,18 +61,18 @@ Note that only `ValueType` is mandatory. For the rest of the arguments, if not p
 
 int main(){
     /* 
-     * ValueType : double
-     * IndexType : long long
-     * Layout    : Kokkos::LayoutRight
-     * Space     : Kokkos::Serial::memory_spae 
+     * ValueType        : double
+     * IndexType        : long long
+     * Layout           : Kokkos::LayoutRight
+     * MemorySpace      : Kokkos::HostSpace 
      */
-    Morpheus::CooMatirx<double, long long, Kokkos::LayoutRight, typename Kokkos::Serial::memory_spae> A;  
+    Morpheus::CooMatirx<double, long long, Kokkos::LayoutRight, Kokkos::HostSpace> A;  
 
     /* 
-     * ValueType : double
-     * IndexType : int (Default)
-     * Layout    : Kokkos::LayoutRight (Default), 
-     * Space     : Kokkos::DefaultSpace (Default) 
+     * ValueType        : double
+     * IndexType        : int (Default)
+     * Layout           : Kokkos::LayoutRight (Default), 
+     * MemorySpace      : Kokkos::DefaultSpace (Default) 
      */
     Morpheus::CsrMatirx<double> B; 
 }
@@ -89,14 +89,11 @@ For each algorithm the same interface is used across different formats. Algorith
 ```cpp
 #include <Morpheus_Core.hpp>
 
-using serial = Kokkos::Serial;
-using host = Kokkos::Serial::memory_spae;
-
 int main(){
     // [ 3.5   *   * ]
     // [  *   1.5  * ]
-    Morpheus::CooMatirx<double, host> A(2, 3, 2);  
-    Morpheus::DenseVector<double, host> x(3, 0), y(2, 0); 
+    Morpheus::CooMatirx<double,  Kokkos::HostSpace> A(2, 3, 2);  
+    Morpheus::DenseVector<double,  Kokkos::HostSpace> x(3, 0), y(2, 0); 
     
     // Initializing A
     A.row_indices[0] = 0;
@@ -111,7 +108,7 @@ int main(){
     x[0] = 1; x[1] = 2; x[2] = 3;
 
     // y = A * x
-    Morpheus::Multiply<serial>(A, x, y);
+    Morpheus::Multiply<Kokkos::Serial>(A, x, y);
 }
 ```
 
