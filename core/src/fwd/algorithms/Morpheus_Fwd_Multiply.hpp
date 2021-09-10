@@ -29,7 +29,7 @@ namespace Morpheus {
 template <typename ExecSpace, typename Algorithm, typename LinearOperator,
           typename MatrixOrVector1, typename MatrixOrVector2>
 void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-              MatrixOrVector2& y, Algorithm);
+              MatrixOrVector2& y);
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
           typename MatrixOrVector2>

@@ -24,10 +24,10 @@
 #include <Morpheus_Core.hpp>
 #include <iostream>
 
-using coo    = Morpheus::CooMatrix<double, int, Kokkos::Serial>;
-using dia    = Morpheus::DiaMatrix<double, int, Kokkos::Serial>;
-using vec    = Morpheus::DenseVector<double, Kokkos::Serial>;
-using serial = typename Kokkos::Serial::execution_space;
+using coo    = Morpheus::CooMatrix<double, int, Kokkos::HostSpace>;
+using dia    = Morpheus::DiaMatrix<double, int, Kokkos::HostSpace>;
+using vec    = Morpheus::DenseVector<double, Kokkos::HostSpace>;
+using serial = typename Kokkos::Serial;
 
 // Large matrix
 // [ 1,  0, 13,  0,  0],
@@ -83,8 +83,8 @@ int main() {
     Morpheus::multiply<serial>(A, x, ya);
     Morpheus::multiply<serial>(B, x, yb);
 
-    Morpheus::copy(A, B_from_coo);  // should be same with B
-    Morpheus::copy(B, A_from_dia);  // should be same with A
+    Morpheus::convert(A, B_from_coo);  // should be same with B
+    Morpheus::convert(B, A_from_dia);  // should be same with A
 
     std::cout << "============ Checking build_large ============" << std::endl;
     Morpheus::print(ya);
@@ -112,8 +112,8 @@ int main() {
     Morpheus::multiply<serial>(A, x, ya);
     Morpheus::multiply<serial>(B, x, yb);
 
-    Morpheus::copy(A, B_from_coo);  // should be same with B
-    Morpheus::copy(B, A_from_dia);  // should be same with A
+    Morpheus::convert(A, B_from_coo);  // should be same with B
+    Morpheus::convert(B, A_from_dia);  // should be same with A
 
     std::cout << "============ Checking build_medium ============\n";
     Morpheus::print(ya);
@@ -140,8 +140,8 @@ int main() {
     Morpheus::multiply<serial>(A, x, ya);
     Morpheus::multiply<serial>(B, x, yb);
 
-    Morpheus::copy(A, B_from_coo);  // should be same with B
-    Morpheus::copy(B, A_from_dia);  // should be same with A
+    Morpheus::convert(A, B_from_coo);  // should be same with B
+    Morpheus::convert(B, A_from_dia);  // should be same with A
 
     std::cout << "============ Checking build_many_diag ============\n";
     Morpheus::print(ya);
@@ -168,8 +168,8 @@ int main() {
     Morpheus::multiply<serial>(A, x, ya);
     Morpheus::multiply<serial>(B, x, yb);
 
-    Morpheus::copy(A, B_from_coo);  // should be same with B
-    Morpheus::copy(B, A_from_dia);  // should be same with A
+    Morpheus::convert(A, B_from_coo);  // should be same with B
+    Morpheus::convert(B, A_from_dia);  // should be same with A
 
     std::cout << "============ Checking build_simple ============\n";
     Morpheus::print(ya);

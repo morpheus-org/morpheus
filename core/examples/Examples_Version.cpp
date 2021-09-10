@@ -25,8 +25,8 @@
 #include <iostream>
 
 int main() {
-  std::cout << "Welcome to Morpheus v" << MORPHEUS_VERSION_MAJOR << "."
-            << MORPHEUS_VERSION_MINOR << "." << MORPHEUS_VERSION_PATCH << " ("
+  std::cout << "Welcome to Morpheus v" << Morpheus_VERSION_MAJOR << "."
+            << Morpheus_VERSION_MINOR << "." << Morpheus_VERSION_PATCH << " ("
             << MORPHEUS_VERSION << ")" << std::endl;
 
   return 0;
