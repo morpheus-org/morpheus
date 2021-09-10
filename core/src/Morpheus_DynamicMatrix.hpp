@@ -75,23 +75,26 @@ class DynamicMatrix
   template <typename Matrix>
   inline DynamicMatrix(
       const Matrix &src,
-      typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
-          * = nullptr)
+      typename std::enable_if<
+          is_variant_member_v<typename Matrix::type, variant_type>>::type * =
+          nullptr)
       : base("DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()),
         _formats(src) {}
 
   template <typename Matrix>
   inline DynamicMatrix(
       const std::string name, const Matrix &src,
-      typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
-          * = nullptr)
+      typename std::enable_if<
+          is_variant_member_v<typename Matrix::type, variant_type>>::type * =
+          nullptr)
       : base(name + "DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()),
         _formats(src) {}
 
   // Assignment from another matrix type
   template <typename Matrix>
-  typename std::enable_if<is_variant_member_v<Matrix, variant_type>,
-                          DynamicMatrix &>::type
+  typename std::enable_if<
+      is_variant_member_v<typename Matrix::type, variant_type>,
+      DynamicMatrix &>::type
   operator=(const Matrix &matrix) {
     base::resize(matrix.nrows(), matrix.ncols(), matrix.nnnz());
     _formats = matrix;
@@ -129,7 +132,7 @@ class DynamicMatrix
 
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
-                     const index_type nnz, Args &&... args) {
+                     const index_type nnz, Args &&...args) {
     base::resize(m, n, nnz);
     auto f = std::bind(Impl::any_type_resize<ValueType, Properties...>(),
                        std::placeholders::_1, m, n, nnz,
