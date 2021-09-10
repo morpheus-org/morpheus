@@ -24,10 +24,12 @@
 #ifndef MORPHEUS_CSR_OPENMP_MATRIXOPERATIONS_IMPL_HPP
 #define MORPHEUS_CSR_OPENMP_MATRIXOPERATIONS_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_OPENMP)
+
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
-#include <Morpheus_Exceptions.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -42,11 +44,16 @@ inline void update_diagonal(
                                SparseMatrix, Vector>>* = nullptr) {
   using IndexType = typename SparseMatrix::index_type;
 
-  throw Morpheus::NotImplementedException(
-      "OpenMP update_diagonal for CsrMatrix not implemented.");
+#pragma omp parallel for
+  for (IndexType i = 0; i < A.nrows(); ++i) {
+    for (IndexType jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
+      if (A.column_indices[jj] == i) A.values[jj] = diagonal[i];
+    }
+  }
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_OPENMP
 #endif  // MORPHEUS_CSR_OPENMP_MATRIXOPERATIONS_IMPL_HPP

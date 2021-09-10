@@ -24,6 +24,9 @@
 #ifndef MORPHEUS_CSR_CUDA_MATRIXOPERATIONS_IMPL_HPP
 #define MORPHEUS_CSR_CUDA_MATRIXOPERATIONS_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_CUDA)
+
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
@@ -49,4 +52,5 @@ inline void update_diagonal(
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_CUDA
 #endif  // MORPHEUS_CSR_CUDA_MATRIXOPERATIONS_IMPL_HPP

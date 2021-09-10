@@ -27,7 +27,6 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
-#include <Morpheus_Exceptions.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -42,8 +41,11 @@ inline void update_diagonal(
                                SparseMatrix, Vector>>* = nullptr) {
   using IndexType = typename SparseMatrix::index_type;
 
-  throw Morpheus::NotImplementedException(
-      "Serial update_diagonal for CsrMatrix not implemented.");
+  for (IndexType i = 0; i < A.nrows(); ++i) {
+    for (IndexType jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
+      if (A.column_indices[jj] == i) A.values[jj] = diagonal[i];
+    }
+  }
 }
 
 }  // namespace Impl

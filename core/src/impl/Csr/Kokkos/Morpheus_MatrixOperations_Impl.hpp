@@ -39,10 +39,30 @@ inline void update_diagonal(
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
-  using IndexType = typename SparseMatrix::index_type;
+  using execution_space = typename ExecSpace::execution_space;
+  using index_type      = typename LinearOperator::index_type;
+  using value_type      = typename LinearOperator::value_type;
+  using ValueArray =
+      typename LinearOperator::value_array_type::value_array_type;
+  using IndexArray =
+      typename LinearOperator::index_array_type::value_array_type;
 
-  throw Morpheus::NotImplementedException(
-      "Kokkos update_diagonal for CsrMatrix not implemented.");
+  using range_policy =
+      Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
+
+  ValueArray values              = A.values.view();
+  IndexArray column_indices      = A.column_indices.view();
+  IndexArray row_offsets         = A.row_offsets.view();
+  const ValueArray diagonal_view = diagonal.const_view();
+
+  range_policy policy(0, A.nrows());
+
+  Kokkos::parallel_for(
+      policy, KOKKOS_LAMBDA(const index_type i) {
+        for (index_type jj = row_offsets[i]; jj < row_offsets[i + 1]; jj++) {
+          if (column_indices[jj] == i) values[jj] = diagonal_view[i];
+        }
+      });
 }
 
 }  // namespace Impl
