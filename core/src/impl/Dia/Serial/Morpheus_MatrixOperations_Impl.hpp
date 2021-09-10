@@ -27,7 +27,6 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
-#include <Morpheus_Exceptions.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -41,10 +40,19 @@ inline void update_diagonal(
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
   using IndexType = typename SparseMatrix::index_type;
+  using ValueType = typename SparseMatrix::value_type;
 
-  throw Morpheus::NotImplementedException(
-      "Serial update_diagonal for DiaMatrix not implemented.");
-}
+  const IndexType ndiag = A.values.ncols();
+
+  for (IndexType row = 0; row < A.nrows(); row++) {
+    for (IndexType n = 0; n < ndiag; n++) {
+      const IndexType col = row + A.diagonal_offsets[n];
+
+      if (col == row) {
+        A.values(row, n) = diagonal[col];
+      }
+    }
+  }
 
 }  // namespace Impl
 }  // namespace Morpheus

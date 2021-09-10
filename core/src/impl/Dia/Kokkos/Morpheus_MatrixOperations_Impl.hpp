@@ -39,10 +39,35 @@ inline void update_diagonal(
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
-  using IndexType = typename SparseMatrix::index_type;
+  using execution_space = typename ExecSpace::execution_space;
+  using value_array_type =
+      typename SparseMatrix::value_array_type::value_array_type;
+  using index_array_type =
+      typename SparseMatrix::index_array_type::value_array_type;
+  using array_type = typename Vector::value_array_type;
+  using index_type = typename SparseMatrix::index_type;
+  using value_type = typename SparseMatrix::value_type;
+  using range_policy =
+      Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
 
-  throw Morpheus::NotImplementedException(
-      "Kokkos update_diagonal for DiaMatrix not implemented.");
+  value_array_type values           = A.values.view();
+  index_array_type diagonal_offsets = A.diagonal_offsets.view();
+  const array_type x_view           = x.const_view();
+
+  index_type ndiag = A.values.ncols(), ncols = A.ncols();
+
+  range_policy policy(0, A.nrows());
+
+  Kokkos::parallel_for(
+      policy, KOKKOS_LAMBDA(const index_type row) {
+        for (index_type n = 0; n < ndiag; n++) {
+          const index_type col = row + A.diagonal_offsets[n];
+
+          if (col == row) {
+            A.values(row, n) = diagonal[col];
+          }
+        }
+      });
 }
 
 }  // namespace Impl
