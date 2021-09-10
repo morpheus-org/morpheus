@@ -28,12 +28,22 @@
 
 using value_type = double;
 using index_type = int;
-using vec_host   = Morpheus::DenseVector<value_type, Kokkos::HostSpace>;
+
 using coo_host = Morpheus::CooMatrix<value_type, index_type, Kokkos::HostSpace>;
 using csr_host = Morpheus::CsrMatrix<value_type, index_type, Kokkos::HostSpace>;
 using dia_host = Morpheus::DiaMatrix<value_type, index_type, Kokkos::HostSpace>;
+using vec_host = Morpheus::DenseVector<value_type, Kokkos::HostSpace>;
 using dynamic_host =
     Morpheus::DynamicMatrix<value_type, index_type, Kokkos::HostSpace>;
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+using coo_dev = Morpheus::CooMatrix<value_type, index_type, Kokkos::CudaSpace>;
+using csr_dev = Morpheus::CsrMatrix<value_type, index_type, Kokkos::CudaSpace>;
+using dia_dev = Morpheus::DiaMatrix<value_type, index_type, Kokkos::CudaSpace>;
+using vec_dev = Morpheus::DenseVector<value_type, Kokkos::CudaSpace>;
+using dynamic_dev =
+    Morpheus::DynamicMatrix<value_type, index_type, Kokkos::CudaSpace>;
+#endif
 
 const value_type UPDATE_VAL = -5;
 
@@ -42,89 +52,9 @@ const value_type UPDATE_VAL = -5;
 //    [ 0  0 30]
 //    [40 50 60]
 
-void init(coo_host& A);
-void init(csr_host& A);
-void init(dia_host& A);
-
-void ref(coo_host& A);
-void ref(csr_host& A);
-void ref(dia_host& A);
-
-void validate(const coo_host& A, const coo_host& Aref);
-void validate(const csr_host& A, const csr_host& Aref);
-void validate(const dia_host& A, const dia_host& Aref);
-
-template <typename Matrix, typename Space>
-void update_and_print(dynamic_host& Ad) {
-  Matrix A, Aref;
-  init(A);
-  ref(Aref);
-
-  vec_host diag(A.ncols(), UPDATE_VAL);
-
-  Ad = A;
-  Morpheus::update_diagonal<Space>(Ad, diag);
-
-  validate(A, Aref);
-}
-
-template <typename Matrix, typename Space>
-void update_and_print() {
-  Matrix A, Aref;
-  init(A);
-  ref(Aref);
-
-  vec_host diag(A.ncols(), UPDATE_VAL);
-
-  Morpheus::update_diagonal<Space>(A, diag);
-
-  validate(A, Aref);
-}
-
-int main() {
-  Morpheus::initialize();
-  {
-    dynamic_host A;
-
-    update_and_print<coo_host, Kokkos::Serial>();
-    update_and_print<csr_host, Kokkos::Serial>();
-    update_and_print<dia_host, Kokkos::Serial>();
-
-    update_and_print<coo_host, Morpheus::Serial>();
-    update_and_print<csr_host, Morpheus::Serial>();
-    update_and_print<dia_host, Morpheus::Serial>();
-
-    update_and_print<coo_host, Kokkos::Serial>(A);
-    update_and_print<csr_host, Kokkos::Serial>(A);
-    update_and_print<dia_host, Kokkos::Serial>(A);
-
-    update_and_print<coo_host, Morpheus::Serial>(A);
-    update_and_print<csr_host, Morpheus::Serial>(A);
-    update_and_print<dia_host, Morpheus::Serial>(A);
-
-#if defined(MORPHEUS_ENABLE_OPENMP)
-    update_and_print<coo_host, Kokkos::OpenMP>();
-    update_and_print<csr_host, Kokkos::OpenMP>();
-    update_and_print<dia_host, Kokkos::OpenMP>();
-
-    update_and_print<coo_host, Morpheus::OpenMP>();
-    update_and_print<csr_host, Morpheus::OpenMP>();
-    update_and_print<dia_host, Morpheus::OpenMP>();
-
-    update_and_print<coo_host, Kokkos::OpenMP>(A);
-    update_and_print<csr_host, Kokkos::OpenMP>(A);
-    update_and_print<dia_host, Kokkos::OpenMP>(A);
-
-    update_and_print<coo_host, Morpheus::OpenMP>(A);
-    update_and_print<csr_host, Morpheus::OpenMP>(A);
-    update_and_print<dia_host, Morpheus::OpenMP>(A);
-#endif
-  }
-  Morpheus::finalize();
-}
-
-void init(coo_host& A) {
-  coo_host mat(4, 3, 6);
+template <typename Matrix>
+void init(Matrix& A, Morpheus::CooTag) {
+  Matrix mat(4, 3, 6);
 
   // initialize matrix entries
   mat.row_indices[0]    = 0;
@@ -149,8 +79,9 @@ void init(coo_host& A) {
   A = mat;
 }
 
-void init(csr_host& A) {
-  csr_host mat(4, 3, 6);
+template <typename Matrix>
+void init(Matrix& A, Morpheus::CsrTag) {
+  Matrix mat(4, 3, 6);
 
   // initialize matrix entries
   mat.row_offsets[0] = 0;
@@ -175,8 +106,9 @@ void init(csr_host& A) {
   A = mat;
 }
 
-void init(dia_host& A) {
-  dia_host mat(4, 3, 6, 5);
+template <typename Matrix>
+void init(Matrix& A, Morpheus::DiaTag) {
+  Matrix mat(4, 3, 6, 5);
 
   // Diagonal offsets
   mat.diagonal_offsets[0] = -3;
@@ -214,8 +146,9 @@ void init(dia_host& A) {
   A = mat;
 }
 
-void ref(coo_host& A) {
-  coo_host mat(4, 3, 6);
+template <typename Matrix>
+void ref(Matrix& A, Morpheus::CooTag) {
+  Matrix mat(4, 3, 6);
 
   // initialize matrix entries
   mat.row_indices[0]    = 0;
@@ -240,8 +173,9 @@ void ref(coo_host& A) {
   A = mat;
 }
 
-void ref(csr_host& A) {
-  csr_host mat(4, 3, 6);
+template <typename Matrix>
+void ref(Matrix& A, Morpheus::CsrTag) {
+  Matrix mat(4, 3, 6);
 
   // initialize matrix entries
   mat.row_offsets[0] = 0;
@@ -266,8 +200,9 @@ void ref(csr_host& A) {
   A = mat;
 }
 
-void ref(dia_host& A) {
-  dia_host mat(4, 3, 6, 5);
+template <typename Matrix>
+void ref(Matrix& A, Morpheus::DiaTag) {
+  Matrix mat(4, 3, 6, 5);
 
   // Diagonal offsets
   mat.diagonal_offsets[0] = -3;
@@ -305,7 +240,8 @@ void ref(dia_host& A) {
   A = mat;
 }
 
-void validate(const coo_host& A, const coo_host& Aref) {
+template <typename Matrix>
+void validate(const Matrix& A, const Matrix& Aref, Morpheus::CooTag) {
   for (index_type n = 0; n < A.nnnz(); n++) {
     if (A.row_indices[n] != Aref.row_indices[n]) {
       std::stringstream msg;
@@ -331,7 +267,8 @@ void validate(const coo_host& A, const coo_host& Aref) {
   }
 }
 
-void validate(const csr_host& A, const csr_host& Aref) {
+template <typename Matrix>
+void validate(const Matrix& A, const Matrix& Aref, Morpheus::CsrTag) {
   for (index_type i = 0; i < A.nrows(); i++) {
     if (A.row_offsets[i] != Aref.row_offsets[i]) {
       std::stringstream msg;
@@ -358,7 +295,8 @@ void validate(const csr_host& A, const csr_host& Aref) {
   }
 }
 
-void validate(const dia_host& A, const dia_host& Aref) {
+template <typename Matrix>
+void validate(const Matrix& A, const Matrix& Aref, Morpheus::DiaTag) {
   const index_type ndiag = A.values.ncols();
 
   for (index_type row = 0; row < A.nrows(); row++) {
@@ -384,4 +322,111 @@ void validate(const dia_host& A, const dia_host& Aref) {
       }
     }
   }
+}
+
+template <typename DynamicMatrix, typename Matrix, typename Vector,
+          typename ExecSpace>
+void update_and_print(DynamicMatrix& Ad) {
+  using tag = typename Matrix::HostMirror::tag;
+  typename Matrix::HostMirror Ah, Ah_ref, Aout;
+
+  init(Ah, tag{});
+  ref(Ah_ref, tag{});
+
+  Vector diag(Ah.ncols(), UPDATE_VAL);
+
+  Matrix A;
+  Morpheus::copy(Ah, A);
+  Ad = A;
+  Morpheus::update_diagonal<ExecSpace>(Ad, diag);
+  Morpheus::copy(Ad, Aout);
+
+  validate(Aout, Ah_ref, tag{});
+}
+
+template <typename Matrix, typename Vector, typename ExecSpace>
+void update_and_print() {
+  using tag = typename Matrix::HostMirror::tag;
+  typename Matrix::HostMirror Ah, Ah_ref, Aout;
+
+  init(Ah, tag{});
+  ref(Ah_ref, tag{});
+
+  Vector diag(Ah.ncols(), UPDATE_VAL);
+
+  Matrix A;
+  Morpheus::copy(Ah, A);
+  Morpheus::update_diagonal<ExecSpace>(A, diag);
+  Morpheus::copy(A, Aout);
+
+  validate(Aout, Ah_ref, tag{});
+}
+
+int main() {
+  Morpheus::initialize();
+  {
+    {
+      dynamic_host A;
+
+      update_and_print<coo_host, vec_host, Kokkos::Serial>();
+      update_and_print<csr_host, vec_host, Kokkos::Serial>();
+      update_and_print<dia_host, vec_host, Kokkos::Serial>();
+
+      update_and_print<coo_host, vec_host, Morpheus::Serial>();
+      update_and_print<csr_host, vec_host, Morpheus::Serial>();
+      update_and_print<dia_host, vec_host, Morpheus::Serial>();
+
+      update_and_print<dynamic_host, coo_host, vec_host, Kokkos::Serial>(A);
+      update_and_print<dynamic_host, csr_host, vec_host, Kokkos::Serial>(A);
+      update_and_print<dynamic_host, dia_host, vec_host, Kokkos::Serial>(A);
+
+      update_and_print<dynamic_host, coo_host, vec_host, Morpheus::Serial>(A);
+      update_and_print<dynamic_host, csr_host, vec_host, Morpheus::Serial>(A);
+      update_and_print<dynamic_host, dia_host, vec_host, Morpheus::Serial>(A);
+    }
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+    {
+      dynamic_host A;
+      update_and_print<coo_host, vec_host, Kokkos::OpenMP>();
+      update_and_print<csr_host, vec_host, Kokkos::OpenMP>();
+      update_and_print<dia_host, vec_host, Kokkos::OpenMP>();
+
+      update_and_print<coo_host, vec_host, Morpheus::OpenMP>();
+      update_and_print<csr_host, vec_host, Morpheus::OpenMP>();
+      update_and_print<dia_host, vec_host, Morpheus::OpenMP>();
+
+      update_and_print<dynamic_host, coo_host, vec_host, Kokkos::OpenMP>(A);
+      update_and_print<dynamic_host, csr_host, vec_host, Kokkos::OpenMP>(A);
+      update_and_print<dynamic_host, dia_host, vec_host, Kokkos::OpenMP>(A);
+
+      update_and_print<dynamic_host, coo_host, vec_host, Morpheus::OpenMP>(A);
+      update_and_print<dynamic_host, csr_host, vec_host, Morpheus::OpenMP>(A);
+      update_and_print<dynamic_host, dia_host, vec_host, Morpheus::OpenMP>(A);
+    }
+#endif
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+    {
+      dynamic_dev A;
+
+      update_and_print<coo_dev, vec_dev, Kokkos::Cuda>();
+      update_and_print<csr_dev, vec_dev, Kokkos::Cuda>();
+      update_and_print<dia_dev, vec_dev, Kokkos::Cuda>();
+
+      update_and_print<coo_dev, vec_dev, Morpheus::Cuda>();
+      update_and_print<csr_dev, vec_dev, Morpheus::Cuda>();
+      update_and_print<dia_dev, vec_dev, Morpheus::Cuda>();
+
+      update_and_print<dynamic_dev, coo_dev, vec_dev, Kokkos::Cuda>(A);
+      update_and_print<dynamic_dev, csr_dev, vec_dev, Kokkos::Cuda>(A);
+      update_and_print<dynamic_dev, dia_dev, vec_dev, Kokkos::Cuda>(A);
+
+      update_and_print<dynamic_dev, coo_dev, vec_dev, Morpheus::Cuda>(A);
+      update_and_print<dynamic_dev, csr_dev, vec_dev, Morpheus::Cuda>(A);
+      update_and_print<dynamic_dev, dia_dev, vec_dev, Morpheus::Cuda>(A);
+    }
+#endif
+  }
+  Morpheus::finalize();
 }
