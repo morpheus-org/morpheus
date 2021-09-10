@@ -41,7 +41,6 @@ inline void update_diagonal(
                                SparseMatrix, Vector>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
   using index_type      = typename SparseMatrix::index_type;
-  using value_type      = typename SparseMatrix::value_type;
   using ValueArray = typename SparseMatrix::value_array_type::value_array_type;
   using IndexArray = typename SparseMatrix::index_array_type::value_array_type;
 

@@ -44,11 +44,12 @@ inline void update_diagonal(
                                SparseMatrix, Vector>>* = nullptr) {
   using IndexType = typename SparseMatrix::index_type;
 
-// Note: Assumes only a single entry exists for every diagonal element
+// Note: Assumes only a single entry exists for every diagonal element.
+// i.e a single threads will update a particular non-zero on the diagonal
 #pragma omp parallel for
   for (IndexType n = 0; n < A.nnnz(); n++) {
     if (A.row_indices[n] == A.column_indices[n]) {
-      A.values[n] = diagonal[A.column_indices[n]]
+      A.values[n] = diagonal[A.column_indices[n]];
     }
   }
 }

@@ -29,6 +29,9 @@
 
 namespace Morpheus {
 
+// Updates the main diagonal of the matrix with contents of the diagonal vector.
+// Note that it doesn't change the sparsity pattern of the matrix
+// i.e it only updates the non-zero elements on the main diagonal.
 template <typename ExecSpace, typename Algorithm, typename SparseMatrix,
           typename Vector>
 inline void update_diagonal(SparseMatrix& A, const Vector& diagonal) {

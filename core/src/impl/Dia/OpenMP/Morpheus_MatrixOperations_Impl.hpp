@@ -52,11 +52,13 @@ inline void update_diagonal(
     for (IndexType n = 0; n < ndiag; n++) {
       const IndexType col = row + A.diagonal_offsets[n];
 
-      if (col == row) {
-        A.values(row, n) = diagonal[col];
+      if ((col >= 0 && col < A.ncols()) && (col == row)) {
+        A.values(row, n) =
+            (A.values(row, n) == ValueType(0)) ? 0 : diagonal[col];
       }
     }
   }
+}
 
 }  // namespace Impl
 }  // namespace Morpheus

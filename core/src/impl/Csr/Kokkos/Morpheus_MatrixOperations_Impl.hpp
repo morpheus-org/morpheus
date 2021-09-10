@@ -39,12 +39,9 @@ inline void update_diagonal(
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
-  using index_type      = typename LinearOperator::index_type;
-  using value_type      = typename LinearOperator::value_type;
-  using ValueArray =
-      typename LinearOperator::value_array_type::value_array_type;
-  using IndexArray =
-      typename LinearOperator::index_array_type::value_array_type;
+  using index_type      = typename SparseMatrix::index_type;
+  using ValueArray = typename SparseMatrix::value_array_type::value_array_type;
+  using IndexArray = typename SparseMatrix::index_array_type::value_array_type;
 
   using range_policy =
       Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;

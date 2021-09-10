@@ -40,7 +40,7 @@ inline void update_diagonal(SparseMatrix& A, const Vector& diagonal,
                             Algorithm) {
   std::visit(
       [&](auto&& arg) {
-        Morpheus::update_diagonal<ExecSpace>(arg, diagonal, Algorithm{});
+        Morpheus::update_diagonal<ExecSpace, Algorithm>(arg, diagonal);
       },
       A.formats());
 }

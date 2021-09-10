@@ -51,7 +51,7 @@ inline void update_diagonal(
 
   value_array_type values           = A.values.view();
   index_array_type diagonal_offsets = A.diagonal_offsets.view();
-  const array_type x_view           = x.const_view();
+  const array_type diagonal_view    = diagonal.const_view();
 
   index_type ndiag = A.values.ncols(), ncols = A.ncols();
 
@@ -60,10 +60,11 @@ inline void update_diagonal(
   Kokkos::parallel_for(
       policy, KOKKOS_LAMBDA(const index_type row) {
         for (index_type n = 0; n < ndiag; n++) {
-          const index_type col = row + A.diagonal_offsets[n];
+          const index_type col = row + diagonal_offsets[n];
 
-          if (col == row) {
-            A.values(row, n) = diagonal[col];
+          if ((col >= 0 && col < ncols) && (col == row)) {
+            values(row, n) =
+                (values(row, n) == value_type(0)) ? 0 : diagonal_view[col];
           }
         }
       });

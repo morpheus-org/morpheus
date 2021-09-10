@@ -40,9 +40,7 @@ inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
                      Morpheus::DenseVectorTag, Morpheus::DenseVectorTag,
                      Algorithm) {
   std::visit(
-      [&](auto&& arg) {
-        Morpheus::multiply<ExecSpace>(arg, x, y, Algorithm{});
-      },
+      [&](auto&& arg) { Morpheus::multiply<ExecSpace, Algorithm>(arg, x, y); },
       A.const_formats());
 }
 

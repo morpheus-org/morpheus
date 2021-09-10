@@ -27,7 +27,6 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
-#include <Morpheus_Exceptions.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -44,7 +43,7 @@ inline void update_diagonal(
 
   for (IndexType n = 0; n < A.nnnz(); n++) {
     if (A.row_indices[n] == A.column_indices[n]) {
-      A.values[n] = diagonal[A.column_indices[n]]
+      A.values[n] = diagonal[A.column_indices[n]];
     }
   }
 }
