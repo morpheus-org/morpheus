@@ -30,7 +30,9 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
-#include <Morpheus_Exceptions.hpp>
+
+#include <impl/Morpheus_CudaUtils.hpp>
+#include <impl/Csr/Kernels/Morpheus_MatrixOperations_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -45,8 +47,13 @@ inline void update_diagonal(
                                SparseMatrix, Vector>>* = nullptr) {
   using IndexType = typename SparseMatrix::index_type;
 
-  throw Morpheus::NotImplementedException(
-      "Cuda update_diagonal for CsrMatrix not implemented.");
+  const size_t BLOCK_SIZE = 256;
+  const size_t NUM_BLOCKS = (A.nrows() + BLOCK_SIZE - 1) / BLOCK_SIZE;
+
+  Kernels::update_diagonal_kernel<ValueType, IndexType>
+      <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), A.row_offsets.data(),
+                                      A.column_indices.data(), A.values.data(),
+                                      diagonal.data());
 }
 
 }  // namespace Impl

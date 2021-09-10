@@ -43,7 +43,10 @@ inline void update_diagonal(
 
   for (IndexType i = 0; i < A.nrows(); ++i) {
     for (IndexType jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
-      if (A.column_indices[jj] == i) A.values[jj] = diagonal[i];
+      if (A.column_indices[jj] == i) {
+        A.values[jj] = diagonal[i];
+        break;
+      }
     }
   }
 }

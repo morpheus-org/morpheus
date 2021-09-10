@@ -56,7 +56,10 @@ inline void update_diagonal(
   Kokkos::parallel_for(
       policy, KOKKOS_LAMBDA(const index_type i) {
         for (index_type jj = row_offsets[i]; jj < row_offsets[i + 1]; jj++) {
-          if (column_indices[jj] == i) values[jj] = diagonal_view[i];
+          if (column_indices[jj] == i) {
+            values[jj] = diagonal_view[i];
+            break;
+          }
         }
       });
 }
