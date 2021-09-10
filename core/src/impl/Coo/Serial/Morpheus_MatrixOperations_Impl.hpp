@@ -42,8 +42,11 @@ inline void update_diagonal(
                                SparseMatrix, Vector>>* = nullptr) {
   using IndexType = typename SparseMatrix::index_type;
 
-  throw Morpheus::NotImplementedException(
-      "Serial update_diagonal for CooMatrix not implemented.");
+  for (IndexType n = 0; n < A.nnnz(); n++) {
+    if (A.row_indices[n] == A.column_indices[n]) {
+      A.values[n] = diagonal[A.column_indices[n]]
+    }
+  }
 }
 
 }  // namespace Impl

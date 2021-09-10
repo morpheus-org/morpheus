@@ -24,10 +24,12 @@
 #ifndef MORPHEUS_COO_OPENMP_MATRIXOPERATIONS_IMPL_HPP
 #define MORPHEUS_COO_OPENMP_MATRIXOPERATIONS_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_OPENMP)
+
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
-#include <Morpheus_Exceptions.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -42,11 +44,17 @@ inline void update_diagonal(
                                SparseMatrix, Vector>>* = nullptr) {
   using IndexType = typename SparseMatrix::index_type;
 
-  throw Morpheus::NotImplementedException(
-      "OpenMP update_diagonal for CooMatrix not implemented.");
+// Note: Assumes only a single entry exists for every diagonal element
+#pragma omp parallel for
+  for (IndexType n = 0; n < A.nnnz(); n++) {
+    if (A.row_indices[n] == A.column_indices[n]) {
+      A.values[n] = diagonal[A.column_indices[n]]
+    }
+  }
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_OPENMP
 #endif  // MORPHEUS_COO_OPENMP_MATRIXOPERATIONS_IMPL_HPP
