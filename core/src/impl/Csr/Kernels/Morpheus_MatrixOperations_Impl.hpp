@@ -32,10 +32,10 @@ namespace Impl {
 
 namespace Kernels {
 template <typename ValueType, typename IndexType>
-__global__ void update_diagonal_kernel(const IndexType nrows,
-                                       const IndexType* Ap, const IndexType* Aj,
-                                       ValueType* Ax,
-                                       const ValueType* diagonal) {
+__global__ void update_csr_diagonal_kernel(const IndexType nrows,
+                                           const IndexType* Ap,
+                                           const IndexType* Aj, ValueType* Ax,
+                                           const ValueType* diagonal) {
   const IndexType thread_id = blockDim.x * blockIdx.x + threadIdx.x;
   const IndexType grid_size = gridDim.x * blockDim.x;
 

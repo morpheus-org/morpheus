@@ -32,11 +32,12 @@ namespace Impl {
 
 namespace Kernels {
 template <typename ValueType, typename IndexType>
-__global__ void update_diagonal_kernel(const IndexType nnnz, const IndexType* I,
-                                       const IndexType* J, ValueType* V,
-                                       const ValueType* diagonal) {
+__global__ void update_coo_diagonal_kernel(const IndexType nnnz,
+                                           const IndexType* I,
+                                           const IndexType* J, ValueType* V,
+                                           const ValueType* diagonal) {
   const IndexType tid = blockDim.x * blockIdx.x + threadIdx.x;
-  if (tid >= n) return;
+  if (tid >= nnnz) return;
 
   if (I[tid] == J[tid]) V[tid] = diagonal[J[tid]];
 }

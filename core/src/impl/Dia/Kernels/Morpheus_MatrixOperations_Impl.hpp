@@ -32,19 +32,19 @@ namespace Impl {
 
 namespace Kernels {
 template <typename ValueType, typename IndexType>
-__global__ void update_diagonal_kernel(const IndexType num_rows,
-                                       const IndexType num_cols,
-                                       const IndexType num_diagonals,
-                                       const IndexType pitch,
-                                       const IndexType* diagonal_offsets,
-                                       ValueType* values,
-                                       const ValueType* diagonal) {
+__global__ void update_dia_diagonal_kernel(const IndexType num_rows,
+                                           const IndexType num_cols,
+                                           const IndexType num_diagonals,
+                                           const IndexType pitch,
+                                           const IndexType* diagonal_offsets,
+                                           ValueType* values,
+                                           const ValueType* diagonal) {
   const IndexType thread_id = blockDim.x * blockIdx.x + threadIdx.x;
   const IndexType grid_size = gridDim.x * blockDim.x;
 
   for (IndexType row = thread_id; row < num_rows; row += grid_size) {
     for (IndexType n = 0; n < num_diagonals; n++) {
-      const IndexType col = row + A.diagonal_offsets[n];
+      const IndexType col = row + diagonal_offsets[n];
       const IndexType idx = row + pitch * n;
 
       if ((col >= 0 && col < num_cols) && (col == row)) {

@@ -335,9 +335,7 @@ void update_and_print(DynamicMatrix& Ad) {
 
   Vector diag(Ah.ncols(), UPDATE_VAL);
 
-  Matrix A;
-  Morpheus::copy(Ah, A);
-  Ad = A;
+  Morpheus::copy(Ah, Ad);
   Morpheus::update_diagonal<ExecSpace>(Ad, diag);
   Morpheus::copy(Ad, Aout);
 

@@ -46,11 +46,12 @@ inline void update_diagonal(
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
   using IndexType = typename SparseMatrix::index_type;
+  using ValueType = typename SparseMatrix::value_type;
 
   const size_t BLOCK_SIZE = 256;
-  const size_t NUM_BLOCKS = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
+  const size_t NUM_BLOCKS = (A.nnnz() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-  Kernels::update_diagonal_kernel<ValueType, IndexType>
+  Kernels::update_coo_diagonal_kernel<ValueType, IndexType>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nnnz(), A.row_indices.data(),
                                       A.column_indices.data(), A.values.data(),
                                       diagonal.data());
