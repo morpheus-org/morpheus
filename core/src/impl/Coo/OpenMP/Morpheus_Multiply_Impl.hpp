@@ -69,6 +69,11 @@ inline void multiply(
   // Initialize to special value
   vector grp_sum(nthreads, max_val);
 
+#pragma omp parallel for
+  for (IndexType n = 0; n < A.nrows(); n++) {
+    y[n] = ValueType(0);
+  }
+
 #pragma omp parallel
   {
     const IndexType tid = omp_get_thread_num();

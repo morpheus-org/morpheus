@@ -43,6 +43,11 @@ inline void multiply(
                                LinearOperator, MatrixOrVector1,
                                MatrixOrVector2>>* = nullptr) {
   using IndexType = typename LinearOperator::index_type;
+  using ValueType = typename LinearOperator::value_type;
+
+  for (IndexType n = 0; n < A.nrows(); n++) {
+    y[n] = ValueType(0);
+  }
 
   for (IndexType n = 0; n < A.nnnz(); n++) {
     y[A.row_indices[n]] += A.values[n] * x[A.column_indices[n]];
