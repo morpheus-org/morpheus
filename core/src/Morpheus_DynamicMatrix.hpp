@@ -97,7 +97,7 @@ class DynamicMatrix
       DynamicMatrix &>::type
   operator=(const Matrix &matrix) {
     base::resize(matrix.nrows(), matrix.ncols(), matrix.nnnz());
-    _formats = matrix;
+    this->activate(matrix.format_enum());
     return *this;
   }
 
@@ -120,9 +120,7 @@ class DynamicMatrix
       DynamicMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
     this->set_name(src.name());
-    this->set_nrows(src.nrows());
-    this->set_ncols(src.ncols());
-    this->set_nnnz(src.nnnz());
+    base::resize(src.nrows(), src.ncols(), src.nnnz());
 
     this->activate(src.active_index());  // switch to src format
     std::visit(Impl::any_type_assign(), src.const_formats(), _formats);
@@ -132,7 +130,7 @@ class DynamicMatrix
 
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
-                     const index_type nnz, Args &&...args) {
+                     const index_type nnz, Args &&... args) {
     base::resize(m, n, nnz);
     auto f = std::bind(Impl::any_type_resize<ValueType, Properties...>(),
                        std::placeholders::_1, m, n, nnz,
