@@ -59,12 +59,16 @@
 namespace Morpheus {
 
 struct InitArguments : public Kokkos::InitArguments {
-  InitArguments(int nt = -1, int nn = -1, int dv = -1, bool dw = false,
-                bool ti = false)
-      : Kokkos::InitArguments(nt, nn, dv, dw, ti) {}
+  using base = Kokkos::InitArguments;
+  int dynamic_format;
+
+  InitArguments(int dyn_fmt = 0, int nt = -1, int nn = -1, int dv = -1,
+                bool dw = false, bool ti = false)
+      : base(nt, nn, dv, dw, ti), dynamic_format(dyn_fmt) {}
 };
 
 void initialize(int& argc, char* argv[]);
+void initialize(int& argc, char* argv[], InitArguments& args);
 void print_configuration(std::ostream& out, const bool detail = true);
 void initialize(InitArguments args = InitArguments());
 void finalize();

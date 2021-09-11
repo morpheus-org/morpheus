@@ -27,13 +27,11 @@
 int main(int argc, char* argv[]) {
   {
     Morpheus::initialize(argc, argv);
-    Morpheus::print_configuration(std::cout);
     Morpheus::finalize();
   }
 
   {
     Morpheus::initialize();
-    Morpheus::print_configuration(std::cout);
     Morpheus::finalize();
   }
 
@@ -42,7 +40,13 @@ int main(int argc, char* argv[]) {
     args.num_threads = 4;
 
     Morpheus::initialize(args);
-    Morpheus::print_configuration(std::cout);
+    Morpheus::finalize();
+  }
+
+  {
+    Morpheus::InitArguments args;
+    Morpheus::initialize(argc, argv, args);
+
     Morpheus::finalize();
   }
   return 0;
