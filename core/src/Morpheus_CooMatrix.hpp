@@ -208,6 +208,10 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
 
   // Determine whether matrix elements are sorted by row and column index
   bool is_sorted(void) { return Morpheus::is_sorted(*this); }
+
+  formats_e format_enum() const { return Morpheus::COO_FORMAT; }
+
+  int format_index() const { return static_cast<int>(Morpheus::COO_FORMAT); }
 };
 }  // namespace Morpheus
 

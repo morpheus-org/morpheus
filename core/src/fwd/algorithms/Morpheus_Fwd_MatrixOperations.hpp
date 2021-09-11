@@ -1,5 +1,5 @@
 /**
- * Morpheus_Fwd_Multiply.hpp
+ * Morpheus_Fwd_MatrixOperations.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,21 +21,19 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_FWD_MULTIPLY_HPP
-#define MORPHEUS_FWD_MULTIPLY_HPP
+#ifndef MORPHEUS_FWD_MATRIXOPERATIONS_HPP
+#define MORPHEUS_FWD_MATRIXOPERATIONS_HPP
 
 namespace Morpheus {
 
-template <typename ExecSpace, typename Algorithm, typename LinearOperator,
-          typename MatrixOrVector1, typename MatrixOrVector2>
-void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-              MatrixOrVector2& y);
+template <typename ExecSpace, typename Algorithm, typename SparseMatrix,
+          typename Vector>
+inline void update_diagonal(SparseMatrix& A, const Vector& diagonal);
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-              MatrixOrVector2& y);
+// Default algorithm to run with update_diagonal is always Alg0
+template <typename ExecSpace, typename SparseMatrix, typename Vector>
+inline void update_diagonal(SparseMatrix& A, const Vector& diagonal);
 
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_FWD_MULTIPLY_HPP
+#endif  // MORPHEUS_FWD_MATRIXOPERATIONS_HPP

@@ -1,5 +1,5 @@
 /**
- * Morpheus_Multiply_Impl.hpp
+ * Morpheus_MatrixOperations_Impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_DYNAMIC_MULTIPLY_IMPL_HPP
-#define MORPHEUS_DYNAMIC_MULTIPLY_IMPL_HPP
+#ifndef MORPHEUS_DYNAMIC_MATRIXOPERATIONS_IMPL_HPP
+#define MORPHEUS_DYNAMIC_MATRIXOPERATIONS_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
@@ -33,18 +33,19 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Algorithm, typename LinearOperator,
-          typename MatrixOrVector1, typename MatrixOrVector2>
-inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-                     MatrixOrVector2& y, Morpheus::DynamicTag,
-                     Morpheus::DenseVectorTag, Morpheus::DenseVectorTag,
-                     Algorithm) {
+template <typename ExecSpace, typename Algorithm, typename SparseMatrix,
+          typename Vector>
+inline void update_diagonal(SparseMatrix& A, const Vector& diagonal,
+                            Morpheus::DynamicTag, Morpheus::DenseVectorTag,
+                            Algorithm) {
   std::visit(
-      [&](auto&& arg) { Morpheus::multiply<ExecSpace, Algorithm>(arg, x, y); },
-      A.const_formats());
+      [&](auto&& arg) {
+        Morpheus::update_diagonal<ExecSpace, Algorithm>(arg, diagonal);
+      },
+      A.formats());
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_DYNAMIC_MULTIPLY_IMPL_HPP
+#endif  // MORPHEUS_DYNAMIC_MATRIXOPERATIONS_IMPL_HPP

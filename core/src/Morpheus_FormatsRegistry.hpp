@@ -31,10 +31,10 @@ namespace Morpheus {
 
 template <class ValueType, class... Properties>
 struct MatrixFormats {
-  using formats_proxy =
-      typename MatrixFormatsProxy<CooMatrix<ValueType, Properties...>,
-                                  CsrMatrix<ValueType, Properties...>,
-                                  DiaMatrix<ValueType, Properties...>>::type;
+  using formats_proxy = typename MatrixFormatsProxy<
+      typename CooMatrix<ValueType, Properties...>::type,
+      typename CsrMatrix<ValueType, Properties...>::type,
+      typename DiaMatrix<ValueType, Properties...>::type>::type;
   using variant   = typename formats_proxy::variant;
   using type_list = typename formats_proxy::type_list;
 };

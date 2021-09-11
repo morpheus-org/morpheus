@@ -27,6 +27,7 @@
 #include <fwd/algorithms/Morpheus_Fwd_Convert.hpp>
 #include <fwd/algorithms/Morpheus_Fwd_Copy.hpp>
 #include <fwd/algorithms/Morpheus_Fwd_Dot.hpp>
+#include <fwd/algorithms/Morpheus_Fwd_MatrixOperations.hpp>
 #include <fwd/algorithms/Morpheus_Fwd_Multiply.hpp>
 #include <fwd/algorithms/Morpheus_Fwd_Print.hpp>
 #include <fwd/algorithms/Morpheus_Fwd_Scan.hpp>

@@ -190,7 +190,12 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
     resize(src.nrows(), src.ncols(), src.nnnz());
     return *this;
   }
+
+  formats_e format_enum() const { return Morpheus::CSR_FORMAT; }
+
+  int format_index() const { return static_cast<int>(Morpheus::CSR_FORMAT); }
 };
+
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_CSRMATRIX_HPP

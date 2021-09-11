@@ -22,40 +22,17 @@
  */
 
 #include <Morpheus_Core.hpp>
-#include <impl/DenseVector/Cuda/Morpheus_Elementwise_Impl.hpp>
 
 #include <iostream>
 
-using vec_serial = Morpheus::DenseVector<double, Kokkos::Serial>;
-using vec_cuda   = Morpheus::DenseVector<double, Kokkos::Cuda>;
-using coo_serial = Morpheus::CooMatrix<double, Kokkos::Serial>;
-using coo_cuda   = Morpheus::CooMatrix<double, Kokkos::Cuda>;
+using vec_serial = Morpheus::DenseVector<double, Kokkos::HostSpace>;
+using vec_cuda   = Morpheus::DenseVector<double, Kokkos::CudaSpace>;
+using coo_serial = Morpheus::CooMatrix<double, Kokkos::HostSpace>;
+using coo_cuda   = Morpheus::CooMatrix<double, Kokkos::CudaSpace>;
 
 int main() {
   Morpheus::initialize();
-  {  // Elementwise vec-vec on cuda
-    {
-      vec_cuda x(5, 2), y(5, 4), xy(5);
-      Morpheus::Impl::elementwise(x, y, xy);
-      auto xy_h = Morpheus::create_mirror_container(xy);
-      Morpheus::copy(xy, xy_h);
-      Morpheus::print(xy_h);
-    }
-    // Elementwise vec-vec from host to cuda
-    {
-      vec_serial x(5, 2), y(5, 4), xy(5);
-
-      auto x_d  = Morpheus::create_mirror_container<Kokkos::Cuda>(x);
-      auto y_d  = Morpheus::create_mirror_container<Kokkos::Cuda>(y);
-      auto xy_d = Morpheus::create_mirror_container<Kokkos::Cuda>(x);
-
-      Morpheus::copy(x, x_d);
-      Morpheus::copy(y, y_d);
-
-      Morpheus::Impl::elementwise(x_d, y_d, xy_d);
-      Morpheus::copy(xy_d, xy);
-      Morpheus::print(xy);
-    }
+  {
     // SpMV COO with CUDA
     {
       coo_serial A(2, 3, 4);

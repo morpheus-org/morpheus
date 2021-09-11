@@ -162,7 +162,7 @@ struct ContainerTraits {
                 "ValueType must be an arithmetic type such as int or double");
 
  public:
-  using type = Container<ValueType, Properties...>;
+  //   using type = Container<ValueType, Properties...>;
 
   using value_type           = ValueType;
   using const_value_type     = typename std::add_const<ValueType>::type;
@@ -176,6 +176,7 @@ struct ContainerTraits {
   using memory_space      = MemorySpace;
   using host_mirror_space = HostMirrorSpace;
 
+  using type = Container<value_type, index_type, array_layout, memory_space>;
   using HostMirror = Container<non_const_value_type, non_const_index_type,
                                array_layout, host_mirror_space>;
 

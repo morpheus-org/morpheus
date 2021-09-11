@@ -23,19 +23,20 @@
 
 #include <Morpheus_Core.hpp>
 
-using coo = Morpheus::CooMatrix<double, int, Kokkos::Serial>;
-using dyn = Morpheus::DynamicMatrix<double, int, Kokkos::Serial>;
-using vec = Morpheus::DenseVector<double, Kokkos::Serial>;
+using coo = Morpheus::CooMatrix<double, int, Kokkos::HostSpace>;
+using dyn = Morpheus::DynamicMatrix<double, int, Kokkos::HostSpace>;
+using vec = Morpheus::DenseVector<double, Kokkos::HostSpace>;
 
 using serial = Kokkos::Serial;
-using omp    = Kokkos::OpenMP;
+#if defined(MORPHEUS_ENABLE_OPENMP)
+using omp = Kokkos::OpenMP;
+#endif
 
 int main() {
   Morpheus::initialize();
   {
     coo A(4, 3, 6);
-    dyn B(A);
-    vec x(3, 2), ya("ya", 4, 0), yb("yb", 4, 0);
+    vec x(3, 2), ya("ya", 4, 0);
 
     // initialize matrix entries
     A.row_indices[0]    = 0;
@@ -60,11 +61,16 @@ int main() {
     Morpheus::print(A);
     Morpheus::print(x);
 
-    Morpheus::multiply<serial>(A, x, yb);
+    Morpheus::multiply<serial>(A, x, ya);
     Morpheus::print(ya);
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+    dyn B(A);
+    vec yb("yb", 4, 0);
 
     Morpheus::multiply<omp>(B, x, yb);
     Morpheus::print(yb);
+#endif
   }
   Morpheus::finalize();
 }

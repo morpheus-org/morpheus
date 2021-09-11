@@ -324,10 +324,6 @@ void read_matrix_market_stream(
         is_container<typename Container<T, P...>::tag>::value &&
         is_Host_Memoryspace_v<typename Container<T, P...>::memory_space>>::
         type* = nullptr) {
-  // general case
-  using IndexType = typename Container<T, P...>::index_type;
-  using ValueType = typename Container<T, P...>::value_type;
-
   // read banner
   matrix_market_banner banner;
   read_matrix_market_banner(banner, input);

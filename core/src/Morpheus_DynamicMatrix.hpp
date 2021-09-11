@@ -75,26 +75,29 @@ class DynamicMatrix
   template <typename Matrix>
   inline DynamicMatrix(
       const Matrix &src,
-      typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
-          * = nullptr)
+      typename std::enable_if<
+          is_variant_member_v<typename Matrix::type, variant_type>>::type * =
+          nullptr)
       : base("DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()),
         _formats(src) {}
 
   template <typename Matrix>
   inline DynamicMatrix(
       const std::string name, const Matrix &src,
-      typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
-          * = nullptr)
+      typename std::enable_if<
+          is_variant_member_v<typename Matrix::type, variant_type>>::type * =
+          nullptr)
       : base(name + "DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()),
         _formats(src) {}
 
   // Assignment from another matrix type
   template <typename Matrix>
-  typename std::enable_if<is_variant_member_v<Matrix, variant_type>,
-                          DynamicMatrix &>::type
+  typename std::enable_if<
+      is_variant_member_v<typename Matrix::type, variant_type>,
+      DynamicMatrix &>::type
   operator=(const Matrix &matrix) {
     base::resize(matrix.nrows(), matrix.ncols(), matrix.nnnz());
-    _formats = matrix;
+    this->activate(matrix.format_enum());
     return *this;
   }
 
@@ -117,9 +120,7 @@ class DynamicMatrix
       DynamicMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
     this->set_name(src.name());
-    this->set_nrows(src.nrows());
-    this->set_ncols(src.ncols());
-    this->set_nnnz(src.nnnz());
+    base::resize(src.nrows(), src.ncols(), src.nnnz());
 
     this->activate(src.active_index());  // switch to src format
     std::visit(Impl::any_type_assign(), src.const_formats(), _formats);

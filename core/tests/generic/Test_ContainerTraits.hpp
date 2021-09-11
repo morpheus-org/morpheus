@@ -27,7 +27,14 @@ template <typename Container, typename Tag, typename ValueTypeRef,
           typename IndexTypeRef, typename LayoutRef, typename SpaceRef>
 void test_container_traits() {
   // Type Traits
-  static_assert(std::is_same<typename Container::type, Container>::value);
+  static_assert(
+      std::is_same<typename Container::type::value_type, ValueTypeRef>::value);
+  static_assert(
+      std::is_same<typename Container::type::index_type, IndexTypeRef>::value);
+  static_assert(
+      std::is_same<typename Container::type::array_layout, LayoutRef>::value);
+  static_assert(
+      std::is_same<typename Container::type::memory_space, SpaceRef>::value);
   static_assert(std::is_same<typename Container::tag, Tag>::value);
 
   // Value Traits
@@ -60,21 +67,22 @@ void test_container_traits() {
 
   // Pointer Traits
   static_assert(
-      std::is_same<typename Container::pointer,
-                   typename std::add_pointer<Container>::type>::value);
+      std::is_same<
+          typename Container::pointer,
+          typename std::add_pointer<typename Container::type>::type>::value);
   static_assert(
       std::is_same<typename Container::const_pointer,
-                   typename std::add_pointer<
-                       typename std::add_const<Container>::type>::type>::value);
+                   typename std::add_pointer<typename std::add_const<
+                       typename Container::type>::type>::type>::value);
 
   //   Reference Traits
-  static_assert(
-      std::is_same<typename Container::reference,
-                   typename std::add_lvalue_reference<Container>::type>::value);
+  static_assert(std::is_same<typename Container::reference,
+                             typename std::add_lvalue_reference<
+                                 typename Container::type>::type>::value);
   static_assert(
       std::is_same<typename Container::const_reference,
-                   typename std::add_lvalue_reference<
-                       typename std::add_const<Container>::type>::type>::value);
+                   typename std::add_lvalue_reference<typename std::add_const<
+                       typename Container::type>::type>::type>::value);
 }
 
 template <typename Container, typename Tag, typename ValueTypeRef,
