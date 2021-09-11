@@ -4,6 +4,7 @@
 - Added updating main diagonal of sparse matrix in MatrixOperations. Update is only performed on non-zero elements of the main diagonal i.e doesn't change the sparsity pattern of the matrix.
 - Added interface to inspect the sparse formats using their enum tag and facilitate format switching for dynamic matrix.
 - Fixed errors in deep copy semantics for the `DynamicMatrix`.
+- Added command line parsing for selecting dynamically which format to switch to.
 
 
 ## Version 0.3.0
