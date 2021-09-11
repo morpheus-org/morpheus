@@ -46,34 +46,34 @@ struct any_type_resize
 
   // Specialization for Coo resize with three arguments
   template <typename... Args>
-  result_type operator()(CooMatrix<ValueType, Properties...> &mat,
-                         const index_type nrows, const index_type ncols,
-                         const index_type nnnz) {
+  result_type operator()(
+      typename CooMatrix<ValueType, Properties...>::type &mat,
+      const index_type nrows, const index_type ncols, const index_type nnnz) {
     mat.resize(nrows, ncols, nnnz);
   }
 
   // Specialization for Csr resize with three arguments
   template <typename... Args>
-  result_type operator()(CsrMatrix<ValueType, Properties...> &mat,
-                         const index_type nrows, const index_type ncols,
-                         const index_type nnnz) {
+  result_type operator()(
+      typename CsrMatrix<ValueType, Properties...>::type &mat,
+      const index_type nrows, const index_type ncols, const index_type nnnz) {
     mat.resize(nrows, ncols, nnnz);
   }
 
   // Specialization for Dia resize with five arguments
   template <typename... Args>
-  result_type operator()(DiaMatrix<ValueType, Properties...> &mat,
-                         const index_type nrows, const index_type ncols,
-                         const index_type nnnz, const index_type ndiag,
-                         const index_type alignment = 32) {
+  result_type operator()(
+      typename DiaMatrix<ValueType, Properties...>::type &mat,
+      const index_type nrows, const index_type ncols, const index_type nnnz,
+      const index_type ndiag, const index_type alignment = 32) {
     mat.resize(nrows, ncols, nnnz, ndiag, alignment);
   }
 
   // Constrains any other overloads for supporting formats
   // Unsupported formats won't compile
   template <typename... Args>
-  result_type operator()(CooMatrix<ValueType, Properties...> &mat,
-                         Args &&... args) {
+  result_type operator()(
+      typename CooMatrix<ValueType, Properties...>::type &mat, Args &&...args) {
     std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic resize interface.\n\
@@ -82,8 +82,8 @@ struct any_type_resize
   }
 
   template <typename... Args>
-  result_type operator()(CsrMatrix<ValueType, Properties...> &mat,
-                         Args &&... args) {
+  result_type operator()(
+      typename CsrMatrix<ValueType, Properties...>::type &mat, Args &&...args) {
     std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic resize interface.\n\
@@ -92,8 +92,8 @@ struct any_type_resize
   }
 
   template <typename... Args>
-  result_type operator()(DiaMatrix<ValueType, Properties...> &mat,
-                         Args &&... args) {
+  result_type operator()(
+      typename DiaMatrix<ValueType, Properties...>::type &mat, Args &&...args) {
     std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic resize interface.\n\
