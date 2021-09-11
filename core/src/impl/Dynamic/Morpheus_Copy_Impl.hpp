@@ -58,17 +58,16 @@ struct copy_fn {
     throw Morpheus::FormatConversionException(
         "Morpheus::copy() is only available between the same container types. "
         "(" +
-        src.name() + " != " + dst.name() + ")" +
-        "Please use Morpheus::convert() instead to perform conversions "
-        "between "
-        "different types.");
+        src.name() + " != " + dst.name() +
+        ") Please use Morpheus::convert() instead to perform conversions "
+        "between different types.");
   }
 };
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DynamicTag,
           SparseMatTag) {
-  if (std::holds_alternative<DestinationType>(src.const_formats())) {
+  if (src.const_formats().index() == static_cast<int>(dst.format_enum())) {
     auto f = std::bind(Impl::copy_fn(), std::placeholders::_1, std::ref(dst));
     std::visit(f, src.const_formats());
   } else {
@@ -85,7 +84,10 @@ void copy(const SourceType& src, DestinationType& dst, DynamicTag,
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, SparseMatTag,
           DynamicTag) {
-  dst    = SourceType();
+  dst.activate(src.format_enum());
+  dst.set_nrows(src.nrows());
+  dst.set_ncols(src.ncols());
+  dst.set_nnnz(src.nnnz());
   auto f = std::bind(Impl::copy_fn(), std::cref(src), std::placeholders::_1);
   std::visit(f, dst.formats());
 }
@@ -93,6 +95,9 @@ void copy(const SourceType& src, DestinationType& dst, SparseMatTag,
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DynamicTag, DynamicTag) {
   dst.activate(src.active_index());
+  dst.set_nrows(src.nrows());
+  dst.set_ncols(src.ncols());
+  dst.set_nnnz(src.nnnz());
   std::visit(Impl::copy_fn(), src.const_formats(), dst.formats());
 }
 
