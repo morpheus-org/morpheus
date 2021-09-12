@@ -30,9 +30,8 @@ namespace Test {
 // Therefore checking the mirror container, it should maintain it's own
 // state.
 TEST(TESTSUITE_NAME, DeepCopy_DenseVector_SameSpace_Mirror) {
-  using test_memory_space = typename TEST_EXECSPACE::memory_space;
   using container  = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
-                                          test_memory_space>;
+                                          TEST_EXECSPACE>;
   using index_type = typename container::index_type;
 
   container x(10, -2), x_res(10, -10);
@@ -59,9 +58,8 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseVector_SameSpace_Mirror) {
 // state when the initial container lives in different state, otherwise
 // it should have a shared state.
 TEST(TESTSUITE_NAME, DeepCopy_DenseVector_SameSpace_MirrorContainer) {
-  using test_memory_space = typename TEST_EXECSPACE::memory_space;
   using container  = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
-                                          test_memory_space>;
+                                          TEST_EXECSPACE>;
   using index_type = typename container::index_type;
 
   container x(10, -2), x_res(10, -10);
@@ -94,7 +92,7 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseVector_SameSpace_MirrorContainer) {
 // Issues a copy between device and host, which is always deep
 TEST(TESTSUITE_NAME, DeepCopy_DenseVector_DeviceHost) {
   using container  = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
-                                          typename Kokkos::Cuda::memory_space>;
+                                          typename Kokkos::Cuda>;
   using index_type = typename container::index_type;
 
   container x(10, -2);
@@ -113,7 +111,7 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseVector_DeviceHost) {
 // Issues a copy between device and host, which is always deep
 TEST(TESTSUITE_NAME, DeepCopy_DenseVector_DeviceHost_MirrorContainer) {
   using container  = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
-                                          typename Kokkos::Cuda::memory_space>;
+                                          typename Kokkos::Cuda>;
   using index_type = typename container::index_type;
 
   container x(10, -2);
@@ -131,9 +129,8 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseVector_DeviceHost_MirrorContainer) {
 // Creates a mirror on device from host
 // Issues a copy between host to device and back (both should always be deep)
 TEST(TESTSUITE_NAME, DeepCopy_DenseVector_HostDevice) {
-  using container =
-      Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
-                            typename Kokkos::HostSpace::memory_space>;
+  using container  = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
+                                          typename Kokkos::HostSpace>;
   using index_type = typename container::index_type;
 
   container x(10, -2);
@@ -155,9 +152,8 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseVector_HostDevice) {
 // Creates a mirror container on device from host
 // Issues a copy between host to device and back (both should always be deep)
 TEST(TESTSUITE_NAME, DeepCopy_DenseVector_HostDevice_MirrorContainer) {
-  using container =
-      Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
-                            typename Kokkos::HostSpace::memory_space>;
+  using container  = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
+                                          typename Kokkos::HostSpace>;
   using index_type = typename container::index_type;
 
   container x(10, -2);
@@ -181,9 +177,8 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseVector_HostDevice_MirrorContainer) {
 // the two device mirrors. Then sends the result back to host
 // to be compared which should match the initial state of x2.
 TEST(TESTSUITE_NAME, DeepCopy_DenseVector_DeviceDevice) {
-  using container =
-      Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
-                            typename Kokkos::HostSpace::memory_space>;
+  using container  = Morpheus::DenseVector<float, long long, Kokkos::LayoutLeft,
+                                          typename Kokkos::HostSpace>;
   using index_type = typename container::index_type;
 
   container x1(10, -2), x2(10, -4);

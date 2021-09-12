@@ -50,7 +50,8 @@ class DenseMatrix
 
   using array_layout    = typename traits::array_layout;
   using memory_space    = typename traits::memory_space;
-  using execution_space = typename memory_space::execution_space;
+  using execution_space = typename traits::execution_space;
+  using device_type     = typename traits::device_type;
   using HostMirror      = typename traits::HostMirror;
 
   using pointer         = typename traits::pointer;
@@ -95,7 +96,7 @@ class DenseMatrix
           DenseMatrix, DenseMatrix<VR, PR...>>::value>::type * = nullptr)
       : base("ShallowDenseMatrix" + src.name(), src.nrows(), src.ncols(),
              src.nrows() * src.ncols()),
-        _values(src.view()) {}
+        _values(src.const_view()) {}
 
   // Assignment from another dense matrix type (Shallow)
   template <class VR, class... PR>

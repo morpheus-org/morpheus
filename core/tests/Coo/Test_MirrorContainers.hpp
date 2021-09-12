@@ -30,9 +30,8 @@ namespace Test {
 // Checks that only allocation happened and values are not copied
 // (Mirror always lives on host here)
 TEST(TESTSUITE_NAME, Mirror_CooMatrix_HostMirror) {
-  using test_memory_space = typename TEST_EXECSPACE::memory_space;
-  using container  = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
-                                        test_memory_space>;
+  using container =
+      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
   using index_type = typename container::index_type;
 
   typename container::index_array_type rind(2, 1), cind(2, 2);
@@ -68,9 +67,8 @@ TEST(TESTSUITE_NAME, Mirror_CooMatrix_HostMirror) {
 //  Shallow copy
 // Otherwise only allocation
 TEST(TESTSUITE_NAME, MirrorContainer_CooMatrix_HostMirror) {
-  using test_memory_space = typename TEST_EXECSPACE::memory_space;
-  using container  = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
-                                        test_memory_space>;
+  using container =
+      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
   using index_type = typename container::index_type;
 
   typename container::index_array_type rind(2, 1), cind(2, 2);
@@ -122,16 +120,15 @@ TEST(TESTSUITE_NAME, MirrorContainer_CooMatrix_HostMirror) {
 // Checks that Shallow copy was performed for the mirror
 // (only check on host as otherwise will return access error)
 TEST(TESTSUITE_NAME, MirrorContainer_CooMatrix_explicit_same_space) {
-  using test_memory_space = typename TEST_EXECSPACE::memory_space;
-  using container  = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
-                                        test_memory_space>;
+  using container =
+      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
   using index_type = typename container::index_type;
 
   typename container::index_array_type rind(2, 1), cind(2, 2);
   typename container::value_array_type val(2, 5);
   container A("Coo", 4, 3, 2, rind, cind, val);
 
-  auto A_mirror = Morpheus::create_mirror_container<test_memory_space>(A);
+  auto A_mirror = Morpheus::create_mirror_container<TEST_EXECSPACE>(A);
   using mirror  = decltype(A_mirror);
 
   static_assert(
@@ -164,13 +161,11 @@ TEST(TESTSUITE_NAME, MirrorContainer_CooMatrix_explicit_same_space) {
 // Checks shapes
 // If on host checks that only allocation happened and values are not copied
 TEST(TESTSUITE_NAME, Mirror_CooMatrix_explicit_space) {
-  using test_memory_space = typename TEST_EXECSPACE::memory_space;
-  using container    = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
-                                        test_memory_space>;
+  using container =
+      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
   using mirror_space = std::conditional_t<
-      Morpheus::is_Host_Memoryspace_v<test_memory_space>,
-      typename Kokkos::Cuda::memory_space,
-      typename Kokkos::DefaultHostExecutionSpace::memory_space>;
+      Morpheus::is_Host_Memoryspace_v<typename TEST_EXECSPACE::memory_space>,
+      typename Kokkos::Cuda, typename Kokkos::DefaultHostExecutionSpace>;
   using dst_type =
       Morpheus::CooMatrix<typename container::value_type,
                           typename container::index_type,
@@ -208,11 +203,10 @@ TEST(TESTSUITE_NAME, Mirror_CooMatrix_explicit_space) {
 // Creates a mirror container in other space from container
 // Checks types are the same for both mirror and container
 TEST(TESTSUITE_NAME, MirrorContainer_CooMatrix_explicit_new_space) {
-  using test_memory_space = typename TEST_EXECSPACE::memory_space;
-  using container    = Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft,
-                                        test_memory_space>;
+  using container =
+      Morpheus::CooMatrix<float, long long, Kokkos::LayoutLeft, TEST_EXECSPACE>;
   using mirror_space = std::conditional_t<
-      Morpheus::is_Host_Memoryspace_v<test_memory_space>,
+      Morpheus::is_Host_Memoryspace_v<typename TEST_EXECSPACE::memory_space>,
       typename Kokkos::Cuda::memory_space,
       typename Kokkos::DefaultHostExecutionSpace::memory_space>;
   using dst_type =

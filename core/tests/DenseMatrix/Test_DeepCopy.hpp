@@ -30,9 +30,8 @@ namespace Test {
 // Therefore checking the mirror container, it should maintain it's own
 // state.
 TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_SameSpace_Mirror) {
-  using test_memory_space = typename TEST_EXECSPACE::memory_space;
   using container  = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
-                                          test_memory_space>;
+                                          TEST_EXECSPACE>;
   using index_type = typename container::index_type;
 
   container A("DenseMatrix", 4, 3, 1);
@@ -65,9 +64,8 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_SameSpace_Mirror) {
 // state when the initial container lives in different state, otherwise
 // it should have a shared state.
 TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_SameSpace_MirrorContainer) {
-  using test_memory_space = typename TEST_EXECSPACE::memory_space;
   using container  = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
-                                          test_memory_space>;
+                                          TEST_EXECSPACE>;
   using index_type = typename container::index_type;
 
   container A("DenseMatrix", 4, 3, 1);
@@ -108,7 +106,7 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_SameSpace_MirrorContainer) {
 // Issues a copy between device and host, which is always deep
 TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_DeviceHost) {
   using container = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
-                                          typename Kokkos::Cuda::memory_space>;
+                                          typename Kokkos::Cuda>;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;
 
@@ -132,7 +130,7 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_DeviceHost) {
 // Issues a copy between device and host, which is always deep
 TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_DeviceHost_MirrorCotnainer) {
   using container = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
-                                          typename Kokkos::Cuda::memory_space>;
+                                          typename Kokkos::Cuda>;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;
 
@@ -155,9 +153,8 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_DeviceHost_MirrorCotnainer) {
 // Creates a mirror on device from host
 // Issues a copy between host to device and back (both should always be deep)
 TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_HostDevice) {
-  using container =
-      Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
-                            typename Kokkos::HostSpace::memory_space>;
+  using container = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
+                                          typename Kokkos::HostSpace>;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;
 
@@ -186,9 +183,8 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_HostDevice) {
 // Creates a mirror container on device from host
 // Issues a copy between host to device and back (both should always be deep)
 TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_HostDevice_MirrorContainer) {
-  using container =
-      Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
-                            typename Kokkos::HostSpace::memory_space>;
+  using container = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
+                                          typename Kokkos::HostSpace>;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;
 
@@ -219,9 +215,8 @@ TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_HostDevice_MirrorContainer) {
 // the two device mirrors. Then sends the result back to host
 // to be compared which should match the initial state of Ar.
 TEST(TESTSUITE_NAME, DeepCopy_DenseMatrix_DeviecDevice_MirrorContainer) {
-  using container =
-      Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
-                            typename Kokkos::HostSpace::memory_space>;
+  using container = Morpheus::DenseMatrix<float, long long, Kokkos::LayoutLeft,
+                                          typename Kokkos::HostSpace>;
   using value_array_type = typename container::value_array_type;
   using index_type       = typename container::index_type;
 
