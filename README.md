@@ -52,7 +52,7 @@ To define a container we need to specify four template parameters:
 - `ValueType`: The type of the values the container will hold. Valid types must satisfy `std::is_arithmetic` i.e to be an arithmetic type.
 - `IndexType`: The type of the indices the container will hold. Valid types must satisfy `std::is_integral` i.e to be an integral type.
 - `Layout`: Orientation of data in memory. Valid layouts are either  `Kokkos::LayoutLeft` (Column-Major) or `Kokkos::LayoutRight` (Row-Major).
-- `MemorySpace`: A memory space supported by Kokkos. Valid *Memory* Spaces are `Kokkos::HostSpace`, `Kokkos::CudaSpace` and `Kokkos::HipSpace` or `Kokkos::Serial::memory_spae`, `Kokkos::OpenMP::memory_spae`, `Kokkos::Cuda::memory_spae` and `Kokkos::HIP::memory_spae`.
+- `Space`: A memory or execution space supported by Kokkos. Valid *Memory* Spaces are `Kokkos::HostSpace`, `Kokkos::CudaSpace` and `Kokkos::HipSpace`. Valid *Execution* Spaces are `Kokkos::Serial`, `Kokkos::OpenMP`, `Kokkos::Cuda` and `Kokkos::HIP`. Note that specifying the execution space will determine in which space each member function will be executed. By not providing a space parameter `Morpheus` will choose a default one for you.
 
 Note that only `ValueType` is mandatory. For the rest of the arguments, if not provided, sensible defaults will be selected.
 

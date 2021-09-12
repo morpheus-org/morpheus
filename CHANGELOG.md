@@ -5,6 +5,7 @@
 - Added interface to inspect the sparse formats using their enum tag and facilitate format switching for dynamic matrix.
 - Fixed errors in deep copy semantics for the `DynamicMatrix`.
 - Added command line parsing for selecting dynamically which format to switch to.
+- Added execution space trait in containers so that any member functions will use those for determining where to be executed.
 
 
 ## Version 0.3.0
