@@ -104,11 +104,9 @@ class DenseVector
       is_compatible_type<DenseVector, DenseVector<VR, PR...>>::value,
       DenseVector&>::type
   operator=(const DenseVector<VR, PR...>& src) {
-    if (this != &src) {
-      _name   = src.name();
-      _size   = src.size();
-      _values = src.view();
-    }
+    _name   = src.name();
+    _size   = src.size();
+    _values = src.const_view();
     return *this;
   }
 
