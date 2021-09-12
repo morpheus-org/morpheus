@@ -78,8 +78,11 @@ class DynamicMatrix
       typename std::enable_if<
           is_variant_member_v<typename Matrix::type, variant_type>>::type * =
           nullptr)
-      : base("DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()),
-        _formats(src) {}
+      : base("DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()) {
+    auto f = std::bind(Impl::any_type_assign(), std::cref(src),
+                       std::placeholders::_1);
+    std::visit(f, _formats);
+  }
 
   template <typename Matrix>
   inline DynamicMatrix(
@@ -87,8 +90,11 @@ class DynamicMatrix
       typename std::enable_if<
           is_variant_member_v<typename Matrix::type, variant_type>>::type * =
           nullptr)
-      : base(name + "DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()),
-        _formats(src) {}
+      : base(name + "DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()) {
+    auto f = std::bind(Impl::any_type_assign(), std::cref(src),
+                       std::placeholders::_1);
+    std::visit(f, _formats);
+  }
 
   // Assignment from another matrix type
   template <typename Matrix>
@@ -98,6 +104,10 @@ class DynamicMatrix
   operator=(const Matrix &matrix) {
     base::resize(matrix.nrows(), matrix.ncols(), matrix.nnnz());
     this->activate(matrix.format_enum());
+
+    auto f = std::bind(Impl::any_type_assign(), std::cref(matrix),
+                       std::placeholders::_1);
+    std::visit(f, _formats);
     return *this;
   }
 
@@ -130,7 +140,7 @@ class DynamicMatrix
 
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
-                     const index_type nnz, Args &&... args) {
+                     const index_type nnz, Args &&...args) {
     base::resize(m, n, nnz);
     auto f = std::bind(Impl::any_type_resize<ValueType, Properties...>(),
                        std::placeholders::_1, m, n, nnz,
