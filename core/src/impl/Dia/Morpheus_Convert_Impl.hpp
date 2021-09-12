@@ -81,8 +81,7 @@ void convert(const SourceType& src, DestinationType& dst, DiaTag, CooTag) {
 template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
              typename SourceType::index_type alignment = 32) {
-  using IndexType      = typename SourceType::index_type;
-  using IndexArrayType = typename SourceType::index_array_type;
+  using IndexType = typename SourceType::index_type;
 
   if (src.nnnz() == 0) {
     dst.resize(src.nrows(), src.ncols(), src.nnnz(), 0);
@@ -100,31 +99,20 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
   std::set<IndexType> diag_set(diag_map.begin(), diag_map.end());
   IndexType ndiags = IndexType(diag_set.size());
 
-  // TODO: Check if fill in exceeds a tolerance value otherwise throw
-  // format_conversion_exception
-
-  IndexArrayType diagonal_offsets(ndiags, 0);
-  for (auto it = diag_set.cbegin(); it != diag_set.cend(); ++it) {
-    auto i              = std::distance(diag_set.cbegin(), it);
-    diagonal_offsets[i] = *it;
-  }
-
-  // Create diagonal indexes
-  IndexArrayType diag_idx(src.nnnz(), 0);
-  for (IndexType n = 0; n < IndexType(src.nnnz()); n++) {
-    for (IndexType i = 0; i < IndexType(ndiags); i++) {
-      if (diag_map[n] == diagonal_offsets[i]) diag_idx[n] = i;
-    }
-  }
-
   dst.resize(src.nrows(), src.ncols(), src.nnnz(), ndiags, alignment);
 
-  for (IndexType i = 0; i < IndexType(ndiags); i++) {
-    dst.diagonal_offsets[i] = diagonal_offsets[i];
+  for (auto it = diag_set.cbegin(); it != diag_set.cend(); ++it) {
+    auto i                  = std::distance(diag_set.cbegin(), it);
+    dst.diagonal_offsets[i] = *it;
   }
 
   for (IndexType n = 0; n < IndexType(src.nnnz()); n++) {
-    dst.values(src.row_indices[n], diag_idx[n]) = src.values[n];
+    for (IndexType i = 0; i < IndexType(ndiags); i++) {
+      if (diag_map[n] == dst.diagonal_offsets[i]) {
+        dst.values(src.row_indices[n], i) = src.values[n];
+        break;
+      }
+    }
   }
 }
 
