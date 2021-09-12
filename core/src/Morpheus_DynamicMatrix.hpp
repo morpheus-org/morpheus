@@ -166,6 +166,14 @@ class DynamicMatrix
 
   inline int active_index() const { return _formats.index(); }
 
+  int format_index() const { return this->active_index(); }
+
+  inline formats_e active_enum() const {
+    return static_cast<formats_e>(_formats.index());
+  }
+
+  inline formats_e format_enum() const { return this->active_enum(); }
+
   inline void activate(const formats_e index) {
     constexpr int size = std::variant_size_v<
         typename MatrixFormats<ValueType, Properties...>::variant>;
