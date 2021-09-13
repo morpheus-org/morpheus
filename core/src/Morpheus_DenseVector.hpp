@@ -96,12 +96,14 @@ class DenseVector
   inline DenseVector(
       const DenseVector<VR, PR...>& src,
       typename std::enable_if<is_compatible_type<
-          DenseVector, DenseVector<VR, PR...>>::value>::type* = nullptr)
+          DenseVector, typename DenseVector<VR, PR...>::type>::value>::type* =
+          nullptr)
       : _name("ShallowVector"), _size(src.size()), _values(src.const_view()) {}
 
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_type<DenseVector, DenseVector<VR, PR...>>::value,
+      is_compatible_type<DenseVector,
+                         typename DenseVector<VR, PR...>::type>::value,
       DenseVector&>::type
   operator=(const DenseVector<VR, PR...>& src) {
     _name   = src.name();

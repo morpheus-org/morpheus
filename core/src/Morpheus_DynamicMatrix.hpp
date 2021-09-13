@@ -118,7 +118,8 @@ class DynamicMatrix
   DynamicMatrix(
       const DynamicMatrix<VR, PR...> &src,
       typename std::enable_if<is_compatible_type<
-          DynamicMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr)
+          DynamicMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type
+          * = nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()) {
     this->activate(src.active_index());  // switch to src format
@@ -128,7 +129,8 @@ class DynamicMatrix
   // Assignment from another compatible dynamic matrix type
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_type<DynamicMatrix, DynamicMatrix<VR, PR...>>::value,
+      is_compatible_type<DynamicMatrix,
+                         typename DynamicMatrix<VR, PR...>::type>::value,
       DynamicMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
     this->set_name(src.name());

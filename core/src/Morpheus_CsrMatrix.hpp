@@ -114,7 +114,8 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   template <class VR, class... PR>
   CsrMatrix(const CsrMatrix<VR, PR...> &src,
             typename std::enable_if<is_compatible_type<
-                CsrMatrix, CsrMatrix<VR, PR...>>::value>::type * = nullptr)
+                CsrMatrix, typename CsrMatrix<VR, PR...>::type>::value>::type
+                * = nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()),
         row_offsets(src.row_offsets),
@@ -124,7 +125,7 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_type<CsrMatrix, CsrMatrix<VR, PR...>>::value,
+      is_compatible_type<CsrMatrix, typename CsrMatrix<VR, PR...>::type>::value,
       CsrMatrix &>::type
   operator=(const CsrMatrix<VR, PR...> &src) {
     this->set_name(src.name());
@@ -142,9 +143,11 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   // Construct from a compatible dynamic matrix type (Shallow)
   // Throws when active type of dynamic matrix not same to concrete type
   template <class VR, class... PR>
-  CsrMatrix(const DynamicMatrix<VR, PR...> &src,
-            typename std::enable_if<is_compatible_container<
-                CsrMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr)
+  CsrMatrix(
+      const DynamicMatrix<VR, PR...> &src,
+      typename std::enable_if<is_compatible_container<
+          CsrMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type * =
+          nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()) {
     auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
@@ -157,7 +160,8 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   // Throws when active type of dynamic matrix not same to concrete type
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_container<CsrMatrix, DynamicMatrix<VR, PR...>>::value,
+      is_compatible_container<CsrMatrix,
+                              typename DynamicMatrix<VR, PR...>::type>::value,
       CsrMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
     auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,

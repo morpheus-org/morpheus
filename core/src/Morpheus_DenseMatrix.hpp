@@ -93,7 +93,8 @@ class DenseMatrix
   inline DenseMatrix(
       const DenseMatrix<VR, PR...> &src,
       typename std::enable_if<is_compatible_type<
-          DenseMatrix, DenseMatrix<VR, PR...>>::value>::type * = nullptr)
+          DenseMatrix, typename DenseMatrix<VR, PR...>::type>::value>::type * =
+          nullptr)
       : base("ShallowDenseMatrix" + src.name(), src.nrows(), src.ncols(),
              src.nrows() * src.ncols()),
         _values(src.const_view()) {}
@@ -101,7 +102,8 @@ class DenseMatrix
   // Assignment from another dense matrix type (Shallow)
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_type<DenseMatrix, DenseMatrix<VR, PR...>>::value,
+      is_compatible_type<DenseMatrix,
+                         typename DenseMatrix<VR, PR...>::type>::value,
       DenseMatrix &>::type
   operator=(const DenseMatrix<VR, PR...> &src) {
     if (this != &src) {
