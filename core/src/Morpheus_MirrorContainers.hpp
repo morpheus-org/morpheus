@@ -49,7 +49,7 @@ struct MirrorContainerType {
   using array_layout = typename src_container_type::array_layout;
   // The destination container type if it is not the same memory space
   using dest_container_type =
-      Container<value_type, index_type, array_layout, memory_space>;
+      Container<value_type, index_type, array_layout, Space>;
   // If it is the same memory_space return the existsing container_type
   using container_type =
       typename std::conditional<is_same_memspace, src_container_type,
@@ -74,8 +74,7 @@ struct MirrorType {
   using index_type   = typename src_container_type::non_const_index_type;
   using array_layout = typename src_container_type::array_layout;
   // The destination container type if it is not the same memory space
-  using container_type =
-      Container<value_type, index_type, array_layout, memory_space>;
+  using container_type = Container<value_type, index_type, array_layout, Space>;
 };
 }  // namespace Impl
 
