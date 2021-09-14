@@ -41,8 +41,8 @@ namespace Impl {
 
 template <typename T>
 int is_row_stop(T container, typename T::index_type start_idx,
-                typename T::index_type cur_index) {
-  return container[start_idx] != container[cur_index];
+                typename T::index_type end_idx) {
+  return container[start_idx] != container[end_idx];
 }
 
 template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
@@ -69,11 +69,6 @@ inline void multiply(
   // Initialize to special value
   vector grp_sum(nthreads, max_val);
 
-#pragma omp parallel for
-  for (IndexType n = 0; n < A.nrows(); n++) {
-    y[n] = ValueType(0);
-  }
-
 #pragma omp parallel
   {
     const IndexType tid = omp_get_thread_num();
@@ -99,39 +94,58 @@ inline void multiply(
             ? 1
             : is_row_stop(A.row_indices, start, last) ||
                   is_row_stop(A.row_indices, start, start + 1);
-    IndexType spans_threads =
+    const IndexType spans_workgroups =
         (tid == 0) ? ValueType(0)
                    : !is_row_stop(A.row_indices, start - 1, start);
 
-    // adjacent synchronization between threads
-    if (spans_threads && !has_row_stop && tid != 0) {
+    // Adjacent synchronization between workgroups:
+    // Workgroup 0 updates the first entry ‘grp_sum[0]’ with its last partial
+    // sum. For a subsequent workgroup with id X, if it does not contain a row
+    // stop, it waits for the entry ‘grp_sum[X-1]’ to be changed from the
+    // initial value, i.e., updated by workgroup (X-1), and then updates
+    // ‘grp_sum[X]’ with the sum of its last partial sum and ‘grp_sum[X-1]’. If
+    // a workgroup contains a row stop, it breaks such chained updates and
+    // directly updates ‘grp_sum[X]’ with its last partial sum.
+    if (spans_workgroups && !has_row_stop && tid != 0) {
+      // wait for the previous group to update its sum
       while (grp_sum[tid - 1] == max_val) {
-        // wait for the previous group to update its sum
+        // Make sure the read picks up a good copy from memory
+#pragma omp flush(grp_sum)
       };
       grp_sum[tid] = out[last] + grp_sum[tid - 1];
+      // Make sure other threads can see my write.
+#pragma omp flush(grp_sum)
     } else {
       grp_sum[tid] = out[last];
+      // Make sure other threads can see my write.
+#pragma omp flush(grp_sum)
     }
 
     IndexType is_first_stop = 1;
+
     for (IndexType n = start; n < stop; n++) {
       IndexType is_stop = (tid == nthreads - 1 && n == last)
                               ? 1
                               : is_row_stop(A.row_indices, n, n + 1);
       if (is_stop) {
+        ValueType R;
         if (is_first_stop) {  // in workgroup
           is_first_stop = 0;
-          if (spans_threads) {  // might span multiple threads
+          if (spans_workgroups) {
+            // wait for the previous group to update its sum
             while (grp_sum[tid - 1] == max_val) {
-              // wait for the previous group to update its sum
+              // Make sure the read picks up a good copy from memory
+#pragma omp flush(grp_sum)
             };
-            y[A.row_indices[n]] = out[n] + grp_sum[tid - 1];
+            R = out[n] + grp_sum[tid - 1];
           } else {
-            y[A.row_indices[n]] = out[n];
+            R = out[n];
           }
         } else {
-          y[A.row_indices[n]] = out[n];
+          R = out[n];
         }
+
+        y[A.row_indices[n]] = R;
       }
     }
   }
