@@ -139,15 +139,41 @@ void parse_command_line_arguments(int& argc, char* argv[],
   }
 }
 
+void greeting_header() {
+  auto const greeting = R"(
+       __________________________________________________
+      |   __  __                  _                      |
+      |  |  \/  | ___  _ __ _ __ | |__   ___ _   _ ___   |
+      |  | |\/| |/ _ \| '__| '_ \| '_ \ / _ \ | | / __|  |
+      |  | |  | | (_) | |  | |_) | | | |  __/ |_| \__ \  |
+      |  |_|  |_|\___/|_|  | .__/|_| |_|\___|\__,_|___/  |
+      |                    |_|                           |
+      |__________________________________________________|
+)";
+  std::cout << greeting << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Welcome to Morpheus v" << Morpheus_VERSION_MAJOR << "."
+            << Morpheus_VERSION_MINOR << "." << Morpheus_VERSION_PATCH << " ("
+            << MORPHEUS_VERSION << ")" << std::endl;
+  std::cout << "  Licensed under the Apache License, Version 2.0. See licence "
+               "file for details."
+            << std::endl;
+  std::cout << std::endl;
+  std::cout << "  Contributors: Christodoulos Stylianou (cstyl)" << std::endl;
+  std::cout << " " << std::endl;
+}
+
 }  // namespace Impl
 
 void initialize(int& argc, char* argv[]) {
   InitArguments arguments;
+  Impl::greeting_header();
   Impl::parse_command_line_arguments(argc, argv, arguments);
   Kokkos::initialize(argc, argv);
 }
 
 void initialize(int& argc, char* argv[], InitArguments& arguments) {
+  Impl::greeting_header();
   Impl::parse_command_line_arguments(argc, argv, arguments);
   Kokkos::initialize(argc, argv);
 }
@@ -170,7 +196,10 @@ void print_configuration(std::ostream& out, const bool detail) {
 
   out << msg.str() << std::endl;
 }
-void initialize(InitArguments args) { Kokkos::initialize(args); }
+void initialize(InitArguments args) {
+  Impl::greeting_header();
+  Kokkos::initialize(args);
+}
 
 void finalize() { Kokkos::finalize(); }
 
