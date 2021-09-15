@@ -67,10 +67,11 @@ struct InitArguments : public Kokkos::InitArguments {
       : base(nt, nn, dv, dw, ti), dynamic_format(dyn_fmt) {}
 };
 
-void initialize(int& argc, char* argv[]);
-void initialize(int& argc, char* argv[], InitArguments& args);
+void initialize(int& argc, char* argv[], bool banner = true);
+void initialize(int& argc, char* argv[], InitArguments& args,
+                bool banner = true);
 void print_configuration(std::ostream& out, const bool detail = true);
-void initialize(InitArguments args = InitArguments());
+void initialize(InitArguments args = InitArguments(), bool banner = true);
 void finalize();
 
 }  // namespace Morpheus

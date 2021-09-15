@@ -49,5 +49,26 @@ int main(int argc, char* argv[]) {
 
     Morpheus::finalize();
   }
+
+  {
+    Morpheus::initialize(argc, argv, false);
+    Morpheus::finalize();
+  }
+
+  {
+    Morpheus::InitArguments args;
+    args.num_threads = 4;
+
+    Morpheus::initialize(args, false);
+    Morpheus::finalize();
+  }
+
+  {
+    Morpheus::InitArguments args;
+    Morpheus::initialize(argc, argv, args, false);
+
+    Morpheus::finalize();
+  }
+
   return 0;
 }

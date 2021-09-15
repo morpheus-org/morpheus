@@ -165,15 +165,16 @@ void greeting_header() {
 
 }  // namespace Impl
 
-void initialize(int& argc, char* argv[]) {
+void initialize(int& argc, char* argv[], const bool banner) {
   InitArguments arguments;
-  Impl::greeting_header();
+  if (banner) Impl::greeting_header();
   Impl::parse_command_line_arguments(argc, argv, arguments);
   Kokkos::initialize(argc, argv);
 }
 
-void initialize(int& argc, char* argv[], InitArguments& arguments) {
-  Impl::greeting_header();
+void initialize(int& argc, char* argv[], InitArguments& arguments,
+                const bool banner) {
+  if (banner) Impl::greeting_header();
   Impl::parse_command_line_arguments(argc, argv, arguments);
   Kokkos::initialize(argc, argv);
 }
@@ -196,8 +197,8 @@ void print_configuration(std::ostream& out, const bool detail) {
 
   out << msg.str() << std::endl;
 }
-void initialize(InitArguments args) {
-  Impl::greeting_header();
+void initialize(InitArguments args, const bool banner) {
+  if (banner) Impl::greeting_header();
   Kokkos::initialize(args);
 }
 
