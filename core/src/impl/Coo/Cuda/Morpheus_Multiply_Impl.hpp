@@ -38,50 +38,38 @@ namespace Morpheus {
 namespace Impl {
 
 // forward decl
-template <typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-void __spmv_coo_flat(const LinearOperator& A, const MatrixOrVector1& x,
-                     MatrixOrVector2& y);
+template <typename Matrix, typename Vector>
+void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y);
 
-template <typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-void __spmv_coo_serial(const LinearOperator& A, const MatrixOrVector1& x,
-                       MatrixOrVector2& y);
+template <typename Matrix, typename Vector>
+void __spmv_coo_serial(const Matrix& A, const Vector& x, Vector& y);
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    CooTag, DenseVectorTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector& x, Vector& y, CooTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               LinearOperator, MatrixOrVector1,
-                               MatrixOrVector2>>* = nullptr) {
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
   __spmv_coo_flat(A, x, y);
 }
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    CooTag, DenseVectorTag, DenseVectorTag, Alg1,
+    const Matrix& A, const Vector& x, Vector& y, CooTag, DenseVectorTag, Alg1,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               LinearOperator, MatrixOrVector1,
-                               MatrixOrVector2>>* = nullptr) {
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
   __spmv_coo_serial(A, x, y);
 }
 
-template <typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-void __spmv_coo_serial(const LinearOperator& A, const MatrixOrVector1& x,
-                       MatrixOrVector2& y) {
-  using IndexType    = typename LinearOperator::index_type;
-  using ValueType    = typename LinearOperator::value_type;
+template <typename Matrix, typename Vector>
+void __spmv_coo_serial(const Matrix& A, const Vector& x, Vector& y) {
+  using IndexType    = typename Matrix::index_type;
+  using ValueType    = typename Matrix::value_type;
   const IndexType* I = A.row_indices.data();
   const IndexType* J = A.column_indices.data();
   const ValueType* V = A.values.data();
@@ -107,12 +95,10 @@ void __spmv_coo_serial(const LinearOperator& A, const MatrixOrVector1& x,
 //   sums.
 //
 //
-template <typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-void __spmv_coo_flat(const LinearOperator& A, const MatrixOrVector1& x,
-                     MatrixOrVector2& y) {
-  using IndexType = typename LinearOperator::index_type;
-  using ValueType = typename LinearOperator::value_type;
+template <typename Matrix, typename Vector>
+void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y) {
+  using IndexType = typename Matrix::index_type;
+  using ValueType = typename Matrix::value_type;
 
   y.assign(y.size(), 0);
   if (A.nnnz() == 0) {
@@ -146,8 +132,8 @@ void __spmv_coo_flat(const LinearOperator& A, const MatrixOrVector1& x,
   const unsigned int active_warps =
       (interval_size == 0) ? 0 : DIVIDE_INTO(tail, interval_size);
 
-  Morpheus::DenseVector<IndexType, Kokkos::Cuda> temp_rows(active_warps, 0);
-  Morpheus::DenseVector<ValueType, Kokkos::Cuda> temp_vals(active_warps, 0);
+  typename Matrix::index_array_type temp_rows(active_warps, 0);
+  typename Matrix::value_array_type temp_vals(active_warps, 0);
 
   Kernels::spmv_coo_flat_kernel<IndexType, ValueType, BLOCK_SIZE>
       <<<num_blocks, BLOCK_SIZE, 0>>>(tail, interval_size, A.row_indices.data(),

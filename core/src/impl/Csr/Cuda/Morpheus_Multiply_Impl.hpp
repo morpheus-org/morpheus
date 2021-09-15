@@ -38,23 +38,18 @@ namespace Morpheus {
 namespace Impl {
 
 // forward decl
-template <size_t THREADS_PER_VECTOR, typename LinearOperator,
-          typename MatrixOrVector1, typename MatrixOrVector2>
-void __spmv_csr_vector(const LinearOperator& A, const MatrixOrVector1& x,
-                       MatrixOrVector2& y);
+template <size_t THREADS_PER_VECTOR, typename Matrix, typename Vector>
+void __spmv_csr_vector(const Matrix& A, const Vector& x, Vector& y);
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    CsrTag, DenseVectorTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector& x, Vector& y, CsrTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               LinearOperator, MatrixOrVector1,
-                               MatrixOrVector2>>* = nullptr) {
-  using IndexType = typename LinearOperator::index_type;
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
+  using IndexType = typename Matrix::index_type;
 
   const IndexType nnz_per_row = A.nnnz() / A.nrows();
 
@@ -78,19 +73,16 @@ inline void multiply(
   __spmv_csr_vector<32>(A, x, y);
 }
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    CsrTag, DenseVectorTag, DenseVectorTag, Alg1,
+    const Matrix& A, const Vector& x, Vector& y, CsrTag, DenseVectorTag, Alg1,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               LinearOperator, MatrixOrVector1,
-                               MatrixOrVector2>>* = nullptr) {
-  using IndexType = typename LinearOperator::index_type;
-  using ValueType = typename LinearOperator::value_type;
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
+  using IndexType = typename Matrix::index_type;
+  using ValueType = typename Matrix::value_type;
 
   const size_t BLOCK_SIZE = 256;
   const size_t NUM_BLOCKS = (A.nrows() + BLOCK_SIZE - 1) / BLOCK_SIZE;
@@ -106,12 +98,10 @@ inline void multiply(
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), I, J, V, x_ptr, y_ptr);
 }
 
-template <size_t THREADS_PER_VECTOR, typename LinearOperator,
-          typename MatrixOrVector1, typename MatrixOrVector2>
-void __spmv_csr_vector(const LinearOperator& A, const MatrixOrVector1& x,
-                       MatrixOrVector2& y) {
-  using IndexType = typename LinearOperator::index_type;
-  using ValueType = typename LinearOperator::value_type;
+template <size_t THREADS_PER_VECTOR, typename Matrix, typename Vector>
+void __spmv_csr_vector(const Matrix& A, const Vector& x, Vector& y) {
+  using IndexType = typename Matrix::index_type;
+  using ValueType = typename Matrix::value_type;
 
   const IndexType* I = A.row_offsets.data();
   const IndexType* J = A.column_indices.data();

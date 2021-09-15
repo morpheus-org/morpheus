@@ -31,31 +31,25 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    DiaTag, DenseVectorTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector& x, Vector& y, DiaTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               LinearOperator, MatrixOrVector1,
-                               MatrixOrVector2>>* = nullptr) {
-  using execution_space = typename ExecSpace::execution_space;
-  using value_array_type =
-      typename LinearOperator::value_array_type::value_array_type;
-  using index_array_type =
-      typename LinearOperator::index_array_type::value_array_type;
-  using array_type1 = typename MatrixOrVector1::value_array_type;
-  using array_type2 = typename MatrixOrVector2::value_array_type;
-  using index_type  = typename LinearOperator::index_type;
-  using value_type  = typename LinearOperator::value_type;
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
+  using execution_space  = typename ExecSpace::execution_space;
+  using value_array_type = typename Matrix::value_array_type::value_array_type;
+  using index_array_type = typename Matrix::index_array_type::value_array_type;
+  using view_type        = typename Vector::value_array_type;
+  using index_type       = typename Matrix::index_type;
+  using value_type       = typename Matrix::value_type;
   using member_type = typename Kokkos::TeamPolicy<execution_space>::member_type;
 
   const value_array_type values           = A.values.const_view();
-  const array_type1 x_view                = x.const_view();
+  const view_type x_view                  = x.const_view();
   const index_array_type diagonal_offsets = A.diagonal_offsets.const_view();
-  array_type2 y_view                      = y.view();
+  view_type y_view                        = y.view();
   index_type ndiag = A.values.ncols(), ncols = A.ncols();
 
   const Kokkos::TeamPolicy<execution_space> policy(A.nrows(), Kokkos::AUTO,
@@ -80,32 +74,26 @@ inline void multiply(
       });
 }
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Matrix, typename Vector, typename Vector>
 inline void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    DiaTag, DenseVectorTag, DenseVectorTag, Alg1,
+    const Matrix& A, const Vector& x, Vector& y, DiaTag, DenseVectorTag, Alg1,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               LinearOperator, MatrixOrVector1,
-                               MatrixOrVector2>>* = nullptr) {
-  using execution_space = typename ExecSpace::execution_space;
-  using value_array_type =
-      typename LinearOperator::value_array_type::value_array_type;
-  using index_array_type =
-      typename LinearOperator::index_array_type::value_array_type;
-  using array_type1 = typename MatrixOrVector1::value_array_type;
-  using array_type2 = typename MatrixOrVector2::value_array_type;
-  using index_type  = typename LinearOperator::index_type;
-  using value_type  = typename LinearOperator::value_type;
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector, Vector>>* = nullptr) {
+  using execution_space  = typename ExecSpace::execution_space;
+  using value_array_type = typename Matrix::value_array_type::value_array_type;
+  using index_array_type = typename Matrix::index_array_type::value_array_type;
+  using view_type        = typename Vector::value_array_type;
+  using index_type       = typename Matrix::index_type;
+  using value_type       = typename Matrix::value_type;
   using range_policy =
       Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
 
   const value_array_type values           = A.values.const_view();
-  const array_type1 x_view                = x.const_view();
+  const view_type x_view                  = x.const_view();
   const index_array_type diagonal_offsets = A.diagonal_offsets.const_view();
-  array_type2 y_view                      = y.view();
+  view_type y_view                        = y.view();
   index_type ndiag = A.values.ncols(), ncols = A.ncols();
 
   range_policy policy(0, A.nrows());

@@ -29,23 +29,18 @@
 
 namespace Morpheus {
 
-template <typename ExecSpace, typename Algorithm, typename LinearOperator,
-          typename MatrixOrVector1, typename MatrixOrVector2>
-inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-                     MatrixOrVector2& y) {
-  Impl::multiply<ExecSpace>(A, x, y, typename LinearOperator::tag{},
-                            typename MatrixOrVector1::tag{},
-                            typename MatrixOrVector2::tag{}, Algorithm{});
+template <typename ExecSpace, typename Algorithm, typename Matrix,
+          typename Vector>
+inline void multiply(const Matrix& A, const Vector& x, Vector& y) {
+  Impl::multiply<ExecSpace>(A, x, y, typename Matrix::tag{},
+                            typename Vector::tag{}, Algorithm{});
 }
 
 // Default algorithm to run with multiply is always Alg0
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
-inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-                     MatrixOrVector2& y) {
-  Impl::multiply<ExecSpace>(A, x, y, typename LinearOperator::tag{},
-                            typename MatrixOrVector1::tag{},
-                            typename MatrixOrVector2::tag{}, Alg0{});
+template <typename ExecSpace, typename Matrix, typename Vector>
+inline void multiply(const Matrix& A, const Vector& x, Vector& y) {
+  Impl::multiply<ExecSpace>(A, x, y, typename Matrix::tag{},
+                            typename Vector::tag{}, Alg0{});
 }
 
 }  // namespace Morpheus

@@ -31,19 +31,16 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    CooTag, DenseVectorTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector& x, Vector& y, CooTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               LinearOperator, MatrixOrVector1,
-                               MatrixOrVector2>>* = nullptr) {
-  using IndexType = typename LinearOperator::index_type;
-  using ValueType = typename LinearOperator::value_type;
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
+  using IndexType = typename Matrix::index_type;
+  using ValueType = typename Matrix::value_type;
 
   for (IndexType n = 0; n < A.nrows(); n++) {
     y[n] = ValueType(0);

@@ -31,25 +31,20 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    CsrTag, DenseVectorTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector& x, Vector& y, CsrTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               LinearOperator, MatrixOrVector1,
-                               MatrixOrVector2>>* = nullptr) {
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
-  using index_type   = Kokkos::IndexType<typename LinearOperator::index_type>;
-  using range_policy = Kokkos::RangePolicy<index_type, execution_space>;
-  using ValueArray =
-      typename LinearOperator::value_array_type::value_array_type;
-  using IndexArray =
-      typename LinearOperator::index_array_type::value_array_type;
-  using V = typename ValueArray::value_type;
-  using I = typename IndexArray::value_type;
+  using index_type      = Kokkos::IndexType<typename Matrix::index_type>;
+  using range_policy    = Kokkos::RangePolicy<index_type, execution_space>;
+  using ValueArray      = typename Matrix::value_array_type::value_array_type;
+  using IndexArray      = typename Matrix::index_array_type::value_array_type;
+  using V               = typename ValueArray::value_type;
+  using I               = typename IndexArray::value_type;
 
   const ValueArray values = A.values.const_view(), x_view = x.const_view();
   const IndexArray column_indices = A.column_indices.const_view(),

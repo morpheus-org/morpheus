@@ -45,20 +45,17 @@ int is_row_stop(T container, typename T::index_type start_idx,
   return container[start_idx] != container[end_idx];
 }
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    CooTag, DenseVectorTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector& x, Vector& y, CooTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               LinearOperator, MatrixOrVector1,
-                               MatrixOrVector2>>* = nullptr) {
-  using ValueType = typename LinearOperator::value_type;
-  using IndexType = typename LinearOperator::index_type;
-  using vector    = MatrixOrVector1;
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
+  using ValueType = typename Matrix::value_type;
+  using IndexType = typename Matrix::index_type;
+  using vector    = Vector;
 
   if (A.nnnz() < threads<IndexType>()) {
     omp_set_num_threads(A.nnnz());

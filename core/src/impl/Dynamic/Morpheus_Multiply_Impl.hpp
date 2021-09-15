@@ -33,12 +33,10 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Algorithm, typename LinearOperator,
-          typename MatrixOrVector1, typename MatrixOrVector2>
-inline void multiply(const LinearOperator& A, const MatrixOrVector1& x,
-                     MatrixOrVector2& y, Morpheus::DynamicTag,
-                     Morpheus::DenseVectorTag, Morpheus::DenseVectorTag,
-                     Algorithm) {
+template <typename ExecSpace, typename Algorithm, typename Matrix,
+          typename Vector>
+inline void multiply(const Matrix& A, const Vector& x, Vector& y, DynamicTag,
+                     DenseVectorTag, Algorithm) {
   std::visit(
       [&](auto&& arg) { Morpheus::multiply<ExecSpace, Algorithm>(arg, x, y); },
       A.const_formats());

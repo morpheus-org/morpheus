@@ -37,19 +37,16 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename LinearOperator, typename MatrixOrVector1,
-          typename MatrixOrVector2>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const LinearOperator& A, const MatrixOrVector1& x, MatrixOrVector2& y,
-    DiaTag, DenseVectorTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector& x, Vector& y, DiaTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               LinearOperator, MatrixOrVector1,
-                               MatrixOrVector2>>* = nullptr) {
-  using IndexType = typename LinearOperator::index_type;
-  using ValueType = typename LinearOperator::value_type;
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
+  using IndexType = typename Matrix::index_type;
+  using ValueType = typename Matrix::value_type;
 
   const size_t BLOCK_SIZE = 256;
   const size_t MAX_BLOCKS = max_active_blocks(
