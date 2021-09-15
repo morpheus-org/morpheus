@@ -74,13 +74,13 @@ inline void multiply(
       });
 }
 
-template <typename ExecSpace, typename Matrix, typename Vector, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
     const Matrix& A, const Vector& x, Vector& y, DiaTag, DenseVectorTag, Alg1,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector, Vector>>* = nullptr) {
+                               Vector>>* = nullptr) {
   using execution_space  = typename ExecSpace::execution_space;
   using value_array_type = typename Matrix::value_array_type::value_array_type;
   using index_array_type = typename Matrix::index_array_type::value_array_type;

@@ -36,8 +36,8 @@ inline void multiply(
     const Matrix& A, const Vector& x, Vector& y, CooTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               LinearOperator, Vector>>* = nullptr) {
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
   //   using execution_space = typename ExecSpace::execution_space;
 
   throw NotImplementedException(

@@ -30,7 +30,7 @@ template <typename ExecSpace, typename Algorithm, typename Matrix,
           typename Vector>
 void multiply(const Matrix& A, const Vector& x, Vector& y);
 
-template <typename ExecSpace, typename Matrix, typename Vector, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector>
 void multiply(const Matrix& A, const Vector& x, Vector& y);
 
 }  // namespace Morpheus
