@@ -197,9 +197,12 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
     return *this;
   }
 
-  formats_e format_enum() const { return Morpheus::CSR_FORMAT; }
+  formats_e format_enum() const { return _id; }
 
-  int format_index() const { return static_cast<int>(Morpheus::CSR_FORMAT); }
+  int format_index() const { return static_cast<int>(_id); }
+
+ private:
+  static constexpr formats_e _id = Morpheus::CSR_FORMAT;
 };
 
 }  // namespace Morpheus
