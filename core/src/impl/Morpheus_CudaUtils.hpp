@@ -27,6 +27,8 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_CUDA)
 
+#include <impl/Morpheus_Utils.hpp>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <cuda.h>
@@ -38,27 +40,6 @@ namespace Impl {
 const int CUDA_MAX_BLOCK_DIM_SIZE = 65535;
 const int CUDA_MAX_THREADS        = (30 * 1024);
 const int CUDA_WARP_SIZE          = 32;
-
-template <typename IndexType>
-bool isPow2(IndexType x,
-            typename std::enable_if<std::is_integral<IndexType>::value>::type
-                * = nullptr) {
-  return ((x & (x - 1)) == 0);
-}
-
-template <typename IndexType>
-IndexType nextPow2(
-    IndexType x,
-    typename std::enable_if<std::is_integral<IndexType>::value>::type * =
-        nullptr) {
-  --x;
-  x |= x >> 1;
-  x |= x >> 2;
-  x |= x >> 4;
-  x |= x >> 8;
-  x |= x >> 16;
-  return ++x;
-}
 
 template <typename T>
 static const char *_cudaGetErrorEnum(T error) {
@@ -94,11 +75,6 @@ inline void __getLastCudaError(const char *errorMessage, const char *file,
   }
 }
 
-template <typename Size1, typename Size2>
-__host__ __device__ Size1 DIVIDE_INTO(Size1 N, Size2 granularity) {
-  return (N + (granularity - 1)) / granularity;
-}
-
 template <typename KernelFunction>
 size_t max_active_blocks(KernelFunction kernel, const size_t CTA_SIZE,
                          const size_t dynamic_smem_bytes) {
@@ -106,16 +82,6 @@ size_t max_active_blocks(KernelFunction kernel, const size_t CTA_SIZE,
   cudaOccupancyMaxActiveBlocksPerMultiprocessor(
       &MAX_BLOCKS, kernel, (int)CTA_SIZE, dynamic_smem_bytes);
   return (size_t)MAX_BLOCKS;
-}
-
-template <typename T>
-__host__ __device__ T min(T x, T y) {
-  return x < y ? x : y;
-}
-
-template <typename T>
-__host__ __device__ T max(T x, T y) {
-  return x > y ? y : x;
 }
 
 // Compute the number of threads and blocks to use for the given reduction

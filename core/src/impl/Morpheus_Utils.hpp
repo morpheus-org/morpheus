@@ -24,6 +24,8 @@
 #ifndef MORPHEUS_UTILS_HPP
 #define MORPHEUS_UTILS_HPP
 
+#include <Morpheus_Macros.hpp>
+
 #include <iostream>
 
 namespace Morpheus {
@@ -37,8 +39,45 @@ void print_matrix_header(const Printable& p, Stream& s) {
 
 // Calculates padding to align the data based on the current length
 template <typename T>
-inline const T get_pad_size(T len, T alignment) {
+MORPHEUS_INLINE_FUNCTION const T get_pad_size(T len, T alignment) {
   return alignment * ((len + alignment - 1) / alignment);
+}
+
+template <typename Size1, typename Size2>
+MORPHEUS_INLINE_FUNCTION Size1 DIVIDE_INTO(Size1 N, Size2 granularity) {
+  return (N + (granularity - 1)) / granularity;
+}
+
+template <typename T>
+MORPHEUS_INLINE_FUNCTION T min(T x, T y) {
+  return x < y ? x : y;
+}
+
+template <typename T>
+MORPHEUS_INLINE_FUNCTION T max(T x, T y) {
+  return x > y ? y : x;
+}
+
+template <typename IndexType>
+MORPHEUS_INLINE_FUNCTION bool isPow2(
+    IndexType x,
+    typename std::enable_if<std::is_integral<IndexType>::value>::type* =
+        nullptr) {
+  return ((x & (x - 1)) == 0);
+}
+
+template <typename IndexType>
+MORPHEUS_INLINE_FUNCTION IndexType
+nextPow2(IndexType x,
+         typename std::enable_if<std::is_integral<IndexType>::value>::type* =
+             nullptr) {
+  --x;
+  x |= x >> 1;
+  x |= x >> 2;
+  x |= x >> 4;
+  x |= x >> 8;
+  x |= x >> 16;
+  return ++x;
 }
 
 }  // namespace Impl
