@@ -39,6 +39,9 @@ namespace Impl {
 
 // forward decl
 template <typename Matrix, typename Vector>
+void __spmv_coo(const Matrix& A, const Vector& x, Vector& y);
+
+template <typename Matrix, typename Vector>
 void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y);
 
 template <typename Matrix, typename Vector>
@@ -52,7 +55,8 @@ inline void multiply(
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                Vector>>* = nullptr) {
-  __spmv_coo_flat(A, x, y);
+  // __spmv_coo_flat(A, x, y);
+  __spmv_coo(A, x, y);
 }
 
 template <typename ExecSpace, typename Matrix, typename Vector>
@@ -149,6 +153,42 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y) {
       <<<1, 1, 0>>>(A.nnnz() - tail, A.row_indices.data() + tail,
                     A.column_indices.data() + tail, A.values.data() + tail,
                     x.data(), y.data());
+}
+
+template <typename Matrix, typename Vector>
+void __spmv_coo(const Matrix& A, const Vector& x, Vector& y) {
+  using IndexType = typename Matrix::index_type;
+  using ValueType = typename Matrix::value_type;
+
+  const size_t BLOCK_SIZE = 256;
+  const size_t MAX_BLOCKS = max_active_blocks(
+      Kernels::spmv_coo_flat_kernel<IndexType, ValueType, BLOCK_SIZE>,
+      BLOCK_SIZE, (size_t)0);
+  const size_t WARPS_PER_BLOCK = BLOCK_SIZE / CUDA_WARP_SIZE;
+
+  const size_t num_units  = A.nnnz() / CUDA_WARP_SIZE;
+  const size_t num_warps  = std::min(num_units, WARPS_PER_BLOCK * MAX_BLOCKS);
+  const size_t num_blocks = DIVIDE_INTO(num_warps, WARPS_PER_BLOCK);
+  const size_t num_iters  = DIVIDE_INTO(num_units, num_warps);
+
+  const IndexType interval_size = CUDA_WARP_SIZE * num_iters;
+
+  const IndexType tail =
+      num_units * CUDA_WARP_SIZE;  // do the last few nonzeros separately (fewer
+                                   // than WARP_SIZE elements)
+
+  const unsigned int active_warps =
+      (interval_size == 0) ? 0 : DIVIDE_INTO(tail, interval_size);
+
+  std::cout << "MAX_BLOCKS(" << MAX_BLOCKS << ")\t"
+            << "WARPS_PER_BLOCK(" << WARPS_PER_BLOCK << ")\t"
+            << "num_units(" << num_units << ")\t"
+            << "num_warps(" << num_warps << ")\t"
+            << "num_blocks(" << num_blocks << ")\t"
+            << "num_iters(" << num_iters << ")\t"
+            << "interval_size(" << interval_size << ")\t"
+            << "tail(" << tail << ")\t"
+            << "active_warps(" << active_warps << ")\t" << std::endl;
 }
 
 }  // namespace Impl
