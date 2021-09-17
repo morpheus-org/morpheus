@@ -7,6 +7,9 @@ if(MORPHEUS_ENABLE_CUDA)
   morpheus_add_executable_and_test(Examples_Cuda SOURCES Examples_Cuda.cpp)
 endif()
 
+morpheus_add_executable_and_test(Examples_DiaConvert SOURCES
+                                 Examples_DiaConvert.cpp)
+
 morpheus_add_executable_and_test(Examples_DiaMatrix SOURCES
                                  Examples_DiaMatrix.cpp)
 
@@ -14,6 +17,8 @@ morpheus_add_executable_and_test(Examples_DynamicResize SOURCES
                                  Examples_DynamicResize.cpp)
 
 morpheus_add_executable_and_test(Examples_Init SOURCES Examples_Init.cpp)
+
+morpheus_add_executable_and_test(Examples_Kokkos SOURCES Examples_Kokkos.cpp)
 
 morpheus_add_executable_and_test(Examples_MatrixOperations SOURCES
                                  Examples_MatrixOperations.cpp)
