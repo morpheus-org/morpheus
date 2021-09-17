@@ -39,6 +39,7 @@ inline void multiply(
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                Vector>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
+  using IndexType = typename Matrix::index_type;
 
   const size_t BLOCK_SIZE = 256;
 #if defined(MORPHEUS_ENABLE_CUDA)
@@ -47,7 +48,7 @@ inline void multiply(
 #else
   const size_t WARP_SZ = 1;  // Can that be vector sz?
 #endif
-  const size_t MAX_BLOCKS      = execution_space().concurency();
+  const size_t MAX_BLOCKS      = execution_space().concurrency();
   const size_t WARPS_PER_BLOCK = BLOCK_SIZE / WARP_SZ;
 
   const size_t num_units  = A.nnnz() / WARP_SZ;

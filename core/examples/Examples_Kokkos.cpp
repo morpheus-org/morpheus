@@ -30,14 +30,19 @@ using coo = Morpheus::CooMatrix<double, int, Kokkos::CudaSpace>;
 using vec = Morpheus::DenseVector<double, Kokkos::CudaSpace>;
 
 int main() {
-  coo A("A", 100, 200, 1250);
-  vec x("x", 200, 0), y("y", 100, 0);
 
-  std::cout << "<Kokkos::Cuda>" << std::endl;
-  Morpheus::multiply<Kokkos::Cuda>(A, x, y);
+  Morpheus::initialize();
+  {
+    coo A("A", 100, 200, 1250);
+    vec x("x", 200, 0), y("y", 100, 0);
 
-  std::cout << "<Morpheus::Cuda>" << std::endl;
-  Morpheus::multiply<Morpheus::Cuda>(A, x, y);
+    std::cout << "<Kokkos::Cuda>" << std::endl;
+    Morpheus::multiply<Kokkos::Cuda>(A, x, y);
+
+    std::cout << "<Morpheus::Cuda>" << std::endl;
+    Morpheus::multiply<Morpheus::Cuda>(A, x, y);
+  }
+  Morpheus::finalize();
 
   return 0;
 }
