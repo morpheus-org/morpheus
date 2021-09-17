@@ -24,13 +24,13 @@
 #ifndef MORPHEUS_COO_KOKKOS_MULTIPLY_IMPL_HPP
 #define MORPHEUS_COO_KOKKOS_MULTIPLY_IMPL_HPP
 
-#include <Morpheus_Macros.hpp>
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
 
 namespace Morpheus {
 namespace Impl {
+
 template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
     const Matrix& A, const Vector& x, Vector& y, CooTag, DenseVectorTag, Alg0,
@@ -39,41 +39,8 @@ inline void multiply(
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                Vector>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
-  using IndexType = typename Matrix::index_type;
 
-  const size_t BLOCK_SIZE = 256;
-#if defined(MORPHEUS_ENABLE_CUDA)
-  const size_t WARP_SZ =
-      std::is_same<execution_space, Kokkos::Cuda>::value ? 32 : 1;
-#else
-  const size_t WARP_SZ = 1;  // Can that be vector sz?
-#endif
-  const size_t MAX_BLOCKS      = execution_space().concurrency();
-  const size_t WARPS_PER_BLOCK = BLOCK_SIZE / WARP_SZ;
-
-  const size_t num_units  = A.nnnz() / WARP_SZ;
-  const size_t num_warps  = std::min(num_units, WARPS_PER_BLOCK * MAX_BLOCKS);
-  const size_t num_blocks = DIVIDE_INTO(num_warps, WARPS_PER_BLOCK);
-  const size_t num_iters  = DIVIDE_INTO(num_units, num_warps);
-
-  const IndexType interval_size = WARP_SZ * num_iters;
-
-  const IndexType tail =
-      num_units * WARP_SZ;  // do the last few nonzeros separately (fewer
-                            // than WARP_SIZE elements)
-
-  const unsigned int active_warps =
-      (interval_size == 0) ? 0 : DIVIDE_INTO(tail, interval_size);
-
-  std::cout << "MAX_BLOCKS(" << MAX_BLOCKS << ")\t"
-            << "WARPS_PER_BLOCK(" << WARPS_PER_BLOCK << ")\t"
-            << "num_units(" << num_units << ")\t"
-            << "num_warps(" << num_warps << ")\t"
-            << "num_blocks(" << num_blocks << ")\t"
-            << "num_iters(" << num_iters << ")\t"
-            << "interval_size(" << interval_size << ")\t"
-            << "tail(" << tail << ")\t"
-            << "active_warps(" << active_warps << ")\t" << std::endl;
+  Morpheus::multiply<execution_space>(A, x, y);
 }
 
 }  // namespace Impl

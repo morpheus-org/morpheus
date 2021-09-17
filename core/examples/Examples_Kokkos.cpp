@@ -25,26 +25,30 @@
 #include <iostream>
 
 #if defined(MORPHEUS_ENABLE_CUDA)
+using coo    = Morpheus::CooMatrix<double, int, Kokkos::CudaSpace>;
+using vec    = Morpheus::DenseVector<double, Kokkos::CudaSpace>;
+using KSpace = Kokkos::Cuda;
+using MSpace = Morpheus::Cuda;
+#else
+using coo    = Morpheus::CooMatrix<double, int, Kokkos::HostSpace>;
+using vec    = Morpheus::DenseVector<double, Kokkos::HostSpace>;
+using KSpace = Kokkos::OpenMP;
+using MSpace = Morpheus::OpenMP;
+#endif
 
-using coo = Morpheus::CooMatrix<double, int, Kokkos::CudaSpace>;
-using vec = Morpheus::DenseVector<double, Kokkos::CudaSpace>;
-
-int main() {
-
-  Morpheus::initialize();
+int main(int argc, char* argv[]) {
+  Morpheus::initialize(argc, argv);
   {
     coo A("A", 100, 200, 1250);
     vec x("x", 200, 0), y("y", 100, 0);
 
-    std::cout << "<Kokkos::Cuda>" << std::endl;
-    Morpheus::multiply<Kokkos::Cuda>(A, x, y);
+    std::cout << "<KSpace>" << std::endl;
+    Morpheus::multiply<KSpace>(A, x, y);
 
-    std::cout << "<Morpheus::Cuda>" << std::endl;
-    Morpheus::multiply<Morpheus::Cuda>(A, x, y);
+    std::cout << "<MSpace>" << std::endl;
+    Morpheus::multiply<MSpace>(A, x, y);
   }
   Morpheus::finalize();
 
   return 0;
 }
-
-#endif
