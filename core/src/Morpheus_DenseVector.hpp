@@ -134,6 +134,12 @@ class DenseVector
     Kokkos::parallel_for("Morpheus::DenseVector::assign", policy, f);
   }
 
+  template <typename Generator>
+  inline void assign(Generator rand_pool, const value_type range_low,
+                     const value_type range_high) {
+    Kokkos::fill_random(_values, rand_pool, range_low, range_high);
+  }
+
   // Element access
   inline value_array_reference operator()(index_type i) const {
     return _values(i);
