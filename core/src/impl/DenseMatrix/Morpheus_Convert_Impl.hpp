@@ -32,26 +32,37 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, DenseMatrixTag,
-             DenseMatrixTag,
-             typename std::enable_if<
-                 is_compatible_type<SourceType, DestinationType>::value ||
-                 is_compatible_from_different_space<
-                     SourceType, DestinationType>::value>::type* = nullptr) {
-  Morpheus::copy(src, dst);
+void convert(
+    const SourceType& src, DestinationType& dst, DenseMatrixTag, DenseMatrixTag,
+    typename std::enable_if<
+        std::is_same<typename SourceType::memory_space,
+                     typename DestinationType::memory_space>::value &&
+        is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
+  using index_type = typename SourceType::index_type;
+  dst.resize(src.nrows(), src.ncols());
+
+  for (index_type i = 0; i < src.nrows(); i++) {
+    for (index_type j = 0; j < src.ncols(); j++) {
+      dst(i, j) = src(i, j);
+    }
+  }
 }
 
 template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, DenseMatrixTag,
-             DenseVectorTag) {
-  using IndexType = typename SourceType::index_type;
+void convert(
+    const SourceType& src, DestinationType& dst, DenseMatrixTag, DenseVectorTag,
+    typename std::enable_if<
+        std::is_same<typename SourceType::memory_space,
+                     typename DestinationType::memory_space>::value &&
+        is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
+  using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows() * src.ncols());
 
-  for (IndexType i = 0; i < src.nrows(); i++) {
-    for (IndexType j = 0; j < src.ncols(); j++) {
-      IndexType idx = i * src.ncols() + j;
-      dst(idx)      = src(i, j);
+  for (index_type i = 0; i < src.nrows(); i++) {
+    for (index_type j = 0; j < src.ncols(); j++) {
+      index_type idx = i * src.ncols() + j;
+      dst(idx)       = src(i, j);
     }
   }
 }
