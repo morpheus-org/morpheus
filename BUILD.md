@@ -133,13 +133,15 @@ $ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/gnu
 $ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_INSTALL_DIR} \
            -DCMAKE_BUILD_TYPE=Release -DKokkos_ENABLE_CUDA=ON -DKokkos_ENABLE_OPENMP=ON  -DKokkos_ENABLE_SERIAL=ON \
            -DKokkos_CXX_STANDARD=17 -DKokkos_ENABLE_COMPILER_WARNINGS=On -DKokkos_ARCH_VOLTA70=On -DKokkos_ARCH_SKX=On \
-           -DKokkos_ENABLE_AGGRESSIVE_VECTORIZATION=On
+           -DKokkos_ENABLE_AGGRESSIVE_VECTORIZATION=On -DKokkos_ENABLE_CUDA_CONSTEXPR=On -DKokkos_ENABLE_CUDA_LAMBDA=On
 $ make
 $ make install
 ```
 **Warning** For cmake to find the cuda drivers you need to have a visible NVIDIA GPU. See [here](#gpu_interactive) how to create an interactive GPU session on Cirrus.
 
 **Warning** For C++17 support requires NVCC 11.0+ or Clang 4.0+
+
+**Warning** For using lambdas on device `Kokkos_ENABLE_CUDA_CONSTEXPR` and `Kokkos_ENABLE_CUDA_LAMBDA` must be enabled.
 
 ## Installing Morpheus
 ```sh
