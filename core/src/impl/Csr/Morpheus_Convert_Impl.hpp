@@ -37,7 +37,7 @@ void convert(
     typename std::enable_if<
         std::is_same<typename SourceType::memory_space,
                      typename DestinationType::memory_space>::value &&
-        is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
+        is_HostSpace_v<typename SourceType::device_type>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());

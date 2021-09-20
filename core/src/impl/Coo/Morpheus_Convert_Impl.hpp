@@ -54,6 +54,7 @@ void convert(
   for (index_type n = 0; n < src.nnnz(); n++) {
     dst.values[n] = src.values[n];
   }
+}
 
 }  // namespace Impl
 }  // namespace Morpheus
