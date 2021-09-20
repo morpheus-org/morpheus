@@ -61,6 +61,7 @@ void spmv_bench(const Matrix& A, vec& x, vec& y,
 
     timer.start(spmv);
     Morpheus::multiply<Space>(A, x, y);
+    Kokkos::fence();
     timer.stop(spmv);
 
     if (rep % print_freq == 0) {
