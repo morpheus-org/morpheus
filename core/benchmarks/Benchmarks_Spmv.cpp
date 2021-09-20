@@ -55,7 +55,7 @@ template <typename Space, typename Matrix>
 void spmv_bench(const Matrix& A, vec& x, vec& y,
                 enum Morpheus::TimerPool::timer_id spmv, std::string fn_str) {
   uint64_t rep = 0;
-  for (uint64_t s = seed, cols = A.ncols(); s < seed + reps; s++) {
+  for (uint64_t s = seed; s < seed + reps; s++) {
     x.assign(Generator(s), 0, 100);
     y.assign(y.size(), 0);
 
@@ -75,17 +75,18 @@ void spmv_bench(const Matrix& A, vec& x, vec& y,
 int main(int argc, char* argv[]) {
   Morpheus::initialize(argc, argv);
   {
+    if (argc != 4) {
+      std::cout << "Benchmarks_Spmv.cpp requires 3 input arguments to be given "
+                   "at runtime (filename, seed, reps). Only received "
+                << argc - 1 << "!" << std::endl;
+      exit(-1);
+    }
+
     std::string filename = argv[1];
     seed                 = atoi(argv[2]);
     reps                 = atoi(argv[3]);
     print_freq           = reps / 10;
     if (print_freq == 0) print_freq = 1;
-
-    if (argc != 4) {
-      std::cout << "Benchmarks_Spmv.cpp requires 3 input arguments to be given "
-                   "at runtime. Only received "
-                << argc - 1 << "!" << std::endl;
-    }
 
     std::cout << "\nRunning Benchmarks_Spmv.cpp with:\n";
     std::cout << "\tFilename:\t" << filename << "\n";
@@ -108,14 +109,16 @@ int main(int argc, char* argv[]) {
     std::cout << "Starting experiment:" << std::endl;
 
     {
-      coo A = create_mirror<ExecSpace>(Aio);
+      coo A = Morpheus::create_mirror<CustomSpace>(Aio);
       Morpheus::copy(Aio, A);
 
       spmv_bench<CustomSpace>(A, x, y, timer.SPMV_COO_CUSTOM, "c_c_spmv<coo>");
       spmv_bench<MorpheusSpace>(A, x, y, timer.SPMV_COO_MORPHEUS,
                                 "c_m_spmv<coo>");
 
-      dyn Adyn(A);
+      dyn Adyn;
+      Adyn.activate(Morpheus::COO_FORMAT);
+      Adyn = A;
       spmv_bench<CustomSpace>(Adyn, x, y, timer.SPMV_DYN_COO_CUSTOM,
                               "d_c_spmv<coo>");
       spmv_bench<MorpheusSpace>(Adyn, x, y, timer.SPMV_DYN_COO_MORPHEUS,
@@ -125,14 +128,16 @@ int main(int argc, char* argv[]) {
     {
       typename csr::HostMirror Acsr_io;
       Morpheus::convert(Aio, Acsr_io);
-      csr A = create_mirror<ExecSpace>(Acsr_io);
+      csr A = Morpheus::create_mirror<CustomSpace>(Acsr_io);
       Morpheus::copy(Acsr_io, A);
 
       spmv_bench<CustomSpace>(A, x, y, timer.SPMV_CSR_CUSTOM, "c_c_spmv<csr>");
       spmv_bench<MorpheusSpace>(A, x, y, timer.SPMV_CSR_MORPHEUS,
                                 "c_m_spmv<csr>");
 
-      dyn Adyn(A);
+      dyn Adyn;
+      Adyn.activate(Morpheus::CSR_FORMAT);
+      Adyn = A;
       spmv_bench<CustomSpace>(Adyn, x, y, timer.SPMV_DYN_CSR_CUSTOM,
                               "d_c_spmv<csr>");
       spmv_bench<MorpheusSpace>(Adyn, x, y, timer.SPMV_DYN_CSR_MORPHEUS,
@@ -142,14 +147,16 @@ int main(int argc, char* argv[]) {
     {
       typename dia::HostMirror Adia_io;
       Morpheus::convert(Aio, Adia_io);
-      dia A = create_mirror<ExecSpace>(Adia_io);
+      dia A = Morpheus::create_mirror<CustomSpace>(Adia_io);
       Morpheus::copy(Adia_io, A);
 
       spmv_bench<CustomSpace>(A, x, y, timer.SPMV_DIA_CUSTOM, "c_c_spmv<dia>");
       spmv_bench<MorpheusSpace>(A, x, y, timer.SPMV_DIA_MORPHEUS,
                                 "c_m_spmv<dia>");
 
-      dyn Adyn(A);
+      dyn Adyn;
+      Adyn.activate(Morpheus::DIA_FORMAT);
+      Adyn = A;
       spmv_bench<CustomSpace>(Adyn, x, y, timer.SPMV_DYN_DIA_CUSTOM,
                               "d_c_spmv<dia>");
       spmv_bench<MorpheusSpace>(Adyn, x, y, timer.SPMV_DYN_DIA_MORPHEUS,

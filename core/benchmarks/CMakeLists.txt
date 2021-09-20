@@ -5,7 +5,7 @@ morpheus_include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 morpheus_add_executable_and_test(Benchmarks_Spmv_Serial SOURCES
                                  Benchmarks_Spmv.cpp)
-target_compile_definitions(MorpheusCore_Benchmarks_Convert_Serial
+target_compile_definitions(MorpheusCore_Benchmarks_Spmv_Serial
                            PUBLIC WITH_SERIAL)
 
 if(MORPHEUS_ENABLE_OPENMP)
