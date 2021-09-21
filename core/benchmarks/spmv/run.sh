@@ -36,7 +36,7 @@ if [ "$MACHINE" == "archer" ]; then
     TARGETS=("Serial" "OpenMP")
 elif [ "$MACHINE" == "cirrus" ]; then
     ROOT_PATH="/lustre/home/e609/cstyl/morpheus"
-    if [ "$COMPILER" != "cuda-11.2" ]; then
+    if [ "$COMPILER" == "cuda-11.2" ]; then
         TARGETS=("Serial" "OpenMP" "Cuda")
     elif [ "$COMPILER" == "gnu-10.2" ]; then
         TARGETS=("Serial" "OpenMP")
@@ -52,7 +52,7 @@ if [ "$MACHINE" == "archer" ]; then
     MAX_CPUS="--cpus-per-task=64"
     SYSTEM="--partition=standard --qos=standard"
 elif [ "$MACHINE" == "cirrus" ]; then
-    if [ "$COMPILER" != "cuda-11.2" ]; then
+    if [ "$COMPILER" == "cuda-11.2" ]; then
         MAX_CPUS="--cpus-per-task=40"
         SYSTEM="--gres=gpu:4 --partition=gpu-cascade --qos=gpu"
     elif [ "$COMPILER" == "gnu-10.2" ]; then
