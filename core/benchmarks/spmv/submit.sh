@@ -39,7 +39,9 @@ MATRICES=("$MATRIX_PATH/cant"
           "$MATRIX_PATH/pdb1HYS"
           "$MATRIX_PATH/pwtk"
           "$MATRIX_PATH/rma10"
-          "$MATRIX_PATH/shipsec1")
+          "$MATRIX_PATH/shipsec1"
+          "$MATRIX_PATH/cop20k_A"
+          "$MATRIX_PATH/scircuit")
 
 if [ "$TARGET" == "OpenMP" ];then
     if [ "$MACHINE" == "archer" ]; then
