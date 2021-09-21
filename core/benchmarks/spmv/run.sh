@@ -21,9 +21,10 @@
 # limitations under the License.
 
 MACHINE="$1"
-TIME="$2"
+COMPILER="$2"
+TIME="$3"
 
-if [ -z "$1" ] || [ -z "$2" ]; then
+if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
     echo "Invalid arguments.. Exiting.."
     exit -1
 fi
@@ -36,6 +37,10 @@ if [ "$MACHINE" == "archer" ]; then
 elif [ "$MACHINE" == "cirrus" ]; then
     ROOT_PATH="/lustre/home/e609/cstyl/morpheus"
     TARGETS=("Serial" "OpenMP" "Cuda")
+    if [ "$COMPILER" != "cuda-11.2" ] || [ "$COMPILER" == "gnu-10.2" ]; then
+         echo "Invalid compiler argument ($COMPILER).. Exiting.."
+        exit -1
+    fi
 fi
 
 for target in "${TARGETS[@]}"
@@ -59,7 +64,7 @@ fi
 
     DATASET="clSpMV"
     RESULTS_PATH="$ROOT_PATH/core/benchmarks/results/spmv-$target"
-    EXECUTABLE="$ROOT_PATH/build-release/core/benchmarks/MorpheusCore_Benchmarks_Spmv_$target"
+    EXECUTABLE="$ROOT_PATH/build-$COMPILER-release/core/benchmarks/MorpheusCore_Benchmarks_Spmv_$target"
 
     mkdir -p $RESULTS_PATH
 
