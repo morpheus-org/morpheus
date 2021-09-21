@@ -53,10 +53,11 @@ fi
 
 for thread in "${THREADS[@]}"
 do
+    echo "Threads::$thread" 2>&1 | tee -a "$PROGRESS"
     export OMP_NUM_THREADS="$thread"
-    echo "THREADS=$OMP_NUM_THREADS"
-    for iter in {1..$REPS}
+    for iter in $(seq 1 $REPS)
     do
+        echo "\tRepetition::$iter" 2>&1 | tee -a "$PROGRESS"
         # for each matrix in test space
         for mat in "${MATRICES[@]}"
         do
@@ -64,9 +65,9 @@ do
             DIR=$(dirname $mat)
             MATRIX="$DIR/$BASE/$BASE.mtx"
 
-            echo -e "\t$BASE" 2>&1 | tee -a "$PROGRESS"
+            echo "\t\tMatrix::$BASE" 2>&1 | tee -a "$PROGRESS"
             
-            OUTDIR="$OUTPATH/$BASE/$iter"
+            OUTDIR="$OUTPATH/$BASE/$thread/$iter"
             OUTFILE="$OUTDIR/out.txt"
             mkdir -p $(dirname $OUTFILE)
 

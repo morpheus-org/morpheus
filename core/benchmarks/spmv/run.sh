@@ -42,17 +42,9 @@ for target in "${TARGETS[@]}"
 do
 if [ "$MACHINE" == "archer" ]; then
     MAX_CPUS="--cpus-per-task=64"
-    if [ "$target" == "OpenMP" ];then
-        THREADS=("1" "2" "4" "8" "16" "32" "64")
-    fi
-
     SYSTEM="--partition=standard --qos=standard"
 elif [ "$MACHINE" == "cirrus" ]; then
     MAX_CPUS="--cpus-per-task=36"
-    if [ "$target" == "OpenMP" ];then
-        THREADS=("1" "2" "4" "8" "16" "32" "36")
-    fi
-
     if [ "$target" == "Cuda" ];then
         SYSTEM="--gres=gpu:4 --partition=gpu-cascade --qos=gpu"
     else
@@ -66,27 +58,18 @@ fi
     SCHEDULER_LAUNCER="sbatch"
 
     DATASET="clSpMV"
-    MATRIX_PATH="$ROOT_PATH/data/$DATASET"
-    RESULTS_PATH="$ROOT_PATH/core/benchmarks/spmv-$target/results"
+    RESULTS_PATH="$ROOT_PATH/core/benchmarks/results/spmv-$target"
     EXECUTABLE="$ROOT_PATH/build-release/core/benchmarks/MorpheusCore_Benchmarks_Spmv_$target"
 
     mkdir -p $RESULTS_PATH
-
-    MATRICES=("$MATRIX_PATH/cant"
-            "$MATRIX_PATH/consph"
-            "$MATRIX_PATH/mac_econ_fwd500"
-            "$MATRIX_PATH/mc2depi"
-            "$MATRIX_PATH/pdb1HYS"
-            "$MATRIX_PATH/pwtk"
-            "$MATRIX_PATH/rma10"
-            "$MATRIX_PATH/shipsec1")
 
     OUTDIR="$RESULTS_PATH/$DATASET"
     OUTFILE="$OUTDIR/out.txt"
     ERRFILE="$OUTDIR/out-err.txt"
     mkdir -p $(dirname $OUTFILE)
 
+    SUBMISSION_SCRIPT="$ROOT_PATH/core/benchmarks/spmv/submit.sh"
     launch_cmd="srun -n 1 --hint=nomultithread --ntasks=1 $EXECUTABLE"
     SCHEDULER_FILES="--output=$OUTFILE --error=$ERRFILE"
-    $SCHEDULER_LAUNCER $SCHEDULER_ARGS $SCHEDULER_FILES submit.sh "$launch_cmd" "$ROOT_PATH" "$OUTDIR" "$DATASET" "$MACHINE" "$target"
+    $SCHEDULER_LAUNCER $SCHEDULER_ARGS $SCHEDULER_FILES $SUBMISSION_SCRIPT "$launch_cmd" "$ROOT_PATH" "$OUTDIR" "$DATASET" "$MACHINE" "$target"
 done
