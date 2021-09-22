@@ -104,7 +104,7 @@ do
         ERRFILE="$OUTDIR/out-err.txt"
         mkdir -p $(dirname $OUTFILE)
 
-        PROGRESS="$RESULTS_PATH/progress_${DATASET}_${mat}.txt"
+        PROGRESS="$RESULTS_PATH/progress_${DATASET}_${BASE}.txt"
         echo -e "Matrix::$BASE" 2>&1 | tee -a "$PROGRESS"
         SCHEDULER_FILES="--output=$OUTFILE --error=$ERRFILE"
 
