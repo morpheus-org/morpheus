@@ -34,6 +34,11 @@ if [ -z "$4" ]; then
     EXPERIMENT="spmv-bench"
 fi
 
+echo "Machine::     $MACHINE"
+echo "Compiler::    $COMPILER"
+echo "Time::        $TIME"
+echo "Experiment::  $EXPERIMENT"
+
 if [ "$MACHINE" == "archer" ]; then
     # Setup the job environment (this module needs to be loaded before any other modules)
     module load epcc-job-env
@@ -50,6 +55,9 @@ elif [ "$MACHINE" == "cirrus" ]; then
         exit -1
     fi
 fi
+
+echo "Root Path::   $ROOT_PATH"
+echo "Targets:: ${TARGETS[*]}"
 
 for target in "${TARGETS[@]}"
 do
