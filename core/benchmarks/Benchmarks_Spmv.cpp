@@ -146,22 +146,27 @@ int main(int argc, char* argv[]) {
     }
 
     {
-      typename dia::HostMirror Adia_io;
-      Morpheus::convert(Aio, Adia_io);
-      dia A = Morpheus::create_mirror<CustomSpace>(Adia_io);
-      Morpheus::copy(Adia_io, A);
+      try {
+        typename dia::HostMirror Adia_io;
+        Morpheus::convert(Aio, Adia_io);
+        dia A = Morpheus::create_mirror<CustomSpace>(Adia_io);
+        Morpheus::copy(Adia_io, A);
 
-      spmv_bench<CustomSpace>(A, x, y, timer.SPMV_DIA_CUSTOM, "c_c_spmv<dia>");
-      spmv_bench<MorpheusSpace>(A, x, y, timer.SPMV_DIA_MORPHEUS,
-                                "c_m_spmv<dia>");
+        spmv_bench<CustomSpace>(A, x, y, timer.SPMV_DIA_CUSTOM,
+                                "c_c_spmv<dia>");
+        spmv_bench<MorpheusSpace>(A, x, y, timer.SPMV_DIA_MORPHEUS,
+                                  "c_m_spmv<dia>");
 
-      dyn Adyn;
-      Adyn.activate(Morpheus::DIA_FORMAT);
-      Adyn = A;
-      spmv_bench<CustomSpace>(Adyn, x, y, timer.SPMV_DYN_DIA_CUSTOM,
-                              "d_c_spmv<dia>");
-      spmv_bench<MorpheusSpace>(Adyn, x, y, timer.SPMV_DYN_DIA_MORPHEUS,
-                                "d_m_spmv<dia>");
+        dyn Adyn;
+        Adyn.activate(Morpheus::DIA_FORMAT);
+        Adyn = A;
+        spmv_bench<CustomSpace>(Adyn, x, y, timer.SPMV_DYN_DIA_CUSTOM,
+                                "d_c_spmv<dia>");
+        spmv_bench<MorpheusSpace>(Adyn, x, y, timer.SPMV_DYN_DIA_MORPHEUS,
+                                  "d_m_spmv<dia>");
+      } catch (Morpheus::FormatConversionException& e) {
+        std::cerr << "Exception Raised:: " << e.what() << std::endl;
+      }
     }
   }
 
