@@ -21,33 +21,26 @@
 # limitations under the License.
 
 CMD="$1"
-ROOT_PATH="$2"
-OUTPATH="$3"
-DATASET="$4"
-MACHINE="$5"
-TARGET="$6"
-MATRIX_PATH="$ROOT_PATH/data/$DATASET"
-PROGRESS="$OUTPATH/../progress_$DATASET.txt"
-ITER=200
-REPS=10
-SEED=0
+MACHINE="$2"
+TARGET="$3"
+COMPILER="$4"
+OUTPATH="$5"
+PROGRESS="$6"
+MATRIX="$7"
 
-MATRICES=("$MATRIX_PATH/cant"
-          "$MATRIX_PATH/consph"
-          "$MATRIX_PATH/mac_econ_fwd500"
-          "$MATRIX_PATH/mc2depi"
-          "$MATRIX_PATH/pdb1HYS"
-          "$MATRIX_PATH/pwtk"
-          "$MATRIX_PATH/rma10"
-          "$MATRIX_PATH/shipsec1"
-          "$MATRIX_PATH/cop20k_A"
-          "$MATRIX_PATH/scircuit")
+ITER=200
+REPS=5
+SEED=0
 
 if [ "$TARGET" == "OpenMP" ];then
     if [ "$MACHINE" == "archer" ]; then
-        THREADS=("1" "2" "4" "8" "16" "32" "64")
+        THREADS=("1" "4" "8" "16" "32" "64")
     elif [ "$MACHINE" == "cirrus" ]; then
-        THREADS=("1" "2" "4" "8" "16" "32" "36")
+        if [ "$COMPILER" == "cuda-11.2" ]; then
+            THREADS=("1" "10" "20" "30" "40")
+        elif [ "$COMPILER" == "gnu-10.2" ]; then
+            THREADS=("1" "4" "8" "16" "32" "36")
+        fi
     fi
 else
     THREADS=("1")
@@ -55,26 +48,16 @@ fi
 
 for thread in "${THREADS[@]}"
 do
-    echo "Threads::$thread" 2>&1 | tee -a "$PROGRESS"
+    echo -e "\tThreads::$thread" 2>&1 | tee -a "$PROGRESS"
     export OMP_NUM_THREADS="$thread"
     for iter in $(seq 1 $REPS)
     do
-        echo "\tRepetition::$iter" 2>&1 | tee -a "$PROGRESS"
-        # for each matrix in test space
-        for mat in "${MATRICES[@]}"
-        do
-            BASE=$(basename $mat)
-            DIR=$(dirname $mat)
-            MATRIX="$DIR/$BASE/$BASE.mtx"
+        echo -e "\t\tRepetition::$iter" 2>&1 | tee -a "$PROGRESS"
 
-            echo "\t\tMatrix::$BASE" 2>&1 | tee -a "$PROGRESS"
-            
-            OUTDIR="$OUTPATH/$BASE/$thread/$iter"
-            OUTFILE="$OUTDIR/out.txt"
-            mkdir -p $(dirname $OUTFILE)
+        OUTDIR="$OUTPATH/$thread/$iter"
+        OUTFILE="$OUTDIR/out.txt"
+        mkdir -p $(dirname $OUTFILE)
 
-            $CMD $MATRIX $SEED $ITER 2>&1 | tee -a $OUTFILE
-            
-        done
+        $CMD $MATRIX $SEED $ITER 2>&1 | tee -a $OUTFILE    
     done
 done
