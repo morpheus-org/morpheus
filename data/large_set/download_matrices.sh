@@ -45,9 +45,15 @@ GRAPH=("https://suitesparse-collection-website.herokuapp.com/MM/Williams/webbase
        "https://suitesparse-collection-website.herokuapp.com/MM/SNAP/web-Google.tar.gz"
        "https://suitesparse-collection-website.herokuapp.com/MM/SNAP/wiki-Talk.tar.gz")
 
+# Matrices from small set
+SMALL_SET=("https://suitesparse-collection-website.herokuapp.com/MM/GHS_psdef/apache1.tar.gz"
+	   "https://suitesparse-collection-website.herokuapp.com/MM/Castrillon/denormal.tar.gz"
+	   "https://suitesparse-collection-website.herokuapp.com/MM/Bai/cryg10000.tar.gz"
+	   "https://suitesparse-collection-website.herokuapp.com/MM/Boeing/pcrystk02.tar.gz"
+	   "https://suitesparse-collection-website.herokuapp.com/MM/AG-Monien/whitaker3_dual.tar.gz")
 
 MATRICES=(${STRUCTURAL[@]} ${MACROECONOMIC[@]} ${ELECTROMAGNETISM[@]} ${CFD[@]}
-          ${THERMAL[@]} ${NONLINEAR[@]} ${GRAPH[@]})
+          ${THERMAL[@]} ${NONLINEAR[@]} ${GRAPH[@]} ${SMALL_SET[@]})
 
 for tarfile in "${MATRICES[@]}"
 do
