@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
                                 "d_c_spmv<dia>");
         spmv_bench<MorpheusSpace>(Adyn, x, y, timer.SPMV_DYN_DIA_MORPHEUS,
                                   "d_m_spmv<dia>");
-      } catch (auto e) {
+      } catch (std::exception& e) {
         std::cerr << "Exception Raised:: " << e.what() << std::endl;
       }
     }
