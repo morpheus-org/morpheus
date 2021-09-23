@@ -43,13 +43,13 @@ if [ "$MACHINE" == "archer" ]; then
     # Setup the job environment (this module needs to be loaded before any other modules)
     module load epcc-job-env
     ROOT_PATH="/work/e609/e609/cstyl/morpheus"
-    TARGETS=("OpenMP")
+    TARGETS=("Serial" "OpenMP")
 elif [ "$MACHINE" == "cirrus" ]; then
     ROOT_PATH="/lustre/home/e609/cstyl/morpheus"
     if [ "$COMPILER" == "cuda-11.2" ]; then
-        TARGETS=("OpenMP" "Cuda")
+        TARGETS=("Serial" "OpenMP" "Cuda")
     elif [ "$COMPILER" == "gnu-10.2" ]; then
-        TARGETS=("OpenMP")
+        TARGETS=("Serial" "OpenMP")
     else
         echo "Invalid compiler argument ($COMPILER).. Exiting.."
         exit -1

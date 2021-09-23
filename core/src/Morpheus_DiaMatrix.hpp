@@ -228,15 +228,16 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
 
   bool exceeds_tolerance(const index_type nrows, const index_type nnnz,
                          const index_type ndiags) {
-    const float max_fill   = 3.0;
+    const float max_fill   = 10.0;
     const float threshold  = 100e6;  // 100M entries
     const float size       = float(ndiags) * float(nrows);
     const float fill_ratio = size / std::max(1.0f, float(nnnz));
 
-    if (max_fill < fill_ratio && size > threshold)
+    if (max_fill < fill_ratio && size > threshold) {
       return true;
-    else
+    } else {
       return false;
+    }
   }
 
  private:
