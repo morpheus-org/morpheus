@@ -138,7 +138,9 @@ int main(int argc, char* argv[]) {
       timer.stop(timer.COPY_CSR_DEEP);
 
       spmv_bench<CustomSpace, Morpheus::Alg0>(A, x, y, timer.SPMV_CSR_CUSTOM_ALG0, "c_c_spmv<csr,alg0>");
+#if defined(WITH_CUDA)
       spmv_bench<CustomSpace, Morpheus::Alg1>(A, x, y, timer.SPMV_CSR_CUSTOM_ALG1, "c_c_spmv<csr,alg1>");
+#endif
       spmv_bench<MorpheusSpace, Morpheus::Alg0>(A, x, y, timer.SPMV_CSR_MORPHEUS,
                                 "c_m_spmv<csr>");
 
