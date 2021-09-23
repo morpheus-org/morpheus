@@ -87,7 +87,7 @@ class TimerInstance {
                 << std::setprecision(7) << t_sum << "\t" << std::setw(20)
                 << std::setprecision(10) << t_sum / static_cast<double>(nsteps)
                 << "\t"
-                << "(" << nsteps << "calls)" << std::endl;
+                << "( " << nsteps << " calls )" << std::endl;
     }
   }
 };
@@ -117,6 +117,15 @@ class TimerPool {
                                          "Convert_DYN_DIA_COO",
                                          "Convert_DYN_DIA_CSR",
                                          "Convert_DYN_DIA_DIA",
+                                         "Convert_IN_COO_COO",
+                                         "Convert_IN_COO_CSR",
+                                         "Convert_IN_COO_DIA",
+                                         "Convert_IN_CSR_COO",
+                                         "Convert_IN_CSR_CSR",
+                                         "Convert_IN_CSR_DIA",
+                                         "Convert_IN_DIA_COO",
+                                         "Convert_IN_DIA_CSR",
+                                         "Convert_IN_DIA_DIA",
                                          "Copy_COO_Deep",
                                          "Copy_CSR_Deep",
                                          "Copy_DIA_Deep",
@@ -160,6 +169,15 @@ class TimerPool {
     CONVERT_DYN_DIA_COO,
     CONVERT_DYN_DIA_CSR,
     CONVERT_DYN_DIA_DIA,
+    CONVERT_IN_COO_COO,
+    CONVERT_IN_COO_CSR,
+    CONVERT_IN_COO_DIA,
+    CONVERT_IN_CSR_COO,
+    CONVERT_IN_CSR_CSR,
+    CONVERT_IN_CSR_DIA,
+    CONVERT_IN_DIA_COO,
+    CONVERT_IN_DIA_CSR,
+    CONVERT_IN_DIA_DIA,
     COPY_COO_DEEP,
     COPY_CSR_DEEP,
     COPY_DIA_DEEP,

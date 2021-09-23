@@ -204,7 +204,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
     ndiags = num_diagonals;
     nalign = alignment;
 
-    if (this->exceeds_tolerance(nrows(), nnnz(), ndiags)) {
+    if (this->exceeds_tolerance(num_rows, num_entries, ndiags)) {
       throw Morpheus::FormatConversionException(
           "DiaMatrix fill-in would exceed maximum tolerance");
     }
@@ -226,12 +226,13 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
 
   int format_index() const { return static_cast<int>(_id); }
 
-  bool exceeds_tolerance(const index_type nrows, const index_type nnnz,
-                         const index_type ndiags) {
+  bool exceeds_tolerance(const index_type num_rows,
+                         const index_type num_entries,
+                         const index_type num_diagonals) {
     const float max_fill   = 10.0;
     const float threshold  = 100e6;  // 100M entries
-    const float size       = float(ndiags) * float(nrows);
-    const float fill_ratio = size / std::max(1.0f, float(nnnz));
+    const float size       = float(num_diagonals) * float(num_rows);
+    const float fill_ratio = size / std::max(1.0f, float(num_entries));
 
     if (max_fill < fill_ratio && size > threshold) {
       return true;
