@@ -79,7 +79,7 @@ do
     SCHEDULER_ARGS="--account=$ACCOUNT --job-name=spmv_$target $RESOURCES $SYSTEM"
     SCHEDULER_LAUNCER="sbatch"
 
-    DATASET="clSpMV"
+    DATASET="large_set"
     RESULTS_PATH="$ROOT_PATH/core/benchmarks/results/$EXPERIMENT/spmv-$target"
     EXECUTABLE="$ROOT_PATH/build-$COMPILER-release/core/benchmarks/MorpheusCore_Benchmarks_Spmv_$target"
     MATRIX_PATH="$ROOT_PATH/data/$DATASET"

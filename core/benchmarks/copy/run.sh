@@ -75,7 +75,7 @@ do
     SCHEDULER_ARGS="--account=$ACCOUNT --job-name=copy_$target $RESOURCES $SYSTEM"
     SCHEDULER_LAUNCER="sbatch"
 
-    DATASET="clSpMV"
+    DATASET="large_set"
     RESULTS_PATH="$ROOT_PATH/core/benchmarks/results/$EXPERIMENT/copy-$target"
     EXECUTABLE="$ROOT_PATH/build-$COMPILER-release/core/benchmarks/MorpheusCore_Benchmarks_Copy"
     MATRIX_PATH="$ROOT_PATH/data/$DATASET"

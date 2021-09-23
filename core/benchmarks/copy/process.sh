@@ -41,7 +41,7 @@ if [ -z "$4" ]; then
     echo "Warning! Experiment, filename and dataset not provided. Using default options."
     EXPERIMENT="copy-bench"
     FILENAME="timings"
-    DATASET="clSpMV"
+    DATASET="large_set"
 fi
 
 echo "Machine::     $MACHINE"
