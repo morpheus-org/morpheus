@@ -63,6 +63,8 @@ echo "Root Path::   $ROOT_PATH"
 RESULTS_FILE="$ROOT_PATH/core/benchmarks/results/processed/$EXPERIMENT/spmv-$TARGET/$DATASET"_"$MACHINE"_"spmv"_"$FILENAME.csv"
 OUTPUT_PATH="$ROOT_PATH/core/benchmarks/results/$EXPERIMENT/spmv-$TARGET/$DATASET"
 
+mkdir -p $(dirname $RESULTS_FILE)
+
 # CSV Header
 header="Machine,Matrix,Target,Threads,Reader,SpMv_COO_Custom,SpMv_CSR_Custom,SpMv_DIA_Custom,SpMv_DYN_COO_Custom,SpMv_DYN_CSR_Custom,SpMv_DYN_DIA_Custom,SpMv_COO_Kokkos,SpMv_CSR_Kokkos,SpMv_DIA_Kokkos,SpMv_DYN_COO_Kokkos,SpMv_DYN_CSR_Kokkos,SpMv_DYN_DIA_Kokkos"
 
@@ -73,30 +75,32 @@ do
     MATRIX=$(basename "$MATRIX_DIR")
     for THREADS_DIR in "$MATRIX_DIR"/*
     do
-        THREAD=$(basename "$THREADS_DIR")
-        for REPS_DIR in "$THREADS_DIR"/*
-        do
-            REP=$(basename "$REPS_DIR")
-            FILE="$MATRIX_DIR/$THREAD/$REP/out.txt"
-        
-            # parse input file
-            reader=$(awk '/I\/O Read/ {printf "%s",$4}' "$FILE")
-            SpMv_COO_Custom=$(awk '/SpMv_COO_Custom/ {printf "%s",$4}' "$FILE")
-            SpMv_CSR_Custom=$(awk '/SpMv_CSR_Custom/ {printf "%s",$4}' "$FILE")
-            SpMv_DIA_Custom=$(awk '/SpMv_DIA_Custom/ {printf "%s",$4}' "$FILE")
-            SpMv_DYN_COO_Custom=$(awk '/SpMv_DYN_COO_Custom/ {printf "%s",$4}' "$FILE")
-            SpMv_DYN_CSR_Custom=$(awk '/SpMv_DYN_CSR_Custom/ {printf "%s",$4}' "$FILE")
-            SpMv_DYN_DIA_Custom=$(awk '/SpMv_DYN_DIA_Custom/ {printf "%s",$4}' "$FILE")
+        if [[ -d $THREADS_DIR ]]; then
+            THREAD=$(basename "$THREADS_DIR")
+            for REPS_DIR in "$THREADS_DIR"/*
+            do
+                REP=$(basename "$REPS_DIR")
+                FILE="$MATRIX_DIR/$THREAD/$REP/out.txt"
 
-            SpMv_COO_Kokkos=$(awk '/SpMv_COO_Kokkos/ {printf "%s",$4}' "$FILE")
-            SpMv_CSR_Kokkos=$(awk '/SpMv_CSR_Kokkos/ {printf "%s",$4}' "$FILE")
-            SpMv_DIA_Kokkos=$(awk '/SpMv_DIA_Kokkos/ {printf "%s",$4}' "$FILE")
-            SpMv_DYN_COO_Kokkos=$(awk '/SpMv_DYN_COO_Kokkos/ {printf "%s",$4}' "$FILE")
-            SpMv_DYN_CSR_Kokkos=$(awk '/SpMv_DYN_CSR_Kokkos/ {printf "%s",$4}' "$FILE")
-            SpMv_DYN_DIA_Kokkos=$(awk '/SpMv_DYN_DIA_Kokkos/ {printf "%s",$4}' "$FILE")
+                # parse input file
+                reader=$(awk '/I\/O Read/ {printf "%s",$4}' "$FILE")
+                SpMv_COO_Custom=$(awk '/SpMv_COO_Custom/ {printf "%s",$4}' "$FILE")
+                SpMv_CSR_Custom=$(awk '/SpMv_CSR_Custom/ {printf "%s",$4}' "$FILE")
+                SpMv_DIA_Custom=$(awk '/SpMv_DIA_Custom/ {printf "%s",$4}' "$FILE")
+                SpMv_DYN_COO_Custom=$(awk '/SpMv_DYN_COO_Custom/ {printf "%s",$4}' "$FILE")
+                SpMv_DYN_CSR_Custom=$(awk '/SpMv_DYN_CSR_Custom/ {printf "%s",$4}' "$FILE")
+                SpMv_DYN_DIA_Custom=$(awk '/SpMv_DYN_DIA_Custom/ {printf "%s",$4}' "$FILE")
 
-            entry="$MACHINE,$MATRIX,$TARGET,$THREAD,$reader,$SpMv_COO_Custom,$SpMv_CSR_Custom,$SpMv_DIA_Custom,$SpMv_DYN_COO_Custom,$SpMv_DYN_CSR_Custom,$SpMv_DYN_DIA_Custom,$SpMv_COO_Kokkos,$SpMv_CSR_Kokkos,$SpMv_DIA_Kokkos,$SpMv_DYN_COO_Kokkos,$SpMv_DYN_CSR_Kokkos,$SpMv_DYN_DIA_Kokkos" 
-            echo "$entry" 2>&1 | tee -a "$RESULTS_FILE"
-        done
+                SpMv_COO_Kokkos=$(awk '/SpMv_COO_Kokkos/ {printf "%s",$4}' "$FILE")
+                SpMv_CSR_Kokkos=$(awk '/SpMv_CSR_Kokkos/ {printf "%s",$4}' "$FILE")
+                SpMv_DIA_Kokkos=$(awk '/SpMv_DIA_Kokkos/ {printf "%s",$4}' "$FILE")
+                SpMv_DYN_COO_Kokkos=$(awk '/SpMv_DYN_COO_Kokkos/ {printf "%s",$4}' "$FILE")
+                SpMv_DYN_CSR_Kokkos=$(awk '/SpMv_DYN_CSR_Kokkos/ {printf "%s",$4}' "$FILE")
+                SpMv_DYN_DIA_Kokkos=$(awk '/SpMv_DYN_DIA_Kokkos/ {printf "%s",$4}' "$FILE")
+
+                entry="$MACHINE,$MATRIX,$TARGET,$THREAD,$reader,$SpMv_COO_Custom,$SpMv_CSR_Custom,$SpMv_DIA_Custom,$SpMv_DYN_COO_Custom,$SpMv_DYN_CSR_Custom,$SpMv_DYN_DIA_Custom,$SpMv_COO_Kokkos,$SpMv_CSR_Kokkos,$SpMv_DIA_Kokkos,$SpMv_DYN_COO_Kokkos,$SpMv_DYN_CSR_Kokkos,$SpMv_DYN_DIA_Kokkos"
+                echo "$entry" 2>&1 | tee -a "$RESULTS_FILE"
+            done
+        fi
     done
-done 
+done
