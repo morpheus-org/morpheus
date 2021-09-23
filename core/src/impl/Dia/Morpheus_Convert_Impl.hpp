@@ -114,14 +114,10 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
   std::set<IndexType> diag_set(diag_map.begin(), diag_map.end());
   IndexType ndiags = IndexType(diag_set.size());
 
-  const float max_fill   = 3.0;
-  const float threshold  = 100e6;  // 100M entries
-  const float size       = float(ndiags) * float(src.nrows());
-  const float fill_ratio = size / std::max(1.0f, float(src.nnnz()));
-
-  if (max_fill < fill_ratio && size > threshold)
+  if (dst.exceeds_tolerance(src.nrows(), src.nnnz(), ndiags)) {
     throw Morpheus::FormatConversionException(
         "DiaMatrix fill-in would exceed maximum tolerance");
+  }
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz(), ndiags, alignment);
 
