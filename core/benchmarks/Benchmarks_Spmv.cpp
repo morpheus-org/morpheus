@@ -51,7 +51,7 @@ uint64_t seed       = 0;
 
 Morpheus::TimerPool timer;
 
-template <typename Space, typename Matrix>
+template <typename Space, typename Algorithm, typename Matrix>
 void spmv_bench(const Matrix& A, vec& x, vec& y,
                 enum Morpheus::TimerPool::timer_id spmv, std::string fn_str) {
   uint64_t rep = 0;
@@ -60,7 +60,7 @@ void spmv_bench(const Matrix& A, vec& x, vec& y,
     y.assign(y.size(), 0);
 
     timer.start(spmv);
-    Morpheus::multiply<Space>(A, x, y);
+    Morpheus::multiply<Space, Algorithm>(A, x, y);
     Kokkos::fence();
     timer.stop(spmv);
 
@@ -115,16 +115,16 @@ int main(int argc, char* argv[]) {
       Morpheus::copy(Aio, A);
       timer.stop(timer.COPY_COO_DEEP);
 
-      spmv_bench<CustomSpace>(A, x, y, timer.SPMV_COO_CUSTOM, "c_c_spmv<coo>");
-      spmv_bench<MorpheusSpace>(A, x, y, timer.SPMV_COO_MORPHEUS,
+      spmv_bench<CustomSpace, Morpheus::Alg0>(A, x, y, timer.SPMV_COO_CUSTOM, "c_c_spmv<coo>");
+      spmv_bench<MorpheusSpace, Morpheus::Alg0>(A, x, y, timer.SPMV_COO_MORPHEUS,
                                 "c_m_spmv<coo>");
 
       dyn Adyn;
       Adyn.activate(Morpheus::COO_FORMAT);
       Adyn = A;
-      spmv_bench<CustomSpace>(Adyn, x, y, timer.SPMV_DYN_COO_CUSTOM,
+      spmv_bench<CustomSpace, Morpheus::Alg0>(Adyn, x, y, timer.SPMV_DYN_COO_CUSTOM,
                               "d_c_spmv<coo>");
-      spmv_bench<MorpheusSpace>(Adyn, x, y, timer.SPMV_DYN_COO_MORPHEUS,
+      spmv_bench<MorpheusSpace, Morpheus::Alg0>(Adyn, x, y, timer.SPMV_DYN_COO_MORPHEUS,
                                 "d_m_spmv<coo>");
     }
 
@@ -137,16 +137,17 @@ int main(int argc, char* argv[]) {
       Morpheus::copy(Acsr_io, A);
       timer.stop(timer.COPY_CSR_DEEP);
 
-      spmv_bench<CustomSpace>(A, x, y, timer.SPMV_CSR_CUSTOM, "c_c_spmv<csr>");
-      spmv_bench<MorpheusSpace>(A, x, y, timer.SPMV_CSR_MORPHEUS,
+      spmv_bench<CustomSpace, Morpheus::Alg0>(A, x, y, timer.SPMV_CSR_CUSTOM_ALG0, "c_c_spmv<csr,alg0>");
+      spmv_bench<CustomSpace, Morpheus::Alg1>(A, x, y, timer.SPMV_CSR_CUSTOM_ALG1, "c_c_spmv<csr,alg1>");
+      spmv_bench<MorpheusSpace, Morpheus::Alg0>(A, x, y, timer.SPMV_CSR_MORPHEUS,
                                 "c_m_spmv<csr>");
 
       dyn Adyn;
       Adyn.activate(Morpheus::CSR_FORMAT);
       Adyn = A;
-      spmv_bench<CustomSpace>(Adyn, x, y, timer.SPMV_DYN_CSR_CUSTOM,
+      spmv_bench<CustomSpace, Morpheus::Alg0>(Adyn, x, y, timer.SPMV_DYN_CSR_CUSTOM,
                               "d_c_spmv<csr>");
-      spmv_bench<MorpheusSpace>(Adyn, x, y, timer.SPMV_DYN_CSR_MORPHEUS,
+      spmv_bench<MorpheusSpace, Morpheus::Alg0>(Adyn, x, y, timer.SPMV_DYN_CSR_MORPHEUS,
                                 "d_m_spmv<csr>");
     }
 
@@ -160,17 +161,17 @@ int main(int argc, char* argv[]) {
         Morpheus::copy(Adia_io, A);
         timer.stop(timer.COPY_DIA_DEEP);
 
-        spmv_bench<CustomSpace>(A, x, y, timer.SPMV_DIA_CUSTOM,
+        spmv_bench<CustomSpace, Morpheus::Alg0>(A, x, y, timer.SPMV_DIA_CUSTOM,
                                 "c_c_spmv<dia>");
-        spmv_bench<MorpheusSpace>(A, x, y, timer.SPMV_DIA_MORPHEUS,
+        spmv_bench<MorpheusSpace, Morpheus::Alg0>(A, x, y, timer.SPMV_DIA_MORPHEUS,
                                   "c_m_spmv<dia>");
 
         dyn Adyn;
         Adyn.activate(Morpheus::DIA_FORMAT);
         Adyn = A;
-        spmv_bench<CustomSpace>(Adyn, x, y, timer.SPMV_DYN_DIA_CUSTOM,
+        spmv_bench<CustomSpace, Morpheus::Alg0>(Adyn, x, y, timer.SPMV_DYN_DIA_CUSTOM,
                                 "d_c_spmv<dia>");
-        spmv_bench<MorpheusSpace>(Adyn, x, y, timer.SPMV_DYN_DIA_MORPHEUS,
+        spmv_bench<MorpheusSpace, Morpheus::Alg0>(Adyn, x, y, timer.SPMV_DYN_DIA_MORPHEUS,
                                   "d_m_spmv<dia>");
       } catch (std::exception& e) {
         std::cerr << "Exception Raised:: " << e.what() << std::endl;
