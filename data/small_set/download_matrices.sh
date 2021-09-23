@@ -16,15 +16,10 @@ MATRICES=("https://suitesparse-collection-website.herokuapp.com/MM/Boeing/pcryst
           "https://suitesparse-collection-website.herokuapp.com/MM/Pajek/dictionary28.tar.gz"
           "https://suitesparse-collection-website.herokuapp.com/MM/SNAP/roadNet-CA.tar.gz")
 
-for matrix in "${MATRICES[@]}"
+for tarfile in "${MATRICES[@]}"
 do
-  wget $matrix
+  wget $tarfile
+  file=$(basename $tarfile)
+  tar xf $file && rm -rf $file
 done
 
-# untar files and delete compressed files
-for i in *.tar.gz
-do
-  pushd `dirname $i`
-  tar xf `basename $i` && rm `basename $i`
-  popd
-done

@@ -15,15 +15,9 @@ MATRICES=("https://suitesparse-collection-website.herokuapp.com/MM/Williams/pdb1
           # "https://suitesparse-collection-website.herokuapp.com/MM/Mittelmann/rail4284.tar.gz"
           )
 
-for matrix in "${MATRICES[@]}"
+for tarfile in "${MATRICES[@]}"
 do
-  wget $matrix
-done
-
-# untar files and delete compressed files
-for i in *.tar.gz
-do
-  pushd `dirname $i`
-  tar xf `basename $i` && rm `basename $i`
-  popd
+  wget $tarfile
+  file=$(basename $tarfile)
+  tar xf $file && rm -rf $file
 done
