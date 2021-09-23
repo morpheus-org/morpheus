@@ -66,7 +66,9 @@ OUTPUT_PATH="$ROOT_PATH/core/benchmarks/results/$EXPERIMENT/spmv-$TARGET/$DATASE
 mkdir -p $(dirname $RESULTS_FILE)
 
 # CSV Header
-header="Machine,Matrix,Target,Threads,Reader,SpMv_COO_Custom,SpMv_CSR_Custom,SpMv_DIA_Custom,SpMv_DYN_COO_Custom,SpMv_DYN_CSR_Custom,SpMv_DYN_DIA_Custom,SpMv_COO_Kokkos,SpMv_CSR_Kokkos,SpMv_DIA_Kokkos,SpMv_DYN_COO_Kokkos,SpMv_DYN_CSR_Kokkos,SpMv_DYN_DIA_Kokkos"
+header="Machine,Matrix,Target,Threads,Reader"
+header="$header,SpMv_COO_Custom,SpMv_CSR_Custom,SpMv_DIA_Custom,SpMv_DYN_COO_Custom,SpMv_DYN_CSR_Custom,SpMv_DYN_DIA_Custom"
+header="$header,SpMv_COO_Kokkos,SpMv_CSR_Kokkos,SpMv_DIA_Kokkos,SpMv_DYN_COO_Kokkos,SpMv_DYN_CSR_Kokkos,SpMv_DYN_DIA_Kokkos"
 
 echo "$header"  2>&1 | tee "$RESULTS_FILE"
 
@@ -98,7 +100,12 @@ do
                 SpMv_DYN_CSR_Kokkos=$(awk '/SpMv_DYN_CSR_Kokkos/ {printf "%s",$4}' "$FILE")
                 SpMv_DYN_DIA_Kokkos=$(awk '/SpMv_DYN_DIA_Kokkos/ {printf "%s",$4}' "$FILE")
 
-                entry="$MACHINE,$MATRIX,$TARGET,$THREAD,$reader,$SpMv_COO_Custom,$SpMv_CSR_Custom,$SpMv_DIA_Custom,$SpMv_DYN_COO_Custom,$SpMv_DYN_CSR_Custom,$SpMv_DYN_DIA_Custom,$SpMv_COO_Kokkos,$SpMv_CSR_Kokkos,$SpMv_DIA_Kokkos,$SpMv_DYN_COO_Kokkos,$SpMv_DYN_CSR_Kokkos,$SpMv_DYN_DIA_Kokkos"
+                entry="$MACHINE,$MATRIX,$TARGET,$THREAD,$REP,$reader"
+                entry="$entry,$SpMv_COO_Custom,$SpMv_CSR_Custom,$SpMv_DIA_Custom"
+                entry="$entry,$SpMv_DYN_COO_Custom,$SpMv_DYN_CSR_Custom,$SpMv_DYN_DIA_Custom"
+                entry="$entry,$SpMv_COO_Kokkos,$SpMv_CSR_Kokkos,$SpMv_DIA_Kokkos"
+                entry="$entry,$SpMv_DYN_COO_Kokkos,$SpMv_DYN_CSR_Kokkos,$SpMv_DYN_DIA_Kokkos"
+                
                 echo "$entry" 2>&1 | tee -a "$RESULTS_FILE"
             done
         fi
