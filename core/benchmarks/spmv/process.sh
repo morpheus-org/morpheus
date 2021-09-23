@@ -69,6 +69,7 @@ mkdir -p $(dirname $RESULTS_FILE)
 header="Machine,Matrix,Target,Threads,Reader"
 header="$header,SpMv_COO_Custom,SpMv_CSR_Custom,SpMv_DIA_Custom,SpMv_DYN_COO_Custom,SpMv_DYN_CSR_Custom,SpMv_DYN_DIA_Custom"
 header="$header,SpMv_COO_Kokkos,SpMv_CSR_Kokkos,SpMv_DIA_Kokkos,SpMv_DYN_COO_Kokkos,SpMv_DYN_CSR_Kokkos,SpMv_DYN_DIA_Kokkos"
+header="$header,COO_Deep,CSR_Deep,DIA_Deep"
 
 echo "$header"  2>&1 | tee "$RESULTS_FILE"
 
@@ -100,11 +101,16 @@ do
                 SpMv_DYN_CSR_Kokkos=$(awk '/SpMv_DYN_CSR_Kokkos/ {printf "%s",$4}' "$FILE")
                 SpMv_DYN_DIA_Kokkos=$(awk '/SpMv_DYN_DIA_Kokkos/ {printf "%s",$4}' "$FILE")
 
+                COO_Deep=$(awk '/Copy_COO_Deep/ {printf "%s",$4}' "$FILE")
+                CSR_Deep=$(awk '/Copy_CSR_Deep/ {printf "%s",$4}' "$FILE")
+                DIA_Deep=$(awk '/Copy_DIA_Deep/ {printf "%s",$4}' "$FILE")
+
                 entry="$MACHINE,$MATRIX,$TARGET,$THREAD,$REP,$reader"
                 entry="$entry,$SpMv_COO_Custom,$SpMv_CSR_Custom,$SpMv_DIA_Custom"
                 entry="$entry,$SpMv_DYN_COO_Custom,$SpMv_DYN_CSR_Custom,$SpMv_DYN_DIA_Custom"
                 entry="$entry,$SpMv_COO_Kokkos,$SpMv_CSR_Kokkos,$SpMv_DIA_Kokkos"
                 entry="$entry,$SpMv_DYN_COO_Kokkos,$SpMv_DYN_CSR_Kokkos,$SpMv_DYN_DIA_Kokkos"
+                entry="$entry,$COO_Deep,$CSR_Deep,$DIA_Deep"
                 
                 echo "$entry" 2>&1 | tee -a "$RESULTS_FILE"
             done

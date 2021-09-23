@@ -110,8 +110,10 @@ int main(int argc, char* argv[]) {
     std::cout << "Starting experiment:" << std::endl;
 
     {
+      timer.start(timer.COPY_COO_DEEP);
       coo A = Morpheus::create_mirror<CustomSpace>(Aio);
       Morpheus::copy(Aio, A);
+      timer.stop(timer.COPY_COO_DEEP);
 
       spmv_bench<CustomSpace>(A, x, y, timer.SPMV_COO_CUSTOM, "c_c_spmv<coo>");
       spmv_bench<MorpheusSpace>(A, x, y, timer.SPMV_COO_MORPHEUS,
@@ -129,8 +131,11 @@ int main(int argc, char* argv[]) {
     {
       typename csr::HostMirror Acsr_io;
       Morpheus::convert(Aio, Acsr_io);
+
+      timer.start(timer.COPY_CSR_DEEP);
       csr A = Morpheus::create_mirror<CustomSpace>(Acsr_io);
       Morpheus::copy(Acsr_io, A);
+      timer.stop(timer.COPY_CSR_DEEP);
 
       spmv_bench<CustomSpace>(A, x, y, timer.SPMV_CSR_CUSTOM, "c_c_spmv<csr>");
       spmv_bench<MorpheusSpace>(A, x, y, timer.SPMV_CSR_MORPHEUS,
@@ -149,8 +154,11 @@ int main(int argc, char* argv[]) {
       try {
         typename dia::HostMirror Adia_io;
         Morpheus::convert(Aio, Adia_io);
+
+        timer.start(timer.COPY_DIA_DEEP);
         dia A = Morpheus::create_mirror<CustomSpace>(Adia_io);
         Morpheus::copy(Adia_io, A);
+        timer.stop(timer.COPY_DIA_DEEP);
 
         spmv_bench<CustomSpace>(A, x, y, timer.SPMV_DIA_CUSTOM,
                                 "c_c_spmv<dia>");
