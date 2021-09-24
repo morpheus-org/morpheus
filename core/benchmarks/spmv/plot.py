@@ -23,12 +23,65 @@
 # TODO:
 # Speed up: 1 to N threads for Concrete (OpenMP)
 # GPU Speed Up: GPU/OpenMP(Ncores) for Concrete
-# Kokkos Overheads: Plot ratio of Kokkos/Custom SpMV (OpenMP)
 
 import pandas as pd
 import numpy as np
 from scipy.stats import sem
 import matplotlib.pyplot as plt
+
+
+def cuda_comparison(
+    openmp_mu,
+    openmp_sem,
+    cuda_mu,
+    cuda_sem,
+    matrices,
+    legend=[
+        "COO_Custom",
+        "CSR_Custom",
+        "DIA_Custom",
+    ],
+    kernel="cuda",
+):
+
+    omp_mu = openmp_mu
+    omp_sem = openmp_sem
+    cu_mu = cuda_mu
+    cu_sem = cuda_sem
+
+    if kernel.lower() == "kokkos":
+        cu_mu[matrices == "dc1", 1] = float("NaN")
+
+    if openmp_mu.shape[1] == 4:
+        omp_mu = np.delete(openmp_mu, 2, axis=1)
+        omp_sem = np.delete(openmp_sem, 2, axis=1)
+
+    if cuda_mu.shape[1] == 4:
+        cu_mu = np.delete(cuda_mu, 2, axis=1)
+        cu_sem = np.delete(cuda_sem, 2, axis=1)
+
+    ratio = cu_mu / omp_mu
+
+    # Error = sqrt((concrete_sem / dynamic_mu)^2 + (concrete_mu * dynamic_sem / dynamic_mu)^2)
+    error = pow(
+        pow(omp_sem / cu_mu, 2) + pow(omp_mu * cu_sem / pow(cu_mu, 2), 2),
+        0.5,
+    )
+
+    fig, ax = plt.subplots(tight_layout=True)
+    plt.plot(
+        matrices,
+        ratio,
+        marker="*",
+        linestyle="None",
+    )
+    ax.set_xticks(np.arange(len(matrices)))
+    ax.set_xticklabels(matrices, rotation=90)
+    ax.set_ylabel("SpeedUp (Times)")
+    ax.set_xlabel("Matrix Name")
+    ax.grid(True)
+    ax.legend(legend)
+    plt.show()
 
 
 def kokkos_comparison(
@@ -89,6 +142,10 @@ def format_performance(concrete_mu, concrete_sem, matrices, arch="serial"):
         concr_mu[matrices == "olafu", 3] = float("NaN")
         concr_mu[matrices == "bcsstk17", 3] = float("NaN")
         concr_mu[matrices == "FEM_3D_thermal1", 3] = float("NaN")
+        concr_mu = np.delete(concr_mu, 2, axis=1)
+        concr_sem = np.delete(concr_sem, 2, axis=1)
+        legend = ["COO", "CSR_Alg0", "DIA"]
+    elif arch.lower() == "openmp":
         concr_mu = np.delete(concr_mu, 2, axis=1)
         concr_sem = np.delete(concr_sem, 2, axis=1)
         legend = ["COO", "CSR_Alg0", "DIA"]
@@ -200,19 +257,51 @@ def split_to_numpy(dataframe):
     return custom, dyncustom, kokkos, dynkokkos, deep
 
 
+def reshape_to_threads(mu, sem, ref_len):
+
+    mu = mu.reshape(int(mu.shape[0] / ref_len), ref_len, mu.shape[1])
+    sem = sem.reshape(int(sem.shape[0] / ref_len), ref_len, sem.shape[1])
+
+    return mu, sem
+
+
 results_path = "/Volumes/PhD/Code/Projects/morpheus/core/benchmarks/results/"
-groups = ["Machine", "Target", "Threads", "Matrix"]
 
 Serial_df = pd.read_csv(results_path + "spmv-Serial/large_set_cirrus_spmv_large.csv")
 OpenMP_df = pd.read_csv(results_path + "spmv-OpenMP/large_set_cirrus_spmv_large.csv")
 Cuda_df = pd.read_csv(results_path + "spmv-Cuda/large_set_cirrus_spmv_large.csv")
 
-ser_mu_df = Serial_df.drop(["Reps"], axis=1).groupby(groups).agg(np.mean)
-ser_sem_df = Serial_df.drop(["Reps"], axis=1).groupby(groups).agg(sem)
-omp_mu_df = OpenMP_df.drop(["Reps"], axis=1).groupby(groups).agg(np.mean)
-omp_sem_df = OpenMP_df.drop(["Reps"], axis=1).groupby(groups).agg(sem)
-cu_mu_df = Cuda_df.drop(["Reps"], axis=1).groupby(groups).agg(np.mean)
-cu_sem_df = Cuda_df.drop(["Reps"], axis=1).groupby(groups).agg(sem)
+ser_mu_df = (
+    Serial_df.drop(["Machine", "Target", "Threads", "Reps"], axis=1)
+    .groupby(["Matrix"])
+    .agg(np.mean)
+)
+ser_sem_df = (
+    Serial_df.drop(["Machine", "Target", "Threads", "Reps"], axis=1)
+    .groupby(["Matrix"])
+    .agg(sem)
+)
+
+omp_mu_df = (
+    OpenMP_df.drop(["Machine", "Target", "Reps"], axis=1)
+    .groupby(["Threads", "Matrix"])
+    .agg(np.mean)
+)
+omp_sem_df = (
+    OpenMP_df.drop(["Machine", "Target", "Reps"], axis=1)
+    .groupby(["Threads", "Matrix"])
+    .agg(sem)
+)
+cu_mu_df = (
+    Cuda_df.drop(["Machine", "Target", "Threads", "Reps"], axis=1)
+    .groupby(["Matrix"])
+    .agg(np.mean)
+)
+cu_sem_df = (
+    Cuda_df.drop(["Machine", "Target", "Threads", "Reps"], axis=1)
+    .groupby(["Matrix"])
+    .agg(sem)
+)
 
 matrices = ser_mu_df.reset_index()["Matrix"].to_numpy()
 
@@ -223,14 +312,45 @@ omp_csem, omp_dcsem, omp_ksem, omp_dksem, omp_deep_sem = split_to_numpy(omp_sem_
 cu_cmu, cu_dcmu, cu_kmu, cu_dkmu, cu_deep_mu = split_to_numpy(cu_mu_df)
 cu_csem, cu_dcsem, cu_ksem, cu_dksem, cu_deep_sem = split_to_numpy(cu_sem_df)
 
-# Format Selection: Plot normalized time for each format wrt COO (Serial)
-format_performance(ser_cmu, ser_csem, matrices, arch="serial")
-format_performance(cu_cmu, cu_csem, matrices, arch="cuda")
+omp_cmu, omp_csem = reshape_to_threads(omp_cmu, omp_csem, len(matrices))
+omp_dcmu, omp_dcsem = reshape_to_threads(omp_dcmu, omp_dcsem, len(matrices))
+omp_kmu, omp_ksem = reshape_to_threads(omp_kmu, omp_ksem, len(matrices))
+omp_dkmu, omp_dksem = reshape_to_threads(omp_dkmu, omp_dksem, len(matrices))
 
-# Dynamic Overheads: Plot ratio of Dynamic/Concrete (Serial)
-dynamic_overheads(ser_cmu, ser_csem, ser_dcmu, ser_dcsem, matrices, arch="serial")
-dynamic_overheads(cu_cmu, cu_csem, cu_dcmu, cu_dcsem, matrices, arch="cuda")
+sz = omp_cmu.shape[0] - 1
 
-# Format Selection: Plot normalized time for each format wrt COO (Serial)
-kokkos_comparison(ser_cmu, ser_csem, ser_kmu, ser_ksem, matrices, arch="serial")
-kokkos_comparison(cu_cmu, cu_csem, cu_kmu, cu_ksem, matrices, arch="cuda")
+# # Format Selection: Plot normalized time for each format wrt COO (Serial)
+# format_performance(ser_cmu, ser_csem, matrices, arch="serial")
+# format_performance(omp_cmu[sz], omp_csem[sz], matrices, arch="openmp")
+# format_performance(cu_cmu, cu_csem, matrices, arch="cuda")
+
+# # Dynamic Overheads: Plot ratio of Dynamic/Concrete (Serial)
+# dynamic_overheads(ser_cmu, ser_csem, ser_dcmu, ser_dcsem, matrices, arch="serial")
+# dynamic_overheads(
+#     omp_cmu[sz], omp_csem[sz], omp_dcmu[sz], omp_dcsem[sz], matrices, arch="openmp"
+# )
+# dynamic_overheads(cu_cmu, cu_csem, cu_dcmu, cu_dcsem, matrices, arch="cuda")
+
+# # Kokkos Overheads: Plot ratio of Kokkos/Custom SpMV (Serial, OpenMP, Cuda)
+# kokkos_comparison(ser_cmu, ser_csem, ser_kmu, ser_ksem, matrices, arch="serial")
+# kokkos_comparison(
+#     omp_cmu[sz], omp_csem[sz], omp_kmu[sz], omp_ksem[sz], matrices, arch="openmp"
+# )
+# kokkos_comparison(cu_cmu, cu_csem, cu_kmu, cu_ksem, matrices, arch="cuda")
+
+# GPU Speed Up: GPU/OpenMP(Ncores) for Concrete
+legend = [
+    "COO_Custom",
+    "CSR_Custom",
+    "DIA_Custom",
+]
+cuda_comparison(omp_cmu[sz], omp_csem[sz], cu_cmu, cu_csem, matrices, legend=legend)
+
+legend = [
+    "COO_Kokkos",
+    "CSR_Kokkos",
+    "DIA_Kokkos",
+]
+cuda_comparison(
+    omp_kmu[sz], omp_ksem[sz], cu_kmu, cu_ksem, matrices, legend=legend, kernel="kokkos"
+)
