@@ -88,11 +88,11 @@ do
                 # parse input file
                 reader=$(awk '/I\/O Read/ {printf "%s",$4}' "$FILE")
                 SpMv_COO_Custom=$(awk '/SpMv_COO_Custom/ {printf "%s",$4}' "$FILE")
-		SpMv_CSR_Custom_Alg0=$(awk '/SpMv_CSR_Custom_Alg0/ {printf "%s",$4}' "$FILE")
+		        SpMv_CSR_Custom_Alg0=$(awk '/SpMv_CSR_Custom_Alg0/ {printf "%s",$4}' "$FILE")
                 SpMv_CSR_Custom_Alg1=$(awk '/SpMv_CSR_Custom_Alg1/ {printf "%s",$4}' "$FILE")
                 SpMv_DIA_Custom=$(awk '/SpMv_DIA_Custom/ {printf "%s",$4}' "$FILE")
                 SpMv_DYN_COO_Custom=$(awk '/SpMv_DYN_COO_Custom/ {printf "%s",$4}' "$FILE")
-		SpMv_DYN_CSR_Custom=$(awk '/SpMv_DYN_CSR_Custom/ {printf "%s",$4}' "$FILE")
+		        SpMv_DYN_CSR_Custom=$(awk '/SpMv_DYN_CSR_Custom/ {printf "%s",$4}' "$FILE")
                 SpMv_DYN_DIA_Custom=$(awk '/SpMv_DYN_DIA_Custom/ {printf "%s",$4}' "$FILE")
 
                 SpMv_COO_Kokkos=$(awk '/SpMv_COO_Kokkos/ {printf "%s",$4}' "$FILE")

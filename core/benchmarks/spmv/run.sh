@@ -85,28 +85,16 @@ do
     EXECUTABLE="$ROOT_PATH/build-$COMPILER-release/core/benchmarks/MorpheusCore_Benchmarks_Spmv_$target"
     MATRIX_PATH="$ROOT_PATH/data/$DATASET"
 
-    MATRICES=("$MATRIX_PATH/cant"
-            "$MATRIX_PATH/consph"
-            "$MATRIX_PATH/mac_econ_fwd500"
-            "$MATRIX_PATH/mc2depi"
-            "$MATRIX_PATH/pdb1HYS"
-            "$MATRIX_PATH/pwtk"
-            "$MATRIX_PATH/rma10"
-            "$MATRIX_PATH/shipsec1"
-            "$MATRIX_PATH/cop20k_A"
-            "$MATRIX_PATH/scircuit")
-
     mkdir -p $RESULTS_PATH
 
     SUBMISSION_SCRIPT="$ROOT_PATH/core/benchmarks/spmv/submit.sh"
     launch_cmd="srun -n 1 --hint=nomultithread --ntasks=1 $EXECUTABLE"
 
     # for each matrix in test space
-   # for mat in "${MATRICES[@]}"
     for mat in $MATRIX_PATH/*
     do
-	if [[ -d $mat ]]
-	then
+        if [[ -d $mat ]]
+        then
             BASE=$(basename $mat)
             DIR=$(dirname $mat)
             MATRIX="$DIR/$BASE/$BASE.mtx"
@@ -121,6 +109,6 @@ do
             SCHEDULER_FILES="--output=$OUTFILE --error=$ERRFILE"
 
             $SCHEDULER_LAUNCER $SCHEDULER_ARGS $SCHEDULER_FILES $SUBMISSION_SCRIPT "$launch_cmd" "$MACHINE" "$target" "$COMPILER" "$OUTDIR" "$PROGRESS" "$MATRIX"
-	fi
+        fi
     done
 done
