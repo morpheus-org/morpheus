@@ -67,7 +67,7 @@ mkdir -p $(dirname $RESULTS_FILE)
 
 # CSV Header
 header="Machine,Matrix,Target,Threads,Reader"
-header="$header,SpMv_COO_Custom,SpMv_DYN_CSR_Custom_Alg0,SpMv_DYN_CSR_Custom_Alg1,SpMv_DIA_Custom,SpMv_DYN_COO_Custom,SpMv_DYN_CSR_Custom,SpMv_DYN_DIA_Custom"
+header="$header,SpMv_COO_Custom,SpMv_CSR_Custom_Alg0,SpMv_CSR_Custom_Alg1,SpMv_DIA_Custom,SpMv_DYN_COO_Custom,SpMv_DYN_CSR_Custom,SpMv_DYN_DIA_Custom"
 header="$header,SpMv_COO_Kokkos,SpMv_CSR_Kokkos,SpMv_DIA_Kokkos,SpMv_DYN_COO_Kokkos,SpMv_DYN_CSR_Kokkos,SpMv_DYN_DIA_Kokkos"
 header="$header,COO_Deep,CSR_Deep,DIA_Deep"
 
@@ -88,11 +88,11 @@ do
                 # parse input file
                 reader=$(awk '/I\/O Read/ {printf "%s",$4}' "$FILE")
                 SpMv_COO_Custom=$(awk '/SpMv_COO_Custom/ {printf "%s",$4}' "$FILE")
-                SpMv_CSR_Custom=$(awk '/SpMv_CSR_Custom/ {printf "%s",$4}' "$FILE")
+		SpMv_CSR_Custom_Alg0=$(awk '/SpMv_CSR_Custom_Alg0/ {printf "%s",$4}' "$FILE")
+                SpMv_CSR_Custom_Alg1=$(awk '/SpMv_CSR_Custom_Alg1/ {printf "%s",$4}' "$FILE")
                 SpMv_DIA_Custom=$(awk '/SpMv_DIA_Custom/ {printf "%s",$4}' "$FILE")
                 SpMv_DYN_COO_Custom=$(awk '/SpMv_DYN_COO_Custom/ {printf "%s",$4}' "$FILE")
-                SpMv_DYN_CSR_Custom_Alg0=$(awk '/SpMv_DYN_CSR_Custom_Alg0/ {printf "%s",$4}' "$FILE")
-                SpMv_DYN_CSR_Custom_Alg1=$(awk '/SpMv_DYN_CSR_Custom_Alg1/ {printf "%s",$4}' "$FILE")
+		SpMv_DYN_CSR_Custom=$(awk '/SpMv_DYN_CSR_Custom/ {printf "%s",$4}' "$FILE")
                 SpMv_DYN_DIA_Custom=$(awk '/SpMv_DYN_DIA_Custom/ {printf "%s",$4}' "$FILE")
 
                 SpMv_COO_Kokkos=$(awk '/SpMv_COO_Kokkos/ {printf "%s",$4}' "$FILE")
@@ -107,7 +107,7 @@ do
                 DIA_Deep=$(awk '/Copy_DIA_Deep/ {printf "%s",$4}' "$FILE")
 
                 entry="$MACHINE,$MATRIX,$TARGET,$THREAD,$REP,$reader"
-                entry="$entry,$SpMv_COO_Custom,$SpMv_DYN_CSR_Custom_Alg0,$SpMv_DYN_CSR_Custom_Alg1,$SpMv_DIA_Custom"
+                entry="$entry,$SpMv_COO_Custom,$SpMv_CSR_Custom_Alg0,$SpMv_CSR_Custom_Alg1,$SpMv_DIA_Custom"
                 entry="$entry,$SpMv_DYN_COO_Custom,$SpMv_DYN_CSR_Custom,$SpMv_DYN_DIA_Custom"
                 entry="$entry,$SpMv_COO_Kokkos,$SpMv_CSR_Kokkos,$SpMv_DIA_Kokkos"
                 entry="$entry,$SpMv_DYN_COO_Kokkos,$SpMv_DYN_CSR_Kokkos,$SpMv_DYN_DIA_Kokkos"

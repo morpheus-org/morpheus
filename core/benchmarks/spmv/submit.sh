@@ -37,9 +37,9 @@ if [ "$TARGET" == "OpenMP" ];then
         THREADS=("1" "4" "8" "16" "32" "64")
     elif [ "$MACHINE" == "cirrus" ]; then
         if [ "$COMPILER" == "cuda-11.2" ]; then
-            THREADS=("1" "10" "20" "30" "40")
+            THREADS=("1" "4" "8" "16" "20")
         elif [ "$COMPILER" == "gnu-10.2" ]; then
-            THREADS=("1" "4" "8" "16" "32" "36")
+            THREADS=("1" "4" "8" "16" "18")
         fi
     fi
 else

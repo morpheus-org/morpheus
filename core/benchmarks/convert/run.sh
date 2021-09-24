@@ -97,21 +97,25 @@ do
     launch_cmd="srun -n 1 --hint=nomultithread --ntasks=1 $EXECUTABLE"
 
     # for each matrix in test space
-    for mat in "${MATRICES[@]}"
+    # for mat in "${MATRICES[@]}"
+    for mat in $MATRIX_PATH/*
     do
-        BASE=$(basename $mat)
-        DIR=$(dirname $mat)
-        MATRIX="$DIR/$BASE/$BASE.mtx"
+        if [[ -d $mat ]]
+        then
+    	    BASE=$(basename $mat)
+            DIR=$(dirname $mat)
+            MATRIX="$DIR/$BASE/$BASE.mtx"
 
-        OUTDIR="$RESULTS_PATH/$DATASET/$BASE"
-        OUTFILE="$OUTDIR/out.txt"
-        ERRFILE="$OUTDIR/out-err.txt"
-        mkdir -p $(dirname $OUTFILE)
+            OUTDIR="$RESULTS_PATH/$DATASET/$BASE"
+            OUTFILE="$OUTDIR/out.txt"
+            ERRFILE="$OUTDIR/out-err.txt"
+            mkdir -p $(dirname $OUTFILE)
 
-        PROGRESS="$RESULTS_PATH/progress_${DATASET}_${BASE}.txt"
-        echo -e "Matrix::$BASE" 2>&1 | tee -a "$PROGRESS"
-        SCHEDULER_FILES="--output=$OUTFILE --error=$ERRFILE"
+            PROGRESS="$RESULTS_PATH/progress_${DATASET}_${BASE}.txt"
+            echo -e "Matrix::$BASE" 2>&1 | tee -a "$PROGRESS"
+            SCHEDULER_FILES="--output=$OUTFILE --error=$ERRFILE"
 
-        $SCHEDULER_LAUNCER $SCHEDULER_ARGS $SCHEDULER_FILES $SUBMISSION_SCRIPT "$launch_cmd" "$OUTDIR" "$PROGRESS" "$MATRIX"
+   	    $SCHEDULER_LAUNCER $SCHEDULER_ARGS $SCHEDULER_FILES $SUBMISSION_SCRIPT "$launch_cmd" "$OUTDIR" "$PROGRESS" "$MATRIX"
+	fi
     done
 done
