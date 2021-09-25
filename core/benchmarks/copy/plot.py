@@ -157,7 +157,8 @@ def copy_runtime(
     ax.set_xlabel("Matrix Name")
     ax.set_yscale("log")
     ax.grid(True)
-    ax.legend(legend)  # ignore COO format until we fix the OMP version
+    ax.legend(legend, bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
+    # ax.legend(legend)
 
     if outdir:
         fig.savefig(outdir + "copy_runtime.eps", format="eps", dpi=1000)

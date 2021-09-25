@@ -63,6 +63,85 @@ def get_args():
     return args
 
 
+def convert_runtime(
+    concrete_mu,
+    concrete_sem,
+    inplace_mu,
+    inplace_sem,
+    matrices,
+    legend=[
+        "COO_COO",
+        "COO_CSR",
+        "COO_DIA",
+        "CSR_COO",
+        "CSR_CSR",
+        "CSR_DIA",
+        "DIA_COO",
+        "DIA_CSR",
+        "DIA_DIA",
+    ],
+    outdir=None,
+):
+
+    cmu = concrete_mu
+    csem = concrete_sem
+
+    inmu = inplace_mu
+    insem = inplace_sem
+
+    # Plot concrete conversion runtime
+    fig, ax = plt.subplots(tight_layout=True)
+
+    for i in range(cmu.shape[1]):
+        plt.errorbar(
+            matrices,
+            cmu[:, i],
+            yerr=csem[:, i],
+            marker="*",
+            linestyle="None",
+        )
+
+    ax.set_xticks(np.arange(matrices.shape[0]))
+    ax.set_xticklabels(matrices, rotation=90)
+    ax.set_ylabel("Runtime (s)")
+    ax.set_xlabel("Matrix Name")
+    ax.set_yscale("log")
+    ax.grid(True)
+    ax.legend(legend, bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
+    # ax.legend(legend)
+
+    if outdir:
+        fig.savefig(outdir + "concrete_convert_runtime.eps", format="eps", dpi=1000)
+    else:
+        plt.show()
+
+    # Plot in-place conversion runtime
+    fig, ax = plt.subplots(tight_layout=True)
+
+    for i in range(inmu.shape[1]):
+        plt.errorbar(
+            matrices,
+            inmu[:, i],
+            yerr=insem[:, i],
+            marker="*",
+            linestyle="None",
+        )
+
+    ax.set_xticks(np.arange(matrices.shape[0]))
+    ax.set_xticklabels(matrices, rotation=90)
+    ax.set_ylabel("Runtime (s)")
+    ax.set_xlabel("Matrix Name")
+    ax.set_yscale("log")
+    ax.grid(True)
+    ax.legend(legend, bbox_to_anchor=(1.04, 0.5), loc="center left", borderaxespad=0)
+    # ax.legend(legend)
+
+    if outdir:
+        fig.savefig(outdir + "inplace_convert_runtime.eps", format="eps", dpi=1000)
+    else:
+        plt.show()
+
+
 def convert_comparison(
     concrete_mu,
     concrete_sem,
@@ -216,7 +295,7 @@ consem, dynsem, insem = split_to_numpy(convert_sem_df)
 print("Convert Comparison plots:")
 
 # Convert Speed Up: Concrete Convert / Dynamic Convert and Concrete Convert / Inplace Convert
-legend = [
+legend_comp = [
     "Dynamic_COO",
     "Dynamic_CSR",
     "Dynamic_DIA",
@@ -233,6 +312,28 @@ convert_comparison(
     inmu,
     insem,
     matrices,
-    legend=legend,
+    legend=legend_comp,
+    outdir=outdir + "/serial_",
+)
+
+legend_runtime = [
+    "COO_COO",
+    "COO_CSR",
+    "COO_DIA",
+    "CSR_COO",
+    "CSR_CSR",
+    "CSR_DIA",
+    "DIA_COO",
+    "DIA_CSR",
+    "DIA_DIA",
+]
+
+convert_runtime(
+    conmu,
+    consem,
+    inmu,
+    insem,
+    matrices,
+    legend=legend_runtime,
     outdir=outdir + "/serial_",
 )
