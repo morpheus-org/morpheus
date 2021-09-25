@@ -145,10 +145,11 @@ print("Copy Comparison plots: T_elem / T_copy")
 
 # Copy Speed Up: Elementwise Copy / Deep Copy
 legend = [
-    "COO_Custom",
-    "CSR_Custom",
-    "DIA_Custom",
+    "COO",
+    "CSR",
+    "DIA",
 ]
+
 copy_comparison(
     deep_mu,
     deep_sem,
