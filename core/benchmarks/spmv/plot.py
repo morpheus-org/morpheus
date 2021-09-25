@@ -20,9 +20,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 """
-# TODO:
-# Speed up: 1 to N threads for Concrete (OpenMP)
-# GPU Speed Up: GPU/OpenMP(Ncores) for Concrete
 
 import pandas as pd
 import numpy as np
@@ -30,7 +27,7 @@ from scipy.stats import sem
 import matplotlib.pyplot as plt
 
 
-def cuda_comparison(
+def gpu_comparison(
     openmp_mu,
     openmp_sem,
     cuda_mu,
@@ -60,27 +57,48 @@ def cuda_comparison(
         cu_mu = np.delete(cuda_mu, 2, axis=1)
         cu_sem = np.delete(cuda_sem, 2, axis=1)
 
-    ratio = cu_mu / omp_mu
+    omp_mu = np.delete(omp_mu, 0, axis=1)
+    omp_sem = np.delete(omp_sem, 0, axis=1)
+    cu_mu = np.delete(cu_mu, 0, axis=1)
+    cu_sem = np.delete(cu_sem, 0, axis=1)
+
+    ratio = omp_mu / cu_mu
 
     # Error = sqrt((concrete_sem / dynamic_mu)^2 + (concrete_mu * dynamic_sem / dynamic_mu)^2)
     error = pow(
-        pow(omp_sem / cu_mu, 2) + pow(omp_mu * cu_sem / pow(cu_mu, 2), 2),
+        pow(cu_sem / omp_mu, 2) + pow(cu_mu * omp_sem / pow(omp_mu, 2), 2),
         0.5,
     )
 
     fig, ax = plt.subplots(tight_layout=True)
-    plt.plot(
-        matrices,
-        ratio,
-        marker="*",
-        linestyle="None",
-    )
-    ax.set_xticks(np.arange(len(matrices)))
+    for i in range(ratio.shape[1]):
+        plt.errorbar(
+            matrices,
+            ratio[:, i],
+            yerr=error[:, i],
+            marker="*",
+            linestyle="None",
+        )
+    if kernel == "cuda":
+        error_alg1 = pow(
+            pow(cuda_sem[:, 2] / openmp_mu[:, 1], 2)
+            + pow(cuda_mu[:, 2] * openmp_sem[:, 1] / pow(openmp_mu[:, 1], 2), 2),
+            0.5,
+        )
+        plt.errorbar(
+            matrices,
+            openmp_mu[:, 1] / cuda_mu[:, 2],
+            yerr=error_alg1,
+            marker="*",
+            linestyle="None",
+        )
+        legend.append("CSR_Custom_Alg1")
+    ax.set_xticks(np.arange(matrices.shape[0]))
     ax.set_xticklabels(matrices, rotation=90)
     ax.set_ylabel("SpeedUp (Times)")
     ax.set_xlabel("Matrix Name")
     ax.grid(True)
-    ax.legend(legend)
+    ax.legend(legend[1:])  # ignore COO format until we fix the OMP version
     plt.show()
 
 
@@ -107,21 +125,23 @@ def kokkos_comparison(
         "DIA_Kokkos",
     ]
 
-    ratio = ko_mu / cu_mu
+    ratio = cu_mu / ko_mu
 
     # Error = sqrt((concrete_sem / dynamic_mu)^2 + (concrete_mu * dynamic_sem / dynamic_mu)^2)
     error = pow(
-        pow(cu_sem / ko_mu, 2) + pow(cu_mu * ko_sem / pow(ko_mu, 2), 2),
+        pow(ko_sem / cu_mu, 2) + pow(ko_mu * cu_sem / pow(cu_mu, 2), 2),
         0.5,
     )
 
     fig, ax = plt.subplots(tight_layout=True)
-    plt.plot(
-        matrices,
-        ratio,
-        marker="*",
-        linestyle="None",
-    )
+    for i in range(ratio.shape[1]):
+        plt.errorbar(
+            matrices,
+            ratio[:, i],
+            yerr=error[:, i],
+            marker="*",
+            linestyle="None",
+        )
     ax.set_xticks(np.arange(len(matrices)))
     ax.set_xticklabels(matrices, rotation=90)
     ax.set_ylabel("Ratio (Times)")
@@ -155,16 +175,18 @@ def format_performance(concrete_mu, concrete_sem, matrices, arch="serial"):
         legend = ["COO", "CSR_Alg0", "CSR_Alg1", "DIA"]
 
     ref_mu = concr_mu[:, 0]
-    ratio = concr_mu / ref_mu[:, None]
+    ratio = ref_mu[:, None] / concr_mu
     error = concr_sem
 
     fig, ax = plt.subplots(tight_layout=True)
-    plt.plot(
-        matrices,
-        ratio,
-        marker="*",
-        linestyle="None",
-    )
+    for i in range(ratio.shape[1]):
+        plt.errorbar(
+            matrices,
+            ratio[:, i],
+            yerr=error[:, i],
+            marker="*",
+            linestyle="None",
+        )
     ax.set_xticks(np.arange(len(matrices)))
     ax.set_xticklabels(matrices, rotation=90)
     ax.set_ylabel("Ratio (Times)")
@@ -191,22 +213,24 @@ def dynamic_overheads(
         "DIA_Custom",
     ]
 
-    ratio = dynamic_mu / concr_mu
+    ratio = concr_mu / dynamic_mu
 
     # Error = sqrt((concrete_sem / dynamic_mu)^2 + (concrete_mu * dynamic_sem / dynamic_mu)^2)
     error = pow(
-        pow(concr_sem / dynamic_mu, 2)
-        + pow(concr_mu * dynamic_sem / pow(dynamic_mu, 2), 2),
+        pow(dynamic_sem / concr_mu, 2)
+        + pow(dynamic_mu * concr_sem / pow(concr_mu, 2), 2),
         0.5,
     )
 
     fig, ax = plt.subplots(tight_layout=True)
-    plt.plot(
-        matrices,
-        ratio,
-        marker="*",
-        linestyle="None",
-    )
+    for i in range(ratio.shape[1]):
+        plt.errorbar(
+            matrices,
+            ratio[:, i],
+            yerr=error[:, i],
+            marker="*",
+            linestyle="None",
+        )
     ax.set_xticks(np.arange(len(matrices)))
     ax.set_xticklabels(matrices, rotation=90)
     ax.set_ylabel("Ratio (Times)")
@@ -319,24 +343,32 @@ omp_dkmu, omp_dksem = reshape_to_threads(omp_dkmu, omp_dksem, len(matrices))
 
 sz = omp_cmu.shape[0] - 1
 
-# # Format Selection: Plot normalized time for each format wrt COO (Serial)
-# format_performance(ser_cmu, ser_csem, matrices, arch="serial")
-# format_performance(omp_cmu[sz], omp_csem[sz], matrices, arch="openmp")
-# format_performance(cu_cmu, cu_csem, matrices, arch="cuda")
+print("Format Performance plots: T_ref / T_format")
 
-# # Dynamic Overheads: Plot ratio of Dynamic/Concrete (Serial)
-# dynamic_overheads(ser_cmu, ser_csem, ser_dcmu, ser_dcsem, matrices, arch="serial")
-# dynamic_overheads(
-#     omp_cmu[sz], omp_csem[sz], omp_dcmu[sz], omp_dcsem[sz], matrices, arch="openmp"
-# )
-# dynamic_overheads(cu_cmu, cu_csem, cu_dcmu, cu_dcsem, matrices, arch="cuda")
+# Format Selection: Plot normalized time for each format wrt COO (Serial)
+format_performance(ser_cmu, ser_csem, matrices, arch="serial")
+format_performance(omp_cmu[sz], omp_csem[sz], matrices, arch="openmp")
+format_performance(cu_cmu, cu_csem, matrices, arch="cuda")
 
-# # Kokkos Overheads: Plot ratio of Kokkos/Custom SpMV (Serial, OpenMP, Cuda)
-# kokkos_comparison(ser_cmu, ser_csem, ser_kmu, ser_ksem, matrices, arch="serial")
-# kokkos_comparison(
-#     omp_cmu[sz], omp_csem[sz], omp_kmu[sz], omp_ksem[sz], matrices, arch="openmp"
-# )
-# kokkos_comparison(cu_cmu, cu_csem, cu_kmu, cu_ksem, matrices, arch="cuda")
+print("Dynamic Overheads plots: T_concr / T_dynamic")
+
+# Dynamic Overheads: Plot ratio of Dynamic/Concrete (Serial)
+dynamic_overheads(ser_cmu, ser_csem, ser_dcmu, ser_dcsem, matrices, arch="serial")
+dynamic_overheads(
+    omp_cmu[sz], omp_csem[sz], omp_dcmu[sz], omp_dcsem[sz], matrices, arch="openmp"
+)
+dynamic_overheads(cu_cmu, cu_csem, cu_dcmu, cu_dcsem, matrices, arch="cuda")
+
+print("Kokkos Comparison plots: T_custom / T_kokkos")
+
+# Kokkos Overheads: Plot ratio of Kokkos/Custom SpMV (Serial, OpenMP, Cuda)
+kokkos_comparison(ser_cmu, ser_csem, ser_kmu, ser_ksem, matrices, arch="serial")
+kokkos_comparison(
+    omp_cmu[sz], omp_csem[sz], omp_kmu[sz], omp_ksem[sz], matrices, arch="openmp"
+)
+kokkos_comparison(cu_cmu, cu_csem, cu_kmu, cu_ksem, matrices, arch="cuda")
+
+print("GPU Comparison plots: T_omp / T_gpu")
 
 # GPU Speed Up: GPU/OpenMP(Ncores) for Concrete
 legend = [
@@ -344,13 +376,13 @@ legend = [
     "CSR_Custom",
     "DIA_Custom",
 ]
-cuda_comparison(omp_cmu[sz], omp_csem[sz], cu_cmu, cu_csem, matrices, legend=legend)
+gpu_comparison(omp_cmu[sz], omp_csem[sz], cu_cmu, cu_csem, matrices, legend=legend)
 
 legend = [
     "COO_Kokkos",
     "CSR_Kokkos",
     "DIA_Kokkos",
 ]
-cuda_comparison(
+gpu_comparison(
     omp_kmu[sz], omp_ksem[sz], cu_kmu, cu_ksem, matrices, legend=legend, kernel="kokkos"
 )
