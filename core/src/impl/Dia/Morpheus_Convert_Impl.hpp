@@ -24,6 +24,7 @@
 #ifndef MORPHEUS_DIA_CONVERT_IMPL_HPP
 #define MORPHEUS_DIA_CONVERT_IMPL_HPP
 
+#include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
 #include <fwd/Morpheus_Fwd_Algorithms.hpp>
@@ -35,12 +36,26 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, DiaTag, DiaTag,
-             typename std::enable_if<
-                 is_compatible_type<SourceType, DestinationType>::value ||
-                 is_compatible_from_different_space<
-                     SourceType, DestinationType>::value>::type* = nullptr) {
-  Morpheus::copy(src, dst);
+void convert(
+    const SourceType& src, DestinationType& dst, DiaTag, DiaTag,
+    typename std::enable_if<
+        std::is_same<typename SourceType::memory_space,
+                     typename DestinationType::memory_space>::value &&
+        is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
+  using index_type = typename SourceType::index_type;
+
+  dst.resize(src.nrows(), src.ncols(), src.nnnz(), src.diagonal_offsets.size());
+
+  // element-wise copy of indices and values
+  for (index_type n = 0; n < src.diagonal_offsets.size(); n++) {
+    dst.diagonal_offsets[n] = src.diagonal_offsets[n];
+  }
+
+  for (index_type j = 0; j < src.values.ncols(); j++) {
+    for (index_type i = 0; i < src.values.nrows(); i++) {
+      dst.values(i, j) = src.values(i, j);
+    }
+  }
 }
 
 template <typename SourceType, typename DestinationType>
@@ -98,6 +113,11 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
   // Create unique diagonal set
   std::set<IndexType> diag_set(diag_map.begin(), diag_map.end());
   IndexType ndiags = IndexType(diag_set.size());
+
+  if (dst.exceeds_tolerance(src.nrows(), src.nnnz(), ndiags)) {
+    throw Morpheus::FormatConversionException(
+        "DiaMatrix fill-in would exceed maximum tolerance");
+  }
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz(), ndiags, alignment);
 

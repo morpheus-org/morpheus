@@ -87,7 +87,7 @@ class TimerInstance {
                 << std::setprecision(7) << t_sum << "\t" << std::setw(20)
                 << std::setprecision(10) << t_sum / static_cast<double>(nsteps)
                 << "\t"
-                << "(" << nsteps << "calls)" << std::endl;
+                << "( " << nsteps << " calls )" << std::endl;
     }
   }
 };
@@ -117,13 +117,35 @@ class TimerPool {
                                          "Convert_DYN_DIA_COO",
                                          "Convert_DYN_DIA_CSR",
                                          "Convert_DYN_DIA_DIA",
+                                         "Convert_IN_COO_COO",
+                                         "Convert_IN_COO_CSR",
+                                         "Convert_IN_COO_DIA",
+                                         "Convert_IN_CSR_COO",
+                                         "Convert_IN_CSR_CSR",
+                                         "Convert_IN_CSR_DIA",
+                                         "Convert_IN_DIA_COO",
+                                         "Convert_IN_DIA_CSR",
+                                         "Convert_IN_DIA_DIA",
+                                         "Copy_COO_Deep",
+                                         "Copy_CSR_Deep",
+                                         "Copy_DIA_Deep",
+                                         "Copy_COO_Elem",
+                                         "Copy_CSR_Elem",
+                                         "Copy_DIA_Elem",
                                          "Set_Vecs",
-                                         "SpMv_COO",
-                                         "SpMv_CSR",
-                                         "SpMv_DIA",
-                                         "SpMv_DYN_COO",
-                                         "SpMv_DYN_CSR",
-                                         "SpMv_DYN_DIA"};
+                                         "SpMv_COO_Custom",
+                                         "SpMv_CSR_Custom_Alg0",
+					 "SpMv_CSR_Custom_Alg1",
+                                         "SpMv_DIA_Custom",
+                                         "SpMv_DYN_COO_Custom",
+                                         "SpMv_DYN_CSR_Custom",
+                                         "SpMv_DYN_DIA_Custom",
+                                         "SpMv_COO_Kokkos",
+                                         "SpMv_CSR_Kokkos",
+                                         "SpMv_DIA_Kokkos",
+                                         "SpMv_DYN_COO_Kokkos",
+                                         "SpMv_DYN_CSR_Kokkos",
+                                         "SpMv_DYN_DIA_Kokkos"};
 
  public:
   enum timer_id {
@@ -148,13 +170,35 @@ class TimerPool {
     CONVERT_DYN_DIA_COO,
     CONVERT_DYN_DIA_CSR,
     CONVERT_DYN_DIA_DIA,
+    CONVERT_IN_COO_COO,
+    CONVERT_IN_COO_CSR,
+    CONVERT_IN_COO_DIA,
+    CONVERT_IN_CSR_COO,
+    CONVERT_IN_CSR_CSR,
+    CONVERT_IN_CSR_DIA,
+    CONVERT_IN_DIA_COO,
+    CONVERT_IN_DIA_CSR,
+    CONVERT_IN_DIA_DIA,
+    COPY_COO_DEEP,
+    COPY_CSR_DEEP,
+    COPY_DIA_DEEP,
+    COPY_COO_ELEM,
+    COPY_CSR_ELEM,
+    COPY_DIA_ELEM,
     SET_VECS,
-    SPMV_COO,
-    SPMV_CSR,
-    SPMV_DIA,
-    SPMV_DYN_COO,
-    SPMV_DYN_CSR,
-    SPMV_DYN_DIA,
+    SPMV_COO_CUSTOM,
+    SPMV_CSR_CUSTOM_ALG0,
+    SPMV_CSR_CUSTOM_ALG1,
+    SPMV_DIA_CUSTOM,
+    SPMV_DYN_COO_CUSTOM,
+    SPMV_DYN_CSR_CUSTOM,
+    SPMV_DYN_DIA_CUSTOM,
+    SPMV_COO_MORPHEUS,
+    SPMV_CSR_MORPHEUS,
+    SPMV_DIA_MORPHEUS,
+    SPMV_DYN_COO_MORPHEUS,
+    SPMV_DYN_CSR_MORPHEUS,
+    SPMV_DYN_DIA_MORPHEUS,
     NTIMERS /* This must be the last entry */
   };
 

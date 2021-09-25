@@ -322,8 +322,8 @@ void read_matrix_market_stream(
     Container<T, P...>& mtx, Stream& input, Morpheus::Impl::SparseMatTag,
     typename std::enable_if<
         is_container<typename Container<T, P...>::tag>::value &&
-        is_Host_Memoryspace_v<typename Container<T, P...>::memory_space>>::
-        type* = nullptr) {
+        is_HostSpace_v<typename Container<T, P...>::memory_space>>::type* =
+        nullptr) {
   // read banner
   matrix_market_banner banner;
   read_matrix_market_banner(banner, input);

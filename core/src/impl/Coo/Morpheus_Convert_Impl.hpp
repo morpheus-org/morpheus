@@ -32,12 +32,28 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, CooTag, CooTag,
-             typename std::enable_if<
-                 is_compatible_type<SourceType, DestinationType>::value ||
-                 is_compatible_from_different_space<
-                     SourceType, DestinationType>::value>::type* = nullptr) {
-  Morpheus::copy(src, dst);
+void convert(
+    const SourceType& src, DestinationType& dst, CooTag, CooTag,
+    typename std::enable_if<
+        std::is_same<typename SourceType::memory_space,
+                     typename DestinationType::memory_space>::value &&
+        is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
+  using index_type = typename SourceType::index_type;
+
+  dst.resize(src.nrows(), src.ncols(), src.nnnz());
+
+  // element-wise copy of indices and values
+  for (index_type n = 0; n < src.nnnz(); n++) {
+    dst.row_indices[n] = src.row_indices[n];
+  }
+
+  for (index_type n = 0; n < src.nnnz(); n++) {
+    dst.column_indices[n] = src.column_indices[n];
+  }
+
+  for (index_type n = 0; n < src.nnnz(); n++) {
+    dst.values[n] = src.values[n];
+  }
 }
 
 }  // namespace Impl
