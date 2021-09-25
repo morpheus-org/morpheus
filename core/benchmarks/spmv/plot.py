@@ -24,10 +24,67 @@
 import pandas as pd
 import numpy as np
 from scipy.stats import sem
+from pathlib import Path
 import matplotlib.pyplot as plt
+import argparse
 
 
-def copy_performance(mu, host=True):
+def get_args():
+    """
+    Returns a namedtuple with arguments extracted from the command line.
+    :return: A namedtuple with arguments
+    """
+
+    parser = argparse.ArgumentParser(
+        description="Data processing, analysis and plotting for morpheus benchmarks"
+    )
+
+    parser.add_argument(
+        "--resdir", type=str, required=True, help="Absolute path to results directory."
+    )
+
+    parser.add_argument(
+        "--serdir",
+        type=str,
+        default="/spmv-Serial/",
+        help="Directory name of the Serial results.",
+    )
+
+    parser.add_argument(
+        "--ompdir",
+        type=str,
+        default="/spmv-OpenMP/",
+        help="Directory name of the OpenMP results.",
+    )
+
+    parser.add_argument(
+        "--cudir",
+        type=str,
+        default="/spmv-Cuda/",
+        help="Directory name of the Cuda results.",
+    )
+
+    parser.add_argument(
+        "--filename",
+        type=str,
+        default="large_set_cirrus_spmv_large.csv",
+        help="CSV filename to read the data from.",
+    )
+
+    parser.add_argument(
+        "--outdir",
+        "-o",
+        type=str,
+        required=True,
+        help="Absolute path of the output directory to write the plot files in.",
+    )
+
+    args = parser.parse_args()
+
+    return args
+
+
+def copy_performance(mu, host=True, outdir=None):
     legend = ["COO", "CSR", "DIA"]
     for i, n in enumerate(legend):
         if host:
@@ -49,7 +106,11 @@ def copy_performance(mu, host=True):
     ax.set_yscale("log")
     ax.grid(True)
     ax.legend(legend)
-    plt.show()
+
+    if outdir:
+        fig.savefig(outdir + "copy_performance.eps", format="eps", dpi=1000)
+    else:
+        plt.show()
 
 
 def gpu_comparison(
@@ -64,6 +125,7 @@ def gpu_comparison(
         "DIA_Custom",
     ],
     kernel="cuda",
+    outdir=None,
 ):
 
     omp_mu = openmp_mu
@@ -124,11 +186,15 @@ def gpu_comparison(
     ax.set_xlabel("Matrix Name")
     ax.grid(True)
     ax.legend(legend[1:])  # ignore COO format until we fix the OMP version
-    plt.show()
+
+    if outdir:
+        fig.savefig(outdir + "gpu_comparison.eps", format="eps", dpi=1000)
+    else:
+        plt.show()
 
 
 def kokkos_comparison(
-    custom_mu, custom_sem, kokkos_mu, kokkos_sem, matrices, arch="serial"
+    custom_mu, custom_sem, kokkos_mu, kokkos_sem, matrices, arch="serial", outdir=None
 ):
 
     cu_mu = custom_mu
@@ -173,10 +239,14 @@ def kokkos_comparison(
     ax.set_xlabel("Matrix Name")
     ax.grid(True)
     ax.legend(legend)
-    plt.show()
+
+    if outdir:
+        fig.savefig(outdir + "kokkos_comparison.eps", format="eps", dpi=1000)
+    else:
+        plt.show()
 
 
-def format_performance(concrete_mu, concrete_sem, matrices, arch="serial"):
+def format_performance(concrete_mu, concrete_sem, matrices, arch="serial", outdir=None):
 
     concr_mu = concrete_mu
     concr_sem = concrete_sem
@@ -218,11 +288,21 @@ def format_performance(concrete_mu, concrete_sem, matrices, arch="serial"):
     ax.set_xlabel("Matrix Name")
     ax.grid(True)
     ax.legend(legend)
-    plt.show()
+
+    if outdir:
+        fig.savefig(outdir + "format_performance.eps", format="eps", dpi=1000)
+    else:
+        plt.show()
 
 
 def dynamic_overheads(
-    concrete_mu, concrete_sem, dynamic_mu, dynamic_sem, matrices, arch="serial"
+    concrete_mu,
+    concrete_sem,
+    dynamic_mu,
+    dynamic_sem,
+    matrices,
+    arch="serial",
+    outdir=None,
 ):
 
     if concrete_mu.shape != dynamic_mu.shape:
@@ -262,7 +342,11 @@ def dynamic_overheads(
     ax.set_xlabel("Matrix Name")
     ax.grid(True)
     ax.legend(legend)
-    plt.show()
+
+    if outdir:
+        fig.savefig(outdir + "dynamic_overheads.eps", format="eps", dpi=1000)
+    else:
+        plt.show()
 
 
 def split_to_numpy(dataframe):
@@ -314,11 +398,19 @@ def reshape_to_threads(mu, sem, ref_len):
     return mu, sem
 
 
-results_path = "/Volumes/PhD/Code/Projects/morpheus/core/benchmarks/results/"
+args = get_args()
 
-Serial_df = pd.read_csv(results_path + "spmv-Serial/large_set_cirrus_spmv_large.csv")
-OpenMP_df = pd.read_csv(results_path + "spmv-OpenMP/large_set_cirrus_spmv_large.csv")
-Cuda_df = pd.read_csv(results_path + "spmv-Cuda/large_set_cirrus_spmv_large.csv")
+outdir = args.outdir
+ser_outdir = outdir + "/serial_"
+omp_outdir = outdir + "/omp_"
+cu_outdir = outdir + "/cuda_"
+
+Path(outdir).mkdir(parents=True, exist_ok=True)
+
+# Dataframes
+Serial_df = pd.read_csv(args.resdir + args.serdir + args.filename)
+OpenMP_df = pd.read_csv(args.resdir + args.ompdir + args.filename)
+Cuda_df = pd.read_csv(args.resdir + args.cudir + args.filename)
 
 ser_mu_df = (
     Serial_df.drop(["Machine", "Target", "Threads", "Reps"], axis=1)
@@ -371,27 +463,49 @@ sz = omp_cmu.shape[0] - 1
 print("Format Performance plots: T_ref / T_format")
 
 # Format Selection: Plot normalized time for each format wrt COO (Serial)
-format_performance(ser_cmu, ser_csem, matrices, arch="serial")
-format_performance(omp_cmu[sz], omp_csem[sz], matrices, arch="openmp")
-format_performance(cu_cmu, cu_csem, matrices, arch="cuda")
+format_performance(ser_cmu, ser_csem, matrices, arch="serial", outdir=ser_outdir)
+format_performance(
+    omp_cmu[sz], omp_csem[sz], matrices, arch="openmp", outdir=omp_outdir
+)
+format_performance(cu_cmu, cu_csem, matrices, arch="cuda", outdir=cu_outdir)
 
 print("Dynamic Overheads plots: T_concr / T_dynamic")
 
 # Dynamic Overheads: Plot ratio of Dynamic/Concrete (Serial)
-dynamic_overheads(ser_cmu, ser_csem, ser_dcmu, ser_dcsem, matrices, arch="serial")
 dynamic_overheads(
-    omp_cmu[sz], omp_csem[sz], omp_dcmu[sz], omp_dcsem[sz], matrices, arch="openmp"
+    ser_cmu, ser_csem, ser_dcmu, ser_dcsem, matrices, arch="serial", outdir=ser_outdir
 )
-dynamic_overheads(cu_cmu, cu_csem, cu_dcmu, cu_dcsem, matrices, arch="cuda")
+dynamic_overheads(
+    omp_cmu[sz],
+    omp_csem[sz],
+    omp_dcmu[sz],
+    omp_dcsem[sz],
+    matrices,
+    arch="openmp",
+    outdir=omp_outdir,
+)
+dynamic_overheads(
+    cu_cmu, cu_csem, cu_dcmu, cu_dcsem, matrices, arch="cuda", outdir=cu_outdir
+)
 
 print("Kokkos Comparison plots: T_custom / T_kokkos")
 
 # Kokkos Overheads: Plot ratio of Kokkos/Custom SpMV (Serial, OpenMP, Cuda)
-kokkos_comparison(ser_cmu, ser_csem, ser_kmu, ser_ksem, matrices, arch="serial")
 kokkos_comparison(
-    omp_cmu[sz], omp_csem[sz], omp_kmu[sz], omp_ksem[sz], matrices, arch="openmp"
+    ser_cmu, ser_csem, ser_kmu, ser_ksem, matrices, arch="serial", outdir=ser_outdir
 )
-kokkos_comparison(cu_cmu, cu_csem, cu_kmu, cu_ksem, matrices, arch="cuda")
+kokkos_comparison(
+    omp_cmu[sz],
+    omp_csem[sz],
+    omp_kmu[sz],
+    omp_ksem[sz],
+    matrices,
+    arch="openmp",
+    outdir=omp_outdir,
+)
+kokkos_comparison(
+    cu_cmu, cu_csem, cu_kmu, cu_ksem, matrices, arch="cuda", outdir=cu_outdir
+)
 
 print("GPU Comparison plots: T_omp / T_gpu")
 
@@ -401,7 +515,15 @@ legend = [
     "CSR_Custom",
     "DIA_Custom",
 ]
-gpu_comparison(omp_cmu[sz], omp_csem[sz], cu_cmu, cu_csem, matrices, legend=legend)
+gpu_comparison(
+    omp_cmu[sz],
+    omp_csem[sz],
+    cu_cmu,
+    cu_csem,
+    matrices,
+    legend=legend,
+    outdir=outdir + "/custom_",
+)
 
 legend = [
     "COO_Kokkos",
@@ -409,10 +531,17 @@ legend = [
     "DIA_Kokkos",
 ]
 gpu_comparison(
-    omp_kmu[sz], omp_ksem[sz], cu_kmu, cu_ksem, matrices, legend=legend, kernel="kokkos"
+    omp_kmu[sz],
+    omp_ksem[sz],
+    cu_kmu,
+    cu_ksem,
+    matrices,
+    legend=legend,
+    kernel="kokkos",
+    outdir=outdir + "/kokkos_",
 )
 
 print("Copy Performance plots:")
 
-copy_performance(ser_deep_mu)
-copy_performance(cu_deep_mu, host=False)
+copy_performance(ser_deep_mu, outdir=outdir + "/host_")
+copy_performance(cu_deep_mu, host=False, outdir=outdir + "/device_")
