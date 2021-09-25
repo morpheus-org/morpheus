@@ -111,6 +111,60 @@ def copy_comparison(
         plt.show()
 
 
+def copy_runtime(
+    deep_mu,
+    deep_sem,
+    elem_mu,
+    elem_sem,
+    matrices,
+    legend=[
+        "COO_Deep",
+        "CSR_Deep",
+        "DIA_Deep",
+        "COO_Elem",
+        "CSR_Elem",
+        "DIA_Elem",
+    ],
+    outdir=None,
+):
+
+    dmu = deep_mu
+    dsem = deep_sem
+    emu = elem_mu
+    esem = elem_sem
+
+    fig, ax = plt.subplots(tight_layout=True)
+    for i in range(dmu.shape[1]):
+        plt.errorbar(
+            matrices,
+            dmu[:, i],
+            yerr=dsem[:, i],
+            marker="*",
+            linestyle="None",
+        )
+    for i in range(dmu.shape[1]):
+        plt.errorbar(
+            matrices,
+            emu[:, i],
+            yerr=esem[:, i],
+            marker="*",
+            linestyle="None",
+        )
+
+    ax.set_xticks(np.arange(matrices.shape[0]))
+    ax.set_xticklabels(matrices, rotation=90)
+    ax.set_ylabel("Runtime (s)")
+    ax.set_xlabel("Matrix Name")
+    ax.set_yscale("log")
+    ax.grid(True)
+    ax.legend(legend)  # ignore COO format until we fix the OMP version
+
+    if outdir:
+        fig.savefig(outdir + "copy_runtime.eps", format="eps", dpi=1000)
+    else:
+        plt.show()
+
+
 def split_to_numpy(dataframe):
     df = dataframe.reset_index()
     deep = df[["COO_Deep", "CSR_Deep", "DIA_Deep"]].to_numpy()
@@ -144,7 +198,7 @@ deep_sem, elem_sem = split_to_numpy(copy_sem_df)
 print("Copy Comparison plots: T_elem / T_copy")
 
 # Copy Speed Up: Elementwise Copy / Deep Copy
-legend = [
+legend_comp = [
     "COO",
     "CSR",
     "DIA",
@@ -156,6 +210,24 @@ copy_comparison(
     elem_mu,
     elem_sem,
     matrices,
-    legend=legend,
+    legend=legend_comp,
+    outdir=outdir + "/serial_",
+)
+
+legend_run = [
+    "COO_Deep",
+    "CSR_Deep",
+    "DIA_Deep",
+    "COO_Elem",
+    "CSR_Elem",
+    "DIA_Elem",
+]
+copy_runtime(
+    deep_mu,
+    deep_sem,
+    elem_mu,
+    elem_sem,
+    matrices,
+    legend=legend_run,
     outdir=outdir + "/serial_",
 )
