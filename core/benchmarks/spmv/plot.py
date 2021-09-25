@@ -27,6 +27,31 @@ from scipy.stats import sem
 import matplotlib.pyplot as plt
 
 
+def copy_performance(mu, host=True):
+    legend = ["COO", "CSR", "DIA"]
+    for i, n in enumerate(legend):
+        if host:
+            legend[i] = n + "_host"
+        else:
+            legend[i] = n + "_device"
+    fig, ax = plt.subplots(tight_layout=True)
+    plt.plot(
+        matrices,
+        mu,
+        marker="*",
+        linestyle="None",
+    )
+
+    ax.set_xticks(np.arange(matrices.shape[0]))
+    ax.set_xticklabels(matrices, rotation=90)
+    ax.set_ylabel("Runtime (s)")
+    ax.set_xlabel("Matrix Name")
+    ax.set_yscale("log")
+    ax.grid(True)
+    ax.legend(legend)
+    plt.show()
+
+
 def gpu_comparison(
     openmp_mu,
     openmp_sem,
@@ -386,3 +411,8 @@ legend = [
 gpu_comparison(
     omp_kmu[sz], omp_ksem[sz], cu_kmu, cu_ksem, matrices, legend=legend, kernel="kokkos"
 )
+
+print("Copy Performance plots:")
+
+copy_performance(ser_deep_mu)
+copy_performance(cu_deep_mu, host=False)
