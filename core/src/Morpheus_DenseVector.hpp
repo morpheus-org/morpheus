@@ -141,11 +141,13 @@ class DenseVector
   }
 
   // Element access
-  inline value_array_reference operator()(index_type i) const {
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_reference
+  operator()(index_type i) const {
     return _values(i);
   }
 
-  inline value_array_reference operator[](index_type i) const {
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_reference
+  operator[](index_type i) const {
     return _values(i);
   }
 
