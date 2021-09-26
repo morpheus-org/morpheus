@@ -103,7 +103,7 @@ do
             echo -e "Matrix::$BASE" 2>&1 | tee -a "$PROGRESS"
             SCHEDULER_FILES="--output=$OUTFILE --error=$ERRFILE"
 
-   	        $SCHEDULER_LAUNCER $SCHEDULER_ARGS $SCHEDULER_FILES $SUBMISSION_SCRIPT "$launch_cmd" "$OUTDIR" "$PROGRESS" "$MATRIX"
+   	        $SCHEDULER_LAUNCER $SCHEDULER_ARGS $SCHEDULER_FILES $SUBMISSION_SCRIPT "$launch_cmd" "$OUTDIR" "$PROGRESS" "$MATRIX" "$COMPILER"
 	    fi
     done
 done

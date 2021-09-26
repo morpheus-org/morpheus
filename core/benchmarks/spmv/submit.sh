@@ -32,6 +32,10 @@ ITER=200
 REPS=5
 SEED=0
 
+if [ "$COMPILER" == "gnu-10.2" ]; then
+	module load gcc/10.2.0
+fi
+
 if [ "$TARGET" == "OpenMP" ];then
     if [ "$MACHINE" == "archer" ]; then
         THREADS=("1" "4" "8" "16" "32" "64")

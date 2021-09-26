@@ -24,11 +24,16 @@ CMD="$1"
 OUTPATH="$2"
 PROGRESS="$3"
 MATRIX="$4"
+COMPILER="$5"
 
-REPS=1
-ITER=10
+REPS=10
+ITER=50
 
 THREADS=("1")
+
+if [ "$COMPILER" == "gnu-10.2" ]; then
+        module load gcc/10.2.0
+fi
 
 for thread in "${THREADS[@]}"
 do
