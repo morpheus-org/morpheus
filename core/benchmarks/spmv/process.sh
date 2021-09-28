@@ -23,6 +23,10 @@
 # example command-line instruction:
 # ./process.sh cirrus gnu-10.2 OpenMP morpheus-bench large_set timings
 
+# ./process.sh cirrus gnu-10.2 Serial morpheus-emerg-bench large_set timings
+# ./process.sh cirrus gnu-10.2 OpenMP morpheus-emerg-bench large_set timings
+# ./process.sh cirrus cuda-11.2 Cuda morpheus-emerg-bench large_set timings
+
 MACHINE="$1"
 COMPILER="$2"
 TARGET="$3"
@@ -70,9 +74,9 @@ echo -e "\nParsed Runtime Parameters:"
 echo -e "=========================="
 echo -e "Machine::        $MACHINE"
 echo -e "Compiler::       $COMPILER"
-echo -e "Model::          $MODEL"
 echo -e "Target::         $TARGET"
 echo -e "Experiment::     $EXPERIMENT"
+echo -e "Dataset::        $DATASET"
 echo -e "Filename::       $FILENAME"
 
 if [ "$MACHINE" == "archer" ]; then

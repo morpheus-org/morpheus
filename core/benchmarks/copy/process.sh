@@ -70,9 +70,9 @@ echo -e "\nParsed Runtime Parameters:"
 echo -e "=========================="
 echo -e "Machine::        $MACHINE"
 echo -e "Compiler::       $COMPILER"
-echo -e "Model::          $MODEL"
 echo -e "Target::         $TARGET"
 echo -e "Experiment::     $EXPERIMENT"
+echo -e "Dataset::        $DATASET"
 echo -e "Filename::       $FILENAME"
 
 if [ "$MACHINE" == "archer" ]; then
