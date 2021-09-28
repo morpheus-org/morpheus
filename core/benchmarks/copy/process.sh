@@ -20,37 +20,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# example command-line instruction:
+# ./process.sh cirrus gnu-10.2 OpenMP morpheus-bench large_set timings
+
 MACHINE="$1"
 COMPILER="$2"
 TARGET="$3"
 EXPERIMENT="$4"
-FILENAME="$5"
-DATASET="$6"
+DATASET="$5"
+FILENAME="$6"
 
-if [ -z "$1" ] || [ -z "$2" ]; then
-    echo "Invalid arguments.. Exiting.."
-    exit -1
+if [ "$#" -lt 6 ]; then
+    echo "Warning! Only $# out if 6 were provided."
+    echo "Arguments Provided are: $1 $2 $3 $4 $5 $6"
+
+    echo "Defaulted arguments:"
+    if [ -z "$1" ]; then
+        MACHINE="cirrus"
+        echo -e "\tMachine::        $MACHINE"
+    fi
+
+    if [ -z "$2" ]; then
+        COMPILER="gnu-10.2"
+        echo -e "\tCompiler::       $COMPILER"
+    fi
+
+    if [ -z "$3" ]; then
+        TARGET="OpenMP"
+        echo -e "\tTarget::          $TARGET"
+    fi
+
+    if [ -z "$4" ]; then
+        EXPERIMENT="morpheus-bench"
+        echo -e "\tExperiment::     $EXPERIMENT"
+    fi
+
+    if [ -z "$5" ]; then
+        DATASET="large_set"
+        echo -e "\tDataset::         $DATASET"
+    fi
+
+    if [ -z "$6" ]; then
+        FILENAME="timings"
+        echo -e "\tFilename::       copy-$FILENAME-$MACHINE-$COMPILER-$DATASET-$TARGET.csv"
+    fi
 fi
 
-if [ -z "$3" ]; then
-    echo "Missing target.. Exiting.."
-    exit -1
-fi
-
-if [ -z "$4" ]; then
-    echo "Warning! Experiment, filename and dataset not provided. Using default options."
-    EXPERIMENT="copy-bench"
-    FILENAME="timings"
-    DATASET="large_set"
-fi
-
-echo "Machine::     $MACHINE"
-echo "Compiler::    $COMPILER"
-echo "Target::      $TARGET"
-echo "Experiment::  $EXPERIMENT"
-echo "Filename::    $FILENAME"
-echo "Dataset::     $DATASET"
-
+echo -e "\nParsed Runtime Parameters:"
+echo -e "=========================="
+echo -e "Machine::        $MACHINE"
+echo -e "Compiler::       $COMPILER"
+echo -e "Model::          $MODEL"
+echo -e "Target::         $TARGET"
+echo -e "Experiment::     $EXPERIMENT"
+echo -e "Filename::       $FILENAME"
 
 if [ "$MACHINE" == "archer" ]; then
     ROOT_PATH="/work/e609/e609/cstyl/morpheus"
@@ -60,7 +83,7 @@ fi
 
 echo "Root Path::   $ROOT_PATH"
 
-RESULTS_FILE="$ROOT_PATH/core/benchmarks/results/processed/$EXPERIMENT/copy-$TARGET/$DATASET"_"$MACHINE"_"copy"_"$FILENAME.csv"
+RESULTS_FILE="$ROOT_PATH/core/benchmarks/results/processed/$EXPERIMENT/copy-$FILENAME-$MACHINE-$COMPILER-$DATASET-$TARGET.csv"
 OUTPUT_PATH="$ROOT_PATH/core/benchmarks/results/$EXPERIMENT/copy-$TARGET/$DATASET"
 
 mkdir -p $(dirname $RESULTS_FILE)

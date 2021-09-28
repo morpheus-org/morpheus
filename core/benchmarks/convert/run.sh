@@ -20,24 +20,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# example command-line instruction:
+# ./run.sh cirrus gnu-10.2 24:00:00 morpheus-bench
+
 MACHINE="$1"
 COMPILER="$2"
 TIME="$3"
 EXPERIMENT="$4"
 
-if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
-    echo "Invalid arguments.. Exiting.."
-    exit -1
+if [ "$#" -lt 4 ]; then
+    echo "Warning! Only $# out if 4 were provided."
+    echo "Arguments Provided are: $1 $2 $3 $4"
+
+    echo "Defaulted arguments:"
+    if [ -z "$1" ]; then
+        MACHINE="cirrus"
+        echo -e "\tMachine::        $MACHINE"
+    fi
+
+    if [ -z "$2" ]; then
+        COMPILER="gnu-10.2"
+        echo -e "\tCompiler::       $COMPILER"
+    fi
+
+    if [ -z "$3" ]; then
+        TIME="24:00:00"
+        echo -e "\tTime::           $TIME"
+    fi
+
+    if [ -z "$4" ]; then
+        EXPERIMENT="morpheus-bench"
+        echo -e "\tExperiment::     $EXPERIMENT"
+    fi
 fi
 
-if [ -z "$4" ]; then
-    EXPERIMENT="convert-bench"
-fi
-
-echo "Machine::     $MACHINE"
-echo "Compiler::    $COMPILER"
-echo "Time::        $TIME"
-echo "Experiment::  $EXPERIMENT"
+echo -e "\nParsed Runtime Parameters:"
+echo -e "=========================="
+echo -e "Machine::        $MACHINE"
+echo -e "Compiler::       $COMPILER"
+echo -e "Time::           $TIME"
+echo -e "Experiment::     $EXPERIMENT"
 
 if [ "$MACHINE" == "archer" ]; then
     # Setup the job environment (this module needs to be loaded before any other modules)
