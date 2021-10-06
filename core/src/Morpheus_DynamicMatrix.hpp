@@ -81,6 +81,7 @@ class DynamicMatrix
           is_variant_member_v<typename Matrix::type, variant_type>>::type * =
           nullptr)
       : base("DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()) {
+    this->activate(src.format_enum());
     auto f = std::bind(Impl::any_type_assign(), std::cref(src),
                        std::placeholders::_1);
     std::visit(f, _formats);
@@ -93,6 +94,7 @@ class DynamicMatrix
           is_variant_member_v<typename Matrix::type, variant_type>>::type * =
           nullptr)
       : base(name + "DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()) {
+    this->activate(src.format_enum());
     auto f = std::bind(Impl::any_type_assign(), std::cref(src),
                        std::placeholders::_1);
     std::visit(f, _formats);
