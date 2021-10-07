@@ -46,9 +46,9 @@ inline void multiply(
   using V               = typename ValueArray::value_type;
   using I               = typename IndexArray::value_type;
 
-  const ValueArray values = A.values.const_view(), x_view = x.const_view();
-  const IndexArray column_indices = A.column_indices.const_view(),
-                   row_offsets    = A.row_offsets.const_view();
+  const ValueArray values = A.cvalues().const_view(), x_view = x.const_view();
+  const IndexArray column_indices = A.ccolumn_indices().const_view(),
+                   row_offsets    = A.crow_offsets().const_view();
   ValueArray y_view               = y.view();
 
   range_policy policy(0, A.nrows());

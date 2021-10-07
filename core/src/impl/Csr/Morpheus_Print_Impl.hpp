@@ -39,10 +39,10 @@ void print(const Printable& p, Stream& s, CsrTag) {
   print_matrix_header(p, s);
 
   for (IndexType i = 0; i < p.nrows(); i++) {
-    for (IndexType jj = p.row_offsets[i]; jj < p.row_offsets[i + 1]; jj++) {
+    for (IndexType jj = p.crow_offsets(i); jj < p.crow_offsets(i + 1); jj++) {
       s << " " << std::setw(14) << i;
-      s << " " << std::setw(14) << p.column_indices[jj];
-      s << " " << std::setprecision(4) << std::setw(8) << "(" << p.values[jj]
+      s << " " << std::setw(14) << p.ccolumn_indices(jj);
+      s << " " << std::setprecision(4) << std::setw(8) << "(" << p.cvalues(jj)
         << ")\n";
     }
   }

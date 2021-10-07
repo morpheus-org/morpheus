@@ -61,14 +61,16 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
 
   using index_array_type =
       Morpheus::DenseVector<index_type, index_type, array_layout, memory_space>;
-  using index_array_pointer = typename index_array_type::value_array_pointer;
+  using const_index_array_type = const index_array_type;
+  using index_array_pointer    = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
   using const_index_array_reference = const index_array_reference;
 
   using value_array_type =
       Morpheus::DenseVector<value_type, index_type, array_layout, memory_space>;
-  using value_array_pointer = typename value_array_type::value_array_pointer;
+  using const_value_array_type = const value_array_type;
+  using value_array_pointer    = typename value_array_type::value_array_pointer;
   using value_array_reference =
       typename value_array_type::value_array_reference;
   using const_value_array_reference = const value_array_reference;
@@ -256,6 +258,19 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   }
 
   MORPHEUS_FORCEINLINE_FUNCTION value_array_type &values() { return _values; }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_type &crow_indices() const {
+    return _row_indices;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_type &ccolumn_indices()
+      const {
+    return _column_indices;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_type &cvalues() const {
+    return _values;
+  }
 
  private:
   index_array_type _row_indices, _column_indices;

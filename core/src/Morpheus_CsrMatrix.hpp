@@ -62,18 +62,19 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
 
   using index_array_type =
       Morpheus::DenseVector<index_type, index_type, array_layout, memory_space>;
-  using index_array_pointer = typename index_array_type::value_array_pointer;
+  using const_index_array_type = const index_array_type;
+  using index_array_pointer    = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
+  using const_index_array_reference = const index_array_reference;
 
   using value_array_type =
       Morpheus::DenseVector<value_type, index_type, array_layout, memory_space>;
-  using value_array_pointer = typename value_array_type::value_array_pointer;
+  using const_value_array_type = const value_array_type;
+  using value_array_pointer    = typename value_array_type::value_array_pointer;
   using value_array_reference =
       typename value_array_type::value_array_reference;
-
-  index_array_type row_offsets, column_indices;
-  value_array_type values;
+  using const_value_array_reference = const value_array_reference;
 
   ~CsrMatrix()                 = default;
   CsrMatrix(const CsrMatrix &) = default;
@@ -83,31 +84,31 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
 
   // Construct an empty CsrMatrix
   inline CsrMatrix()
-      : base("CsrMatrix"), row_offsets(1), column_indices(0), values(0) {}
+      : base("CsrMatrix"), _row_offsets(1), _column_indices(0), _values(0) {}
 
   // Construct a CsrMatrix with a specific shape and number of non-zero entries
   inline CsrMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries)
       : base("CsrMatrix", num_rows, num_cols, num_entries),
-        row_offsets(num_rows + 1),
-        column_indices(num_entries),
-        values(num_entries) {}
+        _row_offsets(num_rows + 1),
+        _column_indices(num_entries),
+        _values(num_entries) {}
 
   inline CsrMatrix(const std::string name, const index_type num_rows,
                    const index_type num_cols, const index_type num_entries,
                    const index_array_type &roff, const index_array_type &cind,
                    const value_array_type &vals)
       : base(name + "CsrMatrix", num_rows, num_cols, num_entries),
-        row_offsets(roff),
-        column_indices(cind),
-        values(vals) {}
+        _row_offsets(roff),
+        _column_indices(cind),
+        _values(vals) {}
 
   inline CsrMatrix(const std::string name, const index_type num_rows,
                    const index_type num_cols, const index_type num_entries)
       : base(name + "CsrMatrix", num_rows, num_cols, num_entries),
-        row_offsets(num_rows + 1),
-        column_indices(num_entries),
-        values(num_entries) {}
+        _row_offsets(num_rows + 1),
+        _column_indices(num_entries),
+        _values(num_entries) {}
 
   // Construct from another matrix type (Shallow)
   // Needs to be a compatible type
@@ -118,9 +119,9 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
                 * = nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()),
-        row_offsets(src.row_offsets),
-        column_indices(src.column_indices),
-        values(src.values) {}
+        _row_offsets(src.row_offsets()),
+        _column_indices(src.column_indices()),
+        _values(src.values()) {}
 
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
@@ -133,9 +134,9 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
     this->set_ncols(src.ncols());
     this->set_nnnz(src.nnnz());
 
-    row_offsets    = src.row_offsets;
-    column_indices = src.column_indices;
-    values         = src.values;
+    _row_offsets    = src.row_offsets();
+    _column_indices = src.column_indices();
+    _values         = src.values();
 
     return *this;
   }
@@ -184,9 +185,9 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   inline void resize(const index_type num_rows, const index_type num_cols,
                      const index_type num_entries) {
     base::resize(num_rows, num_cols, num_entries);
-    row_offsets.resize(num_rows + 1);
-    column_indices.resize(num_entries);
-    values.resize(num_entries);
+    _row_offsets.resize(num_rows + 1);
+    _column_indices.resize(num_entries);
+    _values.resize(num_entries);
   }
 
   template <class VR, class... PR>
@@ -201,7 +202,61 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
 
   int format_index() const { return static_cast<int>(_id); }
 
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_reference
+  row_offsets(index_type n) {
+    return _row_offsets(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_reference
+  column_indices(index_type n) {
+    return _column_indices(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_reference values(index_type n) {
+    return _values(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_reference
+  crow_offsets(index_type n) const {
+    return _row_offsets(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_reference
+  ccolumn_indices(index_type n) const {
+    return _column_indices(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_reference
+  cvalues(index_type n) const {
+    return _values(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_type &row_offsets() {
+    return _row_offsets;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_type &column_indices() {
+    return _column_indices;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_type &values() { return _values; }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_type &crow_offsets() const {
+    return _row_offsets;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_type &ccolumn_indices()
+      const {
+    return _column_indices;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_type &cvalues() const {
+    return _values;
+  }
+
  private:
+  index_array_type _row_offsets, _column_indices;
+  value_array_type _values;
   static constexpr formats_e _id = Morpheus::CSR_FORMAT;
 };
 

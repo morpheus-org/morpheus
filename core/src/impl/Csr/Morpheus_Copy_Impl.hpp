@@ -34,9 +34,9 @@ template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, CsrTag, CsrTag) {
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
-  Morpheus::copy(src.row_offsets, dst.row_offsets);
-  Morpheus::copy(src.column_indices, dst.column_indices);
-  Morpheus::copy(src.values, dst.values);
+  Morpheus::copy(src.crow_offsets(), dst.row_offsets());
+  Morpheus::copy(src.ccolumn_indices(), dst.column_indices());
+  Morpheus::copy(src.cvalues(), dst.values());
 }
 
 }  // namespace Impl

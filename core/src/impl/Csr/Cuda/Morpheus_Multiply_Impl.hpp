@@ -87,9 +87,9 @@ inline void multiply(
   const size_t BLOCK_SIZE = 256;
   const size_t NUM_BLOCKS = (A.nrows() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-  const IndexType* I = A.row_offsets.data();
-  const IndexType* J = A.column_indices.data();
-  const ValueType* V = A.values.data();
+  const IndexType* I = A.crow_offsets().data();
+  const IndexType* J = A.ccolumn_indices().data();
+  const ValueType* V = A.cvalues().data();
 
   const ValueType* x_ptr = x.data();
   ValueType* y_ptr       = y.data();
@@ -103,9 +103,9 @@ void __spmv_csr_vector(const Matrix& A, const Vector& x, Vector& y) {
   using IndexType = typename Matrix::index_type;
   using ValueType = typename Matrix::value_type;
 
-  const IndexType* I = A.row_offsets.data();
-  const IndexType* J = A.column_indices.data();
-  const ValueType* V = A.values.data();
+  const IndexType* I = A.crow_offsets().data();
+  const IndexType* J = A.ccolumn_indices().data();
+  const ValueType* V = A.cvalues().data();
 
   const ValueType* x_ptr = x.data();
   ValueType* y_ptr       = y.data();

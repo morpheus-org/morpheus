@@ -44,8 +44,8 @@ inline void multiply(
 
   for (IndexType i = 0; i < A.nrows(); i++) {
     ValueType sum = 0;
-    for (IndexType jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
-      sum += A.values[jj] * x[A.column_indices[jj]];
+    for (IndexType jj = A.crow_offsets(i); jj < A.crow_offsets(i + 1); jj++) {
+      sum += A.cvalues(jj) * x[A.ccolumn_indices(jj)];
     }
     y[i] = sum;
   }

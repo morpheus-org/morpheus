@@ -44,15 +44,15 @@ void convert(
 
   // element-wise copy of indices and values
   for (index_type n = 0; n < src.nrows() + 1; n++) {
-    dst.row_offsets[n] = src.row_offsets[n];
+    dst.row_offsets(n) = src.crow_offsets(n);
   }
 
   for (index_type n = 0; n < src.nnnz(); n++) {
-    dst.column_indices[n] = src.column_indices[n];
+    dst.column_indices(n) = src.ccolumn_indices(n);
   }
 
   for (index_type n = 0; n < src.nnnz(); n++) {
-    dst.values[n] = src.values[n];
+    dst.values(n) = src.cvalues(n);
   }
 }
 
@@ -65,13 +65,14 @@ void convert(const SourceType& src, DestinationType& dst, CsrTag, CooTag) {
 
   // expand compressed indices
   for (IndexType i = 0; i < src.nrows(); i++) {
-    for (IndexType jj = src.row_offsets[i]; jj < src.row_offsets[i + 1]; jj++) {
+    for (IndexType jj = src.crow_offsets(i); jj < src.crow_offsets(i + 1);
+         jj++) {
       dst.row_indices(jj) = i;
     }
   }
 
-  Morpheus::copy(src.column_indices, dst.column_indices());
-  Morpheus::copy(src.values, dst.values());
+  Morpheus::copy(src.ccolumn_indices(), dst.column_indices());
+  Morpheus::copy(src.cvalues(), dst.values());
 }
 
 template <typename SourceType, typename DestinationType>
@@ -83,31 +84,31 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, CsrTag) {
 
   // compute number of non-zero entries per row of coo src
   for (IndexType n = 0; n < src.nnnz(); n++) {
-    dst.row_offsets[src.crow_indices(n)]++;
+    dst.row_offsets(src.crow_indices(n))++;
   }
 
   // cumsum the nnz per row to get csr row_offsets
   for (IndexType i = 0, cumsum = 0; i < src.nrows(); i++) {
-    IndexType temp     = dst.row_offsets[i];
-    dst.row_offsets[i] = cumsum;
+    IndexType temp     = dst.row_offsets(i);
+    dst.row_offsets(i) = cumsum;
     cumsum += temp;
   }
-  dst.row_offsets[src.nrows()] = src.nnnz();
+  dst.row_offsets(src.nrows()) = src.nnnz();
 
   // write coo column indices and values into csr
   for (IndexType n = 0; n < src.nnnz(); n++) {
     IndexType row  = src.crow_indices(n);
-    IndexType dest = dst.row_offsets[row];
+    IndexType dest = dst.row_offsets(row);
 
-    dst.column_indices[dest] = src.ccolumn_indices(n);
-    dst.values[dest]         = src.cvalues(n);
+    dst.column_indices(dest) = src.ccolumn_indices(n);
+    dst.values(dest)         = src.cvalues(n);
 
-    dst.row_offsets[row]++;
+    dst.row_offsets(row)++;
   }
 
   for (IndexType i = 0, last = 0; i <= src.nrows(); i++) {
-    IndexType temp     = dst.row_offsets[i];
-    dst.row_offsets[i] = last;
+    IndexType temp     = dst.row_offsets(i);
+    dst.row_offsets(i) = last;
     last               = temp;
   }
 
