@@ -44,17 +44,17 @@ inline void multiply(
                                Vector>>* = nullptr) {
   using IndexType       = typename Matrix::index_type;
   using ValueType       = typename Matrix::value_type;
-  const IndexType ndiag = A.values.ncols();
+  const IndexType ndiag = A.cvalues().ncols();
 
 #pragma omp parallel for
   for (IndexType row = 0; row < A.nrows(); row++) {
     ValueType sum = ValueType(0);
 
     for (IndexType n = 0; n < ndiag; n++) {
-      const IndexType col = row + A.diagonal_offsets[n];
+      const IndexType col = row + A.cdiagonal_offsets(n);
 
       if (col >= 0 && col < A.ncols()) {
-        sum += A.values(row, n) * x[col];
+        sum += A.cvalues(row, n) * x[col];
       }
     }
     y[row] = sum;

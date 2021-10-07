@@ -44,16 +44,17 @@ void convert(
         is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
-  dst.resize(src.nrows(), src.ncols(), src.nnnz(), src.diagonal_offsets.size());
+  dst.resize(src.nrows(), src.ncols(), src.nnnz(),
+             src.cdiagonal_offsets().size());
 
   // element-wise copy of indices and values
-  for (index_type n = 0; n < src.diagonal_offsets.size(); n++) {
-    dst.diagonal_offsets[n] = src.diagonal_offsets[n];
+  for (index_type n = 0; n < src.cdiagonal_offsets().size(); n++) {
+    dst.diagonal_offsets(n) = src.cdiagonal_offsets(n);
   }
 
-  for (index_type j = 0; j < src.values.ncols(); j++) {
-    for (index_type i = 0; i < src.values.nrows(); i++) {
-      dst.values(i, j) = src.values(i, j);
+  for (index_type j = 0; j < src.cvalues().ncols(); j++) {
+    for (index_type i = 0; i < src.cvalues().nrows(); i++) {
+      dst.values(i, j) = src.cvalues(i, j);
     }
   }
 }
@@ -65,10 +66,10 @@ void convert(const SourceType& src, DestinationType& dst, DiaTag, CooTag) {
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
-  const IndexType ndiag = src.values.ncols();
+  const IndexType ndiag = src.cvalues().ncols();
 
   for (IndexType i = 0, nnzid = 0; i < ndiag; i++) {
-    const IndexType k = src.diagonal_offsets[i];
+    const IndexType k = src.cdiagonal_offsets(i);
 
     const IndexType i_start = std::max<IndexType>(0, -k);
     const IndexType j_start = std::max<IndexType>(0, k);
@@ -77,7 +78,7 @@ void convert(const SourceType& src, DestinationType& dst, DiaTag, CooTag) {
     const IndexType N = std::min(src.nrows() - i_start, src.ncols() - j_start);
 
     for (IndexType n = 0; n < N; n++) {
-      const ValueType temp = src.values(i_start + n, i);
+      const ValueType temp = src.cvalues(i_start + n, i);
 
       if (temp != ValueType(0)) {
         dst.row_indices(nnzid)    = i_start + n;
@@ -123,12 +124,12 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
 
   for (auto it = diag_set.cbegin(); it != diag_set.cend(); ++it) {
     auto i                  = std::distance(diag_set.cbegin(), it);
-    dst.diagonal_offsets[i] = *it;
+    dst.diagonal_offsets(i) = *it;
   }
 
   for (IndexType n = 0; n < IndexType(src.nnnz()); n++) {
     for (IndexType i = 0; i < IndexType(ndiags); i++) {
-      if (diag_map[n] == dst.diagonal_offsets[i]) {
+      if (diag_map[n] == dst.diagonal_offsets(i)) {
         dst.values(src.crow_indices(n), i) = src.cvalues(n);
         break;
       }

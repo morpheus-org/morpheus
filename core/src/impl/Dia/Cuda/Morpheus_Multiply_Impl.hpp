@@ -55,8 +55,8 @@ inline void multiply(
   const size_t NUM_BLOCKS =
       std::min<size_t>(MAX_BLOCKS, DIVIDE_INTO(A.nrows(), BLOCK_SIZE));
 
-  const IndexType* D     = A.diagonal_offsets.data();
-  const ValueType* V     = A.values.data();
+  const IndexType* D     = A.cdiagonal_offsets().data();
+  const ValueType* V     = A.cvalues().data();
   const ValueType* x_ptr = x.data();
   ValueType* y_ptr       = y.data();
 

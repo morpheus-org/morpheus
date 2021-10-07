@@ -60,8 +60,8 @@ inline void update_diagonal(
 
   Kernels::update_dia_diagonal_kernel<ValueType, IndexType>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), A.ncols(), num_diagonals,
-                                      pitch, A.diagonal_offsets.data(),
-                                      A.values.data(), diagonal.data());
+                                      pitch, A.diagonal_offsets().data(),
+                                      A.values().data(), diagonal.data());
 }
 
 }  // namespace Impl

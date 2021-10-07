@@ -61,19 +61,19 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
 
   using index_array_type =
       Morpheus::DenseVector<index_type, index_type, array_layout, memory_space>;
-  using index_array_pointer = typename index_array_type::value_array_pointer;
+  using const_index_array_type = const index_array_type;
+  using index_array_pointer    = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
+  using const_index_array_reference = const index_array_reference;
 
   using value_array_type =
       Morpheus::DenseMatrix<value_type, index_type, array_layout, memory_space>;
-  using value_array_pointer = typename value_array_type::value_array_pointer;
+  using const_value_array_type = const value_array_type;
+  using value_array_pointer    = typename value_array_type::value_array_pointer;
   using value_array_reference =
       typename value_array_type::value_array_reference;
-
-  index_type ndiags, nalign;
-  index_array_type diagonal_offsets;
-  value_array_type values;
+  using const_value_array_reference = const value_array_reference;
 
   ~DiaMatrix()                 = default;
   DiaMatrix(const DiaMatrix &) = default;
@@ -82,7 +82,12 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   DiaMatrix &operator=(DiaMatrix &&) = default;
 
   // Construct an empty DiaMatrix
-  inline DiaMatrix() : base("DiaMatrix"), diagonal_offsets(), values() {}
+  inline DiaMatrix()
+      : base("DiaMatrix"),
+        _ndiags(0),
+        _alignment(0),
+        _diagonal_offsets(),
+        _values() {}
 
   // Construct a DiaMatrix with:
   //      a specific shape
@@ -93,11 +98,11 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
                    const index_type num_entries, const index_type num_diagonals,
                    const index_type alignment = 32)
       : base("DiaMatrix", num_rows, num_cols, num_entries),
-        diagonal_offsets(num_diagonals) {
-    ndiags = num_diagonals;
-    nalign = alignment;
-    values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
-                  num_diagonals);
+        _ndiags(num_diagonals),
+        _alignment(alignment),
+        _diagonal_offsets(num_diagonals) {
+    _values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
+                   num_diagonals);
   }
 
   inline DiaMatrix(const std::string name, const index_type num_rows,
@@ -105,10 +110,10 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
                    const index_array_type &diag_offsets,
                    const value_array_type &vals)
       : base(name + "DiaMatrix", num_rows, num_cols, num_entries),
-        diagonal_offsets(diag_offsets),
-        values(vals) {
-    ndiags = diagonal_offsets.size();
-    nalign = values.nrows();
+        _diagonal_offsets(diag_offsets),
+        _values(vals) {
+    _ndiags    = _diagonal_offsets.size();
+    _alignment = _values.nrows();
   }
 
   inline DiaMatrix(const std::string name, const index_type num_rows,
@@ -116,11 +121,11 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
                    const index_type num_diagonals,
                    const index_type alignment = 32)
       : base(name + "DiaMatrix", num_rows, num_cols, num_entries),
-        diagonal_offsets(num_diagonals) {
-    ndiags = num_diagonals;
-    nalign = alignment;
-    values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
-                  num_diagonals);
+        _ndiags(num_diagonals),
+        _alignment(alignment),
+        _diagonal_offsets(num_diagonals) {
+    _values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
+                   num_diagonals);
   }
 
   // Construct from another matrix type (Shallow)
@@ -131,10 +136,10 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
                 * = nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()),
-        ndiags(src.ndiags),
-        nalign(src.nalign),
-        diagonal_offsets(src.diagonal_offsets),
-        values(src.values) {}
+        _ndiags(src.ndiags()),
+        _alignment(src.alignment()),
+        _diagonal_offsets(src.diagonal_offsets()),
+        _values(src.values()) {}
 
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
@@ -147,10 +152,10 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
     this->set_ncols(src.ncols());
     this->set_nnnz(src.nnnz());
 
-    ndiags           = src.ndiags;
-    nalign           = src.nalign;
-    diagonal_offsets = src.diagonal_offsets;
-    values           = src.values;
+    _ndiags           = src.ndiags();
+    _alignment        = src.alignment();
+    _diagonal_offsets = src.cdiagonal_offsets();
+    _values           = src.cvalues();
 
     return *this;
   }
@@ -201,24 +206,24 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
                      const index_type num_diagonals,
                      const index_type alignment = 32) {
     base::resize(num_rows, num_cols, num_entries);
-    ndiags = num_diagonals;
-    nalign = alignment;
+    _ndiags    = num_diagonals;
+    _alignment = alignment;
 
-    if (this->exceeds_tolerance(num_rows, num_entries, ndiags)) {
+    if (this->exceeds_tolerance(num_rows, num_entries, _ndiags)) {
       throw Morpheus::FormatConversionException(
           "DiaMatrix fill-in would exceed maximum tolerance");
     }
 
-    diagonal_offsets.resize(num_diagonals);
-    values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
-                  num_diagonals);
+    _diagonal_offsets.resize(num_diagonals);
+    _values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
+                   num_diagonals);
   }
 
   template <class VR, class... PR>
   inline DiaMatrix &allocate(const std::string name,
                              const DiaMatrix<VR, PR...> &src) {
     this->set_name(name);
-    resize(src.nrows(), src.ncols(), src.nnnz(), src.ndiags, src.nalign);
+    resize(src.nrows(), src.ncols(), src.nnnz(), src.ndiags(), src.alignment());
     return *this;
   }
 
@@ -241,7 +246,58 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
     }
   }
 
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_reference
+  diagonal_offsets(index_type n) {
+    return _diagonal_offsets(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_reference values(index_type i,
+                                                             index_type j) {
+    return _values(i, j);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_reference
+  cdiagonal_offsets(index_type n) const {
+    return _diagonal_offsets(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_reference
+  cvalues(index_type i, index_type j) const {
+    return _values(i, j);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_type &diagonal_offsets() {
+    return _diagonal_offsets;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_type &values() { return _values; }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_type &cdiagonal_offsets()
+      const {
+    return _diagonal_offsets;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_type &cvalues() const {
+    return _values;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION index_type ndiags() const { return _ndiags; }
+  MORPHEUS_FORCEINLINE_FUNCTION index_type alignment() const {
+    return _alignment;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION void set_ndiags(
+      const index_type num_diagonals) {
+    _ndiags = num_diagonals;
+  }
+  MORPHEUS_FORCEINLINE_FUNCTION void set_alignment(const index_type alignment) {
+    _alignment = alignment;
+  }
+
  private:
+  index_type _ndiags, _alignment;
+  index_array_type _diagonal_offsets;
+  value_array_type _values;
   static constexpr formats_e _id = Morpheus::DIA_FORMAT;
 };
 

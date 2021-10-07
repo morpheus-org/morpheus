@@ -46,11 +46,11 @@ inline void multiply(
   using value_type       = typename Matrix::value_type;
   using member_type = typename Kokkos::TeamPolicy<execution_space>::member_type;
 
-  const value_array_type values           = A.values.const_view();
+  const value_array_type values           = A.cvalues().const_view();
   const view_type x_view                  = x.const_view();
-  const index_array_type diagonal_offsets = A.diagonal_offsets.const_view();
+  const index_array_type diagonal_offsets = A.cdiagonal_offsets().const_view();
   view_type y_view                        = y.view();
-  index_type ndiag = A.values.ncols(), ncols = A.ncols();
+  index_type ndiag = A.cvalues.ncols(), ncols = A.ncols();
 
   const Kokkos::TeamPolicy<execution_space> policy(A.nrows(), Kokkos::AUTO,
                                                    Kokkos::AUTO);
@@ -90,11 +90,11 @@ inline void multiply(
   using range_policy =
       Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
 
-  const value_array_type values           = A.values.const_view();
+  const value_array_type values           = A.cvalues().const_view();
   const view_type x_view                  = x.const_view();
-  const index_array_type diagonal_offsets = A.diagonal_offsets.const_view();
+  const index_array_type diagonal_offsets = A.cdiagonal_offsets().const_view();
   view_type y_view                        = y.view();
-  index_type ndiag = A.values.ncols(), ncols = A.ncols();
+  index_type ndiag = A.cvalues().ncols(), ncols = A.ncols();
 
   range_policy policy(0, A.nrows());
 

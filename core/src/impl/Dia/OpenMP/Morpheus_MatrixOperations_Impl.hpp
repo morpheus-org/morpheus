@@ -45,12 +45,12 @@ inline void update_diagonal(
   using IndexType = typename SparseMatrix::index_type;
   using ValueType = typename SparseMatrix::value_type;
 
-  const IndexType ndiag = A.values.ncols();
+  const IndexType ndiag = A.values().ncols();
 
 #pragma omp parallel for
   for (IndexType row = 0; row < A.nrows(); row++) {
     for (IndexType n = 0; n < ndiag; n++) {
-      const IndexType col = row + A.diagonal_offsets[n];
+      const IndexType col = row + A.diagonal_offsets(n);
 
       if ((col >= 0 && col < A.ncols()) && (col == row)) {
         A.values(row, n) =

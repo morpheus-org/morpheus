@@ -49,8 +49,8 @@ inline void update_diagonal(
   using range_policy =
       Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
 
-  value_array_type values           = A.values.view();
-  index_array_type diagonal_offsets = A.diagonal_offsets.view();
+  value_array_type values           = A.values().view();
+  index_array_type diagonal_offsets = A.diagonal_offsets().view();
   const array_type diagonal_view    = diagonal.const_view();
 
   index_type ndiag = A.values.ncols(), ncols = A.ncols();

@@ -40,10 +40,10 @@ void print(const Printable& p, Stream& s, DiaTag) {
 
   using IndexType       = typename Printable::index_type;
   using ValueType       = typename Printable::value_type;
-  const IndexType ndiag = p.values.ncols();
+  const IndexType ndiag = p.cvalues().ncols();
 
   for (IndexType i = 0; i < ndiag; i++) {
-    const IndexType k = p.diagonal_offsets[i];
+    const IndexType k = p.cdiagonal_offsets(i);
 
     const IndexType i_start = std::max<IndexType>(0, -k);
     const IndexType j_start = std::max<IndexType>(0, k);
@@ -52,7 +52,7 @@ void print(const Printable& p, Stream& s, DiaTag) {
     const IndexType N = std::min(p.nrows() - i_start, p.ncols() - j_start);
 
     for (IndexType n = 0; n < N; n++) {
-      ValueType temp = p.values(i_start + n, i);
+      ValueType temp = p.cvalues(i_start + n, i);
       if (temp != ValueType(0)) {
         s << " " << std::setw(14) << i;
         s << " " << std::setw(14) << i_start + n;
