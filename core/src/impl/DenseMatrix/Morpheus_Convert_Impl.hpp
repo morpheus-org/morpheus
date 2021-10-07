@@ -100,7 +100,7 @@ void convert(const SourceType& src, DestinationType& dst, CooTag,
              DenseMatrixTag) {
   using IndexType = typename SourceType::index_type;
 
-  dst.resize(src.nrows(), src.ncols(), src.nrows() * src.ncols());
+  dst.resize(src.nrows(), src.ncols());
 
   for (IndexType n = 0; n < src.nnnz(); n++) {
     IndexType i = src.row_indices[n];
