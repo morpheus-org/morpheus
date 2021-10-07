@@ -52,9 +52,9 @@ inline void update_diagonal(
   const size_t NUM_BLOCKS = (A.nnnz() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
   Kernels::update_coo_diagonal_kernel<ValueType, IndexType>
-      <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nnnz(), A.row_indices.data(),
-                                      A.column_indices.data(), A.values.data(),
-                                      diagonal.data());
+      <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nnnz(), A.row_indices().data(),
+                                      A.column_indices().data(),
+                                      A.values().data(), diagonal.data());
 }
 
 }  // namespace Impl

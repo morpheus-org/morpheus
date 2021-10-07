@@ -66,12 +66,12 @@ void convert(const SourceType& src, DestinationType& dst, CsrTag, CooTag) {
   // expand compressed indices
   for (IndexType i = 0; i < src.nrows(); i++) {
     for (IndexType jj = src.row_offsets[i]; jj < src.row_offsets[i + 1]; jj++) {
-      dst.row_indices[jj] = i;
+      dst.row_indices(jj) = i;
     }
   }
 
-  Morpheus::copy(src.column_indices, dst.column_indices);
-  Morpheus::copy(src.values, dst.values);
+  Morpheus::copy(src.column_indices, dst.column_indices());
+  Morpheus::copy(src.values, dst.values());
 }
 
 template <typename SourceType, typename DestinationType>
@@ -83,7 +83,7 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, CsrTag) {
 
   // compute number of non-zero entries per row of coo src
   for (IndexType n = 0; n < src.nnnz(); n++) {
-    dst.row_offsets[src.row_indices[n]]++;
+    dst.row_offsets[src.crow_indices(n)]++;
   }
 
   // cumsum the nnz per row to get csr row_offsets
@@ -96,11 +96,11 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, CsrTag) {
 
   // write coo column indices and values into csr
   for (IndexType n = 0; n < src.nnnz(); n++) {
-    IndexType row  = src.row_indices[n];
+    IndexType row  = src.crow_indices(n);
     IndexType dest = dst.row_offsets[row];
 
-    dst.column_indices[dest] = src.column_indices[n];
-    dst.values[dest]         = src.values[n];
+    dst.column_indices[dest] = src.ccolumn_indices(n);
+    dst.values[dest]         = src.cvalues(n);
 
     dst.row_offsets[row]++;
   }

@@ -41,7 +41,7 @@ void convert(
         is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
-  dst.resize(src.nrows() * src.ncols());
+  dst.resize(src.size());
 
   for (index_type i = 0; i < src.size(); i++) {
     dst[i] = src[i];

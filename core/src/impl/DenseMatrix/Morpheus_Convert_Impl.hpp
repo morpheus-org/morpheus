@@ -86,9 +86,9 @@ void convert(const SourceType& src, DestinationType& dst, DenseMatrixTag,
   for (IndexType i = 0, n = 0; i < src.nrows(); i++) {
     for (IndexType j = 0; j < src.ncols(); j++) {
       if (src(i, j) != ValueType(0)) {
-        dst.row_indices[n]    = i;
-        dst.column_indices[n] = j;
-        dst.values[n]         = src(i, j);
+        dst.row_indices(n)    = i;
+        dst.column_indices(n) = j;
+        dst.values(n)         = src(i, j);
         n                     = n + 1;
       }
     }
@@ -103,9 +103,9 @@ void convert(const SourceType& src, DestinationType& dst, CooTag,
   dst.resize(src.nrows(), src.ncols());
 
   for (IndexType n = 0; n < src.nnnz(); n++) {
-    IndexType i = src.row_indices[n];
-    IndexType j = src.column_indices[n];
-    dst(i, j)   = src.values[n];
+    IndexType i = src.crow_indices(n);
+    IndexType j = src.ccolumn_indices(n);
+    dst(i, j)   = src.cvalues(n);
   }
 }
 

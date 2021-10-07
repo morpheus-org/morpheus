@@ -80,9 +80,9 @@ void convert(const SourceType& src, DestinationType& dst, DiaTag, CooTag) {
       const ValueType temp = src.values(i_start + n, i);
 
       if (temp != ValueType(0)) {
-        dst.row_indices[nnzid]    = i_start + n;
-        dst.column_indices[nnzid] = j_start + n;
-        dst.values[nnzid]         = temp;
+        dst.row_indices(nnzid)    = i_start + n;
+        dst.column_indices(nnzid) = j_start + n;
+        dst.values(nnzid)         = temp;
         nnzid                     = nnzid + 1;
       }
     }
@@ -107,7 +107,7 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
 
   // Find on which diagonal each entry sits on
   for (IndexType n = 0; n < IndexType(src.nnnz()); n++) {
-    diag_map[n] = src.column_indices[n] - src.row_indices[n];
+    diag_map[n] = src.ccolumn_indices(n) - src.crow_indices(n);
   }
 
   // Create unique diagonal set
@@ -129,7 +129,7 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
   for (IndexType n = 0; n < IndexType(src.nnnz()); n++) {
     for (IndexType i = 0; i < IndexType(ndiags); i++) {
       if (diag_map[n] == dst.diagonal_offsets[i]) {
-        dst.values(src.row_indices[n], i) = src.values[n];
+        dst.values(src.crow_indices(n), i) = src.cvalues(n);
         break;
       }
     }

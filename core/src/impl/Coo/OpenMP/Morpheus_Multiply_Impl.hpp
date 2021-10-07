@@ -79,21 +79,21 @@ inline void multiply(
     // multiply value arrays with the corresponding vector values
     // indexed by the colum_indices array;
     for (IndexType n = start; n < stop; n++) {
-      out[n] = A.values[n] * x[A.column_indices[n]];
+      out[n] = A.cvalues(n) * x[A.ccolumn_indices(n)];
     }
 
     // perform a segmented scan by key using the row_indices array as key
-    Morpheus::inclusive_scan_by_key<Kokkos::Serial>(A.row_indices, out, out,
+    Morpheus::inclusive_scan_by_key<Kokkos::Serial>(A.crow_indices(), out, out,
                                                     stop - start, start);
 
     const IndexType has_row_stop =
         (tid == nthreads - 1)
             ? 1
-            : is_row_stop(A.row_indices, start, last) ||
-                  is_row_stop(A.row_indices, start, start + 1);
+            : is_row_stop(A.crow_indices(), start, last) ||
+                  is_row_stop(A.crow_indices(), start, start + 1);
     const IndexType spans_workgroups =
         (tid == 0) ? ValueType(0)
-                   : !is_row_stop(A.row_indices, start - 1, start);
+                   : !is_row_stop(A.crow_indices(), start - 1, start);
 
     // Adjacent synchronization between workgroups:
     // Workgroup 0 updates the first entry ‘grp_sum[0]’ with its last partial
@@ -123,7 +123,7 @@ inline void multiply(
     for (IndexType n = start; n < stop; n++) {
       IndexType is_stop = (tid == nthreads - 1 && n == last)
                               ? 1
-                              : is_row_stop(A.row_indices, n, n + 1);
+                              : is_row_stop(A.crow_indices(), n, n + 1);
       if (is_stop) {
         ValueType R;
         if (is_first_stop) {  // in workgroup
@@ -142,7 +142,7 @@ inline void multiply(
           R = out[n];
         }
 
-        y[A.row_indices[n]] = R;
+        y[A.crow_indices(n)] = R;
       }
     }
   }

@@ -48,8 +48,8 @@ inline void update_diagonal(
 // i.e a single threads will update a particular non-zero on the diagonal
 #pragma omp parallel for
   for (IndexType n = 0; n < A.nnnz(); n++) {
-    if (A.row_indices[n] == A.column_indices[n]) {
-      A.values[n] = diagonal[A.column_indices[n]];
+    if (A.row_indices(n) == A.column_indices(n)) {
+      A.values(n) = diagonal[A.column_indices(n)];
     }
   }
 }

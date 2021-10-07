@@ -64,15 +64,14 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   using index_array_pointer = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
+  using const_index_array_reference = const index_array_reference;
 
   using value_array_type =
       Morpheus::DenseVector<value_type, index_type, array_layout, memory_space>;
   using value_array_pointer = typename value_array_type::value_array_pointer;
   using value_array_reference =
       typename value_array_type::value_array_reference;
-
-  index_array_type row_indices, column_indices;
-  value_array_type values;
+  using const_value_array_reference = const value_array_reference;
 
   ~CooMatrix()                 = default;
   CooMatrix(const CooMatrix &) = default;
@@ -82,31 +81,31 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
 
   // Construct an empty CooMatrix
   inline CooMatrix()
-      : base("CooMatrix"), row_indices(0), column_indices(0), values(0) {}
+      : base("CooMatrix"), _row_indices(0), _column_indices(0), _values(0) {}
 
   // Construct a CooMatrix with a specific shape and number of non-zero entries
   inline CooMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries)
       : base("CooMatrix", num_rows, num_cols, num_entries),
-        row_indices(num_entries),
-        column_indices(num_entries),
-        values(num_entries) {}
+        _row_indices(num_entries),
+        _column_indices(num_entries),
+        _values(num_entries) {}
 
   inline CooMatrix(const std::string name, const index_type num_rows,
                    const index_type num_cols, const index_type num_entries,
                    const index_array_type &rind, const index_array_type &cind,
                    const value_array_type &vals)
       : base(name + "CooMatrix", num_rows, num_cols, num_entries),
-        row_indices(rind),
-        column_indices(cind),
-        values(vals) {}
+        _row_indices(rind),
+        _column_indices(cind),
+        _values(vals) {}
 
   inline CooMatrix(const std::string name, const index_type num_rows,
                    const index_type num_cols, const index_type num_entries)
       : base(name + "CooMatrix", num_rows, num_cols, num_entries),
-        row_indices(num_entries),
-        column_indices(num_entries),
-        values(num_entries) {}
+        _row_indices(num_entries),
+        _column_indices(num_entries),
+        _values(num_entries) {}
 
   // Construct from another matrix type (Shallow)
   // Needs to be a compatible type
@@ -117,9 +116,9 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
                 * = nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()),
-        row_indices(src.row_indices),
-        column_indices(src.column_indices),
-        values(src.values) {}
+        _row_indices(src.row_indices()),
+        _column_indices(src.column_indices()),
+        _values(src.values()) {}
 
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
@@ -132,9 +131,9 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
     this->set_ncols(src.ncols());
     this->set_nnnz(src.nnnz());
 
-    row_indices    = src.row_indices;
-    column_indices = src.column_indices;
-    values         = src.values;
+    _row_indices    = src.row_indices();
+    _column_indices = src.column_indices();
+    _values         = src.values();
 
     return *this;
   }
@@ -183,9 +182,9 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   inline void resize(const index_type num_rows, const index_type num_cols,
                      const index_type num_entries) {
     base::resize(num_rows, num_cols, num_entries);
-    row_indices.resize(num_entries);
-    column_indices.resize(num_entries);
-    values.resize(num_entries);
+    _row_indices.resize(num_entries);
+    _column_indices.resize(num_entries);
+    _values.resize(num_entries);
   }
 
   template <class VR, class... PR>
@@ -219,7 +218,48 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
 
   int format_index() const { return static_cast<int>(_id); }
 
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_reference
+  row_indices(index_type n) {
+    return _row_indices(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_reference
+  column_indices(index_type n) {
+    return _column_indices(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_reference values(index_type n) {
+    return _values(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_reference
+  crow_indices(index_type n) const {
+    return _row_indices(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_reference
+  ccolumn_indices(index_type n) const {
+    return _column_indices(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_reference
+  cvalues(index_type n) const {
+    return _values(n);
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_type &row_indices() {
+    return _row_indices;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_type &column_indices() {
+    return _column_indices;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_type &values() { return _values; }
+
  private:
+  index_array_type _row_indices, _column_indices;
+  value_array_type _values;
   static constexpr formats_e _id = Morpheus::COO_FORMAT;
 };
 }  // namespace Morpheus

@@ -70,9 +70,9 @@ template <typename Matrix, typename Vector>
 void __spmv_coo_serial(const Matrix& A, const Vector& x, Vector& y) {
   using IndexType    = typename Matrix::index_type;
   using ValueType    = typename Matrix::value_type;
-  const IndexType* I = A.row_indices.data();
-  const IndexType* J = A.column_indices.data();
-  const ValueType* V = A.values.data();
+  const IndexType* I = A.crow_indices().data();
+  const IndexType* J = A.ccolumn_indices().data();
+  const ValueType* V = A.cvalues().data();
 
   const ValueType* x_ptr = x.data();
   ValueType* y_ptr       = y.data();
@@ -106,9 +106,9 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y) {
     return;
   } else if (A.nnnz() < static_cast<IndexType>(CUDA_WARP_SIZE)) {
     // small matrix
-    Kernels::spmv_coo_serial_kernel<IndexType, ValueType>
-        <<<1, 1, 0>>>(A.nnnz(), A.row_indices.data(), A.column_indices.data(),
-                      A.values.data(), x.data(), y.data());
+    Kernels::spmv_coo_serial_kernel<IndexType, ValueType><<<1, 1, 0>>>(
+        A.nnnz(), A.crow_indices().data(), A.ccolumn_indices().data(),
+        A.cvalues().data(), x.data(), y.data());
     return;
   }
 
@@ -136,19 +136,19 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y) {
   typename Matrix::value_array_type temp_vals(active_warps, 0);
 
   Kernels::spmv_coo_flat_kernel<IndexType, ValueType, BLOCK_SIZE>
-      <<<num_blocks, BLOCK_SIZE, 0>>>(tail, interval_size, A.row_indices.data(),
-                                      A.column_indices.data(), A.values.data(),
-                                      x.data(), y.data(), temp_rows.data(),
-                                      temp_vals.data());
+      <<<num_blocks, BLOCK_SIZE, 0>>>(
+          tail, interval_size, A.crow_indices().data(),
+          A.ccolumn_indices().data(), A.cvalues().data(), x.data(), y.data(),
+          temp_rows.data(), temp_vals.data());
 
   Kernels::spmv_coo_reduce_update_kernel<IndexType, ValueType, BLOCK_SIZE>
       <<<1, BLOCK_SIZE, 0>>>(active_warps, temp_rows.data(), temp_vals.data(),
                              y.data());
 
   Kernels::spmv_coo_serial_kernel<IndexType, ValueType>
-      <<<1, 1, 0>>>(A.nnnz() - tail, A.row_indices.data() + tail,
-                    A.column_indices.data() + tail, A.values.data() + tail,
-                    x.data(), y.data());
+      <<<1, 1, 0>>>(A.nnnz() - tail, A.crow_indices().data() + tail,
+                    A.ccolumn_indices().data() + tail,
+                    A.cvalues().data() + tail, x.data(), y.data());
 }
 
 }  // namespace Impl

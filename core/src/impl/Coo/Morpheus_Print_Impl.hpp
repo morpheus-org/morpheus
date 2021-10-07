@@ -39,9 +39,9 @@ void print(const Printable& p, Stream& s, CooTag) {
   print_matrix_header(p, s);
 
   for (IndexType n = 0; n < p.nnnz(); n++) {
-    s << " " << std::setw(14) << p.row_indices[n];
-    s << " " << std::setw(14) << p.column_indices[n];
-    s << " " << std::setprecision(4) << std::setw(8) << "(" << p.values[n]
+    s << " " << std::setw(14) << p.crow_indices(n);
+    s << " " << std::setw(14) << p.ccolumn_indices(n);
+    s << " " << std::setprecision(4) << std::setw(8) << "(" << p.cvalues(n)
       << ")\n";
   }
 }

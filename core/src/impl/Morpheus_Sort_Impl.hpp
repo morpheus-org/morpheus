@@ -94,7 +94,7 @@ void sort_by_row_and_column(Matrix& mat, CooTag,
   using IndexArrayType = typename Matrix::index_array_type;
   using ValueArrayType = typename Matrix::value_array_type;
 
-  IndexType N = mat.row_indices.size();
+  IndexType N = mat.row_indices().size();
 
   IndexArrayType permutation("permutation", N);
   for (IndexType i = 0; i < N; i++) permutation[i] = i;
@@ -105,38 +105,38 @@ void sort_by_row_and_column(Matrix& mat, CooTag,
   IndexType maxc = max_col;
 
   if (maxr == 0) {
-    maxr = Morpheus::Impl::find_max_element(mat.row_indices);
+    maxr = Morpheus::Impl::find_max_element(mat.row_indices());
   }
   if (maxc == 0) {
-    maxc = Morpheus::Impl::find_max_element(mat.column_indices);
+    maxc = Morpheus::Impl::find_max_element(mat.column_indices());
   }
 
   {
     IndexArrayType temp;
-    Morpheus::copy(mat.column_indices, temp);
+    Morpheus::copy(mat.column_indices(), temp);
 
     Morpheus::Impl::counting_sort_by_key(temp, permutation, minc, maxc,
                                          typename IndexArrayType::tag());
 
-    Morpheus::copy(mat.row_indices, temp);
+    Morpheus::copy(mat.row_indices(), temp);
 
     for (IndexType i = 0; i < IndexType(permutation.size()); i++) {
-      mat.row_indices[i] = temp[permutation[i]];
+      mat.row_indices(i) = temp[permutation[i]];
     }
 
-    Morpheus::Impl::counting_sort_by_key(mat.row_indices, permutation, minr,
+    Morpheus::Impl::counting_sort_by_key(mat.row_indices(), permutation, minr,
                                          maxr, typename IndexArrayType::tag());
-    Morpheus::copy(mat.column_indices, temp);
+    Morpheus::copy(mat.column_indices(), temp);
     for (IndexType i = 0; i < IndexType(permutation.size()); i++) {
-      mat.column_indices[i] = temp[permutation[i]];
+      mat.column_indices(i) = temp[permutation[i]];
     }
   }
 
   {
     ValueArrayType temp;
-    Morpheus::copy(mat.values, temp);
+    Morpheus::copy(mat.values(), temp);
     for (IndexType i = 0; i < IndexType(permutation.size()); i++) {
-      mat.values[i] = temp[permutation[i]];
+      mat.values(i) = temp[permutation[i]];
     }
   }
 }
@@ -145,15 +145,15 @@ template <typename Matrix>
 bool is_sorted(Matrix& mat, CooTag) {
   using IndexType = typename Matrix::index_array_type::index_type;
 
-  if (mat.row_indices.size() != mat.column_indices.size()) {
+  if (mat.row_indices().size() != mat.column_indices().size()) {
     throw Morpheus::RuntimeException(
         "Sizes of row and column indeces do not match.");
   }
 
   for (IndexType i = 0; i < IndexType(mat.nnnz()) - 1; i++) {
-    if ((mat.row_indices[i] > mat.row_indices[i + 1]) ||
-        (mat.row_indices[i] == mat.row_indices[i + 1] &&
-         mat.column_indices[i] > mat.column_indices[i + 1]))
+    if ((mat.row_indices(i) > mat.row_indices(i + 1)) ||
+        (mat.row_indices(i) == mat.row_indices(i + 1) &&
+         mat.column_indices(i) > mat.column_indices(i + 1)))
       return false;
   }
   return true;

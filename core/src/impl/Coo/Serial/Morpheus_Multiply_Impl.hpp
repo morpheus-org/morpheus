@@ -47,7 +47,7 @@ inline void multiply(
   }
 
   for (IndexType n = 0; n < A.nnnz(); n++) {
-    y[A.row_indices[n]] += A.values[n] * x[A.column_indices[n]];
+    y[A.crow_indices(n)] += A.cvalues(n) * x[A.ccolumn_indices(n)];
   }
 }
 
