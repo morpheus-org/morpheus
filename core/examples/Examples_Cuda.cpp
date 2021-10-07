@@ -38,18 +38,18 @@ int main() {
       coo_serial A(2, 3, 4);
       vec_serial x(3, 2), y(2);
 
-      A.row_indices[0]    = 0;
-      A.column_indices[0] = 0;
-      A.values[0]         = 4;
-      A.row_indices[1]    = 0;
-      A.column_indices[1] = 1;
-      A.values[1]         = 3;
-      A.row_indices[2]    = 1;
-      A.column_indices[2] = 1;
-      A.values[2]         = 5;
-      A.row_indices[3]    = 1;
-      A.column_indices[3] = 2;
-      A.values[3]         = 1;
+      A.row_indices(0)    = 0;
+      A.column_indices(0) = 0;
+      A.values(0)         = 4;
+      A.row_indices(1)    = 0;
+      A.column_indices(1) = 1;
+      A.values(1)         = 3;
+      A.row_indices(2)    = 1;
+      A.column_indices(2) = 1;
+      A.values(2)         = 5;
+      A.row_indices(3)    = 1;
+      A.column_indices(3) = 2;
+      A.values(3)         = 1;
 
       Morpheus::multiply<Kokkos::Serial>(A, x, y);
       // !TODO: create_mirror_container_copy that creates the mirror and

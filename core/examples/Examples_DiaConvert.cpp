@@ -39,57 +39,57 @@ using serial = typename Kokkos::Serial;
 coo build_medium_coo() {
   coo mat(5, 5, 13);
   // initialize matrix entries
-  mat.row_indices[0]    = 0;
-  mat.column_indices[0] = 0;
-  mat.values[0]         = 1;
+  mat.row_indices(0)    = 0;
+  mat.column_indices(0) = 0;
+  mat.values(0)         = 1;
 
-  mat.row_indices[1]    = 0;
-  mat.column_indices[1] = 1;
-  mat.values[1]         = -1;
+  mat.row_indices(1)    = 0;
+  mat.column_indices(1) = 1;
+  mat.values(1)         = -1;
 
-  mat.row_indices[2]    = 0;
-  mat.column_indices[2] = 2;
-  mat.values[2]         = -3;
+  mat.row_indices(2)    = 0;
+  mat.column_indices(2) = 2;
+  mat.values(2)         = -3;
 
-  mat.row_indices[3]    = 1;
-  mat.column_indices[3] = 0;
-  mat.values[3]         = -2;
+  mat.row_indices(3)    = 1;
+  mat.column_indices(3) = 0;
+  mat.values(3)         = -2;
 
-  mat.row_indices[4]    = 1;
-  mat.column_indices[4] = 1;
-  mat.values[4]         = 5;
+  mat.row_indices(4)    = 1;
+  mat.column_indices(4) = 1;
+  mat.values(4)         = 5;
 
-  mat.row_indices[5]    = 2;
-  mat.column_indices[5] = 2;
-  mat.values[5]         = 4;
+  mat.row_indices(5)    = 2;
+  mat.column_indices(5) = 2;
+  mat.values(5)         = 4;
 
-  mat.row_indices[6]    = 2;
-  mat.column_indices[6] = 3;
-  mat.values[6]         = 6;
+  mat.row_indices(6)    = 2;
+  mat.column_indices(6) = 3;
+  mat.values(6)         = 6;
 
-  mat.row_indices[7]    = 2;
-  mat.column_indices[7] = 4;
-  mat.values[7]         = 4;
+  mat.row_indices(7)    = 2;
+  mat.column_indices(7) = 4;
+  mat.values(7)         = 4;
 
-  mat.row_indices[8]    = 3;
-  mat.column_indices[8] = 0;
-  mat.values[8]         = -4;
+  mat.row_indices(8)    = 3;
+  mat.column_indices(8) = 0;
+  mat.values(8)         = -4;
 
-  mat.row_indices[9]    = 3;
-  mat.column_indices[9] = 2;
-  mat.values[9]         = 2;
+  mat.row_indices(9)    = 3;
+  mat.column_indices(9) = 2;
+  mat.values(9)         = 2;
 
-  mat.row_indices[10]    = 3;
-  mat.column_indices[10] = 3;
-  mat.values[10]         = 7;
+  mat.row_indices(10)    = 3;
+  mat.column_indices(10) = 3;
+  mat.values(10)         = 7;
 
-  mat.row_indices[11]    = 4;
-  mat.column_indices[11] = 1;
-  mat.values[11]         = 8;
+  mat.row_indices(11)    = 4;
+  mat.column_indices(11) = 1;
+  mat.values(11)         = 8;
 
-  mat.row_indices[12]    = 4;
-  mat.column_indices[12] = 4;
-  mat.values[12]         = -5;
+  mat.row_indices(12)    = 4;
+  mat.column_indices(12) = 4;
+  mat.values(12)         = -5;
 
   return mat;
 }
@@ -97,11 +97,11 @@ coo build_medium_coo() {
 dia build_medium_dia() {
   dia mat(5, 5, 13, 5);
   // Diagonal offsets
-  mat.diagonal_offsets[0] = -3;
-  mat.diagonal_offsets[1] = -1;
-  mat.diagonal_offsets[2] = 0;
-  mat.diagonal_offsets[3] = 1;
-  mat.diagonal_offsets[4] = 2;
+  mat.diagonal_offsets(0) = -3;
+  mat.diagonal_offsets(1) = -1;
+  mat.diagonal_offsets(2) = 0;
+  mat.diagonal_offsets(3) = 1;
+  mat.diagonal_offsets(4) = 2;
   // First Diagonal
   mat.values(0, 0) = -33;
   mat.values(1, 0) = -33;

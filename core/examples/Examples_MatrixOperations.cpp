@@ -57,24 +57,24 @@ void init(Matrix& A, Morpheus::CooTag) {
   Matrix mat(4, 3, 6);
 
   // initialize matrix entries
-  mat.row_indices[0]    = 0;
-  mat.column_indices[0] = 0;
-  mat.values[0]         = 10;
-  mat.row_indices[1]    = 0;
-  mat.column_indices[1] = 2;
-  mat.values[1]         = 20;
-  mat.row_indices[2]    = 2;
-  mat.column_indices[2] = 2;
-  mat.values[2]         = 30;
-  mat.row_indices[3]    = 3;
-  mat.column_indices[3] = 0;
-  mat.values[3]         = 40;
-  mat.row_indices[4]    = 3;
-  mat.column_indices[4] = 1;
-  mat.values[4]         = 50;
-  mat.row_indices[5]    = 3;
-  mat.column_indices[5] = 2;
-  mat.values[5]         = 60;
+  mat.row_indices(0)    = 0;
+  mat.column_indices(0) = 0;
+  mat.values(0)         = 10;
+  mat.row_indices(1)    = 0;
+  mat.column_indices(1) = 2;
+  mat.values(1)         = 20;
+  mat.row_indices(2)    = 2;
+  mat.column_indices(2) = 2;
+  mat.values(2)         = 30;
+  mat.row_indices(3)    = 3;
+  mat.column_indices(3) = 0;
+  mat.values(3)         = 40;
+  mat.row_indices(4)    = 3;
+  mat.column_indices(4) = 1;
+  mat.values(4)         = 50;
+  mat.row_indices(5)    = 3;
+  mat.column_indices(5) = 2;
+  mat.values(5)         = 60;
 
   A = mat;
 }
@@ -84,24 +84,24 @@ void init(Matrix& A, Morpheus::CsrTag) {
   Matrix mat(4, 3, 6);
 
   // initialize matrix entries
-  mat.row_offsets[0] = 0;
-  mat.row_offsets[1] = 2;
-  mat.row_offsets[2] = 2;
-  mat.row_offsets[3] = 3;
-  mat.row_offsets[4] = 6;
+  mat.row_offsets(0) = 0;
+  mat.row_offsets(1) = 2;
+  mat.row_offsets(2) = 2;
+  mat.row_offsets(3) = 3;
+  mat.row_offsets(4) = 6;
 
-  mat.column_indices[0] = 0;
-  mat.values[0]         = 10;
-  mat.column_indices[1] = 2;
-  mat.values[1]         = 20;
-  mat.column_indices[2] = 2;
-  mat.values[2]         = 30;
-  mat.column_indices[3] = 0;
-  mat.values[3]         = 40;
-  mat.column_indices[4] = 1;
-  mat.values[4]         = 50;
-  mat.column_indices[5] = 2;
-  mat.values[5]         = 60;
+  mat.column_indices(0) = 0;
+  mat.values(0)         = 10;
+  mat.column_indices(1) = 2;
+  mat.values(1)         = 20;
+  mat.column_indices(2) = 2;
+  mat.values(2)         = 30;
+  mat.column_indices(3) = 0;
+  mat.values(3)         = 40;
+  mat.column_indices(4) = 1;
+  mat.values(4)         = 50;
+  mat.column_indices(5) = 2;
+  mat.values(5)         = 60;
 
   A = mat;
 }
@@ -111,11 +111,11 @@ void init(Matrix& A, Morpheus::DiaTag) {
   Matrix mat(4, 3, 6, 5);
 
   // Diagonal offsets
-  mat.diagonal_offsets[0] = -3;
-  mat.diagonal_offsets[1] = -2;
-  mat.diagonal_offsets[2] = -1;
-  mat.diagonal_offsets[3] = 0;
-  mat.diagonal_offsets[4] = 2;
+  mat.diagonal_offsets(0) = -3;
+  mat.diagonal_offsets(1) = -2;
+  mat.diagonal_offsets(2) = -1;
+  mat.diagonal_offsets(3) = 0;
+  mat.diagonal_offsets(4) = 2;
 
   // First Diagonal
   mat.values(0, 0) = -1;
@@ -151,24 +151,24 @@ void ref(Matrix& A, Morpheus::CooTag) {
   Matrix mat(4, 3, 6);
 
   // initialize matrix entries
-  mat.row_indices[0]    = 0;
-  mat.column_indices[0] = 0;
-  mat.values[0]         = UPDATE_VAL;
-  mat.row_indices[1]    = 0;
-  mat.column_indices[1] = 2;
-  mat.values[1]         = 20;
-  mat.row_indices[2]    = 2;
-  mat.column_indices[2] = 2;
-  mat.values[2]         = UPDATE_VAL;
-  mat.row_indices[3]    = 3;
-  mat.column_indices[3] = 0;
-  mat.values[3]         = 40;
-  mat.row_indices[4]    = 3;
-  mat.column_indices[4] = 1;
-  mat.values[4]         = 50;
-  mat.row_indices[5]    = 3;
-  mat.column_indices[5] = 2;
-  mat.values[5]         = 60;
+  mat.row_indices(0)    = 0;
+  mat.column_indices(0) = 0;
+  mat.values(0)         = UPDATE_VAL;
+  mat.row_indices(1)    = 0;
+  mat.column_indices(1) = 2;
+  mat.values(1)         = 20;
+  mat.row_indices(2)    = 2;
+  mat.column_indices(2) = 2;
+  mat.values(2)         = UPDATE_VAL;
+  mat.row_indices(3)    = 3;
+  mat.column_indices(3) = 0;
+  mat.values(3)         = 40;
+  mat.row_indices(4)    = 3;
+  mat.column_indices(4) = 1;
+  mat.values(4)         = 50;
+  mat.row_indices(5)    = 3;
+  mat.column_indices(5) = 2;
+  mat.values(5)         = 60;
 
   A = mat;
 }
@@ -178,24 +178,24 @@ void ref(Matrix& A, Morpheus::CsrTag) {
   Matrix mat(4, 3, 6);
 
   // initialize matrix entries
-  mat.row_offsets[0] = 0;
-  mat.row_offsets[1] = 2;
-  mat.row_offsets[2] = 2;
-  mat.row_offsets[3] = 3;
-  mat.row_offsets[4] = 6;
+  mat.row_offsets(0) = 0;
+  mat.row_offsets(1) = 2;
+  mat.row_offsets(2) = 2;
+  mat.row_offsets(3) = 3;
+  mat.row_offsets(4) = 6;
 
-  mat.column_indices[0] = 0;
-  mat.values[0]         = UPDATE_VAL;
-  mat.column_indices[1] = 2;
-  mat.values[1]         = 20;
-  mat.column_indices[2] = 2;
-  mat.values[2]         = UPDATE_VAL;
-  mat.column_indices[3] = 0;
-  mat.values[3]         = 40;
-  mat.column_indices[4] = 1;
-  mat.values[4]         = 50;
-  mat.column_indices[5] = 2;
-  mat.values[5]         = 60;
+  mat.column_indices(0) = 0;
+  mat.values(0)         = UPDATE_VAL;
+  mat.column_indices(1) = 2;
+  mat.values(1)         = 20;
+  mat.column_indices(2) = 2;
+  mat.values(2)         = UPDATE_VAL;
+  mat.column_indices(3) = 0;
+  mat.values(3)         = 40;
+  mat.column_indices(4) = 1;
+  mat.values(4)         = 50;
+  mat.column_indices(5) = 2;
+  mat.values(5)         = 60;
 
   A = mat;
 }
@@ -205,11 +205,11 @@ void ref(Matrix& A, Morpheus::DiaTag) {
   Matrix mat(4, 3, 6, 5);
 
   // Diagonal offsets
-  mat.diagonal_offsets[0] = -3;
-  mat.diagonal_offsets[1] = -2;
-  mat.diagonal_offsets[2] = -1;
-  mat.diagonal_offsets[3] = 0;
-  mat.diagonal_offsets[4] = 2;
+  mat.diagonal_offsets(0) = -3;
+  mat.diagonal_offsets(1) = -2;
+  mat.diagonal_offsets(2) = -1;
+  mat.diagonal_offsets(3) = 0;
+  mat.diagonal_offsets(4) = 2;
 
   // First Diagonal
   mat.values(0, 0) = -1;
@@ -243,25 +243,25 @@ void ref(Matrix& A, Morpheus::DiaTag) {
 template <typename Matrix>
 void validate(const Matrix& A, const Matrix& Aref, Morpheus::CooTag) {
   for (index_type n = 0; n < A.nnnz(); n++) {
-    if (A.row_indices[n] != Aref.row_indices[n]) {
+    if (A.crow_indices(n) != Aref.crow_indices(n)) {
       std::stringstream msg;
-      msg << "Row Indices at index " << n << " differ: " << A.row_indices[n]
-          << " != " << Aref.row_indices[n] << "\n";
+      msg << "Row Indices at index " << n << " differ: " << A.crow_indices(n)
+          << " != " << Aref.crow_indices(n) << "\n";
       throw Morpheus::RuntimeException(msg.str());
     }
 
-    if (A.column_indices[n] != Aref.column_indices[n]) {
+    if (A.ccolumn_indices(n) != Aref.ccolumn_indices(n)) {
       std::stringstream msg;
       msg << "Column Indices at index " << n
-          << " differ: " << A.column_indices[n]
-          << " != " << Aref.column_indices[n] << "\n";
+          << " differ: " << A.ccolumn_indices(n)
+          << " != " << Aref.ccolumn_indices(n) << "\n";
       throw Morpheus::RuntimeException(msg.str());
     }
 
-    if (A.values[n] != Aref.values[n]) {
+    if (A.cvalues(n) != Aref.cvalues(n)) {
       std::stringstream msg;
-      msg << "Values at index " << n << " differ: " << A.values[n]
-          << " != " << Aref.values[n] << "\n";
+      msg << "Values at index " << n << " differ: " << A.cvalues(n)
+          << " != " << Aref.cvalues(n) << "\n";
       throw Morpheus::RuntimeException(msg.str());
     }
   }
@@ -270,25 +270,25 @@ void validate(const Matrix& A, const Matrix& Aref, Morpheus::CooTag) {
 template <typename Matrix>
 void validate(const Matrix& A, const Matrix& Aref, Morpheus::CsrTag) {
   for (index_type i = 0; i < A.nrows(); i++) {
-    if (A.row_offsets[i] != Aref.row_offsets[i]) {
+    if (A.crow_offsets(i) != Aref.crow_offsets(i)) {
       std::stringstream msg;
-      msg << "Row Offsets at index " << i << " differ: " << A.row_offsets[i]
-          << " != " << Aref.row_offsets[i] << "\n";
+      msg << "Row Offsets at index " << i << " differ: " << A.crow_offsets(i)
+          << " != " << Aref.crow_offsets(i) << "\n";
       throw Morpheus::RuntimeException(msg.str());
     }
-    for (index_type jj = A.row_offsets[i]; jj < A.row_offsets[i + 1]; jj++) {
-      if (A.column_indices[jj] != Aref.column_indices[jj]) {
+    for (index_type jj = A.crow_offsets(i); jj < A.crow_offsets(i + 1); jj++) {
+      if (A.ccolumn_indices(jj) != Aref.ccolumn_indices(jj)) {
         std::stringstream msg;
         msg << "Column Indices at index " << jj
-            << " differ: " << A.column_indices[jj]
-            << " != " << Aref.column_indices[jj] << "\n";
+            << " differ: " << A.ccolumn_indices(jj)
+            << " != " << Aref.ccolumn_indices(jj) << "\n";
         throw Morpheus::RuntimeException(msg.str());
       }
 
-      if (A.values[jj] != Aref.values[jj]) {
+      if (A.cvalues(jj) != Aref.cvalues(jj)) {
         std::stringstream msg;
-        msg << "Values at index " << jj << " differ: " << A.values[jj]
-            << " != " << Aref.values[jj] << "\n";
+        msg << "Values at index " << jj << " differ: " << A.cvalues(jj)
+            << " != " << Aref.cvalues(jj) << "\n";
         throw Morpheus::RuntimeException(msg.str());
       }
     }
@@ -297,26 +297,26 @@ void validate(const Matrix& A, const Matrix& Aref, Morpheus::CsrTag) {
 
 template <typename Matrix>
 void validate(const Matrix& A, const Matrix& Aref, Morpheus::DiaTag) {
-  const index_type ndiag = A.values.ncols();
+  const index_type ndiag = A.cvalues().ncols();
 
   for (index_type row = 0; row < A.nrows(); row++) {
     for (index_type n = 0; n < ndiag; n++) {
-      if (A.diagonal_offsets[n] != Aref.diagonal_offsets[n]) {
+      if (A.cdiagonal_offsets(n) != Aref.cdiagonal_offsets(n)) {
         std::stringstream msg;
         msg << "Diagonal Offsets at index " << n
-            << " differ: " << A.diagonal_offsets[n]
-            << " != " << Aref.diagonal_offsets[n] << "\n";
+            << " differ: " << A.cdiagonal_offsets(n)
+            << " != " << Aref.cdiagonal_offsets(n) << "\n";
         throw Morpheus::RuntimeException(msg.str());
       }
 
-      const index_type col = row + A.diagonal_offsets[n];
+      const index_type col = row + A.cdiagonal_offsets(n);
 
       if ((col >= 0 && col < A.ncols()) && (col == row)) {
-        if (A.values(row, n) != Aref.values(row, n)) {
+        if (A.cvalues(row, n) != Aref.cvalues(row, n)) {
           std::stringstream msg;
           msg << "Values at index (" << row << "," << n
-              << ") differ: " << A.values(row, n)
-              << " != " << Aref.values(row, n) << "\n";
+              << ") differ: " << A.cvalues(row, n)
+              << " != " << Aref.cvalues(row, n) << "\n";
           throw Morpheus::RuntimeException(msg.str());
         }
       }

@@ -39,24 +39,24 @@ int main() {
     vec x(3, 2), ya("ya", 4, 0);
 
     // initialize matrix entries
-    A.row_indices[0]    = 0;
-    A.column_indices[0] = 0;
-    A.values[0]         = 10;
-    A.row_indices[1]    = 0;
-    A.column_indices[1] = 2;
-    A.values[1]         = 20;
-    A.row_indices[2]    = 2;
-    A.column_indices[2] = 2;
-    A.values[2]         = 30;
-    A.row_indices[3]    = 3;
-    A.column_indices[3] = 0;
-    A.values[3]         = 40;
-    A.row_indices[4]    = 3;
-    A.column_indices[4] = 1;
-    A.values[4]         = 50;
-    A.row_indices[5]    = 3;
-    A.column_indices[5] = 2;
-    A.values[5]         = 60;
+    A.row_indices(0)    = 0;
+    A.column_indices(0) = 0;
+    A.values(0)         = 10;
+    A.row_indices(1)    = 0;
+    A.column_indices(1) = 2;
+    A.values(1)         = 20;
+    A.row_indices(2)    = 2;
+    A.column_indices(2) = 2;
+    A.values(2)         = 30;
+    A.row_indices(3)    = 3;
+    A.column_indices(3) = 0;
+    A.values(3)         = 40;
+    A.row_indices(4)    = 3;
+    A.column_indices(4) = 1;
+    A.values(4)         = 50;
+    A.row_indices(5)    = 3;
+    A.column_indices(5) = 2;
+    A.values(5)         = 60;
 
     Morpheus::print(A);
     Morpheus::print(x);

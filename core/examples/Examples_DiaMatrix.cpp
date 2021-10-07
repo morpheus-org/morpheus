@@ -74,11 +74,11 @@ int main() {
 
     vec x(5, 0), ya("ycoo", 7, 0), yb("ydia", 7, 0);
 
-    x[0] = 1;
-    x[1] = 2;
-    x[2] = 3;
-    x[3] = 4;
-    x[4] = 5;
+    x(0) = 1;
+    x(1) = 2;
+    x(2) = 3;
+    x(3) = 4;
+    x(4) = 5;
 
     Morpheus::multiply<serial>(A, x, ya);
     Morpheus::multiply<serial>(B, x, yb);
@@ -103,11 +103,11 @@ int main() {
     dia B = build_medium_dia(), B_from_coo;
     vec x(5, 0), ya("ycoo", 5, 0), yb("ydia", 5, 0);
 
-    x[0] = 1;
-    x[1] = 2;
-    x[2] = 3;
-    x[3] = 4;
-    x[4] = 5;
+    x(0) = 1;
+    x(1) = 2;
+    x(2) = 3;
+    x(3) = 4;
+    x(4) = 5;
 
     Morpheus::multiply<serial>(A, x, ya);
     Morpheus::multiply<serial>(B, x, yb);
@@ -133,9 +133,9 @@ int main() {
 
     vec x(3, 0), ya("ycoo", 4, 0), yb("ydia", 4, 0);
 
-    x[0] = 1;
-    x[1] = 2;
-    x[2] = 3;
+    x(0) = 1;
+    x(1) = 2;
+    x(2) = 3;
 
     Morpheus::multiply<serial>(A, x, ya);
     Morpheus::multiply<serial>(B, x, yb);
@@ -161,9 +161,9 @@ int main() {
 
     vec x(3, 0), ya("ycoo", 4, 0), yb("ydia", 4, 0);
 
-    x[0] = 1;
-    x[1] = 2;
-    x[2] = 3;
+    x(0) = 1;
+    x(1) = 2;
+    x(2) = 3;
 
     Morpheus::multiply<serial>(A, x, ya);
     Morpheus::multiply<serial>(B, x, yb);
@@ -189,9 +189,9 @@ int main() {
 dia build_large_dia() {
   dia mat(7, 5, 12, 3);
   // Diagonal offsets
-  mat.diagonal_offsets[0] = -3;
-  mat.diagonal_offsets[1] = 0;
-  mat.diagonal_offsets[2] = 2;
+  mat.diagonal_offsets(0) = -3;
+  mat.diagonal_offsets(1) = 0;
+  mat.diagonal_offsets(2) = 2;
   // First Diagonal
   mat.values(0, 0) = -1;
   mat.values(1, 0) = -1;
@@ -223,53 +223,53 @@ dia build_large_dia() {
 coo build_large_coo() {
   coo mat(7, 5, 12);
   // initialize matrix entries
-  mat.row_indices[0]    = 0;
-  mat.column_indices[0] = 0;
-  mat.values[0]         = 1;
+  mat.row_indices(0)    = 0;
+  mat.column_indices(0) = 0;
+  mat.values(0)         = 1;
 
-  mat.row_indices[1]    = 0;
-  mat.column_indices[1] = 2;
-  mat.values[1]         = 13;
+  mat.row_indices(1)    = 0;
+  mat.column_indices(1) = 2;
+  mat.values(1)         = 13;
 
-  mat.row_indices[2]    = 1;
-  mat.column_indices[2] = 1;
-  mat.values[2]         = 2;
+  mat.row_indices(2)    = 1;
+  mat.column_indices(2) = 1;
+  mat.values(2)         = 2;
 
-  mat.row_indices[3]    = 1;
-  mat.column_indices[3] = 3;
-  mat.values[3]         = 14;
+  mat.row_indices(3)    = 1;
+  mat.column_indices(3) = 3;
+  mat.values(3)         = 14;
 
-  mat.row_indices[4]    = 2;
-  mat.column_indices[4] = 2;
-  mat.values[4]         = 3;
+  mat.row_indices(4)    = 2;
+  mat.column_indices(4) = 2;
+  mat.values(4)         = 3;
 
-  mat.row_indices[5]    = 2;
-  mat.column_indices[5] = 4;
-  mat.values[5]         = 15;
+  mat.row_indices(5)    = 2;
+  mat.column_indices(5) = 4;
+  mat.values(5)         = 15;
 
-  mat.row_indices[6]    = 3;
-  mat.column_indices[6] = 0;
-  mat.values[6]         = 6;
+  mat.row_indices(6)    = 3;
+  mat.column_indices(6) = 0;
+  mat.values(6)         = 6;
 
-  mat.row_indices[7]    = 3;
-  mat.column_indices[7] = 3;
-  mat.values[7]         = 4;
+  mat.row_indices(7)    = 3;
+  mat.column_indices(7) = 3;
+  mat.values(7)         = 4;
 
-  mat.row_indices[8]    = 4;
-  mat.column_indices[8] = 1;
-  mat.values[8]         = 7;
+  mat.row_indices(8)    = 4;
+  mat.column_indices(8) = 1;
+  mat.values(8)         = 7;
 
-  mat.row_indices[9]    = 4;
-  mat.column_indices[9] = 4;
-  mat.values[9]         = 5;
+  mat.row_indices(9)    = 4;
+  mat.column_indices(9) = 4;
+  mat.values(9)         = 5;
 
-  mat.row_indices[10]    = 5;
-  mat.column_indices[10] = 2;
-  mat.values[10]         = 8;
+  mat.row_indices(10)    = 5;
+  mat.column_indices(10) = 2;
+  mat.values(10)         = 8;
 
-  mat.row_indices[11]    = 6;
-  mat.column_indices[11] = 3;
-  mat.values[11]         = 9;
+  mat.row_indices(11)    = 6;
+  mat.column_indices(11) = 3;
+  mat.values(11)         = 9;
 
   return mat;
 }
@@ -277,11 +277,11 @@ coo build_large_coo() {
 dia build_medium_dia() {
   dia mat(5, 5, 13, 5);
   // Diagonal offsets
-  mat.diagonal_offsets[0] = -3;
-  mat.diagonal_offsets[1] = -1;
-  mat.diagonal_offsets[2] = 0;
-  mat.diagonal_offsets[3] = 1;
-  mat.diagonal_offsets[4] = 2;
+  mat.diagonal_offsets(0) = -3;
+  mat.diagonal_offsets(1) = -1;
+  mat.diagonal_offsets(2) = 0;
+  mat.diagonal_offsets(3) = 1;
+  mat.diagonal_offsets(4) = 2;
   // First Diagonal
   mat.values(0, 0) = -33;
   mat.values(1, 0) = -33;
@@ -319,57 +319,57 @@ dia build_medium_dia() {
 coo build_medium_coo() {
   coo mat(5, 5, 13);
   // initialize matrix entries
-  mat.row_indices[0]    = 0;
-  mat.column_indices[0] = 0;
-  mat.values[0]         = 1;
+  mat.row_indices(0)    = 0;
+  mat.column_indices(0) = 0;
+  mat.values(0)         = 1;
 
-  mat.row_indices[1]    = 0;
-  mat.column_indices[1] = 1;
-  mat.values[1]         = -1;
+  mat.row_indices(1)    = 0;
+  mat.column_indices(1) = 1;
+  mat.values(1)         = -1;
 
-  mat.row_indices[2]    = 0;
-  mat.column_indices[2] = 2;
-  mat.values[2]         = -3;
+  mat.row_indices(2)    = 0;
+  mat.column_indices(2) = 2;
+  mat.values(2)         = -3;
 
-  mat.row_indices[3]    = 1;
-  mat.column_indices[3] = 0;
-  mat.values[3]         = -2;
+  mat.row_indices(3)    = 1;
+  mat.column_indices(3) = 0;
+  mat.values(3)         = -2;
 
-  mat.row_indices[4]    = 1;
-  mat.column_indices[4] = 1;
-  mat.values[4]         = 5;
+  mat.row_indices(4)    = 1;
+  mat.column_indices(4) = 1;
+  mat.values(4)         = 5;
 
-  mat.row_indices[5]    = 2;
-  mat.column_indices[5] = 2;
-  mat.values[5]         = 4;
+  mat.row_indices(5)    = 2;
+  mat.column_indices(5) = 2;
+  mat.values(5)         = 4;
 
-  mat.row_indices[6]    = 2;
-  mat.column_indices[6] = 3;
-  mat.values[6]         = 6;
+  mat.row_indices(6)    = 2;
+  mat.column_indices(6) = 3;
+  mat.values(6)         = 6;
 
-  mat.row_indices[7]    = 2;
-  mat.column_indices[7] = 4;
-  mat.values[7]         = 4;
+  mat.row_indices(7)    = 2;
+  mat.column_indices(7) = 4;
+  mat.values(7)         = 4;
 
-  mat.row_indices[8]    = 3;
-  mat.column_indices[8] = 0;
-  mat.values[8]         = -4;
+  mat.row_indices(8)    = 3;
+  mat.column_indices(8) = 0;
+  mat.values(8)         = -4;
 
-  mat.row_indices[9]    = 3;
-  mat.column_indices[9] = 2;
-  mat.values[9]         = 2;
+  mat.row_indices(9)    = 3;
+  mat.column_indices(9) = 2;
+  mat.values(9)         = 2;
 
-  mat.row_indices[10]    = 3;
-  mat.column_indices[10] = 3;
-  mat.values[10]         = 7;
+  mat.row_indices(10)    = 3;
+  mat.column_indices(10) = 3;
+  mat.values(10)         = 7;
 
-  mat.row_indices[11]    = 4;
-  mat.column_indices[11] = 1;
-  mat.values[11]         = 8;
+  mat.row_indices(11)    = 4;
+  mat.column_indices(11) = 1;
+  mat.values(11)         = 8;
 
-  mat.row_indices[12]    = 4;
-  mat.column_indices[12] = 4;
-  mat.values[12]         = -5;
+  mat.row_indices(12)    = 4;
+  mat.column_indices(12) = 4;
+  mat.values(12)         = -5;
 
   return mat;
 }
@@ -377,11 +377,11 @@ coo build_medium_coo() {
 dia build_many_diag_dia() {
   dia mat(4, 3, 6, 5);
   // Diagonal offsets
-  mat.diagonal_offsets[0] = -3;
-  mat.diagonal_offsets[1] = -2;
-  mat.diagonal_offsets[2] = -1;
-  mat.diagonal_offsets[3] = 0;
-  mat.diagonal_offsets[4] = 2;
+  mat.diagonal_offsets(0) = -3;
+  mat.diagonal_offsets(1) = -2;
+  mat.diagonal_offsets(2) = -1;
+  mat.diagonal_offsets(3) = 0;
+  mat.diagonal_offsets(4) = 2;
   // First Diagonal
   mat.values(0, 0) = -1;
   mat.values(1, 0) = -1;
@@ -414,24 +414,24 @@ dia build_many_diag_dia() {
 coo build_many_diag_coo() {
   coo mat(4, 3, 6);
   // initialize matrix entries
-  mat.row_indices[0]    = 0;
-  mat.column_indices[0] = 0;
-  mat.values[0]         = 10;
-  mat.row_indices[1]    = 0;
-  mat.column_indices[1] = 2;
-  mat.values[1]         = 20;
-  mat.row_indices[2]    = 2;
-  mat.column_indices[2] = 2;
-  mat.values[2]         = 30;
-  mat.row_indices[3]    = 3;
-  mat.column_indices[3] = 0;
-  mat.values[3]         = 40;
-  mat.row_indices[4]    = 3;
-  mat.column_indices[4] = 1;
-  mat.values[4]         = 50;
-  mat.row_indices[5]    = 3;
-  mat.column_indices[5] = 2;
-  mat.values[5]         = 60;
+  mat.row_indices(0)    = 0;
+  mat.column_indices(0) = 0;
+  mat.values(0)         = 10;
+  mat.row_indices(1)    = 0;
+  mat.column_indices(1) = 2;
+  mat.values(1)         = 20;
+  mat.row_indices(2)    = 2;
+  mat.column_indices(2) = 2;
+  mat.values(2)         = 30;
+  mat.row_indices(3)    = 3;
+  mat.column_indices(3) = 0;
+  mat.values(3)         = 40;
+  mat.row_indices(4)    = 3;
+  mat.column_indices(4) = 1;
+  mat.values(4)         = 50;
+  mat.row_indices(5)    = 3;
+  mat.column_indices(5) = 2;
+  mat.values(5)         = 60;
 
   return mat;
 }
@@ -440,9 +440,9 @@ dia build_simple_dia() {
   dia mat(4, 3, 6, 3);
 
   // Diagonal offsets
-  mat.diagonal_offsets[0] = -2;
-  mat.diagonal_offsets[1] = 0;
-  mat.diagonal_offsets[2] = 1;
+  mat.diagonal_offsets(0) = -2;
+  mat.diagonal_offsets(1) = 0;
+  mat.diagonal_offsets(2) = 1;
   // First Diagonal
   mat.values(0, 0) = -1;
   mat.values(1, 0) = -1;
@@ -465,24 +465,24 @@ dia build_simple_dia() {
 coo build_simple_coo() {
   coo mat(4, 3, 6);
   // initialize matrix entries
-  mat.row_indices[0]    = 0;
-  mat.column_indices[0] = 0;
-  mat.values[0]         = 10;
-  mat.row_indices[1]    = 0;
-  mat.column_indices[1] = 1;
-  mat.values[1]         = 20;
-  mat.row_indices[2]    = 1;
-  mat.column_indices[2] = 2;
-  mat.values[2]         = 30;
-  mat.row_indices[3]    = 2;
-  mat.column_indices[3] = 0;
-  mat.values[3]         = 40;
-  mat.row_indices[4]    = 2;
-  mat.column_indices[4] = 2;
-  mat.values[4]         = 50;
-  mat.row_indices[5]    = 3;
-  mat.column_indices[5] = 1;
-  mat.values[5]         = 60;
+  mat.row_indices(0)    = 0;
+  mat.column_indices(0) = 0;
+  mat.values(0)         = 10;
+  mat.row_indices(1)    = 0;
+  mat.column_indices(1) = 1;
+  mat.values(1)         = 20;
+  mat.row_indices(2)    = 1;
+  mat.column_indices(2) = 2;
+  mat.values(2)         = 30;
+  mat.row_indices(3)    = 2;
+  mat.column_indices(3) = 0;
+  mat.values(3)         = 40;
+  mat.row_indices(4)    = 2;
+  mat.column_indices(4) = 2;
+  mat.values(4)         = 50;
+  mat.row_indices(5)    = 3;
+  mat.column_indices(5) = 1;
+  mat.values(5)         = 60;
 
   return mat;
 }
