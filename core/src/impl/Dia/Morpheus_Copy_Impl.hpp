@@ -36,7 +36,7 @@ void copy(const SourceType& src, DestinationType& dst, DiaTag, DiaTag) {
              src.cdiagonal_offsets().size());
 
   Morpheus::copy(src.cdiagonal_offsets(), dst.diagonal_offsets());
-  Morpheus::copy(src.cvalues(), dst.cvalues());
+  Morpheus::copy(src.cvalues(), dst.values());
 }
 
 }  // namespace Impl
