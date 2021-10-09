@@ -53,7 +53,7 @@ inline void update_diagonal(
   index_array_type diagonal_offsets = A.diagonal_offsets().view();
   const array_type diagonal_view    = diagonal.const_view();
 
-  index_type ndiag = A.values.ncols(), ncols = A.ncols();
+  index_type ndiag = A.values().ncols(), ncols = A.ncols();
 
   range_policy policy(0, A.nrows());
 

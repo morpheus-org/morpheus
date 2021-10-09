@@ -53,14 +53,14 @@ TEST(TESTSUITE_NAME, DeepCopy_DiaMatrix_SameSpace_Mirror) {
   Morpheus::copy(Ar, A);        // Should be shallow copy
 
   check_shapes(A, A_mirror, Morpheus::DiaTag{});
-  for (index_type i = 0; i < A_mirror.diagonal_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror.diagonal_offsets[i], 1)
+  for (index_type i = 0; i < A_mirror.diagonal_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror.diagonal_offsets(i), 1)
         << "Value of the mirror diagonal offsets should be the same as the "
            "value of "
            "A.row_offsets during deep copy (1)";
   }
-  for (index_type j = 0; j < A_mirror.values.ncols(); j++) {
-    for (index_type i = 0; i < A_mirror.values.nrows(); i++) {
+  for (index_type j = 0; j < A_mirror.values().ncols(); j++) {
+    for (index_type i = 0; i < A_mirror.values().nrows(); i++) {
       ASSERT_EQ(A_mirror.values(i, j), 5)
           << "Value of the mirror values should be the same as the value of "
              "A.values during deep copy (5)";
@@ -103,26 +103,26 @@ TEST(TESTSUITE_NAME, DeepCopy_DiaMatrix_SameSpace_MirrorContainer) {
   check_shapes(A, A_mirror, Morpheus::DiaTag{});
 
   if (Morpheus::is_Host_Memoryspace_v<typename container::memory_space>) {
-    for (index_type i = 0; i < A_mirror.diagonal_offsets.size(); i++) {
-      ASSERT_EQ(A_mirror.diagonal_offsets[i], Ar.diagonal_offsets[i])
+    for (index_type i = 0; i < A_mirror.diagonal_offsets().size(); i++) {
+      ASSERT_EQ(A_mirror.diagonal_offsets(i), Ar.diagonal_offsets(i))
           << "Value of the mirror diagonal offsets should be the same as the "
              "value of Ar.diagonal_offsets (2) due to shallow copy";
     }
-    for (index_type j = 0; j < A_mirror.values.ncols(); j++) {
-      for (index_type i = 0; i < A_mirror.values.nrows(); i++) {
+    for (index_type j = 0; j < A_mirror.values().ncols(); j++) {
+      for (index_type i = 0; i < A_mirror.values().nrows(); i++) {
         ASSERT_EQ(A_mirror.values(i, j), Ar.values(i, j))
             << "Value of the mirror values should be the same as the value of "
                "Ar.values (-1) due to shallow copy";
       }
     }
   } else {
-    for (index_type i = 0; i < A_mirror.diagonal_offsets.size(); i++) {
-      ASSERT_EQ(A_mirror.diagonal_offsets[i], 1)
+    for (index_type i = 0; i < A_mirror.diagonal_offsets().size(); i++) {
+      ASSERT_EQ(A_mirror.diagonal_offsets(i), 1)
           << "Value of the mirror diagonal offsets should be the same as the "
              "value of A.diagonal_offsets during deep copy (1)";
     }
-    for (index_type j = 0; j < A_mirror.values.ncols(); j++) {
-      for (index_type i = 0; i < A_mirror.values.nrows(); i++) {
+    for (index_type j = 0; j < A_mirror.values().ncols(); j++) {
+      for (index_type i = 0; i < A_mirror.values().nrows(); i++) {
         ASSERT_EQ(A_mirror.values(i, j), 5)
             << "Value of the mirror values should be the same as the value of "
                "A.values during deep copy (5)";
@@ -153,13 +153,13 @@ TEST(TESTSUITE_NAME, DeepCopy_DiaMatrix_DeviceHost) {
 
   check_shapes(A, A_mirror, Morpheus::DiaTag{});
 
-  for (index_type i = 0; i < A_mirror.diagonal_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror.diagonal_offsets[i], 1)
+  for (index_type i = 0; i < A_mirror.diagonal_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror.diagonal_offsets(i), 1)
         << "Value of the mirror diagonal offsets should be the same as the "
            "value of the device diagonal_offsets during deep copy (1)";
   }
-  for (index_type j = 0; j < A_mirror.values.ncols(); j++) {
-    for (index_type i = 0; i < A_mirror.values.nrows(); i++) {
+  for (index_type j = 0; j < A_mirror.values().ncols(); j++) {
+    for (index_type i = 0; i < A_mirror.values().nrows(); i++) {
       ASSERT_EQ(A_mirror.values(i, j), 5)
           << "Value of the mirror values should be the same as the value of "
              "the device values during deep copy (5)";
@@ -187,13 +187,13 @@ TEST(TESTSUITE_NAME, DeepCopy_DiaMatrix_DeviceHost_MirrorContainer) {
 
   check_shapes(A, A_mirror, Morpheus::DiaTag{});
 
-  for (index_type i = 0; i < A_mirror.diagonal_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror.diagonal_offsets[i], 1)
+  for (index_type i = 0; i < A_mirror.diagonal_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror.diagonal_offsets(i), 1)
         << "Value of the mirror diagonal offsets should be the same as the "
            "value of the device diagonal_offsets during deep copy (1)";
   }
-  for (index_type j = 0; j < A_mirror.values.ncols(); j++) {
-    for (index_type i = 0; i < A_mirror.values.nrows(); i++) {
+  for (index_type j = 0; j < A_mirror.values().ncols(); j++) {
+    for (index_type i = 0; i < A_mirror.values().nrows(); i++) {
       ASSERT_EQ(A_mirror.values(i, j), 5)
           << "Value of the mirror values should be the same as the value of "
              "the device values during deep copy (5)";
@@ -225,17 +225,17 @@ TEST(TESTSUITE_NAME, DeepCopy_DiaMatrix_HostDevice) {
   check_shapes(A, A_mirror_dev, Morpheus::DiaTag{});
 
   // Change the value to main container to check if we did shallow copy
-  A.diagonal_offsets.assign(A.diagonal_offsets.size(), 0);
-  A.values.assign(A.values.nrows(), A.values.ncols(), 1);
+  A.diagonal_offsets().assign(A.diagonal_offsets().size(), 0);
+  A.values().assign(A.values().nrows(), A.values().ncols(), 1);
 
-  for (index_type i = 0; i < A_mirror_host.diagonal_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror_host.diagonal_offsets[i], 1)
+  for (index_type i = 0; i < A_mirror_host.diagonal_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror_host.diagonal_offsets(i), 1)
         << "Value of the mirror diagonal offsets should be the same as the "
            "value "
            "of A.diagonal_offsets during deep copy (1)";
   }
-  for (index_type j = 0; j < A_mirror_host.values.ncols(); j++) {
-    for (index_type i = 0; i < A_mirror_host.values.nrows(); i++) {
+  for (index_type j = 0; j < A_mirror_host.values().ncols(); j++) {
+    for (index_type i = 0; i < A_mirror_host.values().nrows(); i++) {
       ASSERT_EQ(A_mirror_host.values(i, j), 5)
           << "Value of the mirror values should be the same as the value of "
              "A.values during deep copy (5)";
@@ -267,17 +267,17 @@ TEST(TESTSUITE_NAME, DeepCopy_DiaMatrix_HostDevice_MirrorContainer) {
   check_shapes(A, A_mirror_dev, Morpheus::DiaTag{});
 
   // Change the value to main container to check if we did shallow copy
-  A.diagonal_offsets.assign(A.diagonal_offsets.size(), 0);
-  A.values.assign(A.values.nrows(), A.values.ncols(), 1);
+  A.diagonal_offsets().assign(A.diagonal_offsets().size(), 0);
+  A.values().assign(A.values().nrows(), A.values().ncols(), 1);
 
-  for (index_type i = 0; i < A_mirror_host.diagonal_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror_host.diagonal_offsets[i], 1)
+  for (index_type i = 0; i < A_mirror_host.diagonal_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror_host.diagonal_offsets(i), 1)
         << "Value of the mirror diagonal offsets should be the same as the "
            "value "
            "of A.diagonal_offsets during deep copy (1)";
   }
-  for (index_type j = 0; j < A_mirror_host.values.ncols(); j++) {
-    for (index_type i = 0; i < A_mirror_host.values.nrows(); i++) {
+  for (index_type j = 0; j < A_mirror_host.values().ncols(); j++) {
+    for (index_type i = 0; i < A_mirror_host.values().nrows(); i++) {
       ASSERT_EQ(A_mirror_host.values(i, j), 5)
           << "Value of the mirror values should be the same as the value of "
              "A.values during deep copy (5)";
@@ -317,19 +317,19 @@ TEST(TESTSUITE_NAME, DeepCopy_DiaMatrix_DeviecDevice_MirrorContainer) {
 
   check_shapes(A, Ares, Morpheus::DiaTag{});
   // Change the value to main container to check if we did shallow copy
-  A.diagonal_offsets.assign(A.diagonal_offsets.size(), 3);
-  A.values.assign(A.values.nrows(), A.values.ncols(), 8);
-  Ar.diagonal_offsets.assign(Ar.diagonal_offsets.size(), 3);
-  Ar.values.assign(Ar.values.nrows(), Ar.values.ncols(), 8);
+  A.diagonal_offsets().assign(A.diagonal_offsets().size(), 3);
+  A.values().assign(A.values().nrows(), A.values().ncols(), 8);
+  Ar.diagonal_offsets().assign(Ar.diagonal_offsets().size(), 3);
+  Ar.values().assign(Ar.values().nrows(), Ar.values().ncols(), 8);
 
-  for (index_type i = 0; i < Ares.diagonal_offsets.size(); i++) {
-    ASSERT_EQ(Ares.diagonal_offsets[i], 4)
+  for (index_type i = 0; i < Ares.diagonal_offsets().size(); i++) {
+    ASSERT_EQ(Ares.diagonal_offsets(i), 4)
         << "Value of the Ares.diagonal_offsets should be the same as the "
            "initial "
            "value of Ar.diagonal_offsets during deep copy (4)";
   }
-  for (index_type j = 0; j < Ares.values.ncols(); j++) {
-    for (index_type i = 0; i < Ares.values.nrows(); i++) {
+  for (index_type j = 0; j < Ares.values().ncols(); j++) {
+    for (index_type i = 0; i < Ares.values().nrows(); i++) {
       ASSERT_EQ(Ares.values(i, j), -1)
           << "Value of the Ares.values should be the same as the initial "
              "value of Ar.values during deep copy (-1)";

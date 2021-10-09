@@ -138,8 +138,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
              src.nnnz()),
         _ndiags(src.ndiags()),
         _alignment(src.alignment()),
-        _diagonal_offsets(src.diagonal_offsets()),
-        _values(src.values()) {}
+        _diagonal_offsets(src.cdiagonal_offsets()),
+        _values(src.cvalues()) {}
 
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>

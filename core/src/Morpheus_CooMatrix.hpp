@@ -118,9 +118,9 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
                 * = nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()),
-        _row_indices(src.row_indices()),
-        _column_indices(src.column_indices()),
-        _values(src.values()) {}
+        _row_indices(src.crow_indices()),
+        _column_indices(src.ccolumn_indices()),
+        _values(src.cvalues()) {}
 
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
@@ -133,9 +133,9 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
     this->set_ncols(src.ncols());
     this->set_nnnz(src.nnnz());
 
-    _row_indices    = src.row_indices();
-    _column_indices = src.column_indices();
-    _values         = src.values();
+    _row_indices    = src.crow_indices();
+    _column_indices = src.ccolumn_indices();
+    _values         = src.cvalues();
 
     return *this;
   }

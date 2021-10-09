@@ -51,16 +51,16 @@ TEST(TESTSUITE_NAME, DeepCopy_CsrMatrix_SameSpace_Mirror) {
   Morpheus::copy(Ar, A);        // Should be shallow copy
 
   check_shapes(A, A_mirror, Morpheus::CsrTag{});
-  for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror.row_offsets[i], 1)
+  for (index_type i = 0; i < A_mirror.row_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror.row_offsets(i), 1)
         << "Value of the mirror row offsets should be the same as the value of "
            "A.row_offsets during deep copy (1)";
   }
   for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-    ASSERT_EQ(A_mirror.column_indices[i], 2)
+    ASSERT_EQ(A_mirror.column_indices(i), 2)
         << "Value of the mirror column indices should be the same as the value "
            "of A.column_indices during deep copy (2)";
-    ASSERT_EQ(A_mirror.values[i], 5)
+    ASSERT_EQ(A_mirror.values(i), 5)
         << "Value of the mirror values should be the same as the value of "
            "A.values during deep copy (5)";
   }
@@ -99,30 +99,30 @@ TEST(TESTSUITE_NAME, DeepCopy_CsrMatrix_SameSpace_MirrorContainer) {
   check_shapes(A, A_mirror, Morpheus::CsrTag{});
 
   if (Morpheus::is_Host_Memoryspace_v<typename container::memory_space>) {
-    for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
-      ASSERT_EQ(A_mirror.row_offsets[i], Ar.row_offsets[i])
+    for (index_type i = 0; i < A_mirror.row_offsets().size(); i++) {
+      ASSERT_EQ(A_mirror.row_offsets(i), Ar.row_offsets(i))
           << "Value of the mirror row offsets should be the same as the value  "
              "of Ar.row_offsets (2) due to shallow copy";
     }
     for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-      ASSERT_EQ(A_mirror.column_indices[i], Ar.column_indices[i])
+      ASSERT_EQ(A_mirror.column_indices(i), Ar.column_indices(i))
           << "Value of the mirror column indices should be the same as the "
              "value of Ar.column_indices (1) due to shallow copy";
-      ASSERT_EQ(A_mirror.values[i], Ar.values[i])
+      ASSERT_EQ(A_mirror.values(i), Ar.values(i))
           << "Value of the mirror values should be the same as the value of "
              "Ar.values (3) due to shallow copy";
     }
   } else {
-    for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
-      ASSERT_EQ(A_mirror.row_offsets[i], 1)
+    for (index_type i = 0; i < A_mirror.row_offsets().size(); i++) {
+      ASSERT_EQ(A_mirror.row_offsets(i), 1)
           << "Value of the mirror row offsets should be the same as the value "
              "of A.row_offsets during deep copy (1)";
     }
     for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-      ASSERT_EQ(A_mirror.column_indices[i], 2)
+      ASSERT_EQ(A_mirror.column_indices(i), 2)
           << "Value of the mirror column indices should be the same as the  "
              "value of A.column_indices during deep copy (2)";
-      ASSERT_EQ(A_mirror.values[i], 5)
+      ASSERT_EQ(A_mirror.values(i), 5)
           << "Value of the mirror values should be the same as the value of "
              "A.values during deep copy (5)";
     }
@@ -150,16 +150,16 @@ TEST(TESTSUITE_NAME, DeepCopy_CsrMatrix_DeviceHost) {
 
   check_shapes(A, A_mirror, Morpheus::CsrTag{});
 
-  for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror.row_offsets[i], 1)
+  for (index_type i = 0; i < A_mirror.row_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror.row_offsets(i), 1)
         << "Value of the mirror row offsets should be the same as the value "
            "of the device row_offsets during deep copy (1)";
   }
   for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-    ASSERT_EQ(A_mirror.column_indices[i], 2)
+    ASSERT_EQ(A_mirror.column_indices(i), 2)
         << "Value of the mirror column indices should be the same as the  "
            "value of the device column_indices during deep copy (2)";
-    ASSERT_EQ(A_mirror.values[i], 5)
+    ASSERT_EQ(A_mirror.values(i), 5)
         << "Value of the mirror values should be the same as the value of "
            "the device values during deep copy (5)";
   }
@@ -184,16 +184,16 @@ TEST(TESTSUITE_NAME, DeepCopy_CsrMatrix_DeviceHost_MirrorCotnainer) {
 
   check_shapes(A, A_mirror, Morpheus::CsrTag{});
 
-  for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror.row_offsets[i], 1)
+  for (index_type i = 0; i < A_mirror.row_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror.row_offsets(i), 1)
         << "Value of the mirror row offsets should be the same as the value "
            "of the device row_offsets during deep copy (1)";
   }
   for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-    ASSERT_EQ(A_mirror.column_indices[i], 2)
+    ASSERT_EQ(A_mirror.column_indices(i), 2)
         << "Value of the mirror column indices should be the same as the  "
            "value of the device column_indices during deep copy (2)";
-    ASSERT_EQ(A_mirror.values[i], 5)
+    ASSERT_EQ(A_mirror.values(i), 5)
         << "Value of the mirror values should be the same as the value of "
            "the device values during deep copy (5)";
   }
@@ -222,20 +222,20 @@ TEST(TESTSUITE_NAME, DeepCopy_CsrMatrix_HostDevice) {
   check_shapes(A, A_mirror_dev, Morpheus::CsrTag{});
 
   // Change the value to main container to check if we did shallow copy
-  A.row_offsets.assign(A.row_offsets.size(), 0);
-  A.column_indices.assign(A.column_indices.size(), 1);
-  A.values.assign(A.values.size(), -1);
+  A.row_offsets().assign(A.row_offsets().size(), 0);
+  A.column_indices().assign(A.column_indices().size(), 1);
+  A.vallues().assign(A.vallues().size(), -1);
 
-  for (index_type i = 0; i < A_mirror_host.row_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror_host.row_offsets[i], 1)
+  for (index_type i = 0; i < A_mirror_host.row_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror_host.row_offsets(i), 1)
         << "Value of the mirror row offsets should be the same as the value "
            "of A.row_offsets during deep copy (1)";
   }
   for (index_type i = 0; i < A_mirror_host.nnnz(); i++) {
-    ASSERT_EQ(A_mirror_host.column_indices[i], 2)
+    ASSERT_EQ(A_mirror_host.column_indices(i), 2)
         << "Value of the mirror column indices should be the same as the  "
            "value of A.column_indices during deep copy (2)";
-    ASSERT_EQ(A_mirror_host.values[i], 5)
+    ASSERT_EQ(A_mirror_host.values(i), 5)
         << "Value of the mirror values should be the same as the value of "
            "A.values during deep copy (5)";
   }
@@ -264,20 +264,20 @@ TEST(TESTSUITE_NAME, DeepCopy_CsrMatrix_HostDevice_MirrorContainer) {
   check_shapes(A, A_mirror_dev, Morpheus::CsrTag{});
 
   // Change the value to main container to check if we did shallow copy
-  A.row_offsets.assign(A.row_offsets.size(), 0);
-  A.column_indices.assign(A.column_indices.size(), 1);
-  A.values.assign(A.values.size(), -1);
+  A.row_offsets().assign(A.row_offsets().size(), 0);
+  A.column_indices().assign(A.column_indices().size(), 1);
+  A.vallues().assign(A.vallues().size(), -1);
 
-  for (index_type i = 0; i < A_mirror_host.row_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror_host.row_offsets[i], 1)
+  for (index_type i = 0; i < A_mirror_host.row_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror_host.row_offsets(i), 1)
         << "Value of the mirror row offsets should be the same as the value "
            "of A.row_offsets during deep copy (1)";
   }
   for (index_type i = 0; i < A_mirror_host.nnnz(); i++) {
-    ASSERT_EQ(A_mirror_host.column_indices[i], 2)
+    ASSERT_EQ(A_mirror_host.column_indices(i), 2)
         << "Value of the mirror column indices should be the same as the  "
            "value of A.column_indices during deep copy (2)";
-    ASSERT_EQ(A_mirror_host.values[i], 5)
+    ASSERT_EQ(A_mirror_host.values(i), 5)
         << "Value of the mirror values should be the same as the value of "
            "A.values during deep copy (5)";
   }
@@ -313,23 +313,23 @@ TEST(TESTSUITE_NAME, DeepCopy_CsrMatrix_DeviecDevice_MirrorContainer) {
 
   check_shapes(A, Ares, Morpheus::CsrTag{});
   // Change the value to main container to check if we did shallow copy
-  A.row_offsets.assign(A.row_offsets.size(), 3);
-  A.column_indices.assign(A.column_indices.size(), 8);
-  A.values.assign(A.values.size(), 9);
-  Ar.row_offsets.assign(A.row_offsets.size(), 3);
-  Ar.column_indices.assign(A.column_indices.size(), 8);
-  Ar.values.assign(A.values.size(), 9);
+  A.row_offsets().assign(A.row_offsets().size(), 3);
+  A.column_indices().assign(A.column_indices().size(), 8);
+  A.vallues().assign(A.vallues().size(), 9);
+  Ar.row_offsets().assign(A.row_offsets().size(), 3);
+  Ar.column_indices().assign(A.column_indices().size(), 8);
+  Ar.vallues().assign(A.vallues().size(), 9);
 
-  for (index_type i = 0; i < Ares.row_offsets.size(); i++) {
-    ASSERT_EQ(Ares.row_offsets[i], 0)
+  for (index_type i = 0; i < Ares.row_offsets().size(); i++) {
+    ASSERT_EQ(Ares.row_offsets(i), 0)
         << "Value of the Ares.row_offsets should be the same as the initial "
            "value of Ar.row_offsets during deep copy (0)";
   }
   for (index_type i = 0; i < Ares.nnnz(); i++) {
-    ASSERT_EQ(Ares.column_indices[i], 1)
+    ASSERT_EQ(Ares.column_indices(i), 1)
         << "Value of the Ares.column_indices should be the same as the "
            "initial value of Ar.column_indices during deep copy (1)";
-    ASSERT_EQ(Ares.values[i], -1)
+    ASSERT_EQ(Ares.values(i), -1)
         << "Value of the Ares.values should be the "
            "same as the initial value of Ar.values during deep copy (-1)";
   }

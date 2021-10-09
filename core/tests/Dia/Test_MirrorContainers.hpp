@@ -20,7 +20,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include <Morpheus_Core.hpp>
 
 namespace Test {
@@ -41,20 +40,20 @@ TEST(TESTSUITE_NAME, Mirror_DiaMatrix_HostMirror) {
   auto A_mirror = Morpheus::create_mirror(A);
   using mirror  = decltype(A_mirror);
 
-  static_assert(
-      std::is_same<typename mirror::type,
-                   typename container::HostMirror>::value,
-      "Mirror type should match the HostMirror type of the original container "
-      "as we are creating a mirror in the same space.");
+  static_assert(std::is_same<typename mirror::type,
+                             typename container::HostMirror>::value,
+                "Mirror type should match the HostMirror type of the "
+                "original container "
+                "as we are creating a mirror in the same space.");
 
   check_shapes(A, A_mirror, Morpheus::DiaTag{});
-  for (index_type i = 0; i < A_mirror.diagonal_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror.diagonal_offsets[i], 0)
+  for (index_type i = 0; i < A_mirror.diagonal_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror.diagonal_offsets(i), 0)
         << "Value of the mirror diagonal offsets should be the default "
            "(0) i.e no copy was performed";
   }
-  for (index_type j = 0; j < A_mirror.values.ncols(); j++) {
-    for (index_type i = 0; i < A_mirror.values.nrows(); i++) {
+  for (index_type j = 0; j < A_mirror.values().ncols(); j++) {
+    for (index_type i = 0; i < A_mirror.values().nrows(); i++) {
       ASSERT_EQ(A_mirror.values(i, j), 0)
           << "Value of the mirror values should be the default "
              "(0) i.e no copy was performed";
@@ -86,30 +85,30 @@ TEST(TESTSUITE_NAME, MirrorContainer_DiaMatrix_HostMirror) {
 
   check_shapes(A, A_mirror, Morpheus::DiaTag{});
   // Change the value to main container to check if we did shallow copy
-  A.diagonal_offsets.assign(A.diagonal_offsets.size(), 2);
-  A.values.assign(A.values.nrows(), A.values.ncols(), -1);
+  A.diagonal_offsets().assign(A.diagonal_offsets().size(), 2);
+  A.values().assign(A.values().nrows(), A.values().ncols(), -1);
 
   if (Morpheus::is_Host_Memoryspace_v<typename container::memory_space> &&
       Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
-    for (index_type i = 0; i < A.diagonal_offsets.size(); i++) {
-      ASSERT_EQ(A.diagonal_offsets[i], 2)
+    for (index_type i = 0; i < A.diagonal_offsets().size(); i++) {
+      ASSERT_EQ(A.diagonal_offsets(i), 2)
           << "Value of the Dia diagonal offsets should be (2) due to Shallow "
              "Copy";
     }
-    for (index_type j = 0; j < A_mirror.values.ncols(); j++) {
-      for (index_type i = 0; i < A_mirror.values.nrows(); i++) {
+    for (index_type j = 0; j < A_mirror.values().ncols(); j++) {
+      for (index_type i = 0; i < A_mirror.values().nrows(); i++) {
         ASSERT_EQ(A.values(i, j), -1)
             << "Value of the Dia values should be (-1) due to Shallow Copy";
       }
     }
   } else {
-    for (index_type i = 0; i < A_mirror.diagonal_offsets.size(); i++) {
-      ASSERT_EQ(A_mirror.diagonal_offsets[i], 0)
+    for (index_type i = 0; i < A_mirror.diagonal_offsets().size(); i++) {
+      ASSERT_EQ(A_mirror.diagonal_offsets(i), 0)
           << "Value of the mirror diagonal offsets should be the default "
              "(0) i.e no copy was performed";
     }
-    for (index_type j = 0; j < A_mirror.values.ncols(); j++) {
-      for (index_type i = 0; i < A_mirror.values.nrows(); i++) {
+    for (index_type j = 0; j < A_mirror.values().ncols(); j++) {
+      for (index_type i = 0; i < A_mirror.values().nrows(); i++) {
         ASSERT_EQ(A_mirror.values(i, j), 0)
             << "Value of the mirror values should be the default "
                "(0) i.e no copy was performed";
@@ -141,18 +140,18 @@ TEST(TESTSUITE_NAME, MirrorContainer_DiaMatrix_explicit_same_space) {
 
   check_shapes(A, A_mirror, Morpheus::DiaTag{});
   // Change the value to main container to check if we did shallow copy
-  A.diagonal_offsets.assign(A.diagonal_offsets.size(), 2);
-  A.values.assign(A.values.nrows(), A.values.ncols(), -1);
+  A.diagonal_offsets().assign(A.diagonal_offsets().size(), 2);
+  A.values().assign(A.values().nrows(), A.values().ncols(), -1);
 
   if (Morpheus::is_Host_Memoryspace_v<typename container::memory_space> &&
       Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
-    for (index_type i = 0; i < A.diagonal_offsets.size(); i++) {
-      ASSERT_EQ(A.diagonal_offsets[i], 2)
+    for (index_type i = 0; i < A.diagonal_offsets().size(); i++) {
+      ASSERT_EQ(A.diagonal_offsets(i), 2)
           << "Value of the Dia diagonal offsets should be (2) due to Shallow "
              "Copy";
     }
-    for (index_type j = 0; j < A_mirror.values.ncols(); j++) {
-      for (index_type i = 0; i < A_mirror.values.nrows(); i++) {
+    for (index_type j = 0; j < A_mirror.values().ncols(); j++) {
+      for (index_type i = 0; i < A_mirror.values().nrows(); i++) {
         ASSERT_EQ(A.values(i, j), -1)
             << "Value of the Dia values should be (-1) due to Shallow Copy";
       }
@@ -186,18 +185,19 @@ TEST(TESTSUITE_NAME, Mirror_DiaMatrix_explicit_space) {
 
   static_assert(
       std::is_same<typename mirror::type, typename dst_type::type>::value,
-      "Mirror type should be the same as the source type but in the new mirror "
+      "Mirror type should be the same as the source type but in the new "
+      "mirror "
       "space.");
 
   check_shapes(A, A_mirror, Morpheus::DiaTag{});
   if (Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
-    for (index_type i = 0; i < A_mirror.diagonal_offsets.size(); i++) {
-      ASSERT_EQ(A_mirror.diagonal_offsets[i], 0)
+    for (index_type i = 0; i < A_mirror.diagonal_offsets().size(); i++) {
+      ASSERT_EQ(A_mirror.diagonal_offsets(i), 0)
           << "Value of the mirror diagonal offsets should be the default "
              "(0) i.e no copy was performed";
     }
-    for (index_type j = 0; j < A_mirror.values.ncols(); j++) {
-      for (index_type i = 0; i < A_mirror.values.nrows(); i++) {
+    for (index_type j = 0; j < A_mirror.values().ncols(); j++) {
+      for (index_type i = 0; i < A_mirror.values().nrows(); i++) {
         ASSERT_EQ(A_mirror.values(i, j), 0)
             << "Value of the mirror values should be the default "
                "(0) i.e no copy was performed";

@@ -28,7 +28,7 @@
 using coo    = Morpheus::CooMatrix<double, int, Kokkos::HostSpace>;
 using dia    = Morpheus::DiaMatrix<double, int, Kokkos::HostSpace>;
 using vec    = Morpheus::DenseVector<double, Kokkos::HostSpace>;
-using serial = typename Kokkos::Serial;
+using serial = Kokkos::Serial;
 
 // Medium matrix
 // [ 1, -1, -3,  0,  0]

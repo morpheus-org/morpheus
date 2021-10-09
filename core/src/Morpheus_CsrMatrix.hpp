@@ -119,9 +119,9 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
                 * = nullptr)
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()),
-        _row_offsets(src.row_offsets()),
-        _column_indices(src.column_indices()),
-        _values(src.values()) {}
+        _row_offsets(src.crow_offsets()),
+        _column_indices(src.ccolumn_indices()),
+        _values(src.cvalues()) {}
 
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
@@ -134,9 +134,9 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
     this->set_ncols(src.ncols());
     this->set_nnnz(src.nnnz());
 
-    _row_offsets    = src.row_offsets();
-    _column_indices = src.column_indices();
-    _values         = src.values();
+    _row_offsets    = src.crow_offsets();
+    _column_indices = src.ccolumn_indices();
+    _values         = src.cvalues();
 
     return *this;
   }

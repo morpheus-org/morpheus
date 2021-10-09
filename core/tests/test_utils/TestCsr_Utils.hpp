@@ -48,12 +48,12 @@ void check_shapes(const T1& A, const T2& A_mirror, Morpheus::CsrTag) {
   ASSERT_EQ(A.nrows(), A_mirror.nrows());
   ASSERT_EQ(A.ncols(), A_mirror.ncols());
   ASSERT_EQ(A.nnnz(), A_mirror.nnnz());
-  ASSERT_EQ(A.row_offsets.size(), A.nrows() + 1);
-  ASSERT_EQ(A.column_indices.size(), A.nnnz());
-  ASSERT_EQ(A.values.size(), A.nnnz());
-  ASSERT_EQ(A.row_offsets.size(), A_mirror.row_offsets.size());
-  ASSERT_EQ(A.column_indices.size(), A_mirror.column_indices.size());
-  ASSERT_EQ(A.values.size(), A_mirror.values.size());
+  ASSERT_EQ(A.crow_offsets().size(), A.nrows() + 1);
+  ASSERT_EQ(A.ccolumn_indices().size(), A.nnnz());
+  ASSERT_EQ(A.cvalues().size(), A.nnnz());
+  ASSERT_EQ(A.crow_offsets().size(), A_mirror.crow_offsets().size());
+  ASSERT_EQ(A.ccolumn_indices().size(), A_mirror.ccolumn_indices().size());
+  ASSERT_EQ(A.cvalues().size(), A_mirror.cvalues().size());
 }
 
 #endif  // MORPHEUS_CORE_TEST_CSR_UTILS_HPP

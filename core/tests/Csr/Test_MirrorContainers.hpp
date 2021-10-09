@@ -48,16 +48,16 @@ TEST(TESTSUITE_NAME, Mirror_CsrMatrix_HostMirror) {
       "as we are creating a mirror in the same space.");
 
   check_shapes(A, A_mirror, Morpheus::CsrTag{});
-  for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
-    ASSERT_EQ(A_mirror.row_offsets[i], 0)
+  for (index_type i = 0; i < A_mirror.row_offsets().size(); i++) {
+    ASSERT_EQ(A_mirror.row_offsets(i), 0)
         << "Value of the mirror row offsets should be the default "
            "(0) i.e no copy was performed";
   }
   for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-    ASSERT_EQ(A_mirror.column_indices[i], 0)
+    ASSERT_EQ(A_mirror.column_indices(i), 0)
         << "Value of the mirror column indices should be the default "
            "(0) i.e no copy was performed";
-    ASSERT_EQ(A_mirror.values[i], 0)
+    ASSERT_EQ(A_mirror.values(i), 0)
         << "Value of the mirror values should be the default "
            "(0) i.e no copy was performed";
   }
@@ -88,35 +88,35 @@ TEST(TESTSUITE_NAME, MirrorContainer_CsrMatrix_HostMirror) {
   check_shapes(A, A_mirror, Morpheus::CsrTag{});
 
   // Change the value to main container to check if we did shallow copy
-  A.row_offsets.assign(A.row_offsets.size(), 0);
-  A.column_indices.assign(A.column_indices.size(), 1);
-  A.values.assign(A.values.size(), -1);
+  A.row_offsets().assign(A.row_offsets().size(), 0);
+  A.column_indices().assign(A.column_indices().size(), 1);
+  A.values().assign(A.values().size(), -1);
 
   if (Morpheus::is_Host_Memoryspace_v<typename container::memory_space> &&
       Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
-    for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
-      ASSERT_EQ(A_mirror.row_offsets[i], 0)
+    for (index_type i = 0; i < A_mirror.row_offsets().size(); i++) {
+      ASSERT_EQ(A_mirror.row_offsets(i), 0)
           << "Value of the mirror row offsets should be (0) due to Shallow "
              "Copy";
     }
     for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-      ASSERT_EQ(A_mirror.column_indices[i], 1)
+      ASSERT_EQ(A_mirror.column_indices(i), 1)
           << "Value of the mirror column indices should be (1) due to Shallow "
              "Copy";
-      ASSERT_EQ(A_mirror.values[i], -1)
+      ASSERT_EQ(A_mirror.values(i), -1)
           << "Value of the mirror values should be (-1) due to Shallow Copy";
     }
   } else {
-    for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
-      ASSERT_EQ(A_mirror.row_offsets[i], 0)
+    for (index_type i = 0; i < A_mirror.row_offsets().size(); i++) {
+      ASSERT_EQ(A_mirror.row_offsets(i), 0)
           << "Value of the mirror row offsets should be the default "
              "(0) i.e no copy was performed";
     }
     for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-      ASSERT_EQ(A_mirror.column_indices[i], 0)
+      ASSERT_EQ(A_mirror.column_indices(i), 0)
           << "Value of the mirror column indices should be the default "
              "(0) i.e no copy was performed";
-      ASSERT_EQ(A_mirror.values[i], 0)
+      ASSERT_EQ(A_mirror.values(i), 0)
           << "Value of the mirror values should be the default "
              "(0) i.e no copy was performed";
     }
@@ -146,22 +146,22 @@ TEST(TESTSUITE_NAME, MirrorContainer_CsrMatrix_explicit_same_space) {
 
   check_shapes(A, A_mirror, Morpheus::CsrTag{});
   // Change the value to main container to check if we did shallow copy
-  A.row_offsets.assign(A.row_offsets.size(), 0);
-  A.column_indices.assign(A.column_indices.size(), 1);
-  A.values.assign(A.values.size(), -1);
+  A.row_offsets().assign(A.row_offsets().size(), 0);
+  A.column_indices().assign(A.column_indices().size(), 1);
+  A.values().assign(A.values().size(), -1);
 
   if (Morpheus::is_Host_Memoryspace_v<typename container::memory_space> &&
       Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
-    for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
-      ASSERT_EQ(A_mirror.row_offsets[i], 0)
+    for (index_type i = 0; i < A_mirror.row_offsets().size(); i++) {
+      ASSERT_EQ(A_mirror.row_offsets(i), 0)
           << "Value of the mirror row offsets should be (0) due to Shallow "
              "Copy";
     }
     for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-      ASSERT_EQ(A_mirror.column_indices[i], 1)
+      ASSERT_EQ(A_mirror.column_indices(i), 1)
           << "Value of the mirror column indices should be (1) due to Shallow "
              "Copy";
-      ASSERT_EQ(A_mirror.values[i], -1)
+      ASSERT_EQ(A_mirror.values(i), -1)
           << "Value of the mirror values should be (-1) due to Shallow Copy";
     }
   }
@@ -198,16 +198,16 @@ TEST(TESTSUITE_NAME, Mirror_CsrMatrix_explicit_space) {
 
   check_shapes(A, A_mirror, Morpheus::CsrTag{});
   if (Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
-    for (index_type i = 0; i < A_mirror.row_offsets.size(); i++) {
-      ASSERT_EQ(A_mirror.row_offsets[i], 0)
+    for (index_type i = 0; i < A_mirror.row_offsets().size(); i++) {
+      ASSERT_EQ(A_mirror.row_offsets(i), 0)
           << "Value of the mirror row offsets should be the default "
              "(0) i.e no copy was performed";
     }
     for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-      ASSERT_EQ(A_mirror.column_indices[i], 0)
+      ASSERT_EQ(A_mirror.column_indices(i), 0)
           << "Value of the mirror column indices should be the default "
              "(0) i.e no copy was performed";
-      ASSERT_EQ(A_mirror.values[i], 0)
+      ASSERT_EQ(A_mirror.values(i), 0)
           << "Value of the mirror values should be the default "
              "(0) i.e no copy was performed";
     }

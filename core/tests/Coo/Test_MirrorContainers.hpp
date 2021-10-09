@@ -49,13 +49,13 @@ TEST(TESTSUITE_NAME, Mirror_CooMatrix_HostMirror) {
 
   check_shapes(A, A_mirror, Morpheus::CooTag{});
   for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-    ASSERT_EQ(A_mirror.row_indices[i], 0)
+    ASSERT_EQ(A_mirror.row_indices(i), 0)
         << "Value of the mirror row indices should be the default "
            "(0) i.e no copy was performed";
-    ASSERT_EQ(A_mirror.column_indices[i], 0)
+    ASSERT_EQ(A_mirror.column_indices(i), 0)
         << "Value of the mirror column indices should be the default "
            "(0) i.e no copy was performed";
-    ASSERT_EQ(A_mirror.values[i], 0)
+    ASSERT_EQ(A_mirror.values(i), 0)
         << "Value of the mirror values should be the default "
            "(0) i.e no copy was performed";
   }
@@ -85,30 +85,30 @@ TEST(TESTSUITE_NAME, MirrorContainer_CooMatrix_HostMirror) {
 
   check_shapes(A, A_mirror, Morpheus::CooTag{});
   // Change the value to main container to check if we did shallow copy
-  A.row_indices.assign(A.nnnz(), 0);
-  A.column_indices.assign(A.nnnz(), 1);
-  A.values.assign(A.nnnz(), -1);
+  A.row_indices().assign(A.nnnz(), 0);
+  A.column_indices().assign(A.nnnz(), 1);
+  A.values().assign(A.nnnz(), -1);
   if (Morpheus::is_Host_Memoryspace_v<typename container::memory_space> &&
       Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
     for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-      ASSERT_EQ(A_mirror.row_indices[i], 0)
+      ASSERT_EQ(A_mirror.row_indices(i), 0)
           << "Value of the Mirror Coo row indices should be (0) due to Shallow "
              "Copy";
-      ASSERT_EQ(A_mirror.column_indices[i], 1)
+      ASSERT_EQ(A_mirror.column_indices(i), 1)
           << "Value of the Mirror Coo column indices should be (1) due to "
              "Shallow Copy";
-      ASSERT_EQ(A_mirror.values[i], -1) << "Value of the Mirror Coo values "
+      ASSERT_EQ(A_mirror.values(i), -1) << "Value of the Mirror Coo values "
                                            "should be (-1) due to Shallow Copy";
     }
   } else {
     for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-      ASSERT_EQ(A_mirror.row_indices[i], 0)
+      ASSERT_EQ(A_mirror.row_indices(i), 0)
           << "Value of the mirror row indices should be the default "
              "(0) i.e no copy was performed";
-      ASSERT_EQ(A_mirror.column_indices[i], 0)
+      ASSERT_EQ(A_mirror.column_indices(i), 0)
           << "Value of the mirror column indices should be the default "
              "(0) i.e no copy was performed";
-      ASSERT_EQ(A_mirror.values[i], 0)
+      ASSERT_EQ(A_mirror.values(i), 0)
           << "Value of the mirror values should be the default "
              "(0) i.e no copy was performed";
     }
@@ -139,17 +139,17 @@ TEST(TESTSUITE_NAME, MirrorContainer_CooMatrix_explicit_same_space) {
   check_shapes(A, A_mirror, Morpheus::CooTag{});
 
   // Change the value to main container to check if we did shallow copy
-  A.row_indices.assign(A.nnnz(), 0);
-  A.column_indices.assign(A.nnnz(), 1);
-  A.values.assign(A.nnnz(), -1);
+  A.row_indices().assign(A.nnnz(), 0);
+  A.column_indices().assign(A.nnnz(), 1);
+  A.values().assign(A.nnnz(), -1);
   if (Morpheus::is_Host_Memoryspace_v<typename container::memory_space> &&
       Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
     for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-      ASSERT_EQ(A_mirror.row_indices[i], 0)
+      ASSERT_EQ(A_mirror.row_indices(i), 0)
           << "Value of the Mirror Coo row indices should be (0)";
-      ASSERT_EQ(A_mirror.column_indices[i], 1)
+      ASSERT_EQ(A_mirror.column_indices(i), 1)
           << "Value of the Mirror Coo column indices should be (1)";
-      ASSERT_EQ(A_mirror.values[i], -1)
+      ASSERT_EQ(A_mirror.values(i), -1)
           << "Value of the Mirror Coo values should be (-1)";
     }
   }
@@ -187,13 +187,13 @@ TEST(TESTSUITE_NAME, Mirror_CooMatrix_explicit_space) {
   check_shapes(A, A_mirror, Morpheus::CooTag{});
   if (Morpheus::is_Host_Memoryspace_v<typename mirror::memory_space>) {
     for (index_type i = 0; i < A_mirror.nnnz(); i++) {
-      ASSERT_EQ(A_mirror.row_indices[i], 0)
+      ASSERT_EQ(A_mirror.row_indices(i), 0)
           << "Value of the mirror row indices should be the default "
              "(0) i.e no copy was performed";
-      ASSERT_EQ(A_mirror.column_indices[i], 0)
+      ASSERT_EQ(A_mirror.column_indices(i), 0)
           << "Value of the mirror column indices should be the default "
              "(0) i.e no copy was performed";
-      ASSERT_EQ(A_mirror.values[i], 0)
+      ASSERT_EQ(A_mirror.values(i), 0)
           << "Value of the mirror values should be the default "
              "(0) i.e no copy was performed";
     }
