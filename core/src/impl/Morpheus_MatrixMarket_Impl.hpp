@@ -135,23 +135,23 @@ void read_coordinate_stream(Morpheus::CooMatrix<ValueType, Properties...>& coo,
   // read file contents
   if (banner.type == "pattern") {
     while (num_entries_read < coo.nnnz() && !input.eof()) {
-      input >> coo.row_indices[num_entries_read];
-      input >> coo.column_indices[num_entries_read];
+      input >> coo.row_indices(num_entries_read);
+      input >> coo.column_indices(num_entries_read);
       num_entries_read++;
     }
 
-    auto values_begin = coo.values.data();
-    auto values_end   = coo.values.data() + coo.values.size();
+    auto values_begin = coo.values().data();
+    auto values_end   = coo.values().data() + coo.values().size();
     std::fill(values_begin, values_end, ValueType(1));
   } else if (banner.type == "real" || banner.type == "integer") {
     while (num_entries_read < coo.nnnz() && !input.eof()) {
       ValueType real;
 
-      input >> coo.row_indices[num_entries_read];
-      input >> coo.column_indices[num_entries_read];
+      input >> coo.row_indices(num_entries_read);
+      input >> coo.column_indices(num_entries_read);
       input >> real;
 
-      coo.values[num_entries_read] = real;
+      coo.values(num_entries_read) = real;
       num_entries_read++;
     }
   } else if (banner.type == "complex") {
@@ -169,16 +169,16 @@ void read_coordinate_stream(Morpheus::CooMatrix<ValueType, Properties...>& coo,
 
   // check validity of row and column index data
   if (coo.nnnz() > 0) {
-    auto row_indices_begin = coo.row_indices.data();
-    auto row_indices_end   = coo.row_indices.data() + coo.row_indices.size();
+    auto row_indices_begin = coo.row_indices().data();
+    auto row_indices_end = coo.row_indices().data() + coo.row_indices().size();
     IndexType min_row_index =
         *std::min_element(row_indices_begin, row_indices_end);
     IndexType max_row_index =
         *std::max_element(row_indices_begin, row_indices_end);
 
-    auto column_indices_begin = coo.column_indices.data();
+    auto column_indices_begin = coo.column_indices().data();
     auto column_indices_end =
-        coo.column_indices.data() + coo.column_indices.size();
+        coo.column_indices().data() + coo.column_indices().size();
     IndexType min_col_index =
         *std::min_element(column_indices_begin, column_indices_end);
     IndexType max_col_index =
@@ -197,8 +197,8 @@ void read_coordinate_stream(Morpheus::CooMatrix<ValueType, Properties...>& coo,
 
   // convert base-1 indices to base-0
   for (IndexType n = 0; n < coo.nnnz(); n++) {
-    coo.row_indices[n] -= 1;
-    coo.column_indices[n] -= 1;
+    coo.row_indices(n) -= 1;
+    coo.column_indices(n) -= 1;
   }
 
   // expand symmetric formats to "general" format
@@ -206,7 +206,7 @@ void read_coordinate_stream(Morpheus::CooMatrix<ValueType, Properties...>& coo,
     IndexType off_diagonals = 0;
 
     for (IndexType n = 0; n < coo.nnnz(); n++)
-      if (coo.row_indices[n] != coo.column_indices[n]) off_diagonals++;
+      if (coo.row_indices(n) != coo.column_indices(n)) off_diagonals++;
 
     IndexType general_num_entries = coo.nnnz() + off_diagonals;
 
@@ -218,16 +218,16 @@ void read_coordinate_stream(Morpheus::CooMatrix<ValueType, Properties...>& coo,
 
       for (IndexType n = 0; n < coo.nnnz(); n++) {
         // copy entry over
-        general.row_indices[nnz]    = coo.row_indices[n];
-        general.column_indices[nnz] = coo.column_indices[n];
-        general.values[nnz]         = coo.values[n];
+        general.row_indices(nnz)    = coo.row_indices(n);
+        general.column_indices(nnz) = coo.column_indices(n);
+        general.values(nnz)         = coo.values(n);
         nnz++;
 
         // duplicate off-diagonals
-        if (coo.row_indices[n] != coo.column_indices[n]) {
-          general.row_indices[nnz]    = coo.column_indices[n];
-          general.column_indices[nnz] = coo.row_indices[n];
-          general.values[nnz]         = coo.values[n];
+        if (coo.row_indices(n) != coo.column_indices(n)) {
+          general.row_indices(nnz)    = coo.column_indices(n);
+          general.column_indices(nnz) = coo.row_indices(n);
+          general.values(nnz)         = coo.values(n);
           nnz++;
         }
       }
@@ -373,9 +373,9 @@ void write_coordinate_stream(
          << "\n";
 
   for (size_t i = 0; i < size_t(coo.nnnz()); i++) {
-    output << (coo.row_indices[i] + 1) << " ";
-    output << (coo.column_indices[i] + 1) << " ";
-    Morpheus::Io::Impl::write_value(output, coo.values[i]);
+    output << (coo.row_indices(i) + 1) << " ";
+    output << (coo.column_indices(i) + 1) << " ";
+    Morpheus::Io::Impl::write_value(output, coo.values(i));
     output << "\n";
   }
 }
