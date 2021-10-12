@@ -50,7 +50,7 @@ inline void multiply(
   const view_type x_view                  = x.const_view();
   const index_array_type diagonal_offsets = A.cdiagonal_offsets().const_view();
   view_type y_view                        = y.view();
-  index_type ndiag = A.cvalues.ncols(), ncols = A.ncols();
+  index_type ndiag = A.cvalues().ncols(), ncols = A.ncols();
 
   const Kokkos::TeamPolicy<execution_space> policy(A.nrows(), Kokkos::AUTO,
                                                    Kokkos::AUTO);
