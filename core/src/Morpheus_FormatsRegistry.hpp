@@ -24,6 +24,8 @@
 #ifndef MORPHEUS_FORMATSREGISTRY_HPP
 #define MORPHEUS_FORMATSREGISTRY_HPP
 
+#ifdef __cplusplus
+
 #include <fwd/Morpheus_Fwd_Containers.hpp>
 #include <impl/Morpheus_MatrixProxy.hpp>
 
@@ -39,9 +41,13 @@ struct MatrixFormats {
   using type_list = typename formats_proxy::type_list;
 };
 
+#endif
+
 // Enums should be in the same order as types in MatrixFormatsProxy
 enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT };
 
+#ifdef __cplusplus
 }  // namespace Morpheus
+#endif
 
 #endif  // MORPHEUS_FORMATSREGISTRY_HPP
