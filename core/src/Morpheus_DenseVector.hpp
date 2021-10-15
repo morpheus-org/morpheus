@@ -61,7 +61,7 @@ class DenseVector
   using const_reference = typename traits::const_reference;
 
   using value_array_type =
-      Kokkos::View<value_type*, array_layout, memory_space>;
+      Kokkos::View<value_type*, array_layout, execution_space>;
   using value_array_pointer   = typename value_array_type::pointer_type;
   using value_array_reference = typename value_array_type::reference_type;
 

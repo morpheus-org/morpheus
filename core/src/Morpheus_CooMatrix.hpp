@@ -59,16 +59,16 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
-  using index_array_type =
-      Morpheus::DenseVector<index_type, index_type, array_layout, memory_space>;
+  using index_array_type       = Morpheus::DenseVector<index_type, index_type,
+                                                 array_layout, execution_space>;
   using const_index_array_type = const index_array_type;
   using index_array_pointer    = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
   using const_index_array_reference = const index_array_reference;
 
-  using value_array_type =
-      Morpheus::DenseVector<value_type, index_type, array_layout, memory_space>;
+  using value_array_type       = Morpheus::DenseVector<value_type, index_type,
+                                                 array_layout, execution_space>;
   using const_value_array_type = const value_array_type;
   using value_array_pointer    = typename value_array_type::value_array_pointer;
   using value_array_reference =
