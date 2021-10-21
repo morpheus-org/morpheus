@@ -6,6 +6,10 @@ message(STATUS "Core Tests are enabled")
 
 set(GTEST_SOURCE_DIR ${${PARENT_PACKAGE_NAME}_SOURCE_DIR}/tpls/gtest)
 
+set(Morpheus_ENABLE_INDIVIDUAL_TESTS
+    OFF
+    CACHE INTERNAL "Whether to enable individual unit tests. Default is OFF.")
+
 # need here for tribits
 morpheus_include_directories(${GTEST_SOURCE_DIR})
 morpheus_add_test_library(
@@ -54,27 +58,37 @@ add_subdirectory(Dia)
 set(ALL_SOURCES)
 
 if(MORPHEUS_ENABLE_SERIAL)
-  morpheus_add_executable_and_test(UnitTest_Serial SOURCES TestMain.cpp
-                                   ${Serial_SOURCES})
+  if(Morpheus_ENABLE_INDIVIDUAL_TESTS)
+    morpheus_add_executable_and_test(UnitTest_Serial SOURCES TestMain.cpp
+                                     ${Serial_SOURCES})
+  endif()
   list(APPEND ALL_SOURCES ${Serial_SOURCES})
 endif()
 
 if(MORPHEUS_ENABLE_OPENMP)
-  morpheus_add_executable_and_test(UnitTest_OpenMP SOURCES TestMain.cpp
-                                   ${OpenMP_SOURCES})
+  if(Morpheus_ENABLE_INDIVIDUAL_TESTS)
+    morpheus_add_executable_and_test(UnitTest_OpenMP SOURCES TestMain.cpp
+                                     ${OpenMP_SOURCES})
+  endif()
   list(APPEND ALL_SOURCES ${OpenMP_SOURCES})
 endif()
 
 if(MORPHEUS_ENABLE_CUDA)
-  morpheus_add_executable_and_test(UnitTest_Cuda SOURCES TestMain.cpp
-                                   ${Cuda_SOURCES})
+  if(Morpheus_ENABLE_INDIVIDUAL_TESTS)
+    morpheus_add_executable_and_test(UnitTest_Cuda SOURCES TestMain.cpp
+                                     ${Cuda_SOURCES})
+  endif()
   list(APPEND ALL_SOURCES ${Cuda_SOURCES})
 endif()
 
 if(MORPHEUS_ENABLE_HIP)
-  morpheus_add_executable_and_test(UnitTest_HIP SOURCES TestMain.cpp
-                                   ${HIP_SOURCES})
+  if(Morpheus_ENABLE_INDIVIDUAL_TESTS)
+    morpheus_add_executable_and_test(UnitTest_HIP SOURCES TestMain.cpp
+                                     ${HIP_SOURCES})
+  endif()
   list(APPEND ALL_SOURCES ${HIP_SOURCES})
 endif()
 
-morpheus_add_executable_and_test(UnitTest SOURCES TestMain.cpp ${ALL_SOURCES})
+if(NOT Morpheus_ENABLE_INDIVIDUAL_TESTS)
+  morpheus_add_executable_and_test(UnitTest SOURCES TestMain.cpp ${ALL_SOURCES})
+endif()
