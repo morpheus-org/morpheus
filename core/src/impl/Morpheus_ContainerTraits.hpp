@@ -189,9 +189,10 @@ struct ContainerTraits {
   using device_type       = Kokkos::Device<ExecutionSpace, MemorySpace>;
   using host_mirror_space = HostMirrorSpace;
 
-  using type = Container<value_type, index_type, array_layout, memory_space>;
-  using HostMirror = Container<non_const_value_type, non_const_index_type,
-                               array_layout, host_mirror_space>;
+  using type = Container<value_type, index_type, array_layout, execution_space>;
+  using HostMirror =
+      Container<non_const_value_type, non_const_index_type, array_layout,
+                typename host_mirror_space::execution_space>;
 
   using pointer = typename std::add_pointer<type>::type;
   using const_pointer =

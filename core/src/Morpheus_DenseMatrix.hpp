@@ -114,12 +114,10 @@ class DenseMatrix
     return *this;
   }
 
-  // !FIXME: Needs to perform conversion
   // Construct from another matrix type
   template <class MatrixType>
   DenseMatrix(const MatrixType &src) = delete;
 
-  // !FIXME: Needs to perform conversion
   // Assignment from another matrix type
   template <class MatrixType>
   reference operator=(const MatrixType &src) = delete;
