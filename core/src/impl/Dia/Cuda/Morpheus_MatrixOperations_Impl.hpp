@@ -55,8 +55,8 @@ inline void update_diagonal(
   const size_t NUM_BLOCKS =
       std::min<size_t>(MAX_BLOCKS, DIVIDE_INTO(A.nrows(), BLOCK_SIZE));
 
-  const IndexType num_diagonals = A.values.ncols();
-  const IndexType pitch         = A.values.nrows();
+  const IndexType num_diagonals = A.cvalues().ncols();
+  const IndexType pitch         = A.cvalues().nrows();
 
   Kernels::update_dia_diagonal_kernel<ValueType, IndexType>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), A.ncols(), num_diagonals,

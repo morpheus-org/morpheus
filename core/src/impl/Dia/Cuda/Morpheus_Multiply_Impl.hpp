@@ -60,8 +60,8 @@ inline void multiply(
   const ValueType* x_ptr = x.data();
   ValueType* y_ptr       = y.data();
 
-  const IndexType num_diagonals = A.values.ncols();
-  const IndexType pitch         = A.values.nrows();
+  const IndexType num_diagonals = A.cvalues().ncols();
+  const IndexType pitch         = A.cvalues().nrows();
 
   if (num_diagonals == 0) {
     // empty matrix
