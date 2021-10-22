@@ -366,11 +366,15 @@ macro(MORPHEUS_SETUP_BUILD_ENVIRONMENT)
     # If building in debug mode, define the HAVE_MORPHEUS_DEBUG macro.
     morpheus_add_debug_option()
 
+    if(Morpheus_ENABLE_TESTS OR Morpheus_ENABLE_EXAMPLES)
+      include(cmake/morpheus_gtest.cmake)
+    endif()
+
     # ==================================================================
     # Enable Third Party Libraries
     # ==================================================================
-    # include(cmake/morpheus_tpls.cmake)
-    # include(cmake/morpheus_features.cmake) # TODO
+    # include(cmake/morpheus_tpls.cmake) include(cmake/morpheus_features.cmake)
+    # # TODO
     include(cmake/kokkos_requirements.cmake)
 
   endif()
@@ -474,30 +478,4 @@ function(MORPHEUS_ADD_EXECUTABLE ROOT_NAME)
   # All executables must link to all the morpheus targets This is just private
   # linkage because exe is final
   target_link_libraries(${EXE_NAME} PRIVATE Morpheus::morpheus)
-endfunction()
-
-function(MORPHEUS_ADD_TEST_LIBRARY NAME)
-  set(oneValueArgs)
-  set(multiValueArgs HEADERS SOURCES)
-
-  cmake_parse_arguments(PARSE "STATIC;SHARED" "" "HEADERS;SOURCES;DEPLIBS"
-                        ${ARGN})
-
-  set(LIB_TYPE)
-  if(PARSE_STATIC)
-    set(LIB_TYPE STATIC)
-  elseif(PARSE_SHARED)
-    set(LIB_TYPE SHARED)
-  endif()
-
-  if(PARSE_HEADERS)
-    list(REMOVE_DUPLICATES PARSE_HEADERS)
-  endif()
-  if(PARSE_SOURCES)
-    list(REMOVE_DUPLICATES PARSE_SOURCES)
-  endif()
-  add_library(${NAME} ${LIB_TYPE} ${PARSE_SOURCES})
-  if(PARSE_DEPLIBS)
-    target_link_libraries(${NAME} PRIVATE ${PARSE_DEPLIBS})
-  endif()
 endfunction()
