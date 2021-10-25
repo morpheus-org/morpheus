@@ -6,7 +6,7 @@ morpheus_include_directories(
 
 install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-  DESTINATION ${MORPHEUS_HEADER_INSTALL_DIR}
+  DESTINATION ${MORPHEUS_HEADER_INSTALL_DIR}/core
   FILES_MATCHING
   PATTERN "*.hpp"
   PATTERN "*.h")
@@ -93,30 +93,24 @@ foreach(HEADER ${MORPHEUS_CORE_HEADERS})
 endforeach()
 
 morpheus_add_library(
-  morpheuscore SOURCES ${MORPHEUS_CORE_SOURCES} HEADERS
+  morpheus-core SOURCES ${MORPHEUS_CORE_SOURCES} HEADERS
   ${MORPHEUS_CORE_HEADERS} ADD_BUILD_OPTIONS # core should be given all the
                                              # necessary compiler/linker flags
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/MorpheusCore_config.hpp
-        DESTINATION ${MORPHEUS_HEADER_INSTALL_DIR})
+        DESTINATION ${MORPHEUS_HEADER_INSTALL_DIR}/core)
 
 morpheus_lib_include_directories(
-  morpheuscore ${MORPHEUS_TOP_BUILD_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+  morpheus-core ${MORPHEUS_TOP_BUILD_DIR} ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Link with Kokkos
-target_link_libraries(morpheuscore PUBLIC Kokkos::kokkos)
+target_link_libraries(morpheus-core PUBLIC Kokkos::kokkos)
 
 foreach(HEADER ${MORPHEUS_CORE_HEADERS})
   get_filename_component(dirname ${HEADER} DIRECTORY)
-  target_include_directories(morpheuscore PUBLIC $<BUILD_INTERFACE:${dirname}>)
+  target_include_directories(morpheus-core PUBLIC $<BUILD_INTERFACE:${dirname}>)
 endforeach()
 target_include_directories(
-  morpheuscore PUBLIC $<INSTALL_INTERFACE:${MORPHEUS_HEADER_INSTALL_DIR}>)
-
-# morpheus_link_tpl(morpheuscore PUBLIC BLAS) morpheus_link_tpl(morpheuscore
-# PUBLIC CBLAS) morpheus_link_tpl(morpheuscore PUBLIC MKL)
-# morpheus_link_tpl(morpheuscore PUBLIC CUBLAS) morpheus_link_tpl(morpheuscore
-# PUBLIC CUSPARSE) morpheus_link_tpl(morpheuscore PUBLIC METIS)
-# morpheus_link_tpl(morpheuscore PUBLIC ARMPL)
+  morpheus-core PUBLIC $<INSTALL_INTERFACE:${MORPHEUS_HEADER_INSTALL_DIR}/core>)
