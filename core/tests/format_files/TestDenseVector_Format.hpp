@@ -25,6 +25,7 @@
 #define MORPHEUS_CORE_TEST_DENSE_VECTOR_HPP
 
 #include <gtest/gtest.h>
+#include <Morpheus_Core.hpp>
 
 #define TEST_FORMAT densevector
 #define TEST_FORMAT_NUMBER 3

@@ -10,7 +10,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
     set(testdir ${CMAKE_CURRENT_BINARY_DIR}/${fmtdir}/${dir})
     file(MAKE_DIRECTORY ${testdir})
 
-    foreach(Name MirrorContainers DeepCopy)
+    foreach(Name MirrorContainers DeepCopy DenseVector)
       set(file ${testdir}/Test${Fmt}_${Tag}_${Name}.cpp)
       # Write to a temporary intermediate file and call configure_file to avoid
       # updating timestamps triggering unnecessary rebuilds on subsequent cmake
