@@ -3,26 +3,29 @@ message(STATUS "Core Tests are enabled")
 morpheus_include_directories(${CMAKE_CURRENT_BINARY_DIR})
 morpheus_include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/category_files)
-morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/format_files)
-morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/test_utils)
-morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/generic)
-morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/DenseVector)
-morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/DenseMatrix)
-morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/Coo)
-morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/Csr)
-morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/Dia)
+morpheus_include_directories(${Morpheus_SOURCE_DIR}/core/tests/setup)
 
 foreach(Tag Serial;OpenMP;Cuda;HIP)
   string(TOUPPER ${Tag} DEVICE)
+  string(TOLOWER ${Tag} dir)
   global_set(${Tag}_SOURCES)
-endforeach()
 
-add_subdirectory(generic)
-add_subdirectory(DenseVector)
-add_subdirectory(DenseMatrix)
-add_subdirectory(Coo)
-add_subdirectory(Csr)
-add_subdirectory(Dia)
+  if(MORPHEUS_ENABLE_${DEVICE})
+    set(testdir ${CMAKE_CURRENT_BINARY_DIR}/${dir})
+    file(MAKE_DIRECTORY ${testdir})
+
+    foreach(Name DenseVector)
+      set(file ${testdir}/Test_${Tag}_${Name}.cpp)
+      # Write to a temporary intermediate file and call configure_file to avoid
+      # updating timestamps triggering unnecessary rebuilds on subsequent cmake
+      # runs.
+      file(WRITE ${testdir}/dummy.cpp "#include <Test${Tag}_Category.hpp>\n"
+                                      "#include <Test_${Name}.hpp>\n")
+      configure_file(${testdir}/dummy.cpp ${file})
+      global_append(${Tag}_SOURCES ${file})
+    endforeach()
+  endif()
+endforeach()
 
 set(ALL_SOURCES)
 

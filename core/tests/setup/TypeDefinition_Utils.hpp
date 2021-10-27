@@ -40,7 +40,7 @@
 namespace Impl {
 // wrapper that carries out static checks for each containers traits
 template <typename Container, typename RefValueType, typename RefIndexType,
-          typename RefArrayLayout, typename RefSpace>
+          typename RefSpace, typename RefArrayLayout>
 struct ContainerTester {
   // Type Traits
   static_assert(
@@ -346,19 +346,18 @@ struct DenseVectorTypes {
   using DenseVector_vis = typename Impl::ContainerTester<
       Morpheus::DenseVector<ValueType, IndexType, Space>, ValueType, IndexType,
       Space, typename Space::array_layout>::type;
-  ;
+
   using DenseVector_vil = typename Impl::ContainerTester<
       Morpheus::DenseVector<ValueType, IndexType, ArrayLayout>, ValueType,
       IndexType, DefaultSpace, ArrayLayout>::type;
-  ;
+
   using DenseVector_vils = typename Impl::ContainerTester<
       Morpheus::DenseVector<ValueType, IndexType, ArrayLayout, Space>,
       ValueType, IndexType, Space, ArrayLayout>::type;
-  ;
+
   using DenseVector_vls = typename Impl::ContainerTester<
       Morpheus::DenseVector<ValueType, ArrayLayout, Space>, ValueType,
       DefaultIndexType, Space, ArrayLayout>::type;
-  ;
 };
 
 template <typename ValueType, typename IndexType, typename ArrayLayout,
@@ -381,19 +380,18 @@ struct DenseMatrixTypes {
   using DenseMatrix_vis = typename Impl::ContainerTester<
       Morpheus::DenseMatrix<ValueType, IndexType, Space>, ValueType, IndexType,
       Space, typename Space::array_layout>::type;
-  ;
+
   using DenseMatrix_vil = typename Impl::ContainerTester<
       Morpheus::DenseMatrix<ValueType, IndexType, ArrayLayout>, ValueType,
       IndexType, DefaultSpace, ArrayLayout>::type;
-  ;
+
   using DenseMatrix_vils = typename Impl::ContainerTester<
       Morpheus::DenseMatrix<ValueType, IndexType, ArrayLayout, Space>,
       ValueType, IndexType, Space, ArrayLayout>::type;
-  ;
+
   using DenseMatrix_vls = typename Impl::DenseMatrixTester<
       Morpheus::DenseVector<ValueType, ArrayLayout, Space>, ValueType,
       DefaultIndexType, Space, ArrayLayout>::type;
-  ;
 };
 
 #endif  // MORPHEUS_CORE_TESTS_TYPEDEFINITION_UTILS_HPP

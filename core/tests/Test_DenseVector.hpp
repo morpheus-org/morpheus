@@ -27,7 +27,7 @@
 #include <Morpheus_Core.hpp>
 // CMake Adds:
 // #include <setup/Backends?>
-// #include <setup/TypeDefinition_Utils.hpp>
+#include <setup/TypeDefinition_Utils.hpp>
 
 // using DenseVectorImplementations = ::testing::Types<
 //     DenseVectorTypes<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
