@@ -54,8 +54,9 @@ using DenseVectorImplementations = ::testing::Types<
 template <typename DenseVectorImplementations>
 class DenseVectorTest : public ::testing::Test {
  public:
-  using DenseVector = MorpheusContainers::DenseVector;
-  using HostMirror  = typename MorpheusContainers::DenseVector::HostMirror;
+  using DenseVector = typename DenseVectorImplementations::DenseVector;
+  using HostMirror =
+      typename DenseVectorImplementations::DenseVector::HostMirror;
   // No need for setup and tear-down in this case, mainly care about the types
   // any setup and tear-down will be made by each individual test
 };

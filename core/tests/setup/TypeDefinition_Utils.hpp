@@ -389,8 +389,8 @@ struct DenseMatrixTypes {
       Morpheus::DenseMatrix<ValueType, IndexType, ArrayLayout, Space>,
       ValueType, IndexType, Space, ArrayLayout>::type;
 
-  using DenseMatrix_vls = typename Impl::DenseMatrixTester<
-      Morpheus::DenseVector<ValueType, ArrayLayout, Space>, ValueType,
+  using DenseMatrix_vls = typename Impl::ContainerTester<
+      Morpheus::DenseMatrix<ValueType, ArrayLayout, Space>, ValueType,
       DefaultIndexType, Space, ArrayLayout>::type;
 };
 
