@@ -25,38 +25,15 @@
 #define TEST_CORE_TEST_DENSEVECTOR_HPP
 
 #include <Morpheus_Core.hpp>
-// CMake Adds:
-// #include <setup/Backends?>
-#include <setup/TypeDefinition_Utils.hpp>
 
-// using DenseVectorImplementations = ::testing::Types<
-//     DenseVectorTypes<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
-//     DenseVectorTypes<float, int, Kokkos::LayoutRight, Kokkos::Serial>,
-//     DenseVectorTypes<int, int, Kokkos::LayoutRight, Kokkos::Serial>,
-//     DenseVectorTypes<long long, int, Kokkos::LayoutRight, Kokkos::Serial>,
-//     DenseVectorTypes<double, long long, Kokkos::LayoutRight, Kokkos::Serial>,
-//     DenseVectorTypes<float, long long, Kokkos::LayoutRight, Kokkos::Serial>,
-//     DenseVectorTypes<int, long long, Kokkos::LayoutRight, Kokkos::Serial>,
-//     DenseVectorTypes<long long, long long, Kokkos::LayoutRight,
-//     Kokkos::Serial>, DenseVectorTypes<double, int, Kokkos::LayoutLeft,
-//     Kokkos::Serial>, DenseVectorTypes<float, int, Kokkos::LayoutLeft,
-//     Kokkos::Serial>, DenseVectorTypes<int, int, Kokkos::LayoutLeft,
-//     Kokkos::Serial>, DenseVectorTypes<long long, int, Kokkos::LayoutLeft,
-//     Kokkos::Serial>, DenseVectorTypes<double, long long, Kokkos::LayoutLeft,
-//     Kokkos::Serial>, DenseVectorTypes<float, long long, Kokkos::LayoutLeft,
-//     Kokkos::Serial>, DenseVectorTypes<int, long long, Kokkos::LayoutLeft,
-//     Kokkos::Serial>, DenseVectorTypes<long long, long long,
-//     Kokkos::LayoutLeft, Kokkos::Serial>>;
+#include <setup/DenseVectorDefinition_Utils.hpp>
+// #include <setup/ContainerDefinition_Utils.hpp>
 
-using DenseVectorImplementations = ::testing::Types<
-    DenseVectorTypes<double, int, Kokkos::LayoutRight, Kokkos::Serial>>;
-
-template <typename DenseVectorImplementations>
+template <typename UnaryContainer>
 class DenseVectorTest : public ::testing::Test {
  public:
-  using DenseVector = typename DenseVectorImplementations::DenseVector;
-  using HostMirror =
-      typename DenseVectorImplementations::DenseVector::HostMirror;
+  using DenseVector = UnaryContainer;
+  using HostMirror  = typename UnaryContainer::HostMirror;
   // No need for setup and tear-down in this case, mainly care about the types
   // any setup and tear-down will be made by each individual test
 };
@@ -68,7 +45,7 @@ class DenseVectorTest : public ::testing::Test {
 
 namespace Test {
 
-TYPED_TEST_CASE(DenseVectorTest, ContainerImplementations);
+TYPED_TEST_CASE(DenseVectorTest, DenseVectorUnary);
 
 TYPED_TEST(DenseVectorTest, Traits) {
   // Check DenseVector Specific Traits:
