@@ -27,10 +27,10 @@
 #include <Morpheus_Core.hpp>
 
 #include <setup/DenseVectorDefinition_Utils.hpp>
-// #include <setup/ContainerDefinition_Utils.hpp>
 
+// Used for testing unary operations for same type container
 template <typename UnaryContainer>
-class DenseVectorTest : public ::testing::Test {
+class DenseVectorUnaryTest : public ::testing::Test {
  public:
   using DenseVector = UnaryContainer;
   using HostMirror  = typename UnaryContainer::HostMirror;
@@ -38,16 +38,23 @@ class DenseVectorTest : public ::testing::Test {
   // any setup and tear-down will be made by each individual test
 };
 
-// TODO: Create similar class for when using different algorithms
-// and setup a small, medium and large case vectors with assigned values
-// do that in a separate setup file such that it is visible by different
-// algorithms
+// Used for testing behaviour between many types of the same container
+template <typename DenseVectorTypes>
+class DenseVectorTypesTest : public ::testing::Test {
+ public:
+  using DenseVector_v    = typename DenseVectorTypes::v;
+  using DenseVector_vl   = typename DenseVectorTypes::vl;
+  using DenseVector_vis  = typename DenseVectorTypes::vis;
+  using DenseVector_vil  = typename DenseVectorTypes::vil;
+  using DenseVector_vils = typename DenseVectorTypes::vils;
+  using DenseVector_vls  = typename DenseVectorTypes::vls;
+};
 
 namespace Test {
 
-TYPED_TEST_CASE(DenseVectorTest, DenseVectorUnary);
+TYPED_TEST_CASE(DenseVectorUnaryTest, DenseVectorUnary);
 
-TYPED_TEST(DenseVectorTest, Traits) {
+TYPED_TEST(DenseVectorUnaryTest, Traits) {
   // Check DenseVector Specific Traits:
   // Tag, value_array_type, value_array_pointer, value_array_reference
   // Repeat that for the HostMirror too
@@ -60,13 +67,13 @@ TYPED_TEST(DenseVectorTest, Traits) {
   FAIL();
 }
 
-TYPED_TEST(DenseVectorTest, DefaultConstruction) {
+TYPED_TEST(DenseVectorUnaryTest, DefaultConstruction) {
   // DenseVector()
 
   FAIL();
 }
 
-TYPED_TEST(DenseVectorTest, NormalConstruction) {
+TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
   // DenseVector(const std::string name, index_type n, value_type val = 0)
   // DenseVector(index_type n, value_type val = 0)
   // TODO: Change n to size_t
@@ -74,7 +81,7 @@ TYPED_TEST(DenseVectorTest, NormalConstruction) {
   FAIL();
 }
 
-TYPED_TEST(DenseVectorTest, RandomConstruction) {
+TYPED_TEST(DenseVectorUnaryTest, RandomConstruction) {
   // DenseVector(const std::string name, index_type n, Generator rand_pool,
   //             const value_type range_low, const value_type range_high)
   // TODO: Change n to size_t
@@ -82,7 +89,7 @@ TYPED_TEST(DenseVectorTest, RandomConstruction) {
   FAIL();
 }
 
-TYPED_TEST(DenseVectorTest, ShallowCopySemantics) {
+TYPED_TEST(DenseVectorUnaryTest, ShallowCopySemantics) {
   // DenseVector(const DenseVector<VR, PR...>& src, ...)
   // operator=(const DenseVector<VR, PR...>& src)
   // DenseVector(const DenseVector&) = default;
@@ -91,28 +98,28 @@ TYPED_TEST(DenseVectorTest, ShallowCopySemantics) {
   FAIL();
 }
 
-TYPED_TEST(DenseVectorTest, Allocate) {
+TYPED_TEST(DenseVectorUnaryTest, Allocate) {
   // DenseVector& allocate(const std::string name,
   //                       const DenseVector<VR, PR...>& src)
 
   FAIL();
 }
 
-TYPED_TEST(DenseVectorTest, Assign) {
+TYPED_TEST(DenseVectorUnaryTest, Assign) {
   // assign(const index_type n, const value_type val)
   // TODO: Change n to size_t
 
   FAIL();
 }
 
-TYPED_TEST(DenseVectorTest, AssignRandom) {
+TYPED_TEST(DenseVectorUnaryTest, AssignRandom) {
   // assign(Generator rand_pool, const value_type range_low,
   //        const value_type range_high)
 
   FAIL();
 }
 
-TYPED_TEST(DenseVectorTest, Resize) {
+TYPED_TEST(DenseVectorUnaryTest, Resize) {
   // resize(index_type n)
   // resize(const index_type n, const index_type val)
   // TODO: Change n to size_t
@@ -120,7 +127,7 @@ TYPED_TEST(DenseVectorTest, Resize) {
   FAIL();
 }
 
-TYPED_TEST(DenseVectorTest, UtilRoutines) {
+TYPED_TEST(DenseVectorUnaryTest, UtilRoutines) {
   // size()
   // data()
   // view()
