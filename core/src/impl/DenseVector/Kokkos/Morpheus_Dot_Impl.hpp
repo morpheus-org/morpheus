@@ -31,35 +31,39 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Vector>
-inline typename Vector::value_type dot(
-    typename Vector::index_type n, const Vector& x, const Vector& y,
-    DenseVectorTag, Alg0,
+template <typename ExecSpace, typename Vector1, typename Vector2>
+inline typename Vector1::value_type dot(
+    typename Vector1::index_type n, const Vector1& x, const Vector2& y,
+    DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
+                               Vector2>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
-  using index_type      = Kokkos::IndexType<typename Vector::index_type>;
-  using range_policy    = Kokkos::RangePolicy<index_type, execution_space>;
+  using IndexType       = Kokkos::IndexType<typename Vector::index_type>;
+  using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
   using ValueArray      = typename Vector::value_array_type;
-  using V               = typename Vector::value_type;
-  using I               = typename Vector::index_type;
+  using value_type      = typename Vector::value_type;
+  using index_type      = typename Vector::index_type;
 
   const ValueArray x_view = x.const_view(), y_view = y.const_view();
   range_policy policy(0, n);
 
-  V result = V(0);
+  value_type result = value_type(0);
 
   if (y.data() == x.data()) {
     Kokkos::parallel_reduce(
         "dot_same_data", policy,
-        KOKKOS_LAMBDA(const I& i, V& lsum) { lsum += x_view[i] * x_view[i]; },
+        KOKKOS_LAMBDA(const index_type& i, value_type& lsum) {
+          lsum += x_view[i] * x_view[i];
+        },
         result);
   } else {
     Kokkos::parallel_reduce(
         "dot", policy,
-        KOKKOS_LAMBDA(const I& i, V& lsum) { lsum += x_view[i] * y_view[i]; },
+        KOKKOS_LAMBDA(const index_type& i, value_type& lsum) {
+          lsum += x_view[i] * y_view[i];
+        },
         result);
   }
 

@@ -29,16 +29,19 @@
 
 namespace Morpheus {
 
-template <typename ExecSpace, typename Algorithm, typename Vector>
-inline typename Vector::value_type dot(typename Vector::index_type n,
-                                       const Vector& x, const Vector& y) {
-  return Impl::dot<ExecSpace>(n, x, y, typename Vector::tag{}, Algorithm{});
+template <typename ExecSpace, typename Algorithm, typename Vector1,
+          typename Vector2>
+inline typename Vector1::value_type dot(typename Vector1::index_type n,
+                                        const Vector1& x, const Vector2& y) {
+  return Impl::dot<ExecSpace>(n, x, y, typename Vector1::tag{},
+                              typename Vector2::tag{}, Algorithm{});
 }
 
-template <typename ExecSpace, typename Vector>
-inline typename Vector::value_type dot(typename Vector::index_type n,
-                                       const Vector& x, const Vector& y) {
-  return Impl::dot<ExecSpace>(n, x, y, typename Vector::tag{}, Alg0{});
+template <typename ExecSpace, typename Vector1, typename Vector2>
+inline typename Vector1::value_type dot(typename Vector1::index_type n,
+                                        const Vector1& x, const Vector2& y) {
+  return Impl::dot<ExecSpace>(n, x, y, typename Vector1::tag{},
+                              typename Vector2::tag{}, Alg0{});
 }
 
 }  // namespace Morpheus

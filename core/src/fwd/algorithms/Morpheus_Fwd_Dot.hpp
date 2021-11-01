@@ -26,13 +26,14 @@
 
 namespace Morpheus {
 
-template <typename ExecSpace, typename Algorithm, typename Vector>
-typename Vector::value_type dot(typename Vector::index_type n, const Vector& x,
-                                const Vector& y);
+template <typename ExecSpace, typename Algorithm, typename Vector1,
+          typename Vector2>
+inline typename Vector1::value_type dot(typename Vector1::index_type n,
+                                        const Vector1& x, const Vector2& y);
 
-template <typename ExecSpace, typename Vector>
-typename Vector::value_type dot(typename Vector::index_type n, const Vector& x,
-                                const Vector& y);
+template <typename ExecSpace, typename Vector1, typename Vector2>
+inline typename Vector1::value_type dot(typename Vector1::index_type n,
+                                        const Vector1& x, const Vector2& y);
 
 }  // namespace Morpheus
 

@@ -175,6 +175,7 @@ class DenseVector
   index_type _size;
   value_array_type _values;
 
+  // TODO: Shall we set that to private?
  public:
   struct set_functor {
     value_array_type _data;

@@ -38,25 +38,25 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Vector>
-typename Vector::value_type dot(
-    const typename Vector::index_type n, const Vector& x, const Vector& y,
-    DenseVectorTag, Alg0,
+template <typename ExecSpace, typename Vector1, typename Vector2>
+typename Vector1::value_type dot(
+    const typename Vector::index_type n, const Vector1& x, const Vector2& y,
+    DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
-  using IndexType = typename Vector::index_type;
-  using ValueType = typename Vector::value_type;
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
+                               Vector2>>* = nullptr) {
+  using index_type = typename Vector1::index_type;
+  using value_type = typename Vector1::value_type;
 
   const size_t BLOCK_SIZE = 256;
   const size_t NUM_BLOCKS = (x.size() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-  Vector res_vec(n, 0);
+  Vector1 res_vec(n, 0);
 
   // execute the dot product kernel
-  Kernels::dot_kernel<ValueType, IndexType><<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(
+  Kernels::dot_kernel<value_type, index_type><<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(
       x.size(), x.data(), y.data(), res_vec.data());
 
   return Morpheus::reduce<ExecSpace>(res_vec, n);
