@@ -39,7 +39,8 @@ inline typename Vector1::value_type dot(
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
-                               Vector2>>* = nullptr) {
+                               Vector2> &&
+        is_compatible_type<Vector1, Vector2>::value>* = nullptr) {
   using index_type = typename Vector1::index_type;
   using value_type = typename Vector1::value_type;
 

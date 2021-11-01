@@ -38,13 +38,14 @@ inline typename Vector1::value_type dot(
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
-                               Vector2>>* = nullptr) {
+                               Vector2> &&
+        is_compatible_type<Vector1, Vector2>::value>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
-  using IndexType       = Kokkos::IndexType<typename Vector::index_type>;
+  using IndexType       = Kokkos::IndexType<typename Vector1::index_type>;
   using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
-  using ValueArray      = typename Vector::value_array_type;
-  using value_type      = typename Vector::value_type;
-  using index_type      = typename Vector::index_type;
+  using ValueArray      = typename Vector1::value_array_type;
+  using value_type      = typename Vector1::value_type;
+  using index_type      = typename Vector1::index_type;
 
   const ValueArray x_view = x.const_view(), y_view = y.const_view();
   range_policy policy(0, n);

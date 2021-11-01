@@ -63,30 +63,22 @@ TYPED_TEST(DenseMatrixUnaryTest, Traits) {
   // Add size_type trait
   static_assert(std::is_same<typename TestFixture::DenseMatrix::tag,
                              Morpheus::DenseMatrixTag>::value);
-
-  FAIL();
 }
 
 TYPED_TEST(DenseMatrixUnaryTest, DefaultConstruction) {
   // DenseMatrix()
-
-  FAIL();
 }
 
 TYPED_TEST(DenseMatrixUnaryTest, NormalConstruction) {
   // DenseMatrix(const std::string name, index_type n, value_type val = 0)
   // DenseMatrix(index_type n, value_type val = 0)
   // TODO: Change n to size_t
-
-  FAIL();
 }
 
 TYPED_TEST(DenseMatrixUnaryTest, RandomConstruction) {
   // DenseMatrix(const std::string name, index_type n, Generator rand_pool,
   //             const value_type range_low, const value_type range_high)
   // TODO: Change n to size_t
-
-  FAIL();
 }
 
 // Changed that to DenseMatrixBinaryTests
@@ -95,38 +87,28 @@ TYPED_TEST(DenseMatrixUnaryTest, ShallowCopySemantics) {
   // operator=(const DenseMatrix<VR, PR...>& src)
   // DenseMatrix(const DenseMatrix&) = default;
   // DenseMatrix& operator=(const DenseMatrix&) = default;
-
-  FAIL();
 }
 
 // Changed that to DenseMatrixBinaryTests
 TYPED_TEST(DenseMatrixUnaryTest, Allocate) {
   // DenseMatrix& allocate(const std::string name,
   //                       const DenseMatrix<VR, PR...>& src)
-
-  FAIL();
 }
 
 TYPED_TEST(DenseMatrixUnaryTest, Assign) {
   // assign(const index_type n, const value_type val)
   // TODO: Change n to size_t
-
-  FAIL();
 }
 
 TYPED_TEST(DenseMatrixUnaryTest, AssignRandom) {
   // assign(Generator rand_pool, const value_type range_low,
   //        const value_type range_high)
-
-  FAIL();
 }
 
 TYPED_TEST(DenseMatrixUnaryTest, Resize) {
   // resize(index_type n)
   // resize(const index_type n, const index_type val)
   // TODO: Change n to size_t
-
-  FAIL();
 }
 
 TYPED_TEST(DenseMatrixUnaryTest, UtilRoutines) {
@@ -135,8 +117,6 @@ TYPED_TEST(DenseMatrixUnaryTest, UtilRoutines) {
   // view()
   // const_view()
   // name()
-
-  FAIL();
 }
 
 }  // namespace Test

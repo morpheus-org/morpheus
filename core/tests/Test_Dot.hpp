@@ -57,48 +57,88 @@ class DotTest : public ::testing::Test {
     y_.resize(sz_);
 
     for (int i = 0; i < sz_; i++) {
-      x_(i) = i;
+      x_(i) = i + 1;
       y_(i) = sz_ - i;
-      result += i * (sz_ - i);
+      result += (i + 1) * (sz_ - i);
     }
   }
 };
+
+template <typename T>
+inline void MORPHEUS_EXPECT_EQ(T val1, T val2) {
+  if (std::is_floating_point<T>::value) {
+    EXPECT_PRED_FORMAT2(::testing::internal::CmpHelperFloatingPointEQ<T>, val1,
+                        val2);
+  } else {
+    EXPECT_EQ(val1, val2);
+  }
+}
 
 namespace Test {
 
 TYPED_TEST_CASE(DotTest, ContainerImplementations);
 
 TYPED_TEST(DotTest, SmallTest) {
-  typename TestFixture::DenseVector::index_type sz  = this->s_size;
-  typename TestFixture::DenseVector::value_type res = this->s_res;
+  using value_type = typename TestFixture::DenseVector::value_type;
+  using index_type = typename TestFixture::DenseVector::index_type;
 
-  auto result = Morpheus::dot<TEST_EXECSPACE>(sz, this->s_x, this->s_y);
+  index_type sz  = this->s_size;
+  value_type res = this->s_res;
+  auto x = this->s_x, y = this->s_y;
 
-  std::cout << "SMALL_RESULT = " << result << std::endl;
+  auto result = Morpheus::dot<TEST_EXECSPACE>(sz, x, y);
 
-  EXPECT_PRED_FORMAT2(testing::DoubleLE, result, res);
+  // Make sure the correct type is returned by dot
+  EXPECT_EQ((std::is_same<decltype(result), decltype(res)>::value), 1);
+
+  if (std::is_floating_point<value_type>::value) {
+    EXPECT_PRED_FORMAT2(
+        ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res, result);
+  } else {
+    EXPECT_EQ(res, result);
+  }
 }
 
 TYPED_TEST(DotTest, MediumTest) {
-  typename TestFixture::DenseVector::index_type sz  = this->m_size;
-  typename TestFixture::DenseVector::value_type res = this->m_res;
+  using value_type = typename TestFixture::DenseVector::value_type;
+  using index_type = typename TestFixture::DenseVector::index_type;
 
-  auto result = Morpheus::dot<TEST_EXECSPACE>(sz, this->m_x, this->m_y);
+  index_type sz  = this->m_size;
+  value_type res = this->m_res;
+  auto x = this->m_x, y = this->m_y;
 
-  std::cout << "MEDIUM_RESULT = " << result << std::endl;
+  auto result = Morpheus::dot<TEST_EXECSPACE>(sz, x, y);
 
-  EXPECT_PRED_FORMAT2(testing::DoubleLE, result, res);
+  // Make sure the correct type is returned by dot
+  EXPECT_EQ((std::is_same<decltype(result), decltype(res)>::value), 1);
+
+  if (std::is_floating_point<value_type>::value) {
+    EXPECT_PRED_FORMAT2(
+        ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res, result);
+  } else {
+    EXPECT_EQ(res, result);
+  }
 }
 
 TYPED_TEST(DotTest, LargeTest) {
-  typename TestFixture::DenseVector::index_type sz  = this->l_size;
-  typename TestFixture::DenseVector::value_type res = this->l_res;
+  using value_type = typename TestFixture::DenseVector::value_type;
+  using index_type = typename TestFixture::DenseVector::index_type;
 
-  auto result = Morpheus::dot<TEST_EXECSPACE>(sz, this->l_x, this->l_y);
+  index_type sz  = this->l_size;
+  value_type res = this->l_res;
+  auto x = this->l_x, y = this->l_y;
 
-  std::cout << "LARGE_RESULT = " << result << std::endl;
+  auto result = Morpheus::dot<TEST_EXECSPACE>(sz, x, y);
 
-  EXPECT_PRED_FORMAT2(testing::DoubleLE, result, res);
+  // Make sure the correct type is returned by dot
+  EXPECT_EQ((std::is_same<decltype(result), decltype(res)>::value), 1);
+
+  if (std::is_floating_point<value_type>::value) {
+    EXPECT_PRED_FORMAT2(
+        ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res, result);
+  } else {
+    EXPECT_EQ(res, result);
+  }
 }
 
 }  // namespace Test
