@@ -89,6 +89,7 @@ TYPED_TEST(DenseVectorUnaryTest, RandomConstruction) {
   FAIL();
 }
 
+// Changed that to DenseVectorBinaryTests
 TYPED_TEST(DenseVectorUnaryTest, ShallowCopySemantics) {
   // DenseVector(const DenseVector<VR, PR...>& src, ...)
   // operator=(const DenseVector<VR, PR...>& src)
@@ -98,6 +99,7 @@ TYPED_TEST(DenseVectorUnaryTest, ShallowCopySemantics) {
   FAIL();
 }
 
+// Changed that to DenseVectorBinaryTests
 TYPED_TEST(DenseVectorUnaryTest, Allocate) {
   // DenseVector& allocate(const std::string name,
   //                       const DenseVector<VR, PR...>& src)
