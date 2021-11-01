@@ -77,7 +77,7 @@ struct ContainerTypes_vl {
 
 template <typename ValueType, typename IndexType, typename ArrayLayout,
           typename Space>
-struct MorpheusContainers_vis {
+struct ContainerTypes_vis {
   using DenseVector =
       typename DenseVectorTypes<ValueType, IndexType, ArrayLayout, Space>::vis;
 
@@ -99,7 +99,7 @@ struct MorpheusContainers_vis {
 
 template <typename ValueType, typename IndexType, typename ArrayLayout,
           typename Space>
-struct MorpheusContainers_vil {
+struct ContainerTypes_vil {
   using DenseVector =
       typename DenseVectorTypes<ValueType, IndexType, ArrayLayout, Space>::vil;
 
@@ -121,7 +121,7 @@ struct MorpheusContainers_vil {
 
 template <typename ValueType, typename IndexType, typename ArrayLayout,
           typename Space>
-struct MorpheusContainers_vils {
+struct ContainerTypes_vils {
   using DenseVector =
       typename DenseVectorTypes<ValueType, IndexType, ArrayLayout, Space>::vils;
 
@@ -143,7 +143,7 @@ struct MorpheusContainers_vils {
 
 template <typename ValueType, typename IndexType, typename ArrayLayout,
           typename Space>
-struct MorpheusContainers_vls {
+struct ContainerTypes_vls {
   using DenseVector =
       typename DenseVectorTypes<ValueType, IndexType, ArrayLayout, Space>::vls;
 
@@ -177,7 +177,7 @@ using ContainerImplementations = ::testing::Types<
 // algorithms
 
 template <typename ContainerImplementations>
-class ContainersTest : public ::testing::Environment {
+class ContainersTest : public ::testing::Test {
  public:
   using DenseVector = typename ContainerImplementations::DenseVector;
 
@@ -191,9 +191,13 @@ class ContainersTest : public ::testing::Environment {
 
   using DynamicMatrix = typename ContainerImplementations::DynamicMatrix;
 
-  // TODO: Global Set-Up and Tear-Down
-  // of the various containers to be used by the algorithms. Note that these
-  // containers will be read-only
+  // You can define per-test set-up logic as usual.
+  void SetUp() override { x.assign(5, 11); }
+
+  // You can define per-test tear-down logic as usual.
+  void TearDown() override {}
+
+  DenseVector x;
 };
 
 #endif  // MORPHEUS_CORE_TESTS_CONTAINER_DEFINITION_UTILS_HPP
