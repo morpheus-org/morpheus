@@ -126,8 +126,8 @@ if(BUILD_SHARED_LIBS)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
-set(MORPHEUS_EXT_LIBRARIES Morpheus::morpheus Morpheus::morpheuscore)
-set(MORPHEUS_INT_LIBRARIES morpheus morpheuscore)
+set(MORPHEUS_EXT_LIBRARIES Morpheus::morpheus Morpheus::morpheus-core)
+set(MORPHEUS_INT_LIBRARIES morpheus morpheus-core)
 set_property(GLOBAL PROPERTY MORPHEUS_INT_LIBRARIES ${MORPHEUS_INT_LIBRARIES})
 
 include(GNUInstallDirs)
@@ -153,7 +153,7 @@ if(NOT Morpheus_INSTALL_TESTING)
   # to match the installed target names
   # ~~~
   add_library(Morpheus::morpheus ALIAS morpheus)
-  target_link_libraries(morpheus INTERFACE morpheuscore)
+  target_link_libraries(morpheus INTERFACE morpheus-core)
   morpheus_internal_add_library_install(morpheus)
 endif()
 
