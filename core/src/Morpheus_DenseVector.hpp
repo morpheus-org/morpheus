@@ -91,7 +91,9 @@ class DenseVector
       typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
           nullptr)
       : _name(name + "Vector_ptr"), _size(n), _values(ptr, size_t(n)) {
-    // assign(n, val);
+    static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
+                  "Constructing DenseVector to wrap user memory must supply "
+                  "matching pointer type");
   }
 
   template <typename ValuePtr>
@@ -100,7 +102,9 @@ class DenseVector
       typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
           nullptr)
       : _name("Vector_ptr"), _size(n), _values(ptr, size_t(n)) {
-    // assign(n, val);
+    static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
+                  "Constructing DenseVector to wrap user memory must supply "
+                  "matching pointer type");
   }
 
   template <typename Generator>
