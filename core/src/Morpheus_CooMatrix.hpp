@@ -52,6 +52,7 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
+  using memory_traits   = typename traits::memory_traits;
   using HostMirror      = typename traits::HostMirror;
 
   using pointer         = typename traits::pointer;
@@ -59,16 +60,18 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
-  using index_array_type       = Morpheus::DenseVector<index_type, index_type,
-                                                 array_layout, execution_space>;
+  using index_array_type =
+      Morpheus::DenseVector<index_type, index_type, array_layout,
+                            execution_space, memory_traits>;
   using const_index_array_type = const index_array_type;
   using index_array_pointer    = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
   using const_index_array_reference = const index_array_reference;
 
-  using value_array_type       = Morpheus::DenseVector<value_type, index_type,
-                                                 array_layout, execution_space>;
+  using value_array_type =
+      Morpheus::DenseVector<value_type, index_type, array_layout,
+                            execution_space, memory_traits>;
   using const_value_array_type = const value_array_type;
   using value_array_pointer    = typename value_array_type::value_array_pointer;
   using value_array_reference =
@@ -101,6 +104,19 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
         _row_indices(rind),
         _column_indices(cind),
         _values(vals) {}
+
+  template <typename ValuePtr, typename IndexPtr>
+  explicit inline CooMatrix(
+      const std::string name, const index_type num_rows,
+      const index_type num_cols, const index_type num_entries,
+      IndexPtr rind_ptr, IndexPtr cind_ptr, ValuePtr vals_ptr,
+      typename std::enable_if<std::is_pointer<ValuePtr>::value &&
+                              std::is_pointer<IndexPtr>::value>::type * =
+          nullptr)
+      : base(name + "CooMatrix", num_rows, num_cols, num_entries),
+        _row_indices(size_t(num_entries), rind_ptr),
+        _column_indices(size_t(num_entries), cind_ptr),
+        _values(size_t(num_entries), vals_ptr) {}
 
   inline CooMatrix(const std::string name, const index_type num_rows,
                    const index_type num_cols, const index_type num_entries)
