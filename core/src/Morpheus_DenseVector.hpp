@@ -84,6 +84,25 @@ class DenseVector
       : _name("Vector"), _size(n), _values("Vector", size_t(n)) {
     assign(n, val);
   }
+
+  template <typename ValuePtr>
+  explicit DenseVector(
+      const std::string name, index_type n, ValuePtr ptr,
+      typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
+          nullptr)
+      : _name(name + "Vector_ptr"), _size(n), _values(ptr, size_t(n)) {
+    // assign(n, val);
+  }
+
+  template <typename ValuePtr>
+  explicit DenseVector(
+      index_type n, ValuePtr ptr,
+      typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
+          nullptr)
+      : _name("Vector_ptr"), _size(n), _values(ptr, size_t(n)) {
+    // assign(n, val);
+  }
+
   template <typename Generator>
   inline DenseVector(const std::string name, index_type n, Generator rand_pool,
                      const value_type range_low, const value_type range_high)
