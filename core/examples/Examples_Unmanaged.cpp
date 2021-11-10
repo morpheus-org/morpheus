@@ -30,6 +30,7 @@ using memory_trait = Kokkos::MemoryUnmanaged;
 
 using vec = Morpheus::DenseVector<value_type, memory_trait>;
 using coo = Morpheus::CooMatrix<value_type, memory_trait>;
+using csr = Morpheus::CsrMatrix<value_type, memory_trait>;
 
 int main(int argc, char* argv[]) {
   Morpheus::initialize(argc, argv);
@@ -99,6 +100,55 @@ int main(int argc, char* argv[]) {
 
       free(vals);
       free(rind);
+      free(cind);
+    }
+    // CsrMatrix unmanaged
+    {
+      index_type M = 4, N = 3, NNZ = 6;
+      value_type* vals = (value_type*)malloc(NNZ * sizeof(value_type));
+      index_type* roff = (index_type*)malloc((M + 1) * sizeof(index_type));
+      index_type* cind = (index_type*)malloc(NNZ * sizeof(index_type));
+
+      roff[0] = 0;
+      roff[1] = 2;
+      roff[2] = 3;
+      roff[3] = 5;
+      roff[4] = 6;
+
+      cind[0] = 0;
+      cind[1] = 1;
+      cind[2] = 2;
+      cind[3] = 0;
+      cind[4] = 2;
+      cind[5] = 1;
+
+      vals[0] = 10;
+      vals[1] = 20;
+      vals[2] = 30;
+      vals[3] = 40;
+      vals[4] = 50;
+      vals[5] = 60;
+
+      {
+        csr A("A", M, N, NNZ, roff, cind, vals);
+        typename csr::HostMirror Am = Morpheus::create_mirror_container(A);
+        Morpheus::print(A);
+
+        A.row_offsets(2) = -15;
+        A.values(5)      = -15;
+      }
+
+      for (index_type i = 0; i < M; i++) {
+        std::cout << "\t [" << i << "] : " << roff[i] << std::endl;
+      }
+      std::cout << std::endl;
+      for (index_type i = 0; i < NNZ; i++) {
+        std::cout << "\t [" << i << "] : (" << cind[i] << ", " << vals[i] << ")"
+                  << std::endl;
+      }
+
+      free(vals);
+      free(roff);
       free(cind);
     }
   }

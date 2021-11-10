@@ -91,7 +91,7 @@ class DenseVector
       const std::string name, index_type n, ValuePtr ptr,
       typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
           nullptr)
-      : _name(name + "Vector_ptr"), _size(n), _values(ptr, size_t(n)) {
+      : _name(name + "Vector_Unmanaged"), _size(n), _values(ptr, size_t(n)) {
     static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
                   "Constructing DenseVector to wrap user memory must supply "
                   "matching pointer type");
@@ -102,7 +102,7 @@ class DenseVector
       index_type n, ValuePtr ptr,
       typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
           nullptr)
-      : _name("Vector_ptr"), _size(n), _values(ptr, size_t(n)) {
+      : _name("Vector_Unmanaged"), _size(n), _values(ptr, size_t(n)) {
     static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
                   "Constructing DenseVector to wrap user memory must supply "
                   "matching pointer type");

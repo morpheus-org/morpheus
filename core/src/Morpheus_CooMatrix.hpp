@@ -113,7 +113,7 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
       typename std::enable_if<std::is_pointer<ValuePtr>::value &&
                               std::is_pointer<IndexPtr>::value>::type * =
           nullptr)
-      : base(name + "CooMatrix", num_rows, num_cols, num_entries),
+      : base(name + "CooMatrix_Unmanged", num_rows, num_cols, num_entries),
         _row_indices(size_t(num_entries), rind_ptr),
         _column_indices(size_t(num_entries), cind_ptr),
         _values(size_t(num_entries), vals_ptr) {}
