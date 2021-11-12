@@ -52,6 +52,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
+  using memory_traits   = typename traits::memory_traits;
   using HostMirror      = typename traits::HostMirror;
 
   using pointer         = typename traits::pointer;
@@ -59,16 +60,18 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
-  using index_array_type       = Morpheus::DenseVector<index_type, index_type,
-                                                 array_layout, execution_space>;
+  using index_array_type =
+      Morpheus::DenseVector<index_type, index_type, array_layout,
+                            execution_space, memory_traits>;
   using const_index_array_type = const index_array_type;
   using index_array_pointer    = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
   using const_index_array_reference = const index_array_reference;
 
-  using value_array_type       = Morpheus::DenseMatrix<value_type, index_type,
-                                                 array_layout, execution_space>;
+  using value_array_type =
+      Morpheus::DenseMatrix<value_type, index_type, array_layout,
+                            execution_space, memory_traits>;
   using const_value_array_type = const value_array_type;
   using value_array_pointer    = typename value_array_type::value_array_pointer;
   using value_array_reference =
@@ -115,6 +118,20 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
     _ndiags    = _diagonal_offsets.size();
     _alignment = _values.nrows();
   }
+
+  template <typename ValuePtr, typename IndexPtr>
+  explicit inline DiaMatrix(
+      const std::string name, const index_type num_rows,
+      const index_type num_cols, const index_type num_entries,
+      IndexPtr diag_offsets_ptr, ValuePtr vals_ptr,
+      const index_type num_diagonals, const index_type alignment = 32,
+      typename std::enable_if<std::is_pointer<ValuePtr>::value &&
+                              std::is_pointer<IndexPtr>::value>::type * =
+          nullptr)
+      : base(name + "DiaMatrix_Unmanaged", num_rows, num_cols, num_entries),
+        _diagonal_offsets(num_diagonals, diag_offsets_ptr),
+        _values(Impl::get_pad_size<index_type>(num_rows, alignment),
+                num_diagonals, vals_ptr) {}
 
   inline DiaMatrix(const std::string name, const index_type num_rows,
                    const index_type num_cols, const index_type num_entries,

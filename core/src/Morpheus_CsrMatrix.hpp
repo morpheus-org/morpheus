@@ -114,7 +114,7 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
       typename std::enable_if<std::is_pointer<ValuePtr>::value &&
                               std::is_pointer<IndexPtr>::value>::type * =
           nullptr)
-      : base(name + "CsrMatrix_Unmanged", num_rows, num_cols, num_entries),
+      : base(name + "CsrMatrix_Unmanaged", num_rows, num_cols, num_entries),
         _row_offsets(num_rows + 1, roff_ptr),
         _column_indices(num_entries, cind_ptr),
         _values(num_entries, vals_ptr) {}

@@ -32,32 +32,40 @@ using vec    = Morpheus::DenseVector<value_type, memory_trait>;
 using matrix = Morpheus::DenseMatrix<value_type, memory_trait>;
 using coo    = Morpheus::CooMatrix<value_type, memory_trait>;
 using csr    = Morpheus::CsrMatrix<value_type, memory_trait>;
+using dia    = Morpheus::DiaMatrix<value_type, memory_trait>;
+
+static_assert(
+    std::is_same<typename vec::memory_traits, Kokkos::MemoryUnmanaged>::value);
+
+static_assert(
+    std::is_same<typename Morpheus::DenseVector<double>::memory_traits,
+                 Kokkos::MemoryManaged>::value);
 
 int main(int argc, char* argv[]) {
   Morpheus::initialize(argc, argv);
   {
     // DenseVector unmanaged
     {
-      index_type n  = 15;
-      value_type* v = (value_type*)malloc(n * sizeof(value_type));
+      index_type n = 15;
+      // value_type* v = (value_type*)malloc(n * sizeof(value_type));
+      value_type* v = new value_type(n);
 
       for (index_type i = 0; i < n; i++) {
         v[i] = i * n;
       }
 
-      {
-        vec x("x", n, v);
-        typename vec::HostMirror xm = Morpheus::create_mirror_container(x);
-        Morpheus::print(xm);
+      vec x("x", n, v);
+      typename vec::HostMirror xm = Morpheus::create_mirror_container(x);
+      Morpheus::print(xm);
 
-        xm(5) = -15;
-      }
+      xm(5) = -15;
 
       for (index_type i = 0; i < n; i++) {
         std::cout << "\t [" << i << "] : " << v[i] << std::endl;
       }
 
-      free(v);
+      // free(v);
+      delete[] v;
     }
     // DenseMatrix unmanaged
     {
@@ -179,6 +187,57 @@ int main(int argc, char* argv[]) {
       free(vals);
       free(roff);
       free(cind);
+    }
+
+    // DiaMatrix unmanaged
+    {
+      index_type M = 4, N = 3, NNZ = 6, DIAGS = 3, ALIGNMENT = 32,
+                 VAL_M = Morpheus::Impl::get_pad_size<index_type>(M, ALIGNMENT);
+      value_type* vals =
+          (value_type*)malloc(VAL_M * DIAGS * sizeof(value_type));
+      index_type* diag_off = (index_type*)malloc(DIAGS * sizeof(index_type));
+
+      // Diagonal offsets
+      diag_off[0] = -2;
+      diag_off[1] = 0;
+      diag_off[2] = 1;
+      // First Diagonal
+      vals[0 * DIAGS + 0] = -1;
+      vals[1 * DIAGS + 0] = -1;
+      vals[2 * DIAGS + 0] = 40;
+      vals[3 * DIAGS + 0] = 60;
+      // Second Diagonal
+      vals[0 * DIAGS + 1] = 10;
+      vals[1 * DIAGS + 1] = 0;
+      vals[2 * DIAGS + 1] = 50;
+      vals[3 * DIAGS + 1] = -2;
+      // Third Diagonal
+      vals[0 * DIAGS + 2] = 20;
+      vals[1 * DIAGS + 2] = 30;
+      vals[2 * DIAGS + 2] = -3;
+      vals[3 * DIAGS + 2] = -3;
+
+      {
+        dia A("A", M, N, NNZ, diag_off, vals, DIAGS, ALIGNMENT);
+        typename dia::HostMirror Am = Morpheus::create_mirror_container(A);
+        Morpheus::print(A);
+
+        A.values(0, 1) = -55;
+      }
+
+      for (index_type i = 0; i < DIAGS; i++) {
+        std::cout << "\t [" << i << "] : " << diag_off[i] << std::endl;
+      }
+      std::cout << std::endl;
+      for (index_type i = 0; i < VAL_M; i++) {
+        for (index_type j = 0; j < DIAGS; j++) {
+          std::cout << "\t (" << i << " ," << j << ") : " << vals[i * DIAGS + j]
+                    << std::endl;
+        }
+      }
+
+      free(vals);
+      free(diag_off);
     }
   }
   Morpheus::finalize();
