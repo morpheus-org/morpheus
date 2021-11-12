@@ -26,4 +26,7 @@ morpheus_add_executable_and_test(Examples_MatrixOperations SOURCES
 morpheus_add_executable_and_test(Examples_Multiply SOURCES
                                  Examples_Multiply.cpp)
 
+morpheus_add_executable_and_test(Examples_Unmanaged SOURCES
+                                 Examples_Unmanaged.cpp)
+
 morpheus_add_executable_and_test(Examples_Version SOURCES Examples_Version.cpp)

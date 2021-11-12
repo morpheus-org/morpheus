@@ -41,7 +41,7 @@ TEST(TESTSUITE_NAME, Mirror_DiaMatrix_HostMirror) {
   using mirror  = decltype(A_mirror);
 
   static_assert(std::is_same<typename mirror::type,
-                             typename container::HostMirror>::value,
+                             typename container::HostMirror::type>::value,
                 "Mirror type should match the HostMirror type of the "
                 "original container "
                 "as we are creating a mirror in the same space.");

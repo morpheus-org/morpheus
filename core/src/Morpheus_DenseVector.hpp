@@ -53,6 +53,7 @@ class DenseVector
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
+  using memory_traits   = typename traits::memory_traits;
   using HostMirror      = typename traits::HostMirror;
 
   using pointer         = typename traits::pointer;
@@ -61,7 +62,7 @@ class DenseVector
   using const_reference = typename traits::const_reference;
 
   using value_array_type =
-      Kokkos::View<value_type*, array_layout, execution_space>;
+      Kokkos::View<value_type*, array_layout, execution_space, memory_traits>;
   using value_array_pointer   = typename value_array_type::pointer_type;
   using value_array_reference = typename value_array_type::reference_type;
 
@@ -84,6 +85,29 @@ class DenseVector
       : _name("Vector"), _size(n), _values("Vector", size_t(n)) {
     assign(n, val);
   }
+
+  template <typename ValuePtr>
+  explicit DenseVector(
+      const std::string name, index_type n, ValuePtr ptr,
+      typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
+          nullptr)
+      : _name(name + "Vector_Unmanaged"), _size(n), _values(ptr, size_t(n)) {
+    static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
+                  "Constructing DenseVector to wrap user memory must supply "
+                  "matching pointer type");
+  }
+
+  template <typename ValuePtr>
+  explicit DenseVector(
+      index_type n, ValuePtr ptr,
+      typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
+          nullptr)
+      : _name("Vector_Unmanaged"), _size(n), _values(ptr, size_t(n)) {
+    static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
+                  "Constructing DenseVector to wrap user memory must supply "
+                  "matching pointer type");
+  }
+
   template <typename Generator>
   inline DenseVector(const std::string name, index_type n, Generator rand_pool,
                      const value_type range_low, const value_type range_high)

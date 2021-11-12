@@ -52,6 +52,7 @@ class DenseMatrix
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
+  using memory_traits   = typename traits::memory_traits;
   using HostMirror      = typename traits::HostMirror;
 
   using pointer         = typename traits::pointer;
@@ -60,7 +61,7 @@ class DenseMatrix
   using const_reference = typename traits::const_reference;
 
   using value_array_type =
-      Kokkos::View<value_type **, array_layout, execution_space>;
+      Kokkos::View<value_type **, array_layout, execution_space, memory_traits>;
   using value_array_pointer   = typename value_array_type::pointer_type;
   using value_array_reference = typename value_array_type::reference_type;
 
@@ -86,6 +87,32 @@ class DenseMatrix
       : base(name + "DenseMatrix", num_rows, num_cols, num_rows * num_cols),
         _values(name + "(DenseMatrix)", size_t(num_rows), size_t(num_cols)) {
     assign(num_rows, num_cols, val);
+  }
+
+  template <typename ValuePtr>
+  explicit DenseMatrix(
+      const std::string name, const index_type num_rows,
+      const index_type num_cols, ValuePtr ptr,
+      typename std::enable_if<std::is_pointer<ValuePtr>::value>::type * =
+          nullptr)
+      : base(name + "DenseMatrix_Unmanaged", num_rows, num_cols,
+             num_rows * num_cols),
+        _values(ptr, size_t(num_rows), size_t(num_cols)) {
+    static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
+                  "Constructing DenseMatrix to wrap user memory must supply "
+                  "matching pointer type");
+  }
+
+  template <typename ValuePtr>
+  explicit DenseMatrix(
+      const index_type num_rows, const index_type num_cols, ValuePtr ptr,
+      typename std::enable_if<std::is_pointer<ValuePtr>::value>::type * =
+          nullptr)
+      : base("DenseMatrix_Unmanaged", num_rows, num_cols, num_rows * num_cols),
+        _values(ptr, size_t(num_rows), size_t(num_cols)) {
+    static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
+                  "Constructing DenseMatrix to wrap user memory must supply "
+                  "matching pointer type");
   }
 
   // Construct from another dense matrix type (Shallow)

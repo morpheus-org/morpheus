@@ -56,6 +56,7 @@ class DynamicMatrix
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
+  using memory_traits   = typename traits::memory_traits;
   using HostMirror      = typename traits::HostMirror;
 
   using pointer         = typename traits::pointer;
