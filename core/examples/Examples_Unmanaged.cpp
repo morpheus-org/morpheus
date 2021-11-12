@@ -28,9 +28,10 @@ using index_type   = int;
 using value_type   = double;
 using memory_trait = Kokkos::MemoryUnmanaged;
 
-using vec = Morpheus::DenseVector<value_type, memory_trait>;
-using coo = Morpheus::CooMatrix<value_type, memory_trait>;
-using csr = Morpheus::CsrMatrix<value_type, memory_trait>;
+using vec    = Morpheus::DenseVector<value_type, memory_trait>;
+using matrix = Morpheus::DenseMatrix<value_type, memory_trait>;
+using coo    = Morpheus::CooMatrix<value_type, memory_trait>;
+using csr    = Morpheus::CsrMatrix<value_type, memory_trait>;
 
 int main(int argc, char* argv[]) {
   Morpheus::initialize(argc, argv);
@@ -57,6 +58,34 @@ int main(int argc, char* argv[]) {
       }
 
       free(v);
+    }
+    // DenseMatrix unmanaged
+    {
+      index_type n    = 5;
+      value_type* mat = (value_type*)malloc(n * n * sizeof(value_type*));
+
+      for (index_type i = 0; i < n; i++) {
+        for (index_type j = 0; j < n; j++) {
+          mat[i * n + j] = i * n + j;
+        }
+      }
+
+      {
+        matrix m("m", n, n, mat);
+        typename matrix::HostMirror mm = Morpheus::create_mirror_container(m);
+        Morpheus::print(mm);
+
+        mm(2, 2) = -15;
+      }
+
+      for (index_type i = 0; i < n; i++) {
+        for (index_type j = 0; j < n; j++) {
+          std::cout << mat[i * n + j] << "\t";
+        }
+        std::cout << std::endl;
+      }
+
+      free(mat);
     }
     // CooMatrix unmanaged
     {
