@@ -27,7 +27,7 @@
 #include <Morpheus_FormatTags.hpp>
 #include <fwd/Morpheus_Fwd_Algorithms.hpp>
 
-#include <variant>
+#include <impl/Morpheus_Variant.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -45,7 +45,7 @@ template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, DynamicTag,
              SparseMatTag) {
   auto f = std::bind(Impl::convert_fn(), std::placeholders::_1, std::ref(dst));
-  std::visit(f, src.const_formats());
+  Morpheus::Impl::Variant::visit(f, src.const_formats());
 }
 
 template <typename SourceType, typename DestinationType>
@@ -55,7 +55,7 @@ void convert(const SourceType& src, DestinationType& dst, SparseMatTag,
   dst.set_ncols(src.ncols());
   dst.set_nnnz(src.nnnz());
   auto f = std::bind(Impl::convert_fn(), std::cref(src), std::placeholders::_1);
-  std::visit(f, dst.formats());
+  Morpheus::Impl::Variant::visit(f, dst.formats());
 }
 
 template <typename SourceType, typename DestinationType>
@@ -64,7 +64,8 @@ void convert(const SourceType& src, DestinationType& dst, DynamicTag,
   dst.set_nrows(src.nrows());
   dst.set_ncols(src.ncols());
   dst.set_nnnz(src.nnnz());
-  std::visit(Impl::convert_fn(), src.const_formats(), dst.formats());
+  Morpheus::Impl::Variant::visit(Impl::convert_fn(), src.const_formats(),
+                                 dst.formats());
 }
 
 }  // namespace Impl

@@ -1,5 +1,5 @@
 /**
- * Morpheus_Multiply_Impl.hpp
+ * Morpheus_Variant.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,28 +21,15 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_DYNAMIC_MULTIPLY_IMPL_HPP
-#define MORPHEUS_DYNAMIC_MULTIPLY_IMPL_HPP
+#ifndef MORPHEUS_IMPL_VARIANT_HPP
+#define MORPHEUS_IMPL_VARIANT_HPP
 
-#include <Morpheus_FormatTags.hpp>
-#include <Morpheus_AlgorithmTags.hpp>
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
-
-#include <impl/Morpheus_Variant.hpp>
+#include <variant>
 
 namespace Morpheus {
 namespace Impl {
-
-template <typename ExecSpace, typename Algorithm, typename Matrix,
-          typename Vector>
-inline void multiply(const Matrix& A, const Vector& x, Vector& y, DynamicTag,
-                     DenseVectorTag, Algorithm) {
-  Morpheus::Impl::Variant::visit(
-      [&](auto&& arg) { Morpheus::multiply<ExecSpace, Algorithm>(arg, x, y); },
-      A.const_formats());
+namespace Variant = ::std;
 }
-
-}  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_DYNAMIC_MULTIPLY_IMPL_HPP
+#endif  // MORPHEUS_IMPL_VARIANT_HPP
