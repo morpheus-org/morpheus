@@ -58,8 +58,41 @@ int main() {
     A.column_indices(5) = 2;
     A.values(5)         = 60;
 
-    Morpheus::print(A);
-    Morpheus::print(x);
+    // Morpheus::print(A);
+    // Morpheus::print(x);
+
+    Morpheus::multiply<serial>(A, x, ya);
+    Morpheus::print(ya);
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+    dyn B(A);
+    vec yb("yb", 4, 0);
+
+    Morpheus::multiply<omp>(B, x, yb);
+    Morpheus::print(yb);
+#endif
+  }
+
+  {
+    // Two rows spanning multiple threads
+    const int M = 4, N = 40, NNZ = 50;
+
+    coo A(M, N, NNZ);
+    vec x(N, 2), ya("ya", M, 0);
+
+    // initialize matrix entries
+    for (int i = 0; i < NNZ; i++) {
+      if (i < NNZ / 2) {
+        A.row_indices(i) = 0;
+      } else {
+        A.row_indices(i) = 2;
+      }
+      A.column_indices(i) = i % N;
+      A.values(i)         = i;
+    }
+
+    // Morpheus::print(A);
+    // Morpheus::print(x);
 
     Morpheus::multiply<serial>(A, x, ya);
     Morpheus::print(ya);

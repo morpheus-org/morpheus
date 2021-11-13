@@ -4,9 +4,11 @@ morpheus_include_directories(
   ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
   ${MORPHEUS_TOP_BUILD_DIR})
 
+set(MORPHEUS_CORE_HEADER_INSTALL_DIR ${MORPHEUS_HEADER_INSTALL_DIR}/core)
+
 install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-  DESTINATION ${MORPHEUS_HEADER_INSTALL_DIR}/core
+  DESTINATION ${MORPHEUS_CORE_HEADER_INSTALL_DIR}
   FILES_MATCHING
   PATTERN "*.hpp"
   PATTERN "*.h")
@@ -99,7 +101,7 @@ morpheus_add_library(
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/MorpheusCore_config.hpp
-        DESTINATION ${MORPHEUS_HEADER_INSTALL_DIR}/core)
+        DESTINATION ${MORPHEUS_CORE_HEADER_INSTALL_DIR})
 
 morpheus_lib_include_directories(
   morpheus-core ${MORPHEUS_TOP_BUILD_DIR} ${CMAKE_CURRENT_BINARY_DIR}
@@ -113,4 +115,4 @@ foreach(HEADER ${MORPHEUS_CORE_HEADERS})
   target_include_directories(morpheus-core PUBLIC $<BUILD_INTERFACE:${dirname}>)
 endforeach()
 target_include_directories(
-  morpheus-core PUBLIC $<INSTALL_INTERFACE:${MORPHEUS_HEADER_INSTALL_DIR}/core>)
+  morpheus-core PUBLIC $<INSTALL_INTERFACE:${MORPHEUS_CORE_HEADER_INSTALL_DIR}>)
