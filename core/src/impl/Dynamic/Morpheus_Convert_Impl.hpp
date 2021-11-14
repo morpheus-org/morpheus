@@ -30,8 +30,11 @@
 #include <impl/Morpheus_Variant.hpp>
 
 namespace Morpheus {
-namespace Impl {
+// forward decl
+template <typename SourceType, typename DestinationType>
+void convert(const SourceType& src, DestinationType& dst);
 
+namespace Impl {
 struct convert_fn {
   using result_type = void;
 
