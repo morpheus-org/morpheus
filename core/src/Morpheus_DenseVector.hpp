@@ -26,7 +26,6 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 
-#include <fwd/Morpheus_Fwd_Containers.hpp>
 #include <impl/Morpheus_ContainerTraits.hpp>
 
 #include <Kokkos_Core.hpp>

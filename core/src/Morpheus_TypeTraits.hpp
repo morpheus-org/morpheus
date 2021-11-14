@@ -24,7 +24,10 @@
 #define MORPHEUS_TYPETRAITS_HPP
 
 #include <Morpheus_FormatTags.hpp>
-#include <fwd/Morpheus_Fwd_Containers.hpp>
+
+#include <fwd/Morpheus_Fwd_MatrixBase.hpp>
+#include <fwd/Morpheus_Fwd_DenseMatrix.hpp>
+
 #include <Kokkos_Core.hpp>
 
 #include <type_traits>
