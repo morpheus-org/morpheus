@@ -26,7 +26,6 @@
 
 #include <Morpheus_FormatTags.hpp>
 
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 #include <impl/Morpheus_Variant.hpp>
 #include <impl/Morpheus_MatrixBase.hpp>
 #include <impl/Morpheus_DynamicMatrix_Impl.hpp>
