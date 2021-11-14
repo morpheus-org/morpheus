@@ -28,8 +28,8 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_DynamicMatrix.hpp>
+#include <Morpheus_Sort.hpp>
 
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 #include <impl/Morpheus_MatrixBase.hpp>
 
 namespace Morpheus {

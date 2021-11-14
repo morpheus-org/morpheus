@@ -24,7 +24,6 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_REDUCTION_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_REDUCTION_IMPL_HPP
 
-// TODO: Let Cmake autogenerate those
 #include <impl/DenseVector/Serial/Morpheus_Reduction_Impl.hpp>
 #include <impl/DenseVector/OpenMP/Morpheus_Reduction_Impl.hpp>
 #include <impl/DenseVector/Cuda/Morpheus_Reduction_Impl.hpp>
