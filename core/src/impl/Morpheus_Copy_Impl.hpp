@@ -27,7 +27,6 @@
 #include <impl/DenseVector/Morpheus_Copy_Impl.hpp>
 #include <impl/DenseMatrix/Morpheus_Copy_Impl.hpp>
 
-// TODO: Let Cmake generate these
 #include <impl/Coo/Morpheus_Copy_Impl.hpp>
 #include <impl/Csr/Morpheus_Copy_Impl.hpp>
 #include <impl/Dia/Morpheus_Copy_Impl.hpp>

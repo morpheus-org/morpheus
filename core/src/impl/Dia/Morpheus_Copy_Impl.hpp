@@ -25,7 +25,9 @@
 #define MORPHEUS_DIA_COPY_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
+
+#include <impl/DenseVector/Morpheus_Copy_Impl.hpp>
+#include <impl/DenseMatrix/Morpheus_Copy_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -35,8 +37,10 @@ void copy(const SourceType& src, DestinationType& dst, DiaTag, DiaTag) {
   dst.resize(src.nrows(), src.ncols(), src.nnnz(),
              src.cdiagonal_offsets().size());
 
-  Morpheus::copy(src.cdiagonal_offsets(), dst.diagonal_offsets());
-  Morpheus::copy(src.cvalues(), dst.values());
+  Morpheus::Impl::copy(src.cdiagonal_offsets(), dst.diagonal_offsets(),
+                       DenseVectorTag(), DenseVectorTag());
+  Morpheus::Impl::copy(src.cvalues(), dst.values(), DenseMatrixTag(),
+                       DenseMatrixTag());
 }
 
 }  // namespace Impl

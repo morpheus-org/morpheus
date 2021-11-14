@@ -27,13 +27,15 @@
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 
 #include <impl/Morpheus_Variant.hpp>
 
 namespace Morpheus {
-namespace Impl {
+// forward decl
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst);
 
+namespace Impl {
 struct copy_fn {
   using result_type = void;
 
