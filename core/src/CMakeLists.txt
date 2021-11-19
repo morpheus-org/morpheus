@@ -32,8 +32,7 @@ foreach(Fmt DenseVector;DenseMatrix)
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.hpp)
 endforeach()
 
-# ADD ELEMENTWISE for DenseVector
-if(MORPHEUS_ENABLE_CUDA)
+if(Morpheus_ENABLE_CUDA)
   append_glob(MORPHEUS_CORE_SOURCES
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Cuda/*.cpp)
   append_glob(MORPHEUS_CORE_HEADERS
@@ -50,35 +49,35 @@ foreach(Fmt Coo;Csr;Dia)
   append_glob(MORPHEUS_CORE_HEADERS
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.hpp)
 
-  if(MORPHEUS_ENABLE_SERIAL)
+  if(Morpheus_ENABLE_SERIAL)
     append_glob(MORPHEUS_CORE_SOURCES
                 ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Serial/*.cpp)
     append_glob(MORPHEUS_CORE_HEADERS
                 ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Serial/*.hpp)
   endif()
 
-  if(MORPHEUS_ENABLE_OPENMP)
+  if(Morpheus_ENABLE_OPENMP)
     append_glob(MORPHEUS_CORE_SOURCES
                 ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/OpenMP/*.cpp)
     append_glob(MORPHEUS_CORE_HEADERS
                 ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/OpenMP/*.hpp)
   endif()
 
-  if(MORPHEUS_ENABLE_CUDA)
+  if(Morpheus_ENABLE_CUDA)
     append_glob(MORPHEUS_CORE_SOURCES
                 ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Cuda/*.cpp)
     append_glob(MORPHEUS_CORE_HEADERS
                 ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Cuda/*.hpp)
   endif()
 
-  if(MORPHEUS_ENABLE_HIP)
+  if(Morpheus_ENABLE_HIP)
     append_glob(MORPHEUS_CORE_SOURCES
                 ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/HIP/*.cpp)
     append_glob(MORPHEUS_CORE_HEADERS
                 ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/HIP/*.hpp)
   endif()
 
-  if(MORPHEUS_ENABLE_CUDA OR MORPHEUS_ENABLE_HIP)
+  if(Morpheus_ENABLE_CUDA OR MORPHEUS_ENABLE_HIP)
     append_glob(MORPHEUS_CORE_SOURCES
                 ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Kernels/*.cpp)
     append_glob(MORPHEUS_CORE_HEADERS
