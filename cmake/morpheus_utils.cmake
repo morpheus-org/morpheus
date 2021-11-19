@@ -351,7 +351,7 @@ macro(MORPHEUS_SETUP_BUILD_ENVIRONMENT)
     # then build examples and tests against that installed Morpheus
     find_package(Morpheus REQUIRED)
     # Still need to figure out which backends
-    include(cmake/kokkos_backends.cmake)
+    include(cmake/morpheus_backends.cmake)
   else()
     # Regular build, not install testing
     if(NOT MORPHEUS_HAS_PARENT)
@@ -359,7 +359,7 @@ macro(MORPHEUS_SETUP_BUILD_ENVIRONMENT)
       find_package(Kokkos REQUIRED)
       message(STATUS "Found Kokkos at ${Kokkos_DIR}")
     endif()
-    include(cmake/kokkos_backends.cmake)
+    include(cmake/morpheus_backends.cmake)
     include(cmake/morpheus_test_cxx_std.cmake) # TODO: Enforce cxx std17 or
                                                # above
 

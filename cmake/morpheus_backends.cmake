@@ -6,6 +6,7 @@ macro(CHECK_KOKKOS_BACKEND BE)
   else()
     set(MORPHEUS_ENABLE_${BE} OFF)
   endif()
+  global_set(Morpheus_ENABLE_${BE} ${MORPHEUS_ENABLE_${BE}})
 endmacro(CHECK_KOKKOS_BACKEND)
 
 check_kokkos_backend(CUDA)
