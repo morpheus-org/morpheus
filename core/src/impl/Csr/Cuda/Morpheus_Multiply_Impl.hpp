@@ -38,20 +38,23 @@ namespace Morpheus {
 namespace Impl {
 
 // forward decl
-template <size_t THREADS_PER_VECTOR, typename Matrix, typename Vector>
-void __spmv_csr_vector(const Matrix& A, const Vector& x, Vector& y);
+template <size_t THREADS_PER_VECTOR, typename Matrix, typename Vector1,
+          typename Vector2>
+void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y);
 
-template <typename ExecSpace, typename Matrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y, CsrTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector1& x, Vector2& y, CsrTag, DenseVectorTag,
+    DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
-  using IndexType = typename Matrix::index_type;
+                               Vector1, Vector2>>* = nullptr) {
+  using index_type = typename Matrix::index_type;
 
-  const IndexType nnz_per_row = A.nnnz() / A.nrows();
+  const index_type nnz_per_row = A.nnnz() / A.nrows();
 
   if (nnz_per_row <= 2) {
     __spmv_csr_vector<2>(A, x, y);
@@ -73,55 +76,58 @@ inline void multiply(
   __spmv_csr_vector<32>(A, x, y);
 }
 
-template <typename ExecSpace, typename Matrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y, CsrTag, DenseVectorTag, Alg1,
+    const Matrix& A, const Vector1& x, Vector2& y, CsrTag, DenseVectorTag,
+    DenseVectorTag, Alg1,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
-  using IndexType = typename Matrix::index_type;
-  using ValueType = typename Matrix::value_type;
+                               Vector1, Vector2>>* = nullptr) {
+  using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   const size_t BLOCK_SIZE = 256;
   const size_t NUM_BLOCKS = (A.nrows() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-  const IndexType* I = A.crow_offsets().data();
-  const IndexType* J = A.ccolumn_indices().data();
-  const ValueType* V = A.cvalues().data();
+  const index_type* I = A.crow_offsets().data();
+  const index_type* J = A.ccolumn_indices().data();
+  const value_type* V = A.cvalues().data();
 
-  const ValueType* x_ptr = x.data();
-  ValueType* y_ptr       = y.data();
+  const value_type* x_ptr = x.data();
+  value_type* y_ptr       = y.data();
 
-  Morpheus::Impl::Kernels::spmv_csr_scalar_kernel<IndexType, ValueType>
+  Morpheus::Impl::Kernels::spmv_csr_scalar_kernel<index_type, value_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), I, J, V, x_ptr, y_ptr);
 }
 
-template <size_t THREADS_PER_VECTOR, typename Matrix, typename Vector>
-void __spmv_csr_vector(const Matrix& A, const Vector& x, Vector& y) {
-  using IndexType = typename Matrix::index_type;
-  using ValueType = typename Matrix::value_type;
+template <size_t THREADS_PER_VECTOR, typename Matrix, typename Vector1,
+          typename Vector2>
+void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y) {
+  using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
-  const IndexType* I = A.crow_offsets().data();
-  const IndexType* J = A.ccolumn_indices().data();
-  const ValueType* V = A.cvalues().data();
+  const index_type* I = A.crow_offsets().data();
+  const index_type* J = A.ccolumn_indices().data();
+  const value_type* V = A.cvalues().data();
 
-  const ValueType* x_ptr = x.data();
-  ValueType* y_ptr       = y.data();
+  const value_type* x_ptr = x.data();
+  value_type* y_ptr       = y.data();
 
   const size_t THREADS_PER_BLOCK = 128;
   const size_t VECTORS_PER_BLOCK = THREADS_PER_BLOCK / THREADS_PER_VECTOR;
 
   const size_t MAX_BLOCKS = max_active_blocks(
-      Kernels::spmv_csr_vector_kernel<IndexType, ValueType, VECTORS_PER_BLOCK,
+      Kernels::spmv_csr_vector_kernel<index_type, value_type, VECTORS_PER_BLOCK,
                                       THREADS_PER_VECTOR>,
       THREADS_PER_BLOCK, (size_t)0);
 
   const size_t NUM_BLOCKS =
       std::min<size_t>(MAX_BLOCKS, DIVIDE_INTO(A.nrows(), VECTORS_PER_BLOCK));
 
-  Kernels::spmv_csr_vector_kernel<IndexType, ValueType, VECTORS_PER_BLOCK,
+  Kernels::spmv_csr_vector_kernel<index_type, value_type, VECTORS_PER_BLOCK,
                                   THREADS_PER_VECTOR>
       <<<NUM_BLOCKS, THREADS_PER_BLOCK, 0>>>(A.nrows(), I, J, V, x_ptr, y_ptr);
 }

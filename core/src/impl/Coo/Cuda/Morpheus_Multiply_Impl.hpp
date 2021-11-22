@@ -38,46 +38,50 @@ namespace Morpheus {
 namespace Impl {
 
 // forward decl
-template <typename Matrix, typename Vector>
-void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y);
+template <typename Matrix, typename Vector1, typename Vector2>
+void __spmv_coo_flat(const Matrix& A, const Vector1& x, Vector2& y);
 
-template <typename Matrix, typename Vector>
-void __spmv_coo_serial(const Matrix& A, const Vector& x, Vector& y);
+template <typename Matrix, typename Vector1, typename Vector2>
+void __spmv_coo_serial(const Matrix& A, const Vector1& x, Vector2& y);
 
-template <typename ExecSpace, typename Matrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y, CooTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
+    DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
+                               Vector1, Vector2>>* = nullptr) {
   __spmv_coo_flat(A, x, y);
 }
 
-template <typename ExecSpace, typename Matrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y, CooTag, DenseVectorTag, Alg1,
+    const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
+    DenseVectorTag, Alg1,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
+                               Vector1, Vector2>>* = nullptr) {
   __spmv_coo_serial(A, x, y);
 }
 
-template <typename Matrix, typename Vector>
-void __spmv_coo_serial(const Matrix& A, const Vector& x, Vector& y) {
-  using IndexType    = typename Matrix::index_type;
-  using ValueType    = typename Matrix::value_type;
-  const IndexType* I = A.crow_indices().data();
-  const IndexType* J = A.ccolumn_indices().data();
-  const ValueType* V = A.cvalues().data();
+template <typename Matrix, typename Vector1, typename Vector2>
+void __spmv_coo_serial(const Matrix& A, const Vector1& x, Vector2& y) {
+  using index_type    = typename Matrix::index_type;
+  using value_type    = typename Matrix::value_type;
+  const index_type* I = A.crow_indices().data();
+  const index_type* J = A.ccolumn_indices().data();
+  const value_type* V = A.cvalues().data();
 
-  const ValueType* x_ptr = x.data();
-  ValueType* y_ptr       = y.data();
+  const value_type* x_ptr = x.data();
+  value_type* y_ptr       = y.data();
 
-  Kernels::spmv_coo_serial_kernel<IndexType, ValueType>
+  Kernels::spmv_coo_serial_kernel<index_type, value_type>
       <<<1, 1>>>(A.nnnz(), I, J, V, x_ptr, y_ptr);
 }
 
@@ -95,18 +99,18 @@ void __spmv_coo_serial(const Matrix& A, const Vector& x, Vector& y) {
 //   sums.
 //
 //
-template <typename Matrix, typename Vector>
-void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y) {
-  using IndexType = typename Matrix::index_type;
-  using ValueType = typename Matrix::value_type;
+template <typename Matrix, typename Vector1, typename Vector2>
+void __spmv_coo_flat(const Matrix& A, const Vector1& x, Vector2& y) {
+  using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   y.assign(y.size(), 0);
   if (A.nnnz() == 0) {
     // empty matrix
     return;
-  } else if (A.nnnz() < static_cast<IndexType>(CUDA_WARP_SIZE)) {
+  } else if (A.nnnz() < static_cast<index_type>(CUDA_WARP_SIZE)) {
     // small matrix
-    Kernels::spmv_coo_serial_kernel<IndexType, ValueType><<<1, 1, 0>>>(
+    Kernels::spmv_coo_serial_kernel<index_type, value_type><<<1, 1, 0>>>(
         A.nnnz(), A.crow_indices().data(), A.ccolumn_indices().data(),
         A.cvalues().data(), x.data(), y.data());
     return;
@@ -114,7 +118,7 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y) {
 
   const size_t BLOCK_SIZE = 256;
   const size_t MAX_BLOCKS = max_active_blocks(
-      Kernels::spmv_coo_flat_kernel<IndexType, ValueType, BLOCK_SIZE>,
+      Kernels::spmv_coo_flat_kernel<index_type, value_type, BLOCK_SIZE>,
       BLOCK_SIZE, (size_t)0);
   const size_t WARPS_PER_BLOCK = BLOCK_SIZE / CUDA_WARP_SIZE;
 
@@ -123,9 +127,9 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y) {
   const size_t num_blocks = DIVIDE_INTO(num_warps, WARPS_PER_BLOCK);
   const size_t num_iters  = DIVIDE_INTO(num_units, num_warps);
 
-  const IndexType interval_size = CUDA_WARP_SIZE * num_iters;
+  const index_type interval_size = CUDA_WARP_SIZE * num_iters;
 
-  const IndexType tail =
+  const index_type tail =
       num_units * CUDA_WARP_SIZE;  // do the last few nonzeros separately (fewer
                                    // than WARP_SIZE elements)
 
@@ -135,17 +139,17 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y) {
   typename Matrix::index_array_type temp_rows(active_warps, 0);
   typename Matrix::value_array_type temp_vals(active_warps, 0);
 
-  Kernels::spmv_coo_flat_kernel<IndexType, ValueType, BLOCK_SIZE>
+  Kernels::spmv_coo_flat_kernel<index_type, value_type, BLOCK_SIZE>
       <<<num_blocks, BLOCK_SIZE, 0>>>(
           tail, interval_size, A.crow_indices().data(),
           A.ccolumn_indices().data(), A.cvalues().data(), x.data(), y.data(),
           temp_rows.data(), temp_vals.data());
 
-  Kernels::spmv_coo_reduce_update_kernel<IndexType, ValueType, BLOCK_SIZE>
+  Kernels::spmv_coo_reduce_update_kernel<index_type, value_type, BLOCK_SIZE>
       <<<1, BLOCK_SIZE, 0>>>(active_warps, temp_rows.data(), temp_vals.data(),
                              y.data());
 
-  Kernels::spmv_coo_serial_kernel<IndexType, ValueType>
+  Kernels::spmv_coo_serial_kernel<index_type, value_type>
       <<<1, 1, 0>>>(A.nnnz() - tail, A.crow_indices().data() + tail,
                     A.ccolumn_indices().data() + tail,
                     A.cvalues().data() + tail, x.data(), y.data());

@@ -31,25 +31,26 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Matrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y, DiaTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector1& x, Vector2& y, DiaTag, DenseVectorTag,
+    DenseVectorTag, Alg0,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
+                               Vector1, Vector2>>* = nullptr) {
   using execution_space  = typename ExecSpace::execution_space;
   using value_array_type = typename Matrix::value_array_type::value_array_type;
   using index_array_type = typename Matrix::index_array_type::value_array_type;
-  using view_type        = typename Vector::value_array_type;
   using index_type       = typename Matrix::index_type;
   using value_type       = typename Matrix::value_type;
   using member_type = typename Kokkos::TeamPolicy<execution_space>::member_type;
 
-  const value_array_type values           = A.cvalues().const_view();
-  const view_type x_view                  = x.const_view();
+  const value_array_type values                   = A.cvalues().const_view();
+  const typename Vector1::value_array_type x_view = x.const_view();
   const index_array_type diagonal_offsets = A.cdiagonal_offsets().const_view();
-  view_type y_view                        = y.view();
+  typename Vector2::value_array_type y_view = y.view();
   index_type ndiag = A.cvalues().ncols(), ncols = A.ncols();
 
   const Kokkos::TeamPolicy<execution_space> policy(A.nrows(), Kokkos::AUTO,
@@ -74,26 +75,27 @@ inline void multiply(
       });
 }
 
-template <typename ExecSpace, typename Matrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y, DiaTag, DenseVectorTag, Alg1,
+    const Matrix& A, const Vector1& x, Vector2& y, DiaTag, DenseVectorTag,
+    DenseVectorTag, Alg1,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
+                               Vector1, Vector2>>* = nullptr) {
   using execution_space  = typename ExecSpace::execution_space;
   using value_array_type = typename Matrix::value_array_type::value_array_type;
   using index_array_type = typename Matrix::index_array_type::value_array_type;
-  using view_type        = typename Vector::value_array_type;
   using index_type       = typename Matrix::index_type;
   using value_type       = typename Matrix::value_type;
   using range_policy =
       Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
 
-  const value_array_type values           = A.cvalues().const_view();
-  const view_type x_view                  = x.const_view();
+  const value_array_type values                   = A.cvalues().const_view();
+  const typename Vector1::value_array_type x_view = x.const_view();
   const index_array_type diagonal_offsets = A.cdiagonal_offsets().const_view();
-  view_type y_view                        = y.view();
+  typename Vector2::value_array_type y_view = y.view();
   index_type ndiag = A.cvalues().ncols(), ncols = A.ncols();
 
   range_policy policy(0, A.nrows());

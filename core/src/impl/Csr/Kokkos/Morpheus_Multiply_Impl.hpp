@@ -31,20 +31,22 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Matrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y, CsrTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector1& x, Vector2& y, CsrTag, DenseVectorTag,
+    DenseVectorTag, Alg0,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
-  using execution_space = typename ExecSpace::execution_space;
-  using index_type      = Kokkos::IndexType<typename Matrix::index_type>;
-  using range_policy    = Kokkos::RangePolicy<index_type, execution_space>;
-  using ValueArray      = typename Matrix::value_array_type::value_array_type;
-  using IndexArray      = typename Matrix::index_array_type::value_array_type;
-  using V               = typename ValueArray::value_type;
-  using I               = typename IndexArray::value_type;
+                               Vector1, Vector2>>* = nullptr) {
+  using execution_space   = typename ExecSpace::execution_space;
+  using policy_index_type = Kokkos::IndexType<typename Matrix::index_type>;
+  using range_policy = Kokkos::RangePolicy<policy_index_type, execution_space>;
+  using ValueArray   = typename Matrix::value_array_type::value_array_type;
+  using IndexArray   = typename Matrix::index_array_type::value_array_type;
+  using value_type   = typename ValueArray::value_type;
+  using index_type   = typename IndexArray::value_type;
 
   const ValueArray values = A.cvalues().const_view(), x_view = x.const_view();
   const IndexArray column_indices = A.ccolumn_indices().const_view(),
@@ -54,9 +56,9 @@ inline void multiply(
   range_policy policy(0, A.nrows());
 
   Kokkos::parallel_for(
-      policy, KOKKOS_LAMBDA(const I i) {
-        V sum = 0;
-        for (I jj = row_offsets[i]; jj < row_offsets[i + 1]; jj++) {
+      policy, KOKKOS_LAMBDA(const index_type i) {
+        value_type sum = 0;
+        for (index_type jj = row_offsets[i]; jj < row_offsets[i + 1]; jj++) {
           sum += values[jj] * x_view[column_indices[jj]];
         }
         y_view[i] = sum;

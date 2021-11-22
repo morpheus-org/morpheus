@@ -31,13 +31,15 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Matrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y, CooTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
+    DenseVectorTag, Alg0,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
+                               Vector1, Vector2>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
 
   Morpheus::multiply<execution_space>(A, x, y);

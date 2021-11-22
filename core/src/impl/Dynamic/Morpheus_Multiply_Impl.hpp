@@ -34,9 +34,9 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename Algorithm, typename Matrix,
-          typename Vector>
-inline void multiply(const Matrix& A, const Vector& x, Vector& y, DynamicTag,
-                     DenseVectorTag, Algorithm) {
+          typename Vector1, typename Vector2>
+inline void multiply(const Matrix& A, const Vector1& x, Vector2& y, DynamicTag,
+                     DenseVectorTag, DenseVectorTag, Algorithm) {
   std::visit(
       [&](auto&& arg) { Morpheus::multiply<ExecSpace, Algorithm>(arg, x, y); },
       A.const_formats());

@@ -37,38 +37,40 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Matrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y, DiaTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector1& x, Vector2& y, DiaTag, DenseVectorTag,
+    DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
-  using IndexType = typename Matrix::index_type;
-  using ValueType = typename Matrix::value_type;
+                               Vector1, Vector2>>* = nullptr) {
+  using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   const size_t BLOCK_SIZE = 256;
   const size_t MAX_BLOCKS = max_active_blocks(
-      Kernels::spmv_dia_kernel<IndexType, ValueType, BLOCK_SIZE>, BLOCK_SIZE,
-      (size_t)sizeof(IndexType) * BLOCK_SIZE);
+      Kernels::spmv_dia_kernel<index_type, value_type, BLOCK_SIZE>, BLOCK_SIZE,
+      (size_t)sizeof(index_type) * BLOCK_SIZE);
   const size_t NUM_BLOCKS =
       std::min<size_t>(MAX_BLOCKS, DIVIDE_INTO(A.nrows(), BLOCK_SIZE));
 
-  const IndexType* D     = A.cdiagonal_offsets().data();
-  const ValueType* V     = A.cvalues().data();
-  const ValueType* x_ptr = x.data();
-  ValueType* y_ptr       = y.data();
+  const index_type* D     = A.cdiagonal_offsets().data();
+  const value_type* V     = A.cvalues().data();
+  const value_type* x_ptr = x.data();
+  value_type* y_ptr       = y.data();
 
-  const IndexType num_diagonals = A.cvalues().ncols();
-  const IndexType pitch         = A.cvalues().nrows();
+  const index_type num_diagonals = A.cvalues().ncols();
+  const index_type pitch         = A.cvalues().nrows();
 
   if (num_diagonals == 0) {
     // empty matrix
     return;
   }
 
-  Kernels::spmv_dia_kernel<IndexType, ValueType, BLOCK_SIZE>
+  Kernels::spmv_dia_kernel<index_type, value_type, BLOCK_SIZE>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), A.ncols(), num_diagonals,
                                       pitch, D, V, x_ptr, y_ptr);
 }

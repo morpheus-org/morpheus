@@ -27,11 +27,12 @@
 namespace Morpheus {
 
 template <typename ExecSpace, typename Algorithm, typename Matrix,
-          typename Vector>
-void multiply(const Matrix& A, const Vector& x, Vector& y);
+          typename Vector1, typename Vector2>
+void multiply(const Matrix& A, const Vector1& x, Vector2& y);
 
-template <typename ExecSpace, typename Matrix, typename Vector>
-void multiply(const Matrix& A, const Vector& x, Vector& y);
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
+void multiply(const Matrix& A, const Vector1& x, Vector2& y);
 
 }  // namespace Morpheus
 

@@ -31,23 +31,25 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Matrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y, DiaTag, DenseVectorTag, Alg0,
+    const Matrix& A, const Vector1& x, Vector2& y, DiaTag, DenseVectorTag,
+    DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
-  using IndexType       = typename Matrix::index_type;
-  using ValueType       = typename Matrix::value_type;
-  const IndexType ndiag = A.cvalues().ncols();
+                               Vector1, Vector2>>* = nullptr) {
+  using index_type       = typename Matrix::index_type;
+  using value_type       = typename Matrix::value_type;
+  const index_type ndiag = A.cvalues().ncols();
 
-  for (IndexType row = 0; row < A.nrows(); row++) {
-    ValueType sum = ValueType(0);
+  for (index_type row = 0; row < A.nrows(); row++) {
+    value_type sum = value_type(0);
 
-    for (IndexType n = 0; n < ndiag; n++) {
-      const IndexType col = row + A.cdiagonal_offsets(n);
+    for (index_type n = 0; n < ndiag; n++) {
+      const index_type col = row + A.cdiagonal_offsets(n);
 
       if (col >= 0 && col < A.ncols()) {
         sum += A.cvalues(row, n) * x[col];
