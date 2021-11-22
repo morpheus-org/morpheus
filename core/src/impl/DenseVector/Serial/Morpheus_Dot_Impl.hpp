@@ -41,7 +41,7 @@ inline typename Vector1::value_type dot(
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
                                Vector2>>* = nullptr) {
   using index_type = typename Vector1::index_type;
-  using value_type = typename Vector1::value_type;
+  using value_type = typename Vector1::non_const_value_type;
 
   value_type result = value_type(0);
 
