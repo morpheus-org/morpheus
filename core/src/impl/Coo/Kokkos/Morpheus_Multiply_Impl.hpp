@@ -30,8 +30,10 @@
 
 namespace Morpheus {
 // remove after the function below is implemented
-template <typename ExecSpace, typename Matrix, typename Vector>
-inline void multiply(const Matrix& A, const Vector& x, Vector& y);
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
+inline void multiply(const Matrix& A, const Vector1& x, Vector2& y);
+
 namespace Impl {
 
 template <typename ExecSpace, typename Matrix, typename Vector1,
