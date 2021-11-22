@@ -26,19 +26,22 @@
 
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 
-#include <variant>
+#include <impl/Morpheus_Variant.hpp>
 
 namespace Morpheus {
-namespace Impl {
+// fwd decl
+template <typename ExecSpace, typename Algorithm, typename SparseMatrix,
+          typename Vector>
+inline void update_diagonal(SparseMatrix& A, const Vector& diagonal);
 
+namespace Impl {
 template <typename ExecSpace, typename Algorithm, typename SparseMatrix,
           typename Vector>
 inline void update_diagonal(SparseMatrix& A, const Vector& diagonal,
                             Morpheus::DynamicTag, Morpheus::DenseVectorTag,
                             Algorithm) {
-  std::visit(
+  Morpheus::Impl::Variant::visit(
       [&](auto&& arg) {
         Morpheus::update_diagonal<ExecSpace, Algorithm>(arg, diagonal);
       },

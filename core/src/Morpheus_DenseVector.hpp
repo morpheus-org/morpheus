@@ -26,7 +26,6 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 
-#include <fwd/Morpheus_Fwd_Containers.hpp>
 #include <impl/Morpheus_ContainerTraits.hpp>
 
 #include <Kokkos_Core.hpp>
@@ -199,6 +198,7 @@ class DenseVector
   index_type _size;
   value_array_type _values;
 
+  // TODO: Shall we set that to private?
  public:
   struct set_functor {
     value_array_type _data;

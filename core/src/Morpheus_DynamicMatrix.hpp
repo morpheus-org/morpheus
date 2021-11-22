@@ -26,13 +26,12 @@
 
 #include <Morpheus_FormatTags.hpp>
 
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
+#include <impl/Morpheus_Variant.hpp>
 #include <impl/Morpheus_MatrixBase.hpp>
 #include <impl/Morpheus_DynamicMatrix_Impl.hpp>
 
 #include <iostream>
 #include <string>
-#include <variant>
 #include <functional>
 
 namespace Morpheus {
@@ -85,7 +84,7 @@ class DynamicMatrix
     this->activate(src.format_enum());
     auto f = std::bind(Impl::any_type_assign(), std::cref(src),
                        std::placeholders::_1);
-    std::visit(f, _formats);
+    Morpheus::Impl::Variant::visit(f, _formats);
   }
 
   template <typename Matrix>
@@ -98,7 +97,7 @@ class DynamicMatrix
     this->activate(src.format_enum());
     auto f = std::bind(Impl::any_type_assign(), std::cref(src),
                        std::placeholders::_1);
-    std::visit(f, _formats);
+    Morpheus::Impl::Variant::visit(f, _formats);
   }
 
   // Assignment from another matrix type
@@ -112,7 +111,7 @@ class DynamicMatrix
 
     auto f = std::bind(Impl::any_type_assign(), std::cref(matrix),
                        std::placeholders::_1);
-    std::visit(f, _formats);
+    Morpheus::Impl::Variant::visit(f, _formats);
     return *this;
   }
 
@@ -126,7 +125,8 @@ class DynamicMatrix
       : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
              src.nnnz()) {
     this->activate(src.active_index());  // switch to src format
-    std::visit(Impl::any_type_assign(), src.const_formats(), _formats);
+    Morpheus::Impl::Variant::visit(Impl::any_type_assign(), src.const_formats(),
+                                   _formats);
   }
 
   // Assignment from another compatible dynamic matrix type
@@ -140,7 +140,8 @@ class DynamicMatrix
     base::resize(src.nrows(), src.ncols(), src.nnnz());
 
     this->activate(src.active_index());  // switch to src format
-    std::visit(Impl::any_type_assign(), src.const_formats(), _formats);
+    Morpheus::Impl::Variant::visit(Impl::any_type_assign(), src.const_formats(),
+                                   _formats);
 
     return *this;
   }
@@ -152,7 +153,7 @@ class DynamicMatrix
     auto f = std::bind(Impl::any_type_resize<ValueType, Properties...>(),
                        std::placeholders::_1, m, n, nnz,
                        std::forward<Args>(args)...);
-    return std::visit(f, _formats);
+    return Morpheus::Impl::Variant::visit(f, _formats);
   }
 
   template <class VR, class... PR>
@@ -161,12 +162,13 @@ class DynamicMatrix
     this->set_name(name);
     base::resize(src.nrows(), src.ncols(), src.nnnz());
     this->activate(src.active_index());  // switch to src format
-    std::visit(Impl::any_type_allocate(), src.const_formats(), _formats);
+    Morpheus::Impl::Variant::visit(Impl::any_type_allocate(),
+                                   src.const_formats(), _formats);
     return *this;
   }
 
   inline std::string active_name() const {
-    return std::visit(Impl::any_type_get_name(), _formats);
+    return Morpheus::Impl::Variant::visit(Impl::any_type_get_name(), _formats);
   }
 
   inline int active_index() const { return _formats.index(); }
@@ -180,7 +182,7 @@ class DynamicMatrix
   inline formats_e format_enum() const { return this->active_enum(); }
 
   inline void activate(const formats_e index) {
-    constexpr int size = std::variant_size_v<
+    constexpr int size = Morpheus::Impl::Variant::variant_size_v<
         typename MatrixFormats<ValueType, Properties...>::variant>;
     const int idx = static_cast<int>(index);
 

@@ -26,11 +26,14 @@
 
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 
-#include <variant>
+#include <impl/Morpheus_Variant.hpp>
 
 namespace Morpheus {
+template <typename ExecSpace, typename Algorithm, typename Matrix,
+          typename Vector>
+inline void multiply(const Matrix& A, const Vector& x, Vector& y);
+
 namespace Impl {
 
 template <typename ExecSpace, typename Algorithm, typename Matrix,

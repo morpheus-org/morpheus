@@ -24,7 +24,8 @@
 #ifndef MORPHEUS_MATRIXPROXY_HPP
 #define MORPHEUS_MATRIXPROXY_HPP
 
-#include <variant>
+#include <impl/Morpheus_Variant.hpp>
+
 #include <tuple>
 
 namespace Morpheus {
@@ -39,7 +40,7 @@ template <class... Formats>
 struct MatrixFormatsProxy {
   using type = MatrixFormatsProxy<Formats...>;
 
-  using variant   = std::variant<Formats...>;
+  using variant   = Morpheus::Impl::Variant::variant<Formats...>;
   using type_list = TypeList<Formats...>;
 };
 

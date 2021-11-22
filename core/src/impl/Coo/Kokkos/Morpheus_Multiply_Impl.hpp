@@ -29,6 +29,9 @@
 #include <Morpheus_AlgorithmTags.hpp>
 
 namespace Morpheus {
+// remove after the function below is implemented
+template <typename ExecSpace, typename Matrix, typename Vector>
+inline void multiply(const Matrix& A, const Vector& x, Vector& y);
 namespace Impl {
 
 template <typename ExecSpace, typename Matrix, typename Vector1,

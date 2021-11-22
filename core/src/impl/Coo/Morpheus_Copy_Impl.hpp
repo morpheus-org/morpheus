@@ -25,7 +25,8 @@
 #define MORPHEUS_COO_COPY_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
+
+#include <impl/DenseVector/Morpheus_Copy_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -34,9 +35,12 @@ template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, CooTag, CooTag) {
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
-  Morpheus::copy(src.crow_indices(), dst.row_indices());
-  Morpheus::copy(src.ccolumn_indices(), dst.column_indices());
-  Morpheus::copy(src.cvalues(), dst.values());
+  Morpheus::Impl::copy(src.crow_indices(), dst.row_indices(), DenseVectorTag(),
+                       DenseVectorTag());
+  Morpheus::Impl::copy(src.ccolumn_indices(), dst.column_indices(),
+                       DenseVectorTag(), DenseVectorTag());
+  Morpheus::Impl::copy(src.cvalues(), dst.values(), DenseVectorTag(),
+                       DenseVectorTag());
 }
 
 }  // namespace Impl

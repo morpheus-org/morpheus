@@ -31,24 +31,24 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Vector>
-inline typename Vector::value_type dot(
-    typename Vector::index_type n, const Vector& x, const Vector& y,
-    DenseVectorTag, Alg0,
+template <typename ExecSpace, typename Vector1, typename Vector2>
+inline typename Vector1::value_type dot(
+    typename Vector1::index_type n, const Vector1& x, const Vector2& y,
+    DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
-  using IndexType = typename Vector::index_type;
-  using ValueType = typename Vector::value_type;
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
+                               Vector2>>* = nullptr) {
+  using index_type = typename Vector1::index_type;
+  using value_type = typename Vector1::value_type;
 
-  ValueType result = ValueType(0);
+  value_type result = value_type(0);
 
   if (y.data() == x.data()) {
-    for (IndexType i = 0; i < n; i++) result += x[i] * x[i];
+    for (index_type i = 0; i < n; i++) result += x[i] * x[i];
   } else {
-    for (IndexType i = 0; i < n; i++) result += x[i] * y[i];
+    for (index_type i = 0; i < n; i++) result += x[i] * y[i];
   }
 
   return result;

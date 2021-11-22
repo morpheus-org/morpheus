@@ -24,7 +24,6 @@
 #ifndef MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
 #define MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
 
-// TODO: Let Cmake autogenerate those
 #include <impl/Coo/Serial/Morpheus_Multiply_Impl.hpp>
 #include <impl/Coo/OpenMP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Coo/Cuda/Morpheus_Multiply_Impl.hpp>

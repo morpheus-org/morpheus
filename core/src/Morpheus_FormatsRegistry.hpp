@@ -26,7 +26,10 @@
 
 #ifdef __cplusplus
 
-#include <fwd/Morpheus_Fwd_Containers.hpp>
+#include <fwd/Morpheus_Fwd_CooMatrix.hpp>
+#include <fwd/Morpheus_Fwd_CsrMatrix.hpp>
+#include <fwd/Morpheus_Fwd_DiaMatrix.hpp>
+
 #include <impl/Morpheus_MatrixProxy.hpp>
 
 namespace Morpheus {

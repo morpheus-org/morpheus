@@ -1,5 +1,5 @@
 /**
- * Test_Copy.hpp
+ * Morpheus_Variant.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,8 +21,15 @@
  * limitations under the License.
  */
 
-#include <Morpheus_Core.hpp>
+#ifndef MORPHEUS_IMPL_VARIANT_HPP
+#define MORPHEUS_IMPL_VARIANT_HPP
 
-namespace Test {
-TEST(TESTSUITE_NAME, copy) { ASSERT_TRUE(1); }
-}  // namespace Test
+#include <variant>
+
+namespace Morpheus {
+namespace Impl {
+namespace Variant = ::std;
+}
+}  // namespace Morpheus
+
+#endif  // MORPHEUS_IMPL_VARIANT_HPP

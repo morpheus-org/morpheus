@@ -26,7 +26,8 @@
 
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
+
+#include <impl/Morpheus_Copy_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -71,8 +72,10 @@ void convert(const SourceType& src, DestinationType& dst, CsrTag, CooTag) {
     }
   }
 
-  Morpheus::copy(src.ccolumn_indices(), dst.column_indices());
-  Morpheus::copy(src.cvalues(), dst.values());
+  Morpheus::Impl::copy(src.ccolumn_indices(), dst.column_indices(),
+                       DenseVectorTag(), DenseVectorTag());
+  Morpheus::Impl::copy(src.cvalues(), dst.values(), DenseVectorTag(),
+                       DenseVectorTag());
 }
 
 template <typename SourceType, typename DestinationType>
