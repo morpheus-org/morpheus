@@ -32,8 +32,8 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename SparseMatrix, typename Vector>
-inline void update_diagonal(
-    SparseMatrix& A, const Vector& diagonal, DiaTag, DenseVectorTag, Alg0,
+void update_diagonal(
+    SparseMatrix& A, const Vector& diagonal, DiaTag, DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,

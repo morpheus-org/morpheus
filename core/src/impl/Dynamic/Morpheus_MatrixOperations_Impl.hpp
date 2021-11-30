@@ -31,20 +31,15 @@
 
 namespace Morpheus {
 // fwd decl
-template <typename ExecSpace, typename Algorithm, typename SparseMatrix,
-          typename Vector>
+template <typename ExecSpace, typename SparseMatrix, typename Vector>
 inline void update_diagonal(SparseMatrix& A, const Vector& diagonal);
 
 namespace Impl {
-template <typename ExecSpace, typename Algorithm, typename SparseMatrix,
-          typename Vector>
+template <typename ExecSpace, typename SparseMatrix, typename Vector>
 inline void update_diagonal(SparseMatrix& A, const Vector& diagonal,
-                            Morpheus::DynamicTag, Morpheus::DenseVectorTag,
-                            Algorithm) {
+                            Morpheus::DynamicTag, Morpheus::DenseVectorTag) {
   Morpheus::Impl::Variant::visit(
-      [&](auto&& arg) {
-        Morpheus::update_diagonal<ExecSpace, Algorithm>(arg, diagonal);
-      },
+      [&](auto&& arg) { Morpheus::update_diagonal<ExecSpace>(arg, diagonal); },
       A.formats());
 }
 
