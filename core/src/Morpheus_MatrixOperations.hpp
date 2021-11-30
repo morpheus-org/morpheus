@@ -29,21 +29,64 @@
 
 namespace Morpheus {
 
-// Updates the main diagonal of the matrix with contents of the diagonal vector.
-// Note that it doesn't change the sparsity pattern of the matrix
-// i.e it only updates the non-zero elements on the main diagonal.
-template <typename ExecSpace, typename Algorithm, typename SparseMatrix,
-          typename Vector>
-inline void update_diagonal(SparseMatrix& A, const Vector& diagonal) {
+/**
+ * Updates the main diagonal of the matrix with contents of the diagonal vector.
+ *
+ * \tparam ExecSpace
+ * \tparam SparseMatrix
+ * \tparam Vector
+ *
+ * \param A The matrix
+ * \param diagonal The diagonal matrix represented as a vector
+ *
+ * \note The sparsity pattern of the matrix remains unchanged i.e it only
+ * updates the non-zero elements on the main diagonal.
+ *
+ */
+template <typename ExecSpace, typename SparseMatrix, typename Vector>
+void update_diagonal(SparseMatrix& A, const Vector& diagonal) {
   Impl::update_diagonal<ExecSpace>(A, diagonal, typename SparseMatrix::tag{},
-                                   typename Vector::tag{}, Algorithm{});
+                                   typename Vector::tag{});
 }
 
-// Default algorithm to run with update_diagonal is always Alg0
-template <typename ExecSpace, typename SparseMatrix, typename Vector>
-inline void update_diagonal(SparseMatrix& A, const Vector& diagonal) {
-  Impl::update_diagonal<ExecSpace>(A, diagonal, typename SparseMatrix::tag{},
-                                   typename Vector::tag{}, Alg0{});
+/**
+ * Set a single entry into a matrix.
+ *
+ * \tparam SparseMatrix
+ * \tparam IndexType
+ * \tparam ValueType
+ *
+ * \param A The matrix
+ * \param row The row location of the entry
+ * \param col The column location of the entry
+ * \param value The value to insert
+ */
+template <typename SparseMatrix, typename IndexType, typename ValueType>
+void set_value(SparseMatrix& A, IndexType row, IndexType col, ValueType value) {
+  Impl::set_value(A, row, col, value);
+}
+
+/**
+ * Inserts or adds a block of values into a matrix.
+ *
+ * \tparam ExecSpace
+ * \tparam SparseMatrix
+ * \tparam IndexVector
+ * \tparam ValueVector
+ *
+ * \param A The matrix
+ * \param m The number of rows
+ * \param idxm Row global indices
+ * \param n The number of columns
+ * \param idxn Column global indices
+ * \param values A logically two-dimensional array of values
+ */
+template <typename ExecSpace, typename SparseMatrix, typename IndexVector,
+          typename ValueVector>
+void set_values(SparseMatrix& A, typename IndexVector::value_type m,
+                const IndexVector idxm, typename IndexVector::value_type n,
+                const IndexVector idxn, ValueVector values) {
+  Impl::set_values<ExecSpace>(A, m, idxm, n, idxn, values);
 }
 
 }  // namespace Morpheus
