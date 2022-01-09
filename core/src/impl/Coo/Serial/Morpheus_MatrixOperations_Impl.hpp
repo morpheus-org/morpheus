@@ -28,6 +28,8 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
 
+#include <Morpheus_Exceptions.hpp>
+
 namespace Morpheus {
 namespace Impl {
 
@@ -46,6 +48,33 @@ void update_diagonal(
       A.values(n) = diagonal[A.column_indices(n)];
     }
   }
+}
+
+template <typename ExecSpace, typename SparseMatrix, typename IndexType,
+          typename ValueType>
+void set_value(SparseMatrix& A, IndexType row, IndexType col, ValueType value,
+               CooTag,
+               typename std::enable_if_t<
+                   !Morpheus::is_kokkos_space_v<ExecSpace> &&
+                   Morpheus::is_Serial_space_v<ExecSpace> &&
+                   Morpheus::has_access_v<typename ExecSpace::execution_space,
+                                          SparseMatrix>>* = nullptr) {
+  throw Morpheus::NotImplementedException("set_value not implemented yet");
+}
+
+template <typename ExecSpace, typename SparseMatrix, typename IndexVector,
+          typename ValueVector>
+void set_values(
+    SparseMatrix& A, typename IndexVector::value_type m, const IndexVector idxm,
+    typename IndexVector::value_type n, const IndexVector idxn,
+    const ValueVector values, CooTag, DenseVectorTag, DenseVectorTag,
+    typename std::enable_if_t<
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space,
+                               SparseMatrix, IndexVector, ValueVector>>* =
+        nullptr) {
+  throw Morpheus::NotImplementedException("set_values not implemented yet");
 }
 
 }  // namespace Impl

@@ -52,6 +52,7 @@ void update_diagonal(SparseMatrix& A, const Vector& diagonal) {
 /**
  * Set a single entry into a matrix.
  *
+ * \tparam ExecSpace
  * \tparam SparseMatrix
  * \tparam IndexType
  * \tparam ValueType
@@ -61,9 +62,10 @@ void update_diagonal(SparseMatrix& A, const Vector& diagonal) {
  * \param col The column location of the entry
  * \param value The value to insert
  */
-template <typename SparseMatrix, typename IndexType, typename ValueType>
+template <typename ExecSpace, typename SparseMatrix, typename IndexType,
+          typename ValueType>
 void set_value(SparseMatrix& A, IndexType row, IndexType col, ValueType value) {
-  Impl::set_value(A, row, col, value);
+  Impl::set_value(A, row, col, value, typename SparseMatrix::tag{});
 }
 
 /**
@@ -86,7 +88,8 @@ template <typename ExecSpace, typename SparseMatrix, typename IndexVector,
 void set_values(SparseMatrix& A, typename IndexVector::value_type m,
                 const IndexVector idxm, typename IndexVector::value_type n,
                 const IndexVector idxn, ValueVector values) {
-  Impl::set_values<ExecSpace>(A, m, idxm, n, idxn, values);
+  Impl::set_values<ExecSpace>(A, m, idxm, n, idxn, values,
+                              typename SparseMatrix::tag{});
 }
 
 }  // namespace Morpheus
