@@ -32,8 +32,13 @@ using MSpace = Morpheus::Cuda;
 #else
 using coo    = Morpheus::CooMatrix<double, int, Kokkos::HostSpace>;
 using vec    = Morpheus::DenseVector<double, Kokkos::HostSpace>;
+#if defined(MORPHEUS_ENABLE_OPENMP)
 using KSpace = Kokkos::OpenMP;
 using MSpace = Morpheus::OpenMP;
+#else
+using KSpace = Kokkos::Serial;
+using MSpace = Kokkos::Serial;
+#endif
 #endif
 
 int main(int argc, char* argv[]) {

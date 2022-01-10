@@ -24,6 +24,8 @@
 #ifndef MORPHEUS_DENSEVECTOR_OPENMP_REDUCTION_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_OPENMP_REDUCTION_IMPL_HPP
 
+#if defined(MORPHEUS_ENABLE_OPENMP)
+
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
@@ -52,5 +54,7 @@ typename Vector::value_type reduce(
 
 }  // namespace Impl
 }  // namespace Morpheus
+
+#endif  // MORPHEUS_ENABLE_OPENMP
 
 #endif  // MORPHEUS_DENSEVECTOR_OPENMP_REDUCTION_IMPL_HPP
