@@ -94,8 +94,7 @@ void convert(const SourceType& src, DestinationType& dst, DiaTag, CooTag) {
 }
 
 template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
-             typename SourceType::index_type alignment = 32) {
+void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag) {
   using IndexType = typename SourceType::index_type;
 
   if (src.nnnz() == 0) {
