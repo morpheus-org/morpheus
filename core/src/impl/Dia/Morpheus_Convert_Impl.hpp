@@ -119,7 +119,16 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
         "DiaMatrix fill-in would exceed maximum tolerance");
   }
 
-  dst.resize(src.nrows(), src.ncols(), src.nnnz(), ndiags, alignment);
+  MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
+                  "Destination matrix must have equal or larger shape to the "
+                  "source matrix");
+  MORPHEUS_ASSERT(dst.nnnz() >= src.nnnz(),
+                  "Destination matrix must have equal or larger number of "
+                  "non-zeros to the source matrix");
+  MORPHEUS_ASSERT(
+      dst.cdiagonal_offsets().size() >= src.cdiagonal_offsets().size(),
+      "Destination matrix must have equal or larger number of diagonals to the "
+      "source matrix");
 
   for (auto it = diag_set.cbegin(); it != diag_set.cend(); ++it) {
     auto i                  = std::distance(diag_set.cbegin(), it);

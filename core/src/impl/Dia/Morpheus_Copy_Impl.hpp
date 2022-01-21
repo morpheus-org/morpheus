@@ -35,16 +35,16 @@ namespace Impl {
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DiaTag, DiaTag) {
-  MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
-                  "Destination matrix must have equal or larger shape to the "
-                  "source matrix");
-  MORPHEUS_ASSERT(dst.nnnz() >= src.nnnz(),
-                  "Destination matrix must have equal or larger number of "
-                  "non-zeros to the source matrix");
   MORPHEUS_ASSERT(
-      dst.cdiagonal_offsets().size() >= src.cdiagonal_offsets().size(),
-      "Destination matrix must have equal or larger number of diagonals to the "
-      "source matrix");
+      (dst.nrows() == src.nrows()) && (dst.ncols() == src.ncols()),
+      "Destination matrix must have equal shape to the source matrix");
+  MORPHEUS_ASSERT(dst.nnnz() == src.nnnz(),
+                  "Destination matrix must have equal number of non-zeros to "
+                  "the source matrix");
+  MORPHEUS_ASSERT(
+      dst.cdiagonal_offsets().size() == src.cdiagonal_offsets().size(),
+      "Destination matrix must have equal number of diagonals to the source "
+      "matrix");
 
   Morpheus::Impl::copy(src.cdiagonal_offsets(), dst.diagonal_offsets(),
                        DenseVectorTag(), DenseVectorTag());

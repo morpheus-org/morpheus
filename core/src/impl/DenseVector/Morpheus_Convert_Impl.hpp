@@ -40,7 +40,9 @@ void convert(
         is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
-  dst.resize(src.size());
+  MORPHEUS_ASSERT(dst.size() >= src.size(),
+                  "Destination vector must be of equal or larger size to the "
+                  "source vector");
 
   for (index_type i = 0; i < src.size(); i++) {
     dst[i] = src[i];

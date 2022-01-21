@@ -34,12 +34,12 @@ namespace Impl {
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, CooTag, CooTag) {
-  MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
-                  "Destination matrix must have equal or larger shape to the "
-                  "source matrix");
-  MORPHEUS_ASSERT(dst.nnnz() >= src.nnnz(),
-                  "Destination matrix must have equal or larger number of "
-                  "non-zeros to the source matrix");
+  MORPHEUS_ASSERT(
+      (dst.nrows() == src.nrows()) && (dst.ncols() == src.ncols()),
+      "Destination matrix must have equal shape to the source matrix");
+  MORPHEUS_ASSERT(dst.nnnz() == src.nnnz(),
+                  "Destination matrix must have equal number of non-zeros to "
+                  "the source matrix");
 
   Morpheus::Impl::copy(src.crow_indices(), dst.row_indices(), DenseVectorTag(),
                        DenseVectorTag());

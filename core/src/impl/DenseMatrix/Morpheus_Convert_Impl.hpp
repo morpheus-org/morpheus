@@ -38,7 +38,10 @@ void convert(
                      typename DestinationType::memory_space>::value &&
         is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
-  dst.resize(src.nrows(), src.ncols());
+
+  MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
+                  "Destination matrix must have equal or larger shape to the "
+                  "source matrix");
 
   for (index_type i = 0; i < src.nrows(); i++) {
     for (index_type j = 0; j < src.ncols(); j++) {

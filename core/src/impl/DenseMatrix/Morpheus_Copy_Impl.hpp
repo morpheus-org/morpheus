@@ -35,9 +35,9 @@ namespace Impl {
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DenseMatrixTag,
           DenseMatrixTag) {
-  MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
-                  "Destination matrix must have equal or larger shape to the "
-                  "source matrix");
+  MORPHEUS_ASSERT(
+      (dst.nrows() == src.nrows()) && (dst.ncols() == src.ncols()),
+      "Destination matrix must have equal shape to the source matrix");
 
   // Kokkos has src and dst the other way round
   Kokkos::deep_copy(dst.view(), src.const_view());
