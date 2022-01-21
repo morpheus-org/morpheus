@@ -126,7 +126,7 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag,
                   "Destination matrix must have equal or larger number of "
                   "non-zeros to the source matrix");
   MORPHEUS_ASSERT(
-      dst.cdiagonal_offsets().size() >= src.cdiagonal_offsets().size(),
+      dst.diagonal_offsets().size() >= src.cdiagonal_offsets().size(),
       "Destination matrix must have equal or larger number of diagonals to the "
       "source matrix");
 

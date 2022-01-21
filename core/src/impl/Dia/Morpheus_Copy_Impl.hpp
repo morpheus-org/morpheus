@@ -42,7 +42,7 @@ void copy(const SourceType& src, DestinationType& dst, DiaTag, DiaTag) {
                   "Destination matrix must have equal number of non-zeros to "
                   "the source matrix");
   MORPHEUS_ASSERT(
-      dst.cdiagonal_offsets().size() == src.cdiagonal_offsets().size(),
+      dst.diagonal_offsets().size() == src.cdiagonal_offsets().size(),
       "Destination matrix must have equal number of diagonals to the source "
       "matrix");
 
