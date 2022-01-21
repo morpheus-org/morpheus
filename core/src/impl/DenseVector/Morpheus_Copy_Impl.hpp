@@ -27,6 +27,7 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 
+#include <impl/Morpheus_Utils.hpp>
 #include <Kokkos_Core.hpp>
 
 namespace Morpheus {
@@ -35,7 +36,10 @@ namespace Impl {
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DenseVectorTag,
           DenseVectorTag) {
-  dst.resize(src.size());
+  MORPHEUS_ASSERT(dst.size() >= src.size(),
+                  "Destination vector must be of equal or larger size to the "
+                  "source vector");
+
   // Kokkos has src and dst the other way round
   Kokkos::deep_copy(dst.view(), src.const_view());
 }

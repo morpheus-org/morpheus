@@ -80,6 +80,21 @@ nextPow2(IndexType x,
   return ++x;
 }
 
+#ifndef NDEBUG
+#define MORPHEUS_ASSERT(condition, message)                              \
+  do {                                                                   \
+    if (!(condition)) {                                                  \
+      std::cerr << "Assertion `" #condition "` failed in " << __FILE__   \
+                << " line " << __LINE__ << ": " << message << std::endl; \
+      std::terminate();                                                  \
+    }                                                                    \
+  } while (false)
+#else
+#define MORPHEUS_ASSERT(condition, message) \
+  do {                                      \
+  } while (false)
+#endif
+
 }  // namespace Impl
 }  // namespace Morpheus
 

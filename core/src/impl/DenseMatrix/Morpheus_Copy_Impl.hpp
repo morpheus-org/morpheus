@@ -26,6 +26,7 @@
 
 #include <Morpheus_FormatTags.hpp>
 
+#include <impl/Morpheus_Utils.hpp>
 #include <Kokkos_Core.hpp>
 
 namespace Morpheus {
@@ -34,7 +35,10 @@ namespace Impl {
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DenseMatrixTag,
           DenseMatrixTag) {
-  dst.resize(src.nrows(), src.ncols());
+  MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
+                  "Destination matrix must have equal or larger shape to the "
+                  "source matrix");
+
   // Kokkos has src and dst the other way round
   Kokkos::deep_copy(dst.view(), src.const_view());
 }
