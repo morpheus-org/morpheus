@@ -33,6 +33,14 @@ void copy(const SourceType& src, DestinationType& dst) {
   Impl::copy(src, dst, typename SourceType::tag(),
              typename DestinationType::tag());
 }
+
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst,
+          const typename SourceType::index_type begin,
+          const typename SourceType::index_type end) {
+  Impl::copy(src, dst, begin, end, typename SourceType::tag(),
+             typename DestinationType::tag());
+}
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_COPY_HPP

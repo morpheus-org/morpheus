@@ -30,6 +30,8 @@
 #include <impl/Morpheus_Utils.hpp>
 #include <Kokkos_Core.hpp>
 
+#include <utility>  // std::pair
+
 namespace Morpheus {
 namespace Impl {
 
@@ -42,6 +44,18 @@ void copy(const SourceType& src, DestinationType& dst, DenseVectorTag,
 
   // Kokkos has src and dst the other way round
   Kokkos::deep_copy(dst.view(), src.const_view());
+}
+
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst,
+          const typename SourceType::index_type begin,
+          const typename SourceType::index_type end, DenseVectorTag,
+          DenseVectorTag) {
+  auto src_sub = Kokkos::subview(src.const_view(), std::make_pair(begin, end));
+  auto dst_sub = Kokkos::subview(dst.view(), std::make_pair(begin, end));
+
+  // Kokkos has src and dst the other way round
+  Kokkos::deep_copy(dst_sub, src_sub);
 }
 
 }  // namespace Impl
