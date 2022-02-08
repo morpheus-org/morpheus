@@ -7,6 +7,9 @@ if(MORPHEUS_ENABLE_CUDA)
   morpheus_add_executable_and_test(Examples_Cuda SOURCES Examples_Cuda.cpp)
 endif()
 
+morpheus_add_executable_and_test(Example_VectorSlice_copy SOURCES
+                                 Example_VectorSlice_copy.cpp)
+
 morpheus_add_executable_and_test(Examples_DiaConvert SOURCES
                                  Examples_DiaConvert.cpp)
 
