@@ -30,8 +30,8 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
+#include <Morpheus_Reduction.hpp>
 
-#include <fwd/Morpheus_Fwd_Algorithms.hpp>
 #include <impl/Morpheus_CudaUtils.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_Dot_Impl.hpp>
 
