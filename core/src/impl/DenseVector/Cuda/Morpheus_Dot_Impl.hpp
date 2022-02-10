@@ -40,7 +40,7 @@ namespace Impl {
 
 template <typename ExecSpace, typename Vector1, typename Vector2>
 typename Vector1::value_type dot(
-    const typename Vector::index_type n, const Vector1& x, const Vector2& y,
+    const typename Vector1::index_type n, const Vector1& x, const Vector2& y,
     DenseVectorTag, DenseVectorTag, Alg0,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
