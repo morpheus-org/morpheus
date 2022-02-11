@@ -27,12 +27,13 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_CUDA)
 
-#include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_FormatTags.hpp>
 #include <Morpheus_AlgorithmTags.hpp>
-
-#include <impl/Morpheus_CudaUtils.hpp>
+#include <Morpheus_Copy.hpp>
+#include <Morpheus_FormatTags.hpp>
+#include <Morpheus_TypeTraits.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_Reduction_Impl.hpp>
+#include <impl/DenseVector/Serial/Morpheus_Reduction_Impl.hpp>
+#include <impl/Morpheus_CudaUtils.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -186,12 +187,12 @@ typename Vector::value_type reduce(
         nullptr) {
   using ValueType = typename Vector::value_type;
 
-  ValueType result            = 0;
-  const int maxThreads        = 256;  // number of threads per block
-  const int maxBlocks         = min(size / maxThreads, CUDA_MAX_BLOCK_DIM_SIZE);
+  ValueType result = 0;
+  const int maxThreads = 256;  // number of threads per block
+  const int maxBlocks = min(size / maxThreads, CUDA_MAX_BLOCK_DIM_SIZE);
   const int cpuFinalThreshold = CUDA_WARP_SIZE;
-  int numBlocks               = 0;
-  int numThreads              = 0;
+  int numBlocks = 0;
+  int numThreads = 0;
 
   getNumBlocksAndThreads<int>(size, maxBlocks, maxThreads, numBlocks,
                               numThreads);
@@ -210,11 +211,12 @@ typename Vector::value_type reduce(
   while (s > cpuFinalThreshold) {
     int threads = 0, blocks = 0;
     getNumBlocksAndThreads<int>(s, maxBlocks, maxThreads, blocks, threads);
-    checkCudaErrors(cudaMemcpy(inter_sums.data(), out.data(),
-                               s * sizeof(ValueType),
-                               cudaMemcpyDeviceToDevice));
+    Morpheus::copy(out, inter_sums, 0, s);
+
     reduce<ExecSpace>(inter_sums, out, s, threads, blocks,
                       typename Vector::tag{}, typename Vector::tag{}, Alg0{});
+    // check if kernel execution generated an error
+    getLastCudaError("Kernel execution failed");
 
     s = (s + (threads * 2 - 1)) / (threads * 2);
   }
@@ -222,17 +224,14 @@ typename Vector::value_type reduce(
   if (s > 1) {
     typename Vector::HostMirror h_out(s, 0);
     // copy result from device to host
-    checkCudaErrors(cudaMemcpy(h_out.data(), out.data(), s * sizeof(ValueType),
-                               cudaMemcpyDeviceToHost));
-
-    for (int i = 0; i < s; i++) {
-      result += h_out[i];
-    }
+    Morpheus::copy(out, h_out, 0, s);
+    result = reduce<Kokkos::Serial>(h_out, s, typename Vector::tag{}, Alg0{});
 
   } else {
     // copy final sum from device to host
-    checkCudaErrors(cudaMemcpy(&result, out.data(), sizeof(ValueType),
-                               cudaMemcpyDeviceToHost));
+    typename Vector::HostMirror h_out(1, 0);
+    Morpheus::copy(out, h_out, 0, 1);
+    result = h_out[0];
   }
 
   return result;
