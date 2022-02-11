@@ -157,6 +157,12 @@ class DynamicMatrix
   }
 
   template <class VR, class... PR>
+  inline void resize(const DynamicMatrix<VR, PR...> &src) {
+    Morpheus::Impl::Variant::visit(Impl::any_type_resize_from_mat(),
+                                   src.const_formats(), _formats);
+  }
+
+  template <class VR, class... PR>
   inline DynamicMatrix &allocate(const std::string name,
                                  const DynamicMatrix<VR, PR...> &src) {
     this->set_name(name);

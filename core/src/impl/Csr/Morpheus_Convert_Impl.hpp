@@ -41,12 +41,7 @@ void convert(
         is_HostSpace_v<typename SourceType::device_type>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
-  MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
-                  "Destination matrix must have equal or larger shape to the "
-                  "source matrix");
-  MORPHEUS_ASSERT(dst.nnnz() >= src.nnnz(),
-                  "Destination matrix must have equal or larger number of "
-                  "non-zeros to the source matrix");
+  dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
   // element-wise copy of indices and values
   for (index_type n = 0; n < src.nrows() + 1; n++) {
@@ -65,48 +60,51 @@ void convert(
 template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, CsrTag, CooTag) {
   // Complexity: Linear.  Specifically O(nnz(csr) + max(n_row,n_col))
-  using IndexType = typename SourceType::index_type;
+  using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
   // expand compressed indices
-  for (IndexType i = 0; i < src.nrows(); i++) {
-    for (IndexType jj = src.crow_offsets(i); jj < src.crow_offsets(i + 1);
+  for (index_type i = 0; i < src.nrows(); i++) {
+    for (index_type jj = src.crow_offsets(i); jj < src.crow_offsets(i + 1);
          jj++) {
       dst.row_indices(jj) = i;
     }
   }
 
-  Morpheus::Impl::copy(src.ccolumn_indices(), dst.column_indices(),
-                       DenseVectorTag(), DenseVectorTag());
-  Morpheus::Impl::copy(src.cvalues(), dst.values(), DenseVectorTag(),
-                       DenseVectorTag());
+  for (index_type n = 0; n < src.nnnz(); n++) {
+    dst.column_indices(n) = src.ccolumn_indices(n);
+  }
+
+  for (index_type n = 0; n < src.nnnz(); n++) {
+    dst.values(n) = src.cvalues(n);
+  }
 }
 
 template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, CooTag, CsrTag) {
   // Complexity: Linear.  Specifically O(nnz(coo) + max(n_row,n_col))
-  using IndexType = typename SourceType::index_type;
+  using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
   // compute number of non-zero entries per row of coo src
-  for (IndexType n = 0; n < src.nnnz(); n++) {
+  for (index_type n = 0; n < src.nnnz(); n++) {
     dst.row_offsets(src.crow_indices(n))++;
   }
 
   // cumsum the nnz per row to get csr row_offsets
-  for (IndexType i = 0, cumsum = 0; i < src.nrows(); i++) {
-    IndexType temp     = dst.row_offsets(i);
+  for (index_type i = 0, cumsum = 0; i < src.nrows(); i++) {
+    index_type temp    = dst.row_offsets(i);
     dst.row_offsets(i) = cumsum;
     cumsum += temp;
   }
   dst.row_offsets(src.nrows()) = src.nnnz();
 
   // write coo column indices and values into csr
-  for (IndexType n = 0; n < src.nnnz(); n++) {
-    IndexType row  = src.crow_indices(n);
-    IndexType dest = dst.row_offsets(row);
+  for (index_type n = 0; n < src.nnnz(); n++) {
+    index_type row  = src.crow_indices(n);
+    index_type dest = dst.row_offsets(row);
 
     dst.column_indices(dest) = src.ccolumn_indices(n);
     dst.values(dest)         = src.cvalues(n);
@@ -114,8 +112,8 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, CsrTag) {
     dst.row_offsets(row)++;
   }
 
-  for (IndexType i = 0, last = 0; i <= src.nrows(); i++) {
-    IndexType temp     = dst.row_offsets(i);
+  for (index_type i = 0, last = 0; i <= src.nrows(); i++) {
+    index_type temp    = dst.row_offsets(i);
     dst.row_offsets(i) = last;
     last               = temp;
   }

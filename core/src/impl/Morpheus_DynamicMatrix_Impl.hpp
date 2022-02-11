@@ -102,6 +102,30 @@ struct any_type_resize
   }
 };
 
+struct any_type_resize_from_mat {
+  using result_type = void;
+
+  template <typename T1, typename T2>
+  result_type operator()(
+      const T1 &src, T2 &dst,
+      typename std::enable_if<
+          std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
+          nullptr) {
+    dst.resize(src);
+  }
+
+  template <typename T1, typename T2>
+  result_type operator()(
+      const T1 &src, T2 &dst,
+      typename std::enable_if<
+          !std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
+          nullptr) {
+    throw Morpheus::RuntimeException(
+        "Invalid use of the dynamic resize interface. Src tag " + src.name() +
+        " and dst tag " + dst.name() + " must be the same");
+  }
+};
+
 struct any_type_allocate {
   using result_type = void;
 

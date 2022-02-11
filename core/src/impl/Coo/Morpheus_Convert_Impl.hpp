@@ -39,12 +39,7 @@ void convert(
         is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
-  MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
-                  "Destination matrix must have equal or larger shape to the "
-                  "source matrix");
-  MORPHEUS_ASSERT(dst.nnnz() >= src.nnnz(),
-                  "Destination matrix must have equal or larger number of "
-                  "non-zeros to the source matrix");
+  dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
   // element-wise copy of indices and values
   for (index_type n = 0; n < src.nnnz(); n++) {

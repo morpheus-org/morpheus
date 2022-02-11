@@ -60,26 +60,26 @@ void convert(
 
 template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, DiaTag, CooTag) {
-  using IndexType = typename SourceType::index_type;
-  using ValueType = typename SourceType::value_type;
+  using index_type = typename SourceType::index_type;
+  using value_type = typename SourceType::value_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
-  const IndexType ndiag = src.cvalues().ncols();
+  const index_type ndiag = src.cvalues().ncols();
 
-  for (IndexType i = 0, nnzid = 0; i < ndiag; i++) {
-    const IndexType k = src.cdiagonal_offsets(i);
+  for (index_type i = 0, nnzid = 0; i < ndiag; i++) {
+    const index_type k = src.cdiagonal_offsets(i);
 
-    const IndexType i_start = std::max<IndexType>(0, -k);
-    const IndexType j_start = std::max<IndexType>(0, k);
+    const index_type i_start = std::max<index_type>(0, -k);
+    const index_type j_start = std::max<index_type>(0, k);
 
     // number of elements to process in this diagonal
-    const IndexType N = std::min(src.nrows() - i_start, src.ncols() - j_start);
+    const index_type N = std::min(src.nrows() - i_start, src.ncols() - j_start);
 
-    for (IndexType n = 0; n < N; n++) {
-      const ValueType temp = src.cvalues(i_start + n, i);
+    for (index_type n = 0; n < N; n++) {
+      const value_type temp = src.cvalues(i_start + n, i);
 
-      if (temp != ValueType(0)) {
+      if (temp != value_type(0)) {
         dst.row_indices(nnzid)    = i_start + n;
         dst.column_indices(nnzid) = j_start + n;
         dst.values(nnzid)         = temp;
@@ -95,47 +95,38 @@ void convert(const SourceType& src, DestinationType& dst, DiaTag, CooTag) {
 
 template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag) {
-  using IndexType = typename SourceType::index_type;
+  using index_type = typename SourceType::index_type;
 
   if (src.nnnz() == 0) {
     dst.resize(src.nrows(), src.ncols(), src.nnnz(), 0);
     return;
   }
 
-  std::vector<IndexType> diag_map(src.nnnz(), 0);
+  std::vector<index_type> diag_map(src.nnnz(), 0);
 
   // Find on which diagonal each entry sits on
-  for (IndexType n = 0; n < IndexType(src.nnnz()); n++) {
+  for (index_type n = 0; n < index_type(src.nnnz()); n++) {
     diag_map[n] = src.ccolumn_indices(n) - src.crow_indices(n);
   }
 
   // Create unique diagonal set
-  std::set<IndexType> diag_set(diag_map.begin(), diag_map.end());
-  IndexType ndiags = IndexType(diag_set.size());
+  std::set<index_type> diag_set(diag_map.begin(), diag_map.end());
+  index_type ndiags = index_type(diag_set.size());
 
   if (dst.exceeds_tolerance(src.nrows(), src.nnnz(), ndiags)) {
     throw Morpheus::FormatConversionException(
         "DiaMatrix fill-in would exceed maximum tolerance");
   }
 
-  MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
-                  "Destination matrix must have equal or larger shape to the "
-                  "source matrix");
-  MORPHEUS_ASSERT(dst.nnnz() >= src.nnnz(),
-                  "Destination matrix must have equal or larger number of "
-                  "non-zeros to the source matrix");
-  MORPHEUS_ASSERT(
-      dst.diagonal_offsets().size() >= ndiags,
-      "Destination matrix must have equal or larger number of diagonals to the "
-      "source matrix");
+  dst.resize(src.nrows(), src.ncols(), src.nnnz(), ndiags);
 
   for (auto it = diag_set.cbegin(); it != diag_set.cend(); ++it) {
     auto i                  = std::distance(diag_set.cbegin(), it);
     dst.diagonal_offsets(i) = *it;
   }
 
-  for (IndexType n = 0; n < IndexType(src.nnnz()); n++) {
-    for (IndexType i = 0; i < IndexType(ndiags); i++) {
+  for (index_type n = 0; n < index_type(src.nnnz()); n++) {
+    for (index_type i = 0; i < index_type(ndiags); i++) {
       if (diag_map[n] == dst.diagonal_offsets(i)) {
         dst.values(src.crow_indices(n), i) = src.cvalues(n);
         break;

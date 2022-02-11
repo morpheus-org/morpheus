@@ -206,6 +206,11 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   }
 
   template <class VR, class... PR>
+  inline void resize(const CooMatrix<VR, PR...> &src) {
+    resize(src.nrows(), src.ncols(), src.nnnz());
+  }
+
+  template <class VR, class... PR>
   inline CooMatrix &allocate(const std::string name,
                              const CooMatrix<VR, PR...> &src) {
     this->set_name(name);

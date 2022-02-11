@@ -46,6 +46,7 @@ struct copy_fn {
           is_compatible_type<SourceType, DestinationType>::value ||
           is_compatible_from_different_space<
               SourceType, DestinationType>::value>::type* = nullptr) {
+    dst.resize(src);
     Morpheus::copy(src, dst);
   }
 
@@ -87,9 +88,8 @@ template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, SparseMatTag,
           DynamicTag) {
   dst.activate(src.format_enum());
-  dst.set_nrows(src.nrows());
-  dst.set_ncols(src.ncols());
-  dst.set_nnnz(src.nnnz());
+  // dst.resize(src.nrows(), src.ncols(), src.nnnz());
+  dst.resize(src);
   auto f = std::bind(Impl::copy_fn(), std::cref(src), std::placeholders::_1);
   Morpheus::Impl::Variant::visit(f, dst.formats());
 }
@@ -97,9 +97,8 @@ void copy(const SourceType& src, DestinationType& dst, SparseMatTag,
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, DynamicTag, DynamicTag) {
   dst.activate(src.active_index());
-  dst.set_nrows(src.nrows());
-  dst.set_ncols(src.ncols());
-  dst.set_nnnz(src.nnnz());
+  dst.resize(src);
+
   Morpheus::Impl::Variant::visit(Impl::copy_fn(), src.const_formats(),
                                  dst.formats());
 }

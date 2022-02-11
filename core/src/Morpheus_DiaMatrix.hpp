@@ -237,6 +237,11 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   }
 
   template <class VR, class... PR>
+  inline void resize(const DiaMatrix<VR, PR...> &src) {
+    resize(src.nrows(), src.ncols(), src.nnnz(), src.ndiags(), src.alignment());
+  }
+
+  template <class VR, class... PR>
   inline DiaMatrix &allocate(const std::string name,
                              const DiaMatrix<VR, PR...> &src) {
     this->set_name(name);
