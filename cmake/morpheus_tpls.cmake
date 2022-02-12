@@ -401,6 +401,7 @@ macro(morpheus_import_tpl NAME)
   if(MORPHEUS_ENABLE_TPL_${NAME})
     # Tack on a TPL here to make sure we avoid using anyone else's find
     find_package(TPL${NAME} REQUIRED MODULE)
+    message(STATUS "Found ${NAME} at ${${NAME}_DIR}")
     if(NOT TPL_${NAME}_IMPORTED_NAME)
       message(
         FATAL_ERROR
