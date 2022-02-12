@@ -452,37 +452,11 @@ function(morpheus_link_tpl TARGET)
   endif()
 endfunction()
 
-morpheus_add_tpl_option(BLAS OFF "Whether to enable BLAS")
-morpheus_add_tpl_option(MKL OFF "Whether to enable MKL")
-morpheus_add_tpl_option(CBLAS OFF "Whether to enable CBLAS")
-morpheus_add_tpl_option(ARMPL OFF "Whether to enable ARMPL")
-
-morpheus_add_option(
-  NO_DEFAULT_CUDA_TPLS OFF BOOL
-  "Whether CUDA TPLs should be enabled by default. Default: OFF")
-set(CUBLAS_DEFAULT ${MORPHEUS_ENABLE_CUDA})
-set(CUSPARSE_DEFAULT ${MORPHEUS_ENABLE_CUDA})
-if(MORPHEUS_NO_DEFAULT_CUDA_TPLS)
-  set(CUBLAS_DEFAULT OFF)
-  set(CUSPARSE_DEFAULT OFF)
-endif()
-morpheus_add_tpl_option(
-  CUBLAS ${CUBLAS_DEFAULT} "Whether to enable CUBLAS" DEFAULT_DOCSTRING
-  "ON if CUDA-enabled Kokkos, otherwise OFF")
-morpheus_add_tpl_option(
-  CUSPARSE ${CUSPARSE_DEFAULT} "Whether to enable CUSPARSE" DEFAULT_DOCSTRING
-  "ON if CUDA-enabled Kokkos, otherwise OFF")
-
-morpheus_add_tpl_option(METIS OFF "Whether to enable METIS")
+morpheus_add_tpl_option(MPARK_VARIANT OFF
+                        "Whether to enable Mpark Variant implementation")
 
 # We need to do all the import work
-morpheus_import_tpl(BLAS)
-morpheus_import_tpl(MKL)
-morpheus_import_tpl(CUBLAS)
-morpheus_import_tpl(CUSPARSE)
-morpheus_import_tpl(CBLAS)
-morpheus_import_tpl(METIS)
-morpheus_import_tpl(ARMPL)
+morpheus_import_tpl(MPARK_VARIANT)
 
 # Convert list to newlines (which CMake doesn't always like in cache variables)
 string(REPLACE ";" "\n" MORPHEUS_TPL_EXPORT_TEMP "${MORPHEUS_TPL_EXPORTS}")

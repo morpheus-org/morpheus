@@ -27,26 +27,7 @@
 /* Define if building in debug mode */
 #cmakedefine HAVE_MORPHEUS_DEBUG
 
-/* Define this macro if the MKL TPL is enabled.  This is different
-   than just linking against the MKL to get the BLAS and LAPACK; it
-   requires (a) header file(s) as well, and may use functions other
-   than just BLAS and LAPACK functions.  */
-#cmakedefine HAVE_MORPHEUS_MKL
 /*
  * Third Party Libraries
  */
-#cmakedefine MORPHEUS_ENABLE_TPL_BLAS      /* BLAS library */
-#cmakedefine MORPHEUS_ENABLE_TPL_MKL       /* MKL library */
-#cmakedefine MORPHEUS_ENABLE_TPL_CUSPARSE  /* CUSPARSE */
-#cmakedefine MORPHEUS_ENABLE_TPL_CUBLAS    /* CUBLAS */
-#cmakedefine MORPHEUS_ENABLE_TPL_CBLAS     /* CBLAS */
-#cmakedefine MORPHEUS_ENABLE_TPL_METIS     /* METIS */
-#cmakedefine MORPHEUS_ENABLE_TPL_ARMPL     /* ARMPL */
-
-/* if MKL or ARMPL, BLAS is also defined */
-#if defined(MORPHEUS_ENABLE_TPL_MKL) ||\
-    defined(MORPHEUS_ENABLE_TPL_ARMPL)
-#if !defined(MORPHEUS_ENABLE_TPL_BLAS)
-#define MORPHEUS_ENABLE_TPL_BLAS
-#endif
-#endif
+#cmakedefine MORPHEUS_ENABLE_TPL_MPARK_VARIANT  /* Mpark::variant */

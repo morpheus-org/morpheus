@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -24,12 +24,20 @@
 #ifndef MORPHEUS_IMPL_VARIANT_HPP
 #define MORPHEUS_IMPL_VARIANT_HPP
 
+#if defined(MORPHEUS_ENABLE_TPL_MPARK_VARIANT)
+#include "mpark/variant.hpp"
+#else
 #include <variant>
+#endif  // MORPHEUS_ENABLE_TPL_MPARK_VARIANT
 
 namespace Morpheus {
 namespace Impl {
+#if defined(Morpheus_ENABLE_TPL_MPARK_VARIANT)
+namespace Variant = ::mpark;
+#else
 namespace Variant = ::std;
-}
+#endif  // MORPHEUS_ENABLE_TPL_MPARK_VARIANT
+}  // namespace Impl
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_IMPL_VARIANT_HPP
