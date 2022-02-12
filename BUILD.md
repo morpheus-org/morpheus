@@ -180,3 +180,33 @@ $ srun --exclusive --nodes=1 --time=01:00:00 --gres=gpu:4 --partition=gpu-cascad
 $ ACCOUNT_ID=YOUR_PROJECT_ID
 srun --exclusive --nodes=1 --time=01:00:00 --partition=standard --qos=standard --account=${ACCOUNT_ID} --pty /usr/bin/bash --login
 ```
+
+# Morpheus Keyword Listing
+## Enable Options
+Options can be enabled by specifying `-DMorpheus_ENABLE_X`.
+* Morpheus_ENABLE_DEBUG
+    * Whether to activate extra debug features - may increase compile times
+    * BOOL Default: OFF
+* Morpheus_ENABLE_EXAMPLES
+    * Whether to enable building examples
+    * BOOL Default: OFF
+* Morpheus_ENABLE_TESTS
+    * Whether to enable building tests
+    * BOOL Default: OFF
+* Morpheus_ENABLE_BENCHMARKS
+    * Whether to enable building benchmarks
+    * BOOL Default: OFF
+* Morpheus_INSTALL_TESTING
+    * Whether to build tests and examples against installation
+    * BOOL Default: OFF
+  
+## Third-party Libraries (TPLs)
+The following options control enabling TPLs:
+* Morpheus_ENABLE_TPL_MPARK_VARIANT
+    * Whether to enable the Mpark Variant library
+    * BOOL Default: OFF
+
+The following options control `find_package` paths for CMake-based TPLs:
+* MPARK_VARIANT_DIR or MPARK_VARIANT_ROOT
+    * Location of MPARK_VARIANT prefix (ROOT) or CMake config file (DIR)
+    * PATH Default:
