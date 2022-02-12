@@ -417,6 +417,8 @@ macro(morpheus_import_tpl NAME)
       morpheus_export_imported_tpl(${NAME} IMPORTED_NAME
                                    ${TPL_${NAME}_IMPORTED_NAME})
     endif()
+
+    message(STATUS "Building with ${NAME} TPL.")
   endif()
 endmacro(morpheus_import_tpl)
 
