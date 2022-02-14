@@ -46,13 +46,30 @@ void copy(const SourceType& src, DestinationType& dst, DenseVectorTag,
   Kokkos::deep_copy(dst.view(), src.const_view());
 }
 
+// template <typename SourceType, typename DestinationType>
+// void copy(const SourceType& src, DestinationType& dst,
+//           const typename SourceType::index_type begin,
+//           const typename SourceType::index_type end, DenseVectorTag,
+//           DenseVectorTag) {
+//   auto src_sub = Kokkos::subview(src.const_view(), std::make_pair(begin,
+//   end)); auto dst_sub = Kokkos::subview(dst.view(), std::make_pair(begin,
+//   end));
+
+//   // Kokkos has src and dst the other way round
+//   Kokkos::deep_copy(dst_sub, src_sub);
+// }
+
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst,
-          const typename SourceType::index_type begin,
-          const typename SourceType::index_type end, DenseVectorTag,
+          const typename SourceType::index_type src_begin,
+          const typename SourceType::index_type src_end,
+          const typename DestinationType::index_type dst_begin,
+          const typename DestinationType::index_type dst_end, DenseVectorTag,
           DenseVectorTag) {
-  auto src_sub = Kokkos::subview(src.const_view(), std::make_pair(begin, end));
-  auto dst_sub = Kokkos::subview(dst.view(), std::make_pair(begin, end));
+  auto src_sub =
+      Kokkos::subview(src.const_view(), std::make_pair(src_begin, src_end));
+  auto dst_sub =
+      Kokkos::subview(dst.view(), std::make_pair(dst_begin, dst_end));
 
   // Kokkos has src and dst the other way round
   Kokkos::deep_copy(dst_sub, src_sub);

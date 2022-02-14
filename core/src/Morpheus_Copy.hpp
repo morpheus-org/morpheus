@@ -36,11 +36,26 @@ void copy(const SourceType& src, DestinationType& dst) {
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst,
+          const typename SourceType::index_type src_begin,
+          const typename SourceType::index_type src_end,
+          const typename DestinationType::index_type dst_begin,
+          const typename DestinationType::index_type dst_end) {
+  static_assert(is_vector_v<typename SourceType::tag> &&
+                    is_vector_v<typename DestinationType::tag>,
+                "Both src and dst must be vectors.");
+  assert((src_end - src_begin) != (dst_end - dst_begin));
+
+  Impl::copy(src, dst, src_begin, src_end, dst_begin, dst_end,
+             typename SourceType::tag(), typename DestinationType::tag());
+}
+
+template <typename SourceType, typename DestinationType>
+void copy(const SourceType& src, DestinationType& dst,
           const typename SourceType::index_type begin,
           const typename SourceType::index_type end) {
-  Impl::copy(src, dst, begin, end, typename SourceType::tag(),
-             typename DestinationType::tag());
+  Morpheus::copy(src, dst, begin, end, begin, end);
 }
+
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_COPY_HPP

@@ -156,10 +156,30 @@ class DynamicMatrix
     return Morpheus::Impl::Variant::visit(f, _formats);
   }
 
+  // Resize from a compatible dynamic matrix
   template <class VR, class... PR>
-  inline void resize(const DynamicMatrix<VR, PR...> &src) {
+  inline void resize(
+      const DynamicMatrix<VR, PR...> &src,
+      typename std::enable_if<is_compatible_type<
+          DynamicMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type
+          * = nullptr) {
     Morpheus::Impl::Variant::visit(Impl::any_type_resize_from_mat(),
                                    src.const_formats(), _formats);
+  }
+
+  // Resize from a member matrix format
+  template <typename Matrix>
+  inline void resize(
+      const Matrix &src,
+      typename std::enable_if<
+          is_variant_member_v<typename Matrix::type, variant_type>>::type * =
+          nullptr) {
+    base::resize(src.nrows(), src.ncols(), src.nnnz());
+    this->activate(src.format_enum());
+
+    auto f = std::bind(Impl::any_type_resize_from_mat(), std::cref(src),
+                       std::placeholders::_1);
+    Morpheus::Impl::Variant::visit(f, _formats);
   }
 
   template <class VR, class... PR>

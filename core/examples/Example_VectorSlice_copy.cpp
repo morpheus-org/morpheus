@@ -29,9 +29,19 @@ using serial = Kokkos::Serial;
 int main() {
   Morpheus::initialize();
   {
-    vec x(50, 2), y(50, 0);
+    vec x(10, 2), y(10, 0);
 
-    Morpheus::copy(x, y, 0, 10);
+    Morpheus::copy(x, y, 0, 3);
+
+    x[2] = -15;
+    Morpheus::print(x);
+    Morpheus::print(y);
+  }
+
+  {
+    vec x(10, 2), y(15, 0);
+
+    Morpheus::copy(x, y, 0, 3, 7, 10);
 
     x[3] = -15;
     Morpheus::print(x);
