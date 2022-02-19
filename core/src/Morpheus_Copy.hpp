@@ -25,6 +25,7 @@
 #define MORPHEUS_COPY_HPP
 
 #include <impl/Morpheus_Copy_Impl.hpp>
+#include <impl/Morpheus_Utils.hpp>
 
 namespace Morpheus {
 
@@ -43,7 +44,11 @@ void copy(const SourceType& src, DestinationType& dst,
   static_assert(is_vector_v<typename SourceType::tag> &&
                     is_vector_v<typename DestinationType::tag>,
                 "Both src and dst must be vectors.");
-  assert((src_end - src_begin) != (dst_end - dst_begin));
+  MORPHEUS_ASSERT((src_end - src_begin) == (dst_end - dst_begin),
+                  "Source slice range ("
+                      << src_begin << ", " << src_end
+                      << ") should be equal to the destination slice range ("
+                      << dst_begin << ", " << dst_end << ").");
 
   Impl::copy(src, dst, src_begin, src_end, dst_begin, dst_end,
              typename SourceType::tag(), typename DestinationType::tag());
@@ -54,6 +59,19 @@ void copy(const SourceType& src, DestinationType& dst,
           const typename SourceType::index_type begin,
           const typename SourceType::index_type end) {
   Morpheus::copy(src, dst, begin, end, begin, end);
+}
+
+template <typename KeyType, typename SourceType, typename DestinationType>
+void copy_by_key(const KeyType keys, const SourceType& src,
+                 DestinationType& dst) {
+  static_assert(is_vector_v<typename KeyType::tag> &&
+                    is_vector_v<typename SourceType::tag> &&
+                    is_vector_v<typename DestinationType::tag>,
+                "Both src, keys and dst must be vectors.");
+  // TODO
+  // Impl::copy_by_key(keys, src, dst, typename KeyType::tag(),
+  //                   typename SourceType::tag(),
+  //                   typename DestinationType::tag());
 }
 
 }  // namespace Morpheus
