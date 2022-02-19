@@ -86,11 +86,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
 
   // Construct an empty DiaMatrix
   inline DiaMatrix()
-      : base("DiaMatrix"),
-        _ndiags(0),
-        _alignment(0),
-        _diagonal_offsets(),
-        _values() {}
+      : base(), _ndiags(0), _alignment(0), _diagonal_offsets(), _values() {}
 
   // Construct a DiaMatrix with:
   //      a specific shape
@@ -100,7 +96,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   inline DiaMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries, const index_type num_diagonals,
                    const index_type alignment = 32)
-      : base("DiaMatrix", num_rows, num_cols, num_entries),
+      : base(num_rows, num_cols, num_entries),
         _ndiags(num_diagonals),
         _alignment(alignment),
         _diagonal_offsets(num_diagonals) {
@@ -108,11 +104,11 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
                    num_diagonals);
   }
 
-  inline DiaMatrix(const std::string name, const index_type num_rows,
-                   const index_type num_cols, const index_type num_entries,
+  inline DiaMatrix(const index_type num_rows, const index_type num_cols,
+                   const index_type num_entries,
                    const index_array_type &diag_offsets,
                    const value_array_type &vals)
-      : base(name + "DiaMatrix", num_rows, num_cols, num_entries),
+      : base(num_rows, num_cols, num_entries),
         _diagonal_offsets(diag_offsets),
         _values(vals) {
     _ndiags    = _diagonal_offsets.size();
@@ -121,29 +117,17 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
 
   template <typename ValuePtr, typename IndexPtr>
   explicit inline DiaMatrix(
-      const std::string name, const index_type num_rows,
-      const index_type num_cols, const index_type num_entries,
-      IndexPtr diag_offsets_ptr, ValuePtr vals_ptr,
-      const index_type num_diagonals, const index_type alignment = 32,
+      const index_type num_rows, const index_type num_cols,
+      const index_type num_entries, IndexPtr diag_offsets_ptr,
+      ValuePtr vals_ptr, const index_type num_diagonals,
+      const index_type alignment = 32,
       typename std::enable_if<std::is_pointer<ValuePtr>::value &&
                               std::is_pointer<IndexPtr>::value>::type * =
           nullptr)
-      : base(name + "DiaMatrix_Unmanaged", num_rows, num_cols, num_entries),
+      : base(num_rows, num_cols, num_entries),
         _diagonal_offsets(num_diagonals, diag_offsets_ptr),
         _values(Impl::get_pad_size<index_type>(num_rows, alignment),
                 num_diagonals, vals_ptr) {}
-
-  inline DiaMatrix(const std::string name, const index_type num_rows,
-                   const index_type num_cols, const index_type num_entries,
-                   const index_type num_diagonals,
-                   const index_type alignment = 32)
-      : base(name + "DiaMatrix", num_rows, num_cols, num_entries),
-        _ndiags(num_diagonals),
-        _alignment(alignment),
-        _diagonal_offsets(num_diagonals) {
-    _values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
-                   num_diagonals);
-  }
 
   // Construct from another matrix type (Shallow)
   template <class VR, class... PR>
@@ -151,8 +135,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
             typename std::enable_if<is_compatible_type<
                 DiaMatrix, typename DiaMatrix<VR, PR...>::type>::value>::type
                 * = nullptr)
-      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
-             src.nnnz()),
+      : base(src.nrows(), src.ncols(), src.nnnz()),
         _ndiags(src.ndiags()),
         _alignment(src.alignment()),
         _diagonal_offsets(src.cdiagonal_offsets()),
@@ -164,7 +147,6 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
       is_compatible_type<DiaMatrix, typename DiaMatrix<VR, PR...>::type>::value,
       DiaMatrix &>::type
   operator=(const DiaMatrix<VR, PR...> &src) {
-    this->set_name(src.name());
     this->set_nrows(src.nrows());
     this->set_ncols(src.ncols());
     this->set_nnnz(src.nnnz());
@@ -185,8 +167,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
       typename std::enable_if<is_compatible_container<
           DiaMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type * =
           nullptr)
-      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
-             src.nnnz()) {
+      : base(src.nrows(), src.ncols(), src.nnnz()) {
     auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
                        std::ref(*this));
 
@@ -242,9 +223,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   }
 
   template <class VR, class... PR>
-  inline DiaMatrix &allocate(const std::string name,
-                             const DiaMatrix<VR, PR...> &src) {
-    this->set_name(name);
+  inline DiaMatrix &allocate(const DiaMatrix<VR, PR...> &src) {
     resize(src.nrows(), src.ncols(), src.nnnz(), src.ndiags(), src.alignment());
     return *this;
   }

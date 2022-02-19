@@ -34,10 +34,10 @@ namespace Impl {
 
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, DenseVectorTag) {
-  using IndexType = typename Printable::index_type;
+  using index_type = typename Printable::index_type;
   s << p.name() << "<" << p.size() << "> with " << p.size() << " entries\n";
 
-  for (IndexType n = 0; n < p.size(); n++) {
+  for (index_type n = 0; n < p.size(); n++) {
     s << " " << std::setw(14) << n;
     s << " " << std::setprecision(4) << std::setw(8) << "(" << p[n] << ")\n";
   }

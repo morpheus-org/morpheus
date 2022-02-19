@@ -72,19 +72,6 @@ class FormatConversionException : public Exception {
   FormatConversionException(const MessageType& msg) : Exception(msg) {}
 };
 
-template <typename T, typename... Ts>
-std::string append_str(T&& first, Ts&&... rest) {
-  std::string msg;
-  if constexpr (sizeof...(Ts) == 0) {
-    msg = std::to_string(first);  // for only 1-arguments
-  } else {
-    msg = std::to_string(first) + std::string(",") +
-          append_str(std::forward<Ts>(rest)...);  // pass the rest further
-  }
-
-  return msg;
-}
-
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_EXCEPTIONS_HPP

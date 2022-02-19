@@ -41,14 +41,14 @@ inline void waxpby(
         Morpheus::is_Serial_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
-  using IndexType = typename Vector::index_type;
+  using index_type = typename Vector::index_type;
 
   if (alpha == 1.0) {
-    for (IndexType i = 0; i < n; i++) w[i] = x[i] + beta * y[i];
+    for (index_type i = 0; i < n; i++) w[i] = x[i] + beta * y[i];
   } else if (beta == 1.0) {
-    for (IndexType i = 0; i < n; i++) w[i] = alpha * x[i] + y[i];
+    for (index_type i = 0; i < n; i++) w[i] = alpha * x[i] + y[i];
   } else {
-    for (IndexType i = 0; i < n; i++) w[i] = alpha * x[i] + beta * y[i];
+    for (index_type i = 0; i < n; i++) w[i] = alpha * x[i] + beta * y[i];
   }
 }
 

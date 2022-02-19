@@ -24,8 +24,6 @@
 #ifndef MORPHEUS_CSRMATRIX_HPP
 #define MORPHEUS_CSRMATRIX_HPP
 
-#include <string>
-
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_DenseVector.hpp>
@@ -87,44 +85,28 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
 
   // Construct an empty CsrMatrix
   inline CsrMatrix()
-      : base("CsrMatrix"), _row_offsets(1), _column_indices(0), _values(0) {}
+      : base(), _row_offsets(1), _column_indices(0), _values(0) {}
 
   // Construct a CsrMatrix with a specific shape and number of non-zero entries
   inline CsrMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries)
-      : base("CsrMatrix", num_rows, num_cols, num_entries),
+      : base(num_rows, num_cols, num_entries),
         _row_offsets(num_rows + 1),
         _column_indices(num_entries),
         _values(num_entries) {}
-
-  inline CsrMatrix(const std::string name, const index_type num_rows,
-                   const index_type num_cols, const index_type num_entries,
-                   const index_array_type &roff, const index_array_type &cind,
-                   const value_array_type &vals)
-      : base(name + "CsrMatrix", num_rows, num_cols, num_entries),
-        _row_offsets(roff),
-        _column_indices(cind),
-        _values(vals) {}
 
   template <typename ValuePtr, typename IndexPtr>
   explicit inline CsrMatrix(
-      const std::string name, const index_type num_rows,
-      const index_type num_cols, const index_type num_entries,
-      IndexPtr roff_ptr, IndexPtr cind_ptr, ValuePtr vals_ptr,
+      const index_type num_rows, const index_type num_cols,
+      const index_type num_entries, IndexPtr roff_ptr, IndexPtr cind_ptr,
+      ValuePtr vals_ptr,
       typename std::enable_if<std::is_pointer<ValuePtr>::value &&
                               std::is_pointer<IndexPtr>::value>::type * =
           nullptr)
-      : base(name + "CsrMatrix_Unmanaged", num_rows, num_cols, num_entries),
+      : base(num_rows, num_cols, num_entries),
         _row_offsets(num_rows + 1, roff_ptr),
         _column_indices(num_entries, cind_ptr),
         _values(num_entries, vals_ptr) {}
-
-  inline CsrMatrix(const std::string name, const index_type num_rows,
-                   const index_type num_cols, const index_type num_entries)
-      : base(name + "CsrMatrix", num_rows, num_cols, num_entries),
-        _row_offsets(num_rows + 1),
-        _column_indices(num_entries),
-        _values(num_entries) {}
 
   // Construct from another matrix type (Shallow)
   // Needs to be a compatible type
@@ -133,8 +115,7 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
             typename std::enable_if<is_compatible_type<
                 CsrMatrix, typename CsrMatrix<VR, PR...>::type>::value>::type
                 * = nullptr)
-      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
-             src.nnnz()),
+      : base(src.nrows(), src.ncols(), src.nnnz()),
         _row_offsets(src.crow_offsets()),
         _column_indices(src.ccolumn_indices()),
         _values(src.cvalues()) {}
@@ -145,7 +126,6 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
       is_compatible_type<CsrMatrix, typename CsrMatrix<VR, PR...>::type>::value,
       CsrMatrix &>::type
   operator=(const CsrMatrix<VR, PR...> &src) {
-    this->set_name(src.name());
     this->set_nrows(src.nrows());
     this->set_ncols(src.ncols());
     this->set_nnnz(src.nnnz());
@@ -165,8 +145,7 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
       typename std::enable_if<is_compatible_container<
           CsrMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type * =
           nullptr)
-      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
-             src.nnnz()) {
+      : base(src.nrows(), src.ncols(), src.nnnz()) {
     auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
                        std::ref(*this));
 
@@ -214,7 +193,6 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   template <class VR, class... PR>
   inline CsrMatrix &allocate(const std::string name,
                              const CsrMatrix<VR, PR...> &src) {
-    this->set_name(name);
     resize(src.nrows(), src.ncols(), src.nnnz());
     return *this;
   }

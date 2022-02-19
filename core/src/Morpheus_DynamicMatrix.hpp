@@ -72,28 +72,17 @@ class DynamicMatrix
   DynamicMatrix &operator=(const DynamicMatrix &) = default;
   DynamicMatrix &operator=(DynamicMatrix &&) = default;
 
-  inline DynamicMatrix() : base("DynamicMatrix"), _formats() {}
+  // Default Constructor
+  inline DynamicMatrix() : _formats() {}
 
+  // Construct dynamic matrix from another concrete matrix format
   template <typename Matrix>
   inline DynamicMatrix(
       const Matrix &src,
       typename std::enable_if<
           is_variant_member_v<typename Matrix::type, variant_type>>::type * =
           nullptr)
-      : base("DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()) {
-    this->activate(src.format_enum());
-    auto f = std::bind(Impl::any_type_assign(), std::cref(src),
-                       std::placeholders::_1);
-    Morpheus::Impl::Variant::visit(f, _formats);
-  }
-
-  template <typename Matrix>
-  inline DynamicMatrix(
-      const std::string name, const Matrix &src,
-      typename std::enable_if<
-          is_variant_member_v<typename Matrix::type, variant_type>>::type * =
-          nullptr)
-      : base(name + "DynamicMatrix", src.nrows(), src.ncols(), src.nnnz()) {
+      : base(src.nrows(), src.ncols(), src.nnnz()) {
     this->activate(src.format_enum());
     auto f = std::bind(Impl::any_type_assign(), std::cref(src),
                        std::placeholders::_1);
@@ -122,8 +111,7 @@ class DynamicMatrix
       typename std::enable_if<is_compatible_type<
           DynamicMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type
           * = nullptr)
-      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
-             src.nnnz()) {
+      : base(src.nrows(), src.ncols(), src.nnnz()) {
     this->activate(src.active_index());  // switch to src format
     Morpheus::Impl::Variant::visit(Impl::any_type_assign(), src.const_formats(),
                                    _formats);
@@ -136,7 +124,6 @@ class DynamicMatrix
                          typename DynamicMatrix<VR, PR...>::type>::value,
       DynamicMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
-    this->set_name(src.name());
     base::resize(src.nrows(), src.ncols(), src.nnnz());
 
     this->activate(src.active_index());  // switch to src format
@@ -183,18 +170,12 @@ class DynamicMatrix
   }
 
   template <class VR, class... PR>
-  inline DynamicMatrix &allocate(const std::string name,
-                                 const DynamicMatrix<VR, PR...> &src) {
-    this->set_name(name);
+  inline DynamicMatrix &allocate(const DynamicMatrix<VR, PR...> &src) {
     base::resize(src.nrows(), src.ncols(), src.nnnz());
     this->activate(src.active_index());  // switch to src format
     Morpheus::Impl::Variant::visit(Impl::any_type_allocate(),
                                    src.const_formats(), _formats);
     return *this;
-  }
-
-  inline std::string active_name() const {
-    return Morpheus::Impl::Variant::visit(Impl::any_type_get_name(), _formats);
   }
 
   inline int active_index() const { return _formats.index(); }

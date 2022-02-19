@@ -41,16 +41,16 @@ typename Vector::value_type reduce(
         Morpheus::is_Serial_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
-  using ValueType = typename Vector::value_type;
-  using IndexType = typename Vector::index_type;
-  ValueType sum   = in[0];
-  ValueType c     = (ValueType)0.0;
+  using value_type = typename Vector::value_type;
+  using index_type = typename Vector::index_type;
+  value_type sum   = in[0];
+  value_type c     = (value_type)0.0;
 
-  for (IndexType i = 1; i < size; i++) {
-    ValueType y = in[i] - c;
-    ValueType t = sum + y;
-    c           = (t - sum) - y;
-    sum         = t;
+  for (index_type i = 1; i < size; i++) {
+    value_type y = in[i] - c;
+    value_type t = sum + y;
+    c            = (t - sum) - y;
+    sum          = t;
   }
 
   return sum;

@@ -42,19 +42,19 @@ void update_diagonal(
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
-  using IndexType = typename SparseMatrix::index_type;
-  using ValueType = typename SparseMatrix::value_type;
+  using index_type = typename SparseMatrix::index_type;
+  using value_type = typename SparseMatrix::value_type;
 
-  const IndexType ndiag = A.values().ncols();
+  const index_type ndiag = A.values().ncols();
 
 #pragma omp parallel for
-  for (IndexType row = 0; row < A.nrows(); row++) {
-    for (IndexType n = 0; n < ndiag; n++) {
-      const IndexType col = row + A.diagonal_offsets(n);
+  for (index_type row = 0; row < A.nrows(); row++) {
+    for (index_type n = 0; n < ndiag; n++) {
+      const index_type col = row + A.diagonal_offsets(n);
 
       if ((col >= 0 && col < A.ncols()) && (col == row)) {
         A.values(row, n) =
-            (A.values(row, n) == ValueType(0)) ? 0 : diagonal[col];
+            (A.values(row, n) == value_type(0)) ? 0 : diagonal[col];
       }
     }
   }

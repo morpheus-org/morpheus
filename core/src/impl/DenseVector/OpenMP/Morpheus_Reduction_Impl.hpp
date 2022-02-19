@@ -41,13 +41,13 @@ typename Vector::value_type reduce(
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
-  using ValueType = typename Vector::value_type;
-  using IndexType = typename Vector::index_type;
+  using value_type = typename Vector::value_type;
+  using index_type = typename Vector::index_type;
 
-  ValueType sum = ValueType(0);
+  value_type sum = value_type(0);
 
 #pragma omp parallel for reduction(+ : sum)
-  for (IndexType i = 0; i < size; i++) sum += in[i];
+  for (index_type i = 0; i < size; i++) sum += in[i];
 
   return sum;
 }

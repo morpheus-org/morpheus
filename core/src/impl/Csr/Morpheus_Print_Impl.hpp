@@ -35,11 +35,11 @@ namespace Impl {
 
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, CsrTag) {
-  using IndexType = typename Printable::index_type;
+  using index_type = typename Printable::index_type;
   print_matrix_header(p, s);
 
-  for (IndexType i = 0; i < p.nrows(); i++) {
-    for (IndexType jj = p.crow_offsets(i); jj < p.crow_offsets(i + 1); jj++) {
+  for (index_type i = 0; i < p.nrows(); i++) {
+    for (index_type jj = p.crow_offsets(i); jj < p.crow_offsets(i + 1); jj++) {
       s << " " << std::setw(14) << i;
       s << " " << std::setw(14) << p.ccolumn_indices(jj);
       s << " " << std::setprecision(4) << std::setw(8) << "(" << p.cvalues(jj)

@@ -45,13 +45,13 @@ void update_diagonal(
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
-  using IndexType = typename SparseMatrix::index_type;
-  using ValueType = typename SparseMatrix::value_type;
+  using index_type = typename SparseMatrix::index_type;
+  using value_type = typename SparseMatrix::value_type;
 
   const size_t BLOCK_SIZE = 256;
   const size_t NUM_BLOCKS = (A.nrows() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-  Kernels::update_csr_diagonal_kernel<ValueType, IndexType>
+  Kernels::update_csr_diagonal_kernel<value_type, index_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), A.row_offsets().data(),
                                       A.column_indices().data(),
                                       A.values().data(), diagonal.data());

@@ -41,9 +41,9 @@ void update_diagonal(
         Morpheus::is_Serial_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
-  using IndexType = typename SparseMatrix::index_type;
+  using index_type = typename SparseMatrix::index_type;
 
-  for (IndexType n = 0; n < A.nnnz(); n++) {
+  for (index_type n = 0; n < A.nnnz(); n++) {
     if (A.row_indices(n) == A.column_indices(n)) {
       A.values(n) = diagonal[A.column_indices(n)];
     }

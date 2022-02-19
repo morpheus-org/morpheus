@@ -60,10 +60,8 @@ struct copy_fn {
                 SourceType, DestinationType>::value)>::type* = nullptr) {
     throw Morpheus::FormatConversionException(
         "Morpheus::copy() is only available between the same container types. "
-        "(" +
-        src.name() + " != " + dst.name() +
-        ") Please use Morpheus::convert() instead to perform conversions "
-        "between different types.");
+        "Please use Morpheus::convert() instead to perform conversions between "
+        "different types.");
   }
 };
 
@@ -76,10 +74,8 @@ void copy(const SourceType& src, DestinationType& dst, DynamicTag,
   } else {
     throw Morpheus::FormatConversionException(
         "Morpheus::copy() is only available between the same container types. "
-        "Active type of dynamic matrix (" +
-        src.active_name() + ") should match the type of destination matrix (" +
-        dst.name() +
-        "). Please use Morpheus::convert() instead to perform conversions "
+        "Active type of dynamic matrix should match the type of destination "
+        "matrix. Please use Morpheus::convert() instead to perform conversions "
         "between different types.");
   }
 }
@@ -88,8 +84,8 @@ template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst, SparseMatTag,
           DynamicTag) {
   dst.activate(src.format_enum());
-  // dst.resize(src.nrows(), src.ncols(), src.nnnz());
   dst.resize(src);
+
   auto f = std::bind(Impl::copy_fn(), std::cref(src), std::placeholders::_1);
   Morpheus::Impl::Variant::visit(f, dst.formats());
 }

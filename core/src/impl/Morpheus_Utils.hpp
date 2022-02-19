@@ -33,8 +33,8 @@ namespace Impl {
 
 template <typename Printable, typename Stream>
 void print_matrix_header(const Printable& p, Stream& s) {
-  s << p.name() << "<" << p.nrows() << ", " << p.ncols() << "> with "
-    << p.nnnz() << " entries\n";
+  s << "<" << p.nrows() << ", " << p.ncols() << "> with " << p.nnnz()
+    << " entries\n";
 }
 
 // Calculates padding to align the data based on the current length

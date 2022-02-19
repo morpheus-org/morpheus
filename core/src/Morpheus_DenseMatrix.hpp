@@ -72,35 +72,14 @@ class DenseMatrix
   DenseMatrix &operator=(DenseMatrix &&) = default;
 
   // Construct an empty DenseMatrix
-  inline DenseMatrix() : base("DenseMatrix"), _values() {}
+  inline DenseMatrix() : base(), _values() {}
 
   // Construct a DenseMatrix with a specific shape
   inline DenseMatrix(const index_type num_rows, const index_type num_cols,
                      const value_type val = 0)
-      : base("DenseMatrix", num_rows, num_cols, num_rows * num_cols),
-        _values("DenseMatrix", size_t(num_rows), size_t(num_cols)) {
+      : base(num_rows, num_cols, num_rows * num_cols),
+        _values(size_t(num_rows), size_t(num_cols)) {
     assign(num_rows, num_cols, val);
-  }
-
-  inline DenseMatrix(const std::string name, const index_type num_rows,
-                     const index_type num_cols, const value_type val = 0)
-      : base(name + "DenseMatrix", num_rows, num_cols, num_rows * num_cols),
-        _values(name + "(DenseMatrix)", size_t(num_rows), size_t(num_cols)) {
-    assign(num_rows, num_cols, val);
-  }
-
-  template <typename ValuePtr>
-  explicit DenseMatrix(
-      const std::string name, const index_type num_rows,
-      const index_type num_cols, ValuePtr ptr,
-      typename std::enable_if<std::is_pointer<ValuePtr>::value>::type * =
-          nullptr)
-      : base(name + "DenseMatrix_Unmanaged", num_rows, num_cols,
-             num_rows * num_cols),
-        _values(ptr, size_t(num_rows), size_t(num_cols)) {
-    static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
-                  "Constructing DenseMatrix to wrap user memory must supply "
-                  "matching pointer type");
   }
 
   template <typename ValuePtr>
@@ -108,7 +87,7 @@ class DenseMatrix
       const index_type num_rows, const index_type num_cols, ValuePtr ptr,
       typename std::enable_if<std::is_pointer<ValuePtr>::value>::type * =
           nullptr)
-      : base("DenseMatrix_Unmanaged", num_rows, num_cols, num_rows * num_cols),
+      : base(num_rows, num_cols, num_rows * num_cols),
         _values(ptr, size_t(num_rows), size_t(num_cols)) {
     static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
                   "Constructing DenseMatrix to wrap user memory must supply "
@@ -122,8 +101,7 @@ class DenseMatrix
       typename std::enable_if<is_compatible_type<
           DenseMatrix, typename DenseMatrix<VR, PR...>::type>::value>::type * =
           nullptr)
-      : base("ShallowDenseMatrix" + src.name(), src.nrows(), src.ncols(),
-             src.nrows() * src.ncols()),
+      : base(src.nrows(), src.ncols(), src.nrows() * src.ncols()),
         _values(src.const_view()) {}
 
   // Assignment from another dense matrix type (Shallow)
@@ -133,7 +111,6 @@ class DenseMatrix
                          typename DenseMatrix<VR, PR...>::type>::value,
       DenseMatrix &>::type
   operator=(const DenseMatrix<VR, PR...> &src) {
-    this->set_name(src.name());
     this->set_nrows(src.nrows());
     this->set_ncols(src.ncols());
     this->set_nnnz(src.nnnz());
@@ -169,7 +146,6 @@ class DenseMatrix
   template <class VR, class... PR>
   inline DenseMatrix &allocate(const std::string name,
                                const DenseMatrix<VR, PR...> &src) {
-    this->set_name(name);
     resize(src.nrows(), src.ncols());
     return *this;
   }

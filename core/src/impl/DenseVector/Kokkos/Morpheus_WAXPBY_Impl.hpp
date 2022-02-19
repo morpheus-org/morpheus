@@ -42,28 +42,28 @@ inline void waxpby(
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
   using execution_space = typename ExecSpace::execution_space;
-  using index_type      = Kokkos::IndexType<typename Vector::index_type>;
-  using range_policy    = Kokkos::RangePolicy<index_type, execution_space>;
-  using ValueArray      = typename Vector::value_array_type;
-  using I               = typename Vector::index_type;
+  using IndexType       = Kokkos::IndexType<typename Vector::index_type>;
+  using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
+  using value_array     = typename Vector::value_array_type;
+  using index_type      = typename Vector::index_type;
 
-  const ValueArray x_view = x.const_view(), y_view = y.const_view();
-  ValueArray w_view = w.view();
+  const value_array x_view = x.const_view(), y_view = y.const_view();
+  value_array w_view = w.view();
   range_policy policy(0, n);
 
   if (alpha == 1.0) {
     Kokkos::parallel_for(
-        "waxpby_alpha", policy, KOKKOS_LAMBDA(const I& i) {
+        "waxpby_alpha", policy, KOKKOS_LAMBDA(const index_type& i) {
           w_view[i] = x_view[i] + beta * y_view[i];
         });
   } else if (beta == 1.0) {
     Kokkos::parallel_for(
-        "waxpby_beta", policy, KOKKOS_LAMBDA(const I& i) {
+        "waxpby_beta", policy, KOKKOS_LAMBDA(const index_type& i) {
           w_view[i] = alpha * x_view[i] + y_view[i];
         });
   } else {
     Kokkos::parallel_for(
-        "waxpby", policy, KOKKOS_LAMBDA(const I& i) {
+        "waxpby", policy, KOKKOS_LAMBDA(const index_type& i) {
           w_view[i] = alpha * x_view[i] + beta * y_view[i];
         });
   }

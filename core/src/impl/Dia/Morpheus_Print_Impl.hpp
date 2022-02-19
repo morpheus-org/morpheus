@@ -38,22 +38,22 @@ template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, DiaTag) {
   print_matrix_header(p, s);
 
-  using IndexType       = typename Printable::index_type;
-  using ValueType       = typename Printable::value_type;
-  const IndexType ndiag = p.cvalues().ncols();
+  using index_type       = typename Printable::index_type;
+  using value_type       = typename Printable::value_type;
+  const index_type ndiag = p.cvalues().ncols();
 
-  for (IndexType i = 0; i < ndiag; i++) {
-    const IndexType k = p.cdiagonal_offsets(i);
+  for (index_type i = 0; i < ndiag; i++) {
+    const index_type k = p.cdiagonal_offsets(i);
 
-    const IndexType i_start = std::max<IndexType>(0, -k);
-    const IndexType j_start = std::max<IndexType>(0, k);
+    const index_type i_start = std::max<index_type>(0, -k);
+    const index_type j_start = std::max<index_type>(0, k);
 
     // number of elements to process in this diagonal
-    const IndexType N = std::min(p.nrows() - i_start, p.ncols() - j_start);
+    const index_type N = std::min(p.nrows() - i_start, p.ncols() - j_start);
 
-    for (IndexType n = 0; n < N; n++) {
-      ValueType temp = p.cvalues(i_start + n, i);
-      if (temp != ValueType(0)) {
+    for (index_type n = 0; n < N; n++) {
+      value_type temp = p.cvalues(i_start + n, i);
+      if (temp != value_type(0)) {
         s << " " << std::setw(14) << i;
         s << " " << std::setw(14) << i_start + n;
         s << " " << std::setw(14) << j_start + n;

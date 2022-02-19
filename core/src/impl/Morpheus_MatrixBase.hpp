@@ -26,8 +26,6 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <impl/Morpheus_ContainerTraits.hpp>
 
-#include <string>
-
 namespace Morpheus {
 
 namespace Impl {
@@ -40,18 +38,15 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
   using traits     = ContainerTraits<Container, ValueType, Properties...>;
   using index_type = typename traits::index_type;
 
-  MatrixBase() : _name("Matrix"), _m(0), _n(0), _nnz(0) {}
-
-  explicit MatrixBase(std::string name) : _name(name), _m(0), _n(0), _nnz(0) {}
+  MatrixBase() : _m(0), _n(0), _nnz(0) {}
 
   template <typename Matrix>
   MatrixBase(const Matrix& m,
              typename std::enable_if<is_matrix_v<Matrix>>::type* = 0)
-      : _name(m.name()), _m(m.nrows()), _n(m.ncols()), _nnz(m.nnnz()) {}
+      : _m(m.nrows()), _n(m.ncols()), _nnz(m.nnnz()) {}
 
-  MatrixBase(std::string name, index_type rows, index_type cols,
-             index_type entries = 0)
-      : _name(name), _m(rows), _n(cols), _nnz(entries) {}
+  MatrixBase(index_type rows, index_type cols, index_type entries = 0)
+      : _m(rows), _n(cols), _nnz(entries) {}
 
   void resize(index_type rows, index_type cols, index_type entries) {
     _m   = rows;
@@ -59,17 +54,14 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
     _nnz = entries;
   }
 
-  inline std::string name() const { return _name; }
   inline index_type nrows() const { return _m; }
   inline index_type ncols() const { return _n; }
   inline index_type nnnz() const { return _nnz; }
-  inline void set_name(const std::string name) { _name = name; }
   inline void set_nrows(const index_type rows) { _m = rows; }
   inline void set_ncols(const index_type cols) { _n = cols; }
   inline void set_nnnz(const index_type nnz) { _nnz = nnz; }
 
  private:
-  std::string _name;
   index_type _m, _n, _nnz;
 
 };  // namespace Impl

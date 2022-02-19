@@ -74,31 +74,22 @@ struct any_type_resize
   template <typename... Args>
   result_type operator()(
       typename CooMatrix<ValueType, Properties...>::type &mat, Args &&...args) {
-    std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic resize interface.\n\
-                mat.resize(" +
-        str_args + ") for " + mat.name() + " format.");
+        "Invalid use of the dynamic resize interface.");
   }
 
   template <typename... Args>
   result_type operator()(
       typename CsrMatrix<ValueType, Properties...>::type &mat, Args &&...args) {
-    std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic resize interface.\n\
-                mat.resize(" +
-        str_args + ") for " + mat.name() + " format.");
+        "Invalid use of the dynamic resize interface.");
   }
 
   template <typename... Args>
   result_type operator()(
       typename DiaMatrix<ValueType, Properties...>::type &mat, Args &&...args) {
-    std::string str_args = Morpheus::append_str(args...);
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic resize interface.\n\
-                mat.resize(" +
-        str_args + ") for " + mat.name() + " format.");
+        "Invalid use of the dynamic resize interface.");
   }
 };
 
@@ -121,8 +112,8 @@ struct any_type_resize_from_mat {
           !std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
           nullptr) {
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic resize interface. Src tag " + src.name() +
-        " and dst tag " + dst.name() + " must be the same");
+        "Invalid use of the dynamic resize interface. Src and dst tags must be "
+        "the same");
   }
 };
 
@@ -135,7 +126,7 @@ struct any_type_allocate {
       typename std::enable_if<
           std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
           nullptr) {
-    dst = T2().allocate("from" + src.name(), src);
+    dst = T2().allocate(src);
   }
 
   template <typename T1, typename T2>
@@ -145,8 +136,8 @@ struct any_type_allocate {
           !std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
           nullptr) {
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic allocate interface. Src tag " + src.name() +
-        " and dst tag " + dst.name() + " must be the same");
+        "Invalid use of the dynamic allocate interface. Src and std tags must "
+        "be the same");
   }
 };
 
@@ -169,16 +160,8 @@ struct any_type_assign {
           !std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
           nullptr) {
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic assign interface. Src tag " + src.name() +
-        " and dst tag " + dst.name() + " must be the same");
-  }
-};
-
-struct any_type_get_name {
-  using result_type = std::string;
-  template <typename T>
-  result_type operator()(const T &mat) const {
-    return mat.name();
+        "Invalid use of the dynamic assign interface. Src and dst tags must be "
+        "the same");
   }
 };
 

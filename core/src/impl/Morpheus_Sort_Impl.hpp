@@ -27,8 +27,7 @@
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-
-#include <impl/Morpheus_Copy_Impl.hpp>
+#include <Morpheus_Copy.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -69,10 +68,8 @@ void counting_sort_by_key(Vector1& keys, Vector2& vals,
 
   // allocate temporary arrays
   Vector1 counts(size + 2, 0), temp_keys, temp_vals;
-  Morpheus::Impl::copy(keys, temp_keys, typename Vector1::tag(),
-                       typename Vector1::tag());
-  Morpheus::Impl::copy(vals, temp_vals, typename Vector1::tag(),
-                       typename Vector1::tag());
+  Morpheus::copy(keys, temp_keys);
+  Morpheus::copy(vals, temp_vals);
 
   // count the number of occurences of each key
   for (index_type i = 0; i < keys.size(); i++) counts[keys[i] + 1]++;
@@ -93,13 +90,13 @@ void sort_by_row_and_column(Matrix& mat, CooTag,
                             typename Matrix::index_type max_row = 0,
                             typename Matrix::index_type min_col = 0,
                             typename Matrix::index_type max_col = 0) {
-  using index_type     = typename Matrix::index_type;
-  using IndexArrayType = typename Matrix::index_array_type;
-  using ValueArrayType = typename Matrix::value_array_type;
+  using index_type  = typename Matrix::index_type;
+  using index_array = typename Matrix::index_array_type;
+  using value_array = typename Matrix::value_array_type;
 
   index_type N = mat.row_indices().size();
 
-  IndexArrayType permutation("permutation", N);
+  index_array permutation(N);
   for (index_type i = 0; i < N; i++) permutation[i] = i;
 
   index_type minr = min_row;
@@ -115,36 +112,28 @@ void sort_by_row_and_column(Matrix& mat, CooTag,
   }
 
   {
-    IndexArrayType temp;
-    Morpheus::Impl::copy(mat.column_indices(), temp,
-                         typename IndexArrayType::tag(),
-                         typename IndexArrayType::tag());
-
+    index_array temp;
+    Morpheus::copy(mat.column_indices(), temp);
     Morpheus::Impl::counting_sort_by_key(temp, permutation, minc, maxc,
-                                         typename IndexArrayType::tag());
+                                         typename index_array::tag());
 
-    Morpheus::Impl::copy(mat.row_indices(), temp,
-                         typename IndexArrayType::tag(),
-                         typename IndexArrayType::tag());
-
+    Morpheus::copy(mat.row_indices(), temp);
     for (index_type i = 0; i < index_type(permutation.size()); i++) {
       mat.row_indices(i) = temp[permutation[i]];
     }
 
     Morpheus::Impl::counting_sort_by_key(mat.row_indices(), permutation, minr,
-                                         maxr, typename IndexArrayType::tag());
-    Morpheus::Impl::copy(mat.column_indices(), temp,
-                         typename IndexArrayType::tag(),
-                         typename IndexArrayType::tag());
+                                         maxr, typename index_array::tag());
+    Morpheus::copy(mat.column_indices(), temp);
+
     for (index_type i = 0; i < index_type(permutation.size()); i++) {
       mat.column_indices(i) = temp[permutation[i]];
     }
   }
 
   {
-    ValueArrayType temp;
-    Morpheus::Impl::copy(mat.values(), temp, typename IndexArrayType::tag(),
-                         typename IndexArrayType::tag());
+    value_array temp;
+    Morpheus::copy(mat.values(), temp);
     for (index_type i = 0; i < index_type(permutation.size()); i++) {
       mat.values(i) = temp[permutation[i]];
     }

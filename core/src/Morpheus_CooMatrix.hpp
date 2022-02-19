@@ -86,44 +86,28 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
 
   // Construct an empty CooMatrix
   inline CooMatrix()
-      : base("CooMatrix"), _row_indices(0), _column_indices(0), _values(0) {}
+      : base(), _row_indices(0), _column_indices(0), _values(0) {}
 
   // Construct a CooMatrix with a specific shape and number of non-zero entries
   inline CooMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries)
-      : base("CooMatrix", num_rows, num_cols, num_entries),
+      : base(num_rows, num_cols, num_entries),
         _row_indices(num_entries),
         _column_indices(num_entries),
         _values(num_entries) {}
-
-  inline CooMatrix(const std::string name, const index_type num_rows,
-                   const index_type num_cols, const index_type num_entries,
-                   const index_array_type &rind, const index_array_type &cind,
-                   const value_array_type &vals)
-      : base(name + "CooMatrix", num_rows, num_cols, num_entries),
-        _row_indices(rind),
-        _column_indices(cind),
-        _values(vals) {}
 
   template <typename ValuePtr, typename IndexPtr>
   explicit inline CooMatrix(
-      const std::string name, const index_type num_rows,
-      const index_type num_cols, const index_type num_entries,
-      IndexPtr rind_ptr, IndexPtr cind_ptr, ValuePtr vals_ptr,
+      const index_type num_rows, const index_type num_cols,
+      const index_type num_entries, IndexPtr rind_ptr, IndexPtr cind_ptr,
+      ValuePtr vals_ptr,
       typename std::enable_if<std::is_pointer<ValuePtr>::value &&
                               std::is_pointer<IndexPtr>::value>::type * =
           nullptr)
-      : base(name + "CooMatrix_Unmanaged", num_rows, num_cols, num_entries),
+      : base(num_rows, num_cols, num_entries),
         _row_indices(size_t(num_entries), rind_ptr),
         _column_indices(size_t(num_entries), cind_ptr),
         _values(size_t(num_entries), vals_ptr) {}
-
-  inline CooMatrix(const std::string name, const index_type num_rows,
-                   const index_type num_cols, const index_type num_entries)
-      : base(name + "CooMatrix", num_rows, num_cols, num_entries),
-        _row_indices(num_entries),
-        _column_indices(num_entries),
-        _values(num_entries) {}
 
   // Construct from another matrix type (Shallow)
   // Needs to be a compatible type
@@ -132,8 +116,7 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
             typename std::enable_if<is_compatible_type<
                 CooMatrix, typename CooMatrix<VR, PR...>::type>::value>::type
                 * = nullptr)
-      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
-             src.nnnz()),
+      : base(src.nrows(), src.ncols(), src.nnnz()),
         _row_indices(src.crow_indices()),
         _column_indices(src.ccolumn_indices()),
         _values(src.cvalues()) {}
@@ -144,7 +127,6 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
       is_compatible_type<CooMatrix, typename CooMatrix<VR, PR...>::type>::value,
       CooMatrix &>::type
   operator=(const CooMatrix<VR, PR...> &src) {
-    this->set_name(src.name());
     this->set_nrows(src.nrows());
     this->set_ncols(src.ncols());
     this->set_nnnz(src.nnnz());
@@ -164,8 +146,7 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
       typename std::enable_if<is_compatible_container<
           CooMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type * =
           nullptr)
-      : base(src.name() + "(ShallowCopy)", src.nrows(), src.ncols(),
-             src.nnnz()) {
+      : base(src.nrows(), src.ncols(), src.nnnz()) {
     auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
                        std::ref(*this));
 
@@ -213,7 +194,6 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   template <class VR, class... PR>
   inline CooMatrix &allocate(const std::string name,
                              const CooMatrix<VR, PR...> &src) {
-    this->set_name(name);
     resize(src.nrows(), src.ncols(), src.nnnz());
     return *this;
   }

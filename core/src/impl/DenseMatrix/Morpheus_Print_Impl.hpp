@@ -35,11 +35,11 @@ namespace Impl {
 
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s, DenseMatrixTag) {
-  using IndexType = typename Printable::index_type;
+  using index_type = typename Printable::index_type;
   print_matrix_header(p, s);
 
-  for (IndexType i = 0; i < p.nrows(); i++) {
-    for (IndexType j = 0; j < p.ncols(); j++) {
+  for (index_type i = 0; i < p.nrows(); i++) {
+    for (index_type j = 0; j < p.ncols(); j++) {
       s << " " << std::setw(14) << i;
       s << " " << std::setw(14) << j;
       s << " " << std::setprecision(4) << std::setw(8) << "(" << p(i, j)

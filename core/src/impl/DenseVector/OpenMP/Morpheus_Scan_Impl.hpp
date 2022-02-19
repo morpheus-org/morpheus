@@ -43,14 +43,14 @@ void inclusive_scan(
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
-  using IndexType = typename Vector::index_type;
-  using ValueType = typename Vector::value_type;
+  using index_type = typename Vector::index_type;
+  using value_type = typename Vector::value_type;
 
 #if _OPENMP >= 201511
-  ValueType initial = 0;
+  value_type initial = 0;
 // TODO: Scan semantics require OpenMP5
 #pragma omp simd reduction(inscan, + : initial)
-  for (IndexType i = start; i < size; i++) {
+  for (index_type i = start; i < size; i++) {
     initial += in[i];
 #pragma omp scan inclusive(initial)
     out[i] = initial;
@@ -69,15 +69,15 @@ void exclusive_scan(
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
-  using IndexType = typename Vector::index_type;
-  using ValueType = typename Vector::value_type;
+  using index_type = typename Vector::index_type;
+  using value_type = typename Vector::value_type;
 
 #if _OPENMP >= 201511
   if (size > 0) {
-    ValueType initial = 0;
+    value_type initial = 0;
     // TODO: Scan semantics require OpenMP5
 #pragma omp simd reduction(inscan, + : initial)
-    for (IndexType i = start; i < size - 1; i++) {
+    for (index_type i = start; i < size - 1; i++) {
       out[i] = initial;
 #pragma omp scan exclusive(initial)
       initial += in[i];

@@ -40,16 +40,16 @@ void update_diagonal(
                                SparseMatrix, Vector>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
   using index_type      = typename SparseMatrix::index_type;
-  using ValueArray = typename SparseMatrix::value_array_type::value_array_type;
-  using IndexArray = typename SparseMatrix::index_array_type::value_array_type;
+  using value_array = typename SparseMatrix::value_array_type::value_array_type;
+  using index_array = typename SparseMatrix::index_array_type::value_array_type;
 
   using range_policy =
       Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
 
-  ValueArray values              = A.values().view();
-  IndexArray column_indices      = A.column_indices().view();
-  IndexArray row_offsets         = A.row_offsets().view();
-  const ValueArray diagonal_view = diagonal.const_view();
+  value_array values              = A.values().view();
+  index_array column_indices      = A.column_indices().view();
+  index_array row_offsets         = A.row_offsets().view();
+  const value_array diagonal_view = diagonal.const_view();
 
   range_policy policy(0, A.nrows());
 

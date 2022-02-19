@@ -72,22 +72,22 @@ void convert(
 template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, DenseMatrixTag,
              CooTag) {
-  using IndexType = typename SourceType::index_type;
-  using ValueType = typename SourceType::value_type;
+  using index_type = typename SourceType::index_type;
+  using value_type = typename SourceType::value_type;
 
   // Count non-zeros
-  IndexType nnz = 0;
-  for (IndexType i = 0; i < src.nrows(); i++) {
-    for (IndexType j = 0; j < src.ncols(); j++) {
-      if (src(i, j) != ValueType(0)) nnz = nnz + 1;
+  index_type nnz = 0;
+  for (index_type i = 0; i < src.nrows(); i++) {
+    for (index_type j = 0; j < src.ncols(); j++) {
+      if (src(i, j) != value_type(0)) nnz = nnz + 1;
     }
   }
 
   dst.resize(src.nrows(), src.ncols(), nnz);
 
-  for (IndexType i = 0, n = 0; i < src.nrows(); i++) {
-    for (IndexType j = 0; j < src.ncols(); j++) {
-      if (src(i, j) != ValueType(0)) {
+  for (index_type i = 0, n = 0; i < src.nrows(); i++) {
+    for (index_type j = 0; j < src.ncols(); j++) {
+      if (src(i, j) != value_type(0)) {
         dst.row_indices(n)    = i;
         dst.column_indices(n) = j;
         dst.values(n)         = src(i, j);
@@ -100,14 +100,14 @@ void convert(const SourceType& src, DestinationType& dst, DenseMatrixTag,
 template <typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, CooTag,
              DenseMatrixTag) {
-  using IndexType = typename SourceType::index_type;
+  using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols());
 
-  for (IndexType n = 0; n < src.nnnz(); n++) {
-    IndexType i = src.crow_indices(n);
-    IndexType j = src.ccolumn_indices(n);
-    dst(i, j)   = src.cvalues(n);
+  for (index_type n = 0; n < src.nnnz(); n++) {
+    index_type i = src.crow_indices(n);
+    index_type j = src.ccolumn_indices(n);
+    dst(i, j)    = src.cvalues(n);
   }
 }
 

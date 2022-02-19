@@ -43,15 +43,15 @@ inline void multiply(
   using execution_space   = typename ExecSpace::execution_space;
   using policy_index_type = Kokkos::IndexType<typename Matrix::index_type>;
   using range_policy = Kokkos::RangePolicy<policy_index_type, execution_space>;
-  using ValueArray   = typename Matrix::value_array_type::value_array_type;
-  using IndexArray   = typename Matrix::index_array_type::value_array_type;
-  using value_type   = typename ValueArray::value_type;
-  using index_type   = typename IndexArray::value_type;
+  using value_array  = typename Matrix::value_array_type::value_array_type;
+  using index_array  = typename Matrix::index_array_type::value_array_type;
+  using value_type   = typename value_array::value_type;
+  using index_type   = typename index_array::value_type;
 
-  const ValueArray values = A.cvalues().const_view(), x_view = x.const_view();
-  const IndexArray column_indices = A.ccolumn_indices().const_view(),
-                   row_offsets    = A.crow_offsets().const_view();
-  ValueArray y_view               = y.view();
+  const value_array values = A.cvalues().const_view(), x_view = x.const_view();
+  const index_array column_indices = A.ccolumn_indices().const_view(),
+                    row_offsets    = A.crow_offsets().const_view();
+  value_array y_view               = y.view();
 
   range_policy policy(0, A.nrows());
 

@@ -48,13 +48,13 @@ inline void waxpby(
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
-  using IndexType = typename Vector::index_type;
-  using ValueType = typename Vector::value_type;
+  using index_type = typename Vector::index_type;
+  using value_type = typename Vector::value_type;
 
   const size_t BLOCK_SIZE = 256;
   const size_t NUM_BLOCKS = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-  Kernels::waxpby_kernel<ValueType, IndexType><<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(
+  Kernels::waxpby_kernel<value_type, index_type><<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(
       n, alpha, x.data(), beta, y.data(), w.data());
 }
 

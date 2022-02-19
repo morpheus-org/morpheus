@@ -89,7 +89,7 @@ typename Container<T, P...>::HostMirror create_mirror(
   using src_type = Container<T, P...>;
   using dst_type = typename src_type::HostMirror;
 
-  return dst_type().allocate(src.name().append("Mirror_"), src);
+  return dst_type().allocate(src);
 }
 
 // Create a mirror in a new space (specialization for different space)
@@ -99,8 +99,9 @@ typename Impl::MirrorType<Space, Container, T, P...>::container_type
 create_mirror(const Container<T, P...>& src,
               typename std::enable_if<is_container<
                   typename Container<T, P...>::tag>::value>::type* = nullptr) {
-  return typename Impl::MirrorType<Space, Container, T, P...>::container_type()
-      .allocate(src.name().append("Mirror_"), src);
+  using container_type =
+      typename Impl::MirrorType<Space, Container, T, P...>::container_type;
+  return container_type().allocate(src);
 }
 
 template <template <class, class...> class Container, class T, class... P>
@@ -160,7 +161,7 @@ create_mirror_container(
   using container_type =
       typename Impl::MirrorContainerType<Space, Container, T,
                                          P...>::container_type;
-  return container_type().allocate(src.name().append("MirrorContainer_"), src);
+  return container_type().allocate(src);
 }
 
 }  // namespace Morpheus

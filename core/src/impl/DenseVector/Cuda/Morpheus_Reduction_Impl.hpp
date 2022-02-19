@@ -47,130 +47,130 @@ void reduce(
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
-  using ValueType = typename Vector::value_type;
+  using value_type = typename Vector::value_type;
   dim3 dimBlock(threads, 1, 1);
   dim3 dimGrid(blocks, 1, 1);
 
-  ValueType* d_idata = in.data();
-  ValueType* d_odata = out.data();
+  value_type* d_idata = in.data();
+  value_type* d_odata = out.data();
 
   // when there is only one warp per block, we need to allocate two warps
   // worth of shared memory so that we don't index shared memory out of bounds
-  int smemSize = (threads <= 32) ? 2 * threads * sizeof(ValueType)
-                                 : threads * sizeof(ValueType);
+  int smemSize = (threads <= 32) ? 2 * threads * sizeof(value_type)
+                                 : threads * sizeof(value_type);
 
   // For reduce kernel we require only blockSize/warpSize
   // number of elements in shared memory
-  smemSize = ((threads / 32) + 1) * sizeof(ValueType);
+  smemSize = ((threads / 32) + 1) * sizeof(value_type);
   if (isPow2<unsigned int>(size)) {
     switch (threads) {
       case 1024:
-        Kernels::reduce_kernel<ValueType, 1024, true>
+        Kernels::reduce_kernel<value_type, 1024, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
       case 512:
-        Kernels::reduce_kernel<ValueType, 512, true>
+        Kernels::reduce_kernel<value_type, 512, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 256:
-        Kernels::reduce_kernel<ValueType, 256, true>
+        Kernels::reduce_kernel<value_type, 256, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 128:
-        Kernels::reduce_kernel<ValueType, 128, true>
+        Kernels::reduce_kernel<value_type, 128, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 64:
-        Kernels::reduce_kernel<ValueType, 64, true>
+        Kernels::reduce_kernel<value_type, 64, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 32:
-        Kernels::reduce_kernel<ValueType, 32, true>
+        Kernels::reduce_kernel<value_type, 32, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 16:
-        Kernels::reduce_kernel<ValueType, 16, true>
+        Kernels::reduce_kernel<value_type, 16, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 8:
-        Kernels::reduce_kernel<ValueType, 8, true>
+        Kernels::reduce_kernel<value_type, 8, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 4:
-        Kernels::reduce_kernel<ValueType, 4, true>
+        Kernels::reduce_kernel<value_type, 4, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 2:
-        Kernels::reduce_kernel<ValueType, 2, true>
+        Kernels::reduce_kernel<value_type, 2, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 1:
-        Kernels::reduce_kernel<ValueType, 1, true>
+        Kernels::reduce_kernel<value_type, 1, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
     }
   } else {
     switch (threads) {
       case 1024:
-        Kernels::reduce_kernel<ValueType, 1024, true>
+        Kernels::reduce_kernel<value_type, 1024, true>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
       case 512:
-        Kernels::reduce_kernel<ValueType, 512, false>
+        Kernels::reduce_kernel<value_type, 512, false>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 256:
-        Kernels::reduce_kernel<ValueType, 256, false>
+        Kernels::reduce_kernel<value_type, 256, false>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 128:
-        Kernels::reduce_kernel<ValueType, 128, false>
+        Kernels::reduce_kernel<value_type, 128, false>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 64:
-        Kernels::reduce_kernel<ValueType, 64, false>
+        Kernels::reduce_kernel<value_type, 64, false>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 32:
-        Kernels::reduce_kernel<ValueType, 32, false>
+        Kernels::reduce_kernel<value_type, 32, false>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 16:
-        Kernels::reduce_kernel<ValueType, 16, false>
+        Kernels::reduce_kernel<value_type, 16, false>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 8:
-        Kernels::reduce_kernel<ValueType, 8, false>
+        Kernels::reduce_kernel<value_type, 8, false>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 4:
-        Kernels::reduce_kernel<ValueType, 4, false>
+        Kernels::reduce_kernel<value_type, 4, false>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 2:
-        Kernels::reduce_kernel<ValueType, 2, false>
+        Kernels::reduce_kernel<value_type, 2, false>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 1:
-        Kernels::reduce_kernel<ValueType, 1, false>
+        Kernels::reduce_kernel<value_type, 1, false>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
     }
@@ -185,14 +185,14 @@ typename Vector::value_type reduce(
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
-  using ValueType = typename Vector::value_type;
+  using value_type = typename Vector::value_type;
 
-  ValueType result = 0;
-  const int maxThreads = 256;  // number of threads per block
-  const int maxBlocks = min(size / maxThreads, CUDA_MAX_BLOCK_DIM_SIZE);
+  value_type result           = 0;
+  const int maxThreads        = 256;  // number of threads per block
+  const int maxBlocks         = min(size / maxThreads, CUDA_MAX_BLOCK_DIM_SIZE);
   const int cpuFinalThreshold = CUDA_WARP_SIZE;
-  int numBlocks = 0;
-  int numThreads = 0;
+  int numBlocks               = 0;
+  int numThreads              = 0;
 
   getNumBlocksAndThreads<int>(size, maxBlocks, maxThreads, numBlocks,
                               numThreads);

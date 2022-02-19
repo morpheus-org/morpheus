@@ -31,8 +31,6 @@
 #include <Kokkos_Core.hpp>
 #include <Kokkos_Random.hpp>
 
-#include <string>
-
 namespace Morpheus {
 
 template <class ValueType, class... Properties>
@@ -73,27 +71,11 @@ class DenseVector
   DenseVector& operator=(const DenseVector&) = default;
   DenseVector& operator=(DenseVector&&) = default;
 
-  inline DenseVector() : _name("Vector"), _size(0), _values() {}
-
-  inline DenseVector(const std::string name, index_type n, value_type val = 0)
-      : _name(name + "Vector"), _size(n), _values(name, size_t(n)) {
-    assign(n, val);
-  }
+  inline DenseVector() : _size(0), _values() {}
 
   inline DenseVector(index_type n, value_type val = 0)
-      : _name("Vector"), _size(n), _values("Vector", size_t(n)) {
+      : _size(n), _values("vector", size_t(n)) {
     assign(n, val);
-  }
-
-  template <typename ValuePtr>
-  explicit DenseVector(
-      const std::string name, index_type n, ValuePtr ptr,
-      typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
-          nullptr)
-      : _name(name + "Vector_Unmanaged"), _size(n), _values(ptr, size_t(n)) {
-    static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
-                  "Constructing DenseVector to wrap user memory must supply "
-                  "matching pointer type");
   }
 
   template <typename ValuePtr>
@@ -101,16 +83,17 @@ class DenseVector
       index_type n, ValuePtr ptr,
       typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
           nullptr)
-      : _name("Vector_Unmanaged"), _size(n), _values(ptr, size_t(n)) {
+      : _size(n), _values(ptr, size_t(n)) {
     static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
                   "Constructing DenseVector to wrap user memory must supply "
                   "matching pointer type");
   }
 
+  // Constructing a random vector with values from `range_low` to `range_high`
   template <typename Generator>
-  inline DenseVector(const std::string name, index_type n, Generator rand_pool,
+  inline DenseVector(index_type n, Generator rand_pool,
                      const value_type range_low, const value_type range_high)
-      : _name(name + "Vector"), _size(n), _values(name + "Vector", size_t(n)) {
+      : _size(n), _values("vector", size_t(n)) {
     Kokkos::fill_random(_values, rand_pool, range_low, range_high);
   }
 
@@ -121,7 +104,7 @@ class DenseVector
       typename std::enable_if<is_compatible_type<
           DenseVector, typename DenseVector<VR, PR...>::type>::value>::type* =
           nullptr)
-      : _name("ShallowVector"), _size(src.size()), _values(src.const_view()) {}
+      : _size(src.size()), _values(src.const_view()) {}
 
   template <class VR, class... PR>
   typename std::enable_if<
@@ -129,7 +112,6 @@ class DenseVector
                          typename DenseVector<VR, PR...>::type>::value,
       DenseVector&>::type
   operator=(const DenseVector<VR, PR...>& src) {
-    _name   = src.name();
     _size   = src.size();
     _values = src.const_view();
     return *this;
@@ -138,9 +120,7 @@ class DenseVector
   // Allocates a vector based on the shape of the source vector
   // Needed for Mirror operations
   template <class VR, class... PR>
-  inline DenseVector& allocate(const std::string name,
-                               const DenseVector<VR, PR...>& src) {
-    _name = name + "_Allocated";
+  inline DenseVector& allocate(const DenseVector<VR, PR...>& src) {
     _size = src.size();
     this->resize(src.size());
     return *this;
@@ -190,11 +170,7 @@ class DenseVector
     assign(n, val);
   }
 
-  // Other
-  inline std::string name() const { return _name; }
-
  private:
-  std::string _name;
   index_type _size;
   value_array_type _values;
 
