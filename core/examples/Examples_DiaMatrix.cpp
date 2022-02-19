@@ -72,7 +72,7 @@ int main() {
     coo A = build_large_coo(), A_from_dia;
     dia B = build_large_dia(), B_from_coo;
 
-    vec x(5, 0), ya("ycoo", 7, 0), yb("ydia", 7, 0);
+    vec x(5, 0), ya(7, 0), yb(7, 0);
 
     x(0) = 1;
     x(1) = 2;
@@ -101,7 +101,7 @@ int main() {
   {
     coo A = build_medium_coo(), A_from_dia;
     dia B = build_medium_dia(), B_from_coo;
-    vec x(5, 0), ya("ycoo", 5, 0), yb("ydia", 5, 0);
+    vec x(5, 0), ya(5, 0), yb(5, 0);
 
     x(0) = 1;
     x(1) = 2;
@@ -131,7 +131,7 @@ int main() {
     coo A = build_many_diag_coo(), A_from_dia;
     dia B = build_many_diag_dia(), B_from_coo;
 
-    vec x(3, 0), ya("ycoo", 4, 0), yb("ydia", 4, 0);
+    vec x(3, 0), ya(4, 0), yb(4, 0);
 
     x(0) = 1;
     x(1) = 2;
@@ -159,7 +159,7 @@ int main() {
     coo A = build_simple_coo(), A_from_dia;
     dia B = build_simple_dia(), B_from_coo;
 
-    vec x(3, 0), ya("ycoo", 4, 0), yb("ydia", 4, 0);
+    vec x(3, 0), ya(4, 0), yb(4, 0);
 
     x(0) = 1;
     x(1) = 2;

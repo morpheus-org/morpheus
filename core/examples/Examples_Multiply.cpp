@@ -36,7 +36,7 @@ int main() {
   Morpheus::initialize();
   {
     coo A(4, 3, 6);
-    vec x(3, 2), ya("ya", 4, 0);
+    vec x(3, 2), ya(4, 0);
 
     // initialize matrix entries
     A.row_indices(0)    = 0;
@@ -66,7 +66,7 @@ int main() {
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
     dyn B(A);
-    vec yb("yb", 4, 0);
+    vec yb(4, 0);
 
     Morpheus::multiply<omp>(B, x, yb);
     Morpheus::print(yb);
@@ -78,7 +78,7 @@ int main() {
     const int M = 4, N = 40, NNZ = 50;
 
     coo A(M, N, NNZ);
-    vec x(N, 2), ya("ya", M, 0);
+    vec x(N, 2), ya(M, 0);
 
     // initialize matrix entries
     for (int i = 0; i < NNZ; i++) {
@@ -99,7 +99,7 @@ int main() {
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
     dyn B(A);
-    vec yb("yb", 4, 0);
+    vec yb(4, 0);
 
     Morpheus::multiply<omp>(B, x, yb);
     Morpheus::print(yb);

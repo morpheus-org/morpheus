@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
         v[i] = i * n;
       }
 
-      vec x("x", n, v);
+      vec x(n, v);
       typename vec::HostMirror xm = Morpheus::create_mirror_container(x);
       Morpheus::print(xm);
 
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
       }
 
       {
-        matrix m("m", n, n, mat);
+        matrix m(n, n, mat);
         typename matrix::HostMirror mm = Morpheus::create_mirror_container(m);
         Morpheus::print(mm);
 
@@ -122,7 +122,7 @@ int main(int argc, char* argv[]) {
       vals[5] = 60;
 
       {
-        coo A("A", M, N, NNZ, rind, cind, vals);
+        coo A(M, N, NNZ, rind, cind, vals);
         typename coo::HostMirror Am = Morpheus::create_mirror_container(A);
         Morpheus::print(A);
 
@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
       vals[5] = 60;
 
       {
-        csr A("A", M, N, NNZ, roff, cind, vals);
+        csr A(M, N, NNZ, roff, cind, vals);
         typename csr::HostMirror Am = Morpheus::create_mirror_container(A);
         Morpheus::print(A);
 
@@ -218,7 +218,7 @@ int main(int argc, char* argv[]) {
       vals[3 * DIAGS + 2] = -3;
 
       {
-        dia A("A", M, N, NNZ, diag_off, vals, DIAGS, ALIGNMENT);
+        dia A(M, N, NNZ, diag_off, vals, DIAGS, ALIGNMENT);
         typename dia::HostMirror Am = Morpheus::create_mirror_container(A);
         Morpheus::print(A);
 

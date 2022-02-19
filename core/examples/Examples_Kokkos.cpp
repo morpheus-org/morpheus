@@ -44,8 +44,8 @@ using MSpace = Kokkos::Serial;
 int main(int argc, char* argv[]) {
   Morpheus::initialize(argc, argv);
   {
-    coo A("A", 100, 200, 1250);
-    vec x("x", 200, 0), y("y", 100, 0);
+    coo A(100, 200, 1250);
+    vec x(200, 0), y(100, 0);
 
     std::cout << "<KSpace>" << std::endl;
     Morpheus::multiply<KSpace>(A, x, y);
