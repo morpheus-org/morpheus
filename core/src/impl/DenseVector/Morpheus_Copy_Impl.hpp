@@ -28,6 +28,9 @@
 #include <Morpheus_FormatTags.hpp>
 
 #include <impl/Morpheus_Utils.hpp>
+#include <impl/DenseVector/Serial/Morpheus_Copy_Impl.hpp>
+#include <impl/DenseVector/OpenMP/Morpheus_Copy_Impl.hpp>
+#include <impl/DenseVector/Cuda/Morpheus_Copy_Impl.hpp>
 #include <Kokkos_Core.hpp>
 
 #include <utility>  // std::pair

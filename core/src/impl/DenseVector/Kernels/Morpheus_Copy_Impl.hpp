@@ -1,9 +1,9 @@
 /**
- * Morpheus_Print_Impl.hpp
+ * Morpheus_Copy_Impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -21,29 +21,26 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_DENSEVECTOR_PRINT_IMPL_HPP
-#define MORPHEUS_DENSEVECTOR_PRINT_IMPL_HPP
+#ifndef MORPHEUS_DENSEVECTOR_KERNELS_COPY_IMPL_HPP
+#define MORPHEUS_DENSEVECTOR_KERNELS_COPY_IMPL_HPP
 
-#include <Morpheus_FormatTags.hpp>
-
-#include <iostream>
-#include <iomanip>  // setw, setprecision
+#include <cuda.h>
 
 namespace Morpheus {
 namespace Impl {
+namespace Kernels {
 
-template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, DenseVectorTag) {
-  using index_type = typename Printable::index_type;
-  s << "<" << p.size() << "> with " << p.size() << " entries\n";
+template <typename ValueType, typename IndexType>
+__global__ void copy_by_key_kernel(IndexType n, const ValueType* keys,
+                                   const ValueType* src, ValueType* dst) {
+  const IndexType tid = blockDim.x * blockIdx.x + threadIdx.x;
+  if (tid > n) return;
 
-  for (index_type n = 0; n < p.size(); n++) {
-    s << " " << std::setw(14) << n;
-    s << " " << std::setprecision(4) << std::setw(8) << "(" << p[n] << ")\n";
-  }
+  dst[tid] = src[keys[tid]];
 }
 
+}  // namespace Kernels
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_DENSEVECTOR_PRINT_IMPL_HPP
+#endif  // MORPHEUS_DENSEVECTOR_KERNELS_COPY_IMPL_HPP

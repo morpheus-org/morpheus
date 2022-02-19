@@ -61,17 +61,13 @@ void copy(const SourceType& src, DestinationType& dst,
   Morpheus::copy(src, dst, begin, end, begin, end);
 }
 
-template <typename KeyType, typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename KeyType, typename SourceType,
+          typename DestinationType>
 void copy_by_key(const KeyType keys, const SourceType& src,
                  DestinationType& dst) {
-  static_assert(is_vector_v<typename KeyType::tag> &&
-                    is_vector_v<typename SourceType::tag> &&
-                    is_vector_v<typename DestinationType::tag>,
-                "Both src, keys and dst must be vectors.");
-  // TODO
-  // Impl::copy_by_key(keys, src, dst, typename KeyType::tag(),
-  //                   typename SourceType::tag(),
-  //                   typename DestinationType::tag());
+  Impl::copy_by_key<ExecSpace>(keys, src, dst, typename KeyType::tag(),
+                               typename SourceType::tag(),
+                               typename DestinationType::tag());
 }
 
 }  // namespace Morpheus
