@@ -75,21 +75,24 @@ struct any_type_resize
   result_type operator()(
       typename CooMatrix<ValueType, Properties...>::type &mat, Args &&...args) {
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic resize interface.");
+        "Invalid use of the dynamic resize interface for current format (" +
+        std::to_string(mat.format_index()) + ").");
   }
 
   template <typename... Args>
   result_type operator()(
       typename CsrMatrix<ValueType, Properties...>::type &mat, Args &&...args) {
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic resize interface.");
+        "Invalid use of the dynamic resize interface for current format (" +
+        std::to_string(mat.format_index()) + ").");
   }
 
   template <typename... Args>
   result_type operator()(
       typename DiaMatrix<ValueType, Properties...>::type &mat, Args &&...args) {
     throw Morpheus::RuntimeException(
-        "Invalid use of the dynamic resize interface.");
+        "Invalid use of the dynamic resize interface for current format (" +
+        std::to_string(mat.format_index()) + ").");
   }
 };
 
@@ -113,7 +116,9 @@ struct any_type_resize_from_mat {
           nullptr) {
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic resize interface. Src and dst tags must be "
-        "the same");
+        "the same (" +
+        std::to_string(src.format_index()) +
+        " != " + std::to_string(dst.format_index()) + ")");
   }
 };
 
@@ -137,7 +142,9 @@ struct any_type_allocate {
           nullptr) {
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic allocate interface. Src and std tags must "
-        "be the same");
+        "be the same (" +
+        std::to_string(src.format_index()) +
+        " != " + std::to_string(dst.format_index()) + ")");
   }
 };
 
@@ -161,7 +168,9 @@ struct any_type_assign {
           nullptr) {
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic assign interface. Src and dst tags must be "
-        "the same");
+        "the same (" +
+        std::to_string(src.format_index()) +
+        " != " + std::to_string(dst.format_index()) + ")");
   }
 };
 

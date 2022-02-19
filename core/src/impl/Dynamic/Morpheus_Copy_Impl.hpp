@@ -59,9 +59,12 @@ struct copy_fn {
             is_compatible_from_different_space<
                 SourceType, DestinationType>::value)>::type* = nullptr) {
     throw Morpheus::FormatConversionException(
-        "Morpheus::copy() is only available between the same container types. "
-        "Please use Morpheus::convert() instead to perform conversions between "
-        "different types.");
+        "Morpheus::copy() is only available between the same container types "
+        "(" +
+        std::to_string(src.format_index()) +
+        " != " + std::to_string(dst.format_index()) +
+        "). Please use Morpheus::convert() instead to perform conversions "
+        "between different types.");
   }
 };
 
