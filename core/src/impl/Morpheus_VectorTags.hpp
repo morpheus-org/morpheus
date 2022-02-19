@@ -24,6 +24,8 @@
 #ifndef MORPHEUS_VECTORTAGS_HPP
 #define MORPHEUS_VECTORTAGS_HPP
 
+#include <type_traits>
+
 namespace Morpheus {
 
 namespace Impl {
