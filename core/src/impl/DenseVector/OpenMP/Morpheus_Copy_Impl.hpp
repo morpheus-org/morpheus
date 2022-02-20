@@ -48,7 +48,7 @@ void copy_by_key(
 
 #pragma omp parallel for
   for (index_type i = 0; i < keys.size(); i++) {
-    dst[keys[i]] = src[keys[i]];
+    dst[i] = src[keys[i]];
   }
 }
 

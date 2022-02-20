@@ -43,8 +43,13 @@ void copy_by_key(
                                SourceType, DestinationType>>* = nullptr) {
   using index_type = typename KeyType::value_type;
 
+  MORPHEUS_ASSERT(keys.size() <= src.size(),
+                  "Size of keys must be smaller or equal to src size.");
+  MORPHEUS_ASSERT(keys.size() <= dst.size(),
+                  "Size of keys must be smaller or equal to dst size.");
+
   for (index_type i = 0; i < keys.size(); i++) {
-    dst[keys[i]] = src[keys[i]];
+    dst[i] = src[keys[i]];
   }
 }
 
