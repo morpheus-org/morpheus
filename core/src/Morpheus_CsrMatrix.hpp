@@ -191,8 +191,7 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   }
 
   template <class VR, class... PR>
-  inline CsrMatrix &allocate(const std::string name,
-                             const CsrMatrix<VR, PR...> &src) {
+  inline CsrMatrix &allocate(const CsrMatrix<VR, PR...> &src) {
     resize(src.nrows(), src.ncols(), src.nnnz());
     return *this;
   }
