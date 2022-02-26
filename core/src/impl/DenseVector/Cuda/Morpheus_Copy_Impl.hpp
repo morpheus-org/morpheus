@@ -32,7 +32,7 @@
 #include <Morpheus_AlgorithmTags.hpp>
 
 #include <impl/Morpheus_CudaUtils.hpp>
-// #include <impl/DenseVector/Kernels/Morpheus_Dot_Impl.hpp>
+#include <impl/DenseVector/Kernels/Morpheus_Copy_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -51,12 +51,12 @@ void copy_by_key(
   using value_type = typename SourceType::value_type;
 
   const size_t BLOCK_SIZE = 256;
-  const size_t NUM_BLOCKS = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
+  const size_t NUM_BLOCKS = (keys.size() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
   // execute the dot product kernel
   Kernels::copy_by_key_kernel<value_type, index_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(keys.size(), keys.data(), src.data(),
-                                      out.data());
+                                      dst.data());
 }
 
 }  // namespace Impl
