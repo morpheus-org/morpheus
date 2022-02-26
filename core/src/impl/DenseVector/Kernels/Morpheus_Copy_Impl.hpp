@@ -31,7 +31,7 @@ namespace Impl {
 namespace Kernels {
 
 template <typename ValueType, typename IndexType>
-__global__ void copy_by_key_kernel(IndexType n, const ValueType* keys,
+__global__ void copy_by_key_kernel(IndexType n, const IndexType* keys,
                                    const ValueType* src, ValueType* dst) {
   const IndexType tid = blockDim.x * blockIdx.x + threadIdx.x;
   if (tid > n) return;

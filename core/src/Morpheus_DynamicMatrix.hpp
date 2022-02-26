@@ -146,10 +146,7 @@ class DynamicMatrix
   // Resize from a compatible dynamic matrix
   template <class VR, class... PR>
   inline void resize(
-      const DynamicMatrix<VR, PR...> &src,
-      typename std::enable_if<is_compatible_type<
-          DynamicMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type
-          * = nullptr) {
+      const DynamicMatrix<VR, PR...> &src) {
     Morpheus::Impl::Variant::visit(Impl::any_type_resize_from_mat(),
                                    src.const_formats(), _formats);
   }
