@@ -55,9 +55,12 @@ typename Vector1::value_type dot(
 
   Vector1 res_vec(n, 0);
 
-  // execute the dot product kernel
   Kernels::dot_kernel<value_type, index_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(n, x.data(), y.data(), res_vec.data());
+
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("dot: Kernel execution failed");
+#endif
 
   return Morpheus::reduce<ExecSpace>(res_vec, n);
 }

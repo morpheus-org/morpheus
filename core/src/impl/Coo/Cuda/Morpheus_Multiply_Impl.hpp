@@ -83,6 +83,10 @@ void __spmv_coo_serial(const Matrix& A, const Vector1& x, Vector2& y) {
 
   Kernels::spmv_coo_serial_kernel<index_type, value_type>
       <<<1, 1>>>(A.nnnz(), I, J, V, x_ptr, y_ptr);
+
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("spmv_coo_serial_kernel: Kernel execution failed");
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -113,6 +117,9 @@ void __spmv_coo_flat(const Matrix& A, const Vector1& x, Vector2& y) {
     Kernels::spmv_coo_serial_kernel<index_type, value_type><<<1, 1, 0>>>(
         A.nnnz(), A.crow_indices().data(), A.ccolumn_indices().data(),
         A.cvalues().data(), x.data(), y.data());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+    getLastCudaError("spmv_coo_serial_kernel: Kernel execution failed");
+#endif
     return;
   }
 
@@ -144,15 +151,24 @@ void __spmv_coo_flat(const Matrix& A, const Vector1& x, Vector2& y) {
           tail, interval_size, A.crow_indices().data(),
           A.ccolumn_indices().data(), A.cvalues().data(), x.data(), y.data(),
           temp_rows.data(), temp_vals.data());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("spmv_coo_flat_kernel: Kernel execution failed");
+#endif
 
   Kernels::spmv_coo_reduce_update_kernel<index_type, value_type, BLOCK_SIZE>
       <<<1, BLOCK_SIZE, 0>>>(active_warps, temp_rows.data(), temp_vals.data(),
                              y.data());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("spmv_coo_reduce_kernel: Kernel execution failed");
+#endif
 
   Kernels::spmv_coo_serial_kernel<index_type, value_type>
       <<<1, 1, 0>>>(A.nnnz() - tail, A.crow_indices().data() + tail,
                     A.ccolumn_indices().data() + tail,
                     A.cvalues().data() + tail, x.data(), y.data());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("spmv_coo_serial_kernel: Kernel execution failed");
+#endif
 }
 
 }  // namespace Impl

@@ -55,6 +55,9 @@ void update_diagonal(
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), A.row_offsets().data(),
                                       A.column_indices().data(),
                                       A.values().data(), diagonal.data());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("update_csr_diagonal_kernel: Kernel execution failed");
+#endif
 }
 
 }  // namespace Impl

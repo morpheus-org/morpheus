@@ -50,13 +50,18 @@ void copy_by_key(
   using index_type = typename KeyType::value_type;
   using value_type = typename SourceType::value_type;
 
+  if (keys.size() == 0) return;
+
   const size_t BLOCK_SIZE = 256;
   const size_t NUM_BLOCKS = (keys.size() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-  // execute the dot product kernel
   Kernels::copy_by_key_kernel<value_type, index_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(keys.size(), keys.data(), src.data(),
                                       dst.data());
+
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("copy_by_key_kernel: Kernel execution failed");
+#endif
 }
 
 }  // namespace Impl

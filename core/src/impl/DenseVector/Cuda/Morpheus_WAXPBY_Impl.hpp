@@ -56,6 +56,9 @@ inline void waxpby(
 
   Kernels::waxpby_kernel<value_type, index_type><<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(
       n, alpha, x.data(), beta, y.data(), w.data());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("spmv_waxpby_kernel: Kernel execution failed");
+#endif
 }
 
 }  // namespace Impl

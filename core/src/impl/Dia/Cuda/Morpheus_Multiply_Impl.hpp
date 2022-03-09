@@ -73,6 +73,10 @@ inline void multiply(
   Kernels::spmv_dia_kernel<index_type, value_type, BLOCK_SIZE>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), A.ncols(), num_diagonals,
                                       pitch, D, V, x_ptr, y_ptr);
+
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("spmv_dia_kernel: Kernel execution failed");
+#endif
 }
 
 }  // namespace Impl

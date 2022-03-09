@@ -54,14 +54,9 @@ void reduce(
   value_type* d_idata = in.data();
   value_type* d_odata = out.data();
 
-  // when there is only one warp per block, we need to allocate two warps
-  // worth of shared memory so that we don't index shared memory out of bounds
-  int smemSize = (threads <= 32) ? 2 * threads * sizeof(value_type)
-                                 : threads * sizeof(value_type);
-
   // For reduce kernel we require only blockSize/warpSize
   // number of elements in shared memory
-  smemSize = ((threads / 32) + 1) * sizeof(value_type);
+  int smemSize = ((threads / 32) + 1) * sizeof(value_type);
   if (isPow2<unsigned int>(size)) {
     switch (threads) {
       case 1024:
@@ -121,7 +116,7 @@ void reduce(
   } else {
     switch (threads) {
       case 1024:
-        Kernels::reduce_kernel<value_type, 1024, true>
+        Kernels::reduce_kernel<value_type, 1024, false>
             <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
       case 512:
@@ -201,9 +196,9 @@ typename Vector::value_type reduce(
   Vector out(numBlocks, 0);
   reduce<ExecSpace>(in, out, size, numThreads, numBlocks,
                     typename Vector::tag{}, typename Vector::tag{}, Alg0{});
-
-  // check if kernel execution generated an error
-  getLastCudaError("Kernel execution failed");
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("reduce_kernel: Kernel execution failed");
+#endif
 
   // sum partial block sums on GPU
   int s = numBlocks;
@@ -215,8 +210,9 @@ typename Vector::value_type reduce(
 
     reduce<ExecSpace>(inter_sums, out, s, threads, blocks,
                       typename Vector::tag{}, typename Vector::tag{}, Alg0{});
-    // check if kernel execution generated an error
-    getLastCudaError("Kernel execution failed");
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+    getLastCudaError("reduce_kernel: Kernel execution failed");
+#endif
 
     s = (s + (threads * 2 - 1)) / (threads * 2);
   }
@@ -226,7 +222,6 @@ typename Vector::value_type reduce(
     // copy result from device to host
     Morpheus::copy(out, h_out, 0, s);
     result = reduce<Kokkos::Serial>(h_out, s, typename Vector::tag{}, Alg0{});
-
   } else {
     // copy final sum from device to host
     typename Vector::HostMirror h_out(1, 0);

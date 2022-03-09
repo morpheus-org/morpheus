@@ -101,6 +101,9 @@ inline void multiply(
 
   Morpheus::Impl::Kernels::spmv_csr_scalar_kernel<index_type, value_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), I, J, V, x_ptr, y_ptr);
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("spmv_csr_scalar_kernel: Kernel execution failed");
+#endif
 }
 
 template <size_t THREADS_PER_VECTOR, typename Matrix, typename Vector1,
@@ -130,6 +133,10 @@ void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y) {
   Kernels::spmv_csr_vector_kernel<index_type, value_type, VECTORS_PER_BLOCK,
                                   THREADS_PER_VECTOR>
       <<<NUM_BLOCKS, THREADS_PER_BLOCK, 0>>>(A.nrows(), I, J, V, x_ptr, y_ptr);
+
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("spmv_csr_vector_kernel: Kernel execution failed");
+#endif
 }
 
 }  // namespace Impl
