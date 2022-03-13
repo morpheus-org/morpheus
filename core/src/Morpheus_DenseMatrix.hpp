@@ -78,7 +78,7 @@ class DenseMatrix
   inline DenseMatrix(const index_type num_rows, const index_type num_cols,
                      const value_type val = 0)
       : base(num_rows, num_cols, num_rows * num_cols),
-        _values(size_t(num_rows), size_t(num_cols)) {
+        _values("matrix", size_t(num_rows), size_t(num_cols)) {
     assign(num_rows, num_cols, val);
   }
 
