@@ -243,7 +243,6 @@ void read_coordinate_stream(Morpheus::CooMatrix<ValueType, Properties...>& coo,
     }
 
     // store full matrix in coo
-    // ! FIXME: might be better to do swap
     coo = general;
   }  // if (banner.symmetry != "general")
   // sort indices by (row,column)
@@ -313,7 +312,8 @@ void read_array_stream(Morpheus::DenseMatrix<ValueType, Properties...>& mtx,
     throw Morpheus::NotImplementedException(
         "only general array symmetric MatrixMarket format is supported");
 
-  Morpheus::copy(dense, mtx);
+  mtx = dense;
+  // Morpheus::copy(dense, mtx);
 }
 
 template <template <class, class...> class Container, class T, class... P,
