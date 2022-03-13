@@ -67,7 +67,7 @@ void counting_sort_by_key(Vector1& keys, Vector2& vals,
   index_type size = max - min;
 
   // allocate temporary arrays
-  Vector1 counts(size + 2, 0), temp_keys, temp_vals;
+  Vector1 counts(size + 2, 0), temp_keys(keys.size()), temp_vals(vals.size());
   Morpheus::copy(keys, temp_keys);
   Morpheus::copy(vals, temp_vals);
 
@@ -93,6 +93,7 @@ void sort_by_row_and_column(Matrix& mat, CooTag,
   using index_type  = typename Matrix::index_type;
   using index_array = typename Matrix::index_array_type;
   using value_array = typename Matrix::value_array_type;
+  using space       = typename Matrix::execution_space;
 
   index_type N = mat.row_indices().size();
 
@@ -112,31 +113,27 @@ void sort_by_row_and_column(Matrix& mat, CooTag,
   }
 
   {
-    index_array temp;
+    index_array temp(mat.column_indices().size());
     Morpheus::copy(mat.column_indices(), temp);
     Morpheus::Impl::counting_sort_by_key(temp, permutation, minc, maxc,
                                          typename index_array::tag());
 
-    Morpheus::copy(mat.row_indices(), temp);
-    for (index_type i = 0; i < index_type(permutation.size()); i++) {
-      mat.row_indices(i) = temp[permutation[i]];
+    if (mat.row_indices().size() != temp.size()) {
+      temp.resize(mat.row_indices().size());
     }
+    Morpheus::copy(mat.row_indices(), temp);
+    Morpheus::copy_by_key<space>(permutation, temp, mat.row_indices());
 
     Morpheus::Impl::counting_sort_by_key(mat.row_indices(), permutation, minr,
                                          maxr, typename index_array::tag());
     Morpheus::copy(mat.column_indices(), temp);
-
-    for (index_type i = 0; i < index_type(permutation.size()); i++) {
-      mat.column_indices(i) = temp[permutation[i]];
-    }
+    Morpheus::copy_by_key<space>(permutation, temp, mat.column_indices());
   }
 
   {
-    value_array temp;
+    value_array temp(mat.values().size());
     Morpheus::copy(mat.values(), temp);
-    for (index_type i = 0; i < index_type(permutation.size()); i++) {
-      mat.values(i) = temp[permutation[i]];
-    }
+    Morpheus::copy_by_key<space>(permutation, temp, mat.values());
   }
 }
 
