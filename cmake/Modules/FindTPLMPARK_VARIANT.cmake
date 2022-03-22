@@ -8,6 +8,30 @@ elseif(MPARK_VARIANT_LIBRARIES)
 elseif(MPARK_VARIANT_LIBRARY_DIRS)
   morpheus_find_imported(MPARK_VARIANT INTERFACE LIBRARIES mpark_variant
                          LIBRARY_PATHS ${MPARK_VARIANT_LIBRARY_DIRS})
+elseif(Morpheus_MPARK_VARIANT_ROOT OR DEFINED ENV{MPARK_VARIANT_DIR})
+  if(Morpheus_MPARK_VARIANT_ROOT AND DEFINED ENV{MPARK_VARIANT_DIR})
+    message(
+      FATAL_ERROR
+        "Both Morpheus_MPARK_VARIANT_ROOT and ENV{MPARK_VARIANT_DIR} are defined!"
+    )
+  endif()
+
+  if(Morpheus_MPARK_VARIANT_ROOT)
+    set(MPARK_VARIANT_ROOT ${Morpheus_MPARK_VARIANT_ROOT})
+  else()
+    set(MPARK_VARIANT_ROOT $ENV{MPARK_VARIANT_DIR})
+  endif()
+
+  morpheus_find_imported(
+    MPARK_VARIANT
+    INTERFACE
+    LIBRARIES
+    LIBRARY_PATHS
+    ${MPARK_VARIANT_ROOT}/lib
+    HEADERS
+    mpark/variant.hpp
+    HEADER_PATHS
+    ${MPARK_VARIANT_ROOT}/include)
 else()
   find_package(MPARK_VARIANT REQUIRED)
   morpheus_create_imported_tpl(

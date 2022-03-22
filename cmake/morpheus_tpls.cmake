@@ -17,18 +17,18 @@ macro(MORPHEUS_ADD_TPL_OPTION NAME DEFAULT_VALUE DOCSTRING)
     "Location of ${NAME} install root. Default: None or the value of the environment variable ${NAME}_ROOT if set"
   )
   if(DEFINED TPL_ENABLE_${NAME})
-    if(TPL_ENABLE_${NAME} AND NOT MORPHEUS_ENABLE_TPL_${NAME})
+    if(TPL_ENABLE_${NAME} AND NOT Morpheus_ENABLE_TPL_${NAME})
       message(
-        "Overriding MORPHEUS_ENABLE_TPL_${NAME}=OFF with TPL_ENABLE_${NAME}=ON")
+        "Overriding Morpheus_ENABLE_TPL_${NAME}=OFF with TPL_ENABLE_${NAME}=ON")
       set(MORPHEUS_ENABLE_TPL_${NAME} ON)
-    elseif(NOT TPL_ENABLE_${NAME} AND MORPHEUS_ENABLE_TPL_${NAME})
+    elseif(NOT TPL_ENABLE_${NAME} AND Morpheus_ENABLE_TPL_${NAME})
       message(
         "Overriding MORPHEUS_ENABLE_TPL_${NAME}=ON with TPL_ENABLE_${NAME}=OFF")
-      set(MORPHEUS_ENABLE_TPL_${NAME} OFF)
+      set(Morpheus_ENABLE_TPL_${NAME} OFF)
     endif()
   endif()
-  if(MORPHEUS_ENABLE_TPL_${NAME})
-    list(APPEND MORPHEUS_TPL_LIST ${NAME})
+  if(Morpheus_ENABLE_TPL_${NAME})
+    list(APPEND Morpheus_TPL_LIST ${NAME})
   endif()
 endmacro()
 
@@ -398,7 +398,7 @@ macro(morpheus_import_tpl NAME)
     cmake_policy(SET CMP0074 NEW)
   endif()
 
-  if(MORPHEUS_ENABLE_TPL_${NAME})
+  if(Morpheus_ENABLE_TPL_${NAME})
     # Tack on a TPL here to make sure we avoid using anyone else's find
     find_package(TPL${NAME} REQUIRED MODULE)
     message(STATUS "Found ${NAME} at ${${NAME}_DIR}")
