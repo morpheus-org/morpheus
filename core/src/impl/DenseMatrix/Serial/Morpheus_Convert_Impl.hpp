@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_DENSEMATRIX_CONVERT_IMPL_HPP
-#define MORPHEUS_DENSEMATRIX_CONVERT_IMPL_HPP
+#ifndef MORPHEUS_DENSEMATRIX_SERIAL_CONVERT_IMPL_HPP
+#define MORPHEUS_DENSEMATRIX_SERIAL_CONVERT_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
@@ -30,13 +30,14 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
     const SourceType& src, DestinationType& dst, DenseMatrixTag, DenseMatrixTag,
     typename std::enable_if<
-        std::is_same<typename SourceType::memory_space,
-                     typename DestinationType::memory_space>::value &&
-        is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
   MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
@@ -50,13 +51,14 @@ void convert(
   }
 }
 
-template <typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
     const SourceType& src, DestinationType& dst, DenseMatrixTag, DenseVectorTag,
     typename std::enable_if<
-        std::is_same<typename SourceType::memory_space,
-                     typename DestinationType::memory_space>::value &&
-        is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows() * src.ncols());
@@ -69,9 +71,14 @@ void convert(
   }
 }
 
-template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, DenseMatrixTag,
-             CooTag) {
+template <typename ExecSpace, typename SourceType, typename DestinationType>
+void convert(
+    const SourceType& src, DestinationType& dst, DenseMatrixTag, CooTag,
+    typename std::enable_if<
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
   using value_type = typename SourceType::value_type;
 
@@ -97,9 +104,14 @@ void convert(const SourceType& src, DestinationType& dst, DenseMatrixTag,
   }
 }
 
-template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, CooTag,
-             DenseMatrixTag) {
+template <typename ExecSpace, typename SourceType, typename DestinationType>
+void convert(
+    const SourceType& src, DestinationType& dst, CooTag, DenseMatrixTag,
+    typename std::enable_if<
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols());
@@ -114,4 +126,4 @@ void convert(const SourceType& src, DestinationType& dst, CooTag,
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_DENSEMATRIX_CONVERT_IMPL_HPP
+#endif  // MORPHEUS_DENSEMATRIX_SERIAL_CONVERT_IMPL_HPP

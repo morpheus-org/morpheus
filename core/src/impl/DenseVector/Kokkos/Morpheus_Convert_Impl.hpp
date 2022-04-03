@@ -21,35 +21,28 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_DENSEVECTOR_CONVERT_IMPL_HPP
-#define MORPHEUS_DENSEVECTOR_CONVERT_IMPL_HPP
+#ifndef MORPHEUS_DENSEVECTOR_KOKKOS_CONVERT_IMPL_HPP
+#define MORPHEUS_DENSEVECTOR_KOKKOS_CONVERT_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
 
-namespace Morpheus {
+#include <Morpheus_Exceptions.hpp>
 
+namespace Morpheus {
 namespace Impl {
 
-template <typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
     const SourceType& src, DestinationType& dst, DenseVectorTag, DenseVectorTag,
     typename std::enable_if<
-        std::is_same<typename SourceType::memory_space,
-                     typename DestinationType::memory_space>::value &&
-        is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
-  using index_type = typename SourceType::index_type;
-
-  MORPHEUS_ASSERT(dst.size() >= src.size(),
-                  "Destination vector must be of equal or larger size to the "
-                  "source vector");
-
-  for (index_type i = 0; i < src.size(); i++) {
-    dst[i] = src[i];
-  }
+        Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
+  throw Morpheus::NotImplementedException("convert<Kokkos>");
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_DENSEVECTOR_CONVERT_IMPL_HPP
+#endif  // MORPHEUS_DENSEVECTOR_KOKKOS_CONVERT_IMPL_HPP

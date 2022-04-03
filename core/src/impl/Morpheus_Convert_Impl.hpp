@@ -28,8 +28,15 @@
 
 #include <fwd/Morpheus_Fwd_CooMatrix.hpp>
 
-#include <impl/DenseVector/Morpheus_Convert_Impl.hpp>
-#include <impl/DenseMatrix/Morpheus_Convert_Impl.hpp>
+#include <impl/DenseVector/Serial/Morpheus_Convert_Impl.hpp>
+#include <impl/DenseVector/OpenMP/Morpheus_Convert_Impl.hpp>
+#include <impl/DenseVector/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/DenseVector/Kokkos/Morpheus_Convert_Impl.hpp>
+
+#include <impl/DenseMatrix/Serial/Morpheus_Convert_Impl.hpp>
+#include <impl/DenseMatrix/OpenMP/Morpheus_Convert_Impl.hpp>
+#include <impl/DenseMatrix/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/DenseMatrix/Kokkos/Morpheus_Convert_Impl.hpp>
 
 #include <impl/Coo/Serial/Morpheus_Convert_Impl.hpp>
 #include <impl/Coo/OpenMP/Morpheus_Convert_Impl.hpp>
@@ -52,8 +59,8 @@ namespace Morpheus {
 namespace Impl {
 
 // convert src -> coo_matrix -> dst
-template <typename SourceType, typename DestinationType, typename Format1,
-          typename Format2>
+template <typename ExecSpace, typename SourceType, typename DestinationType,
+          typename Format1, typename Format2>
 void convert(const SourceType& src, DestinationType& dst, Format1, Format2,
              typename std::enable_if_t<!std::is_same_v<Format1, DynamicTag> &&
                                        !std::is_same_v<Format2, DynamicTag>>* =
@@ -66,8 +73,8 @@ void convert(const SourceType& src, DestinationType& dst, Format1, Format2,
   using Coo = CooMatrix<ValueType, IndexType, ArrayLayout, MemorySpace>;
   Coo tmp;
 
-  Morpheus::Impl::convert(src, tmp, Format1(), typename Coo::tag());
-  Morpheus::Impl::convert(tmp, dst, typename Coo::tag(), Format2());
+  Morpheus::Impl::convert<ExecSpace>(src, tmp, Format1(), typename Coo::tag());
+  Morpheus::Impl::convert<ExecSpace>(tmp, dst, typename Coo::tag(), Format2());
 }
 
 }  // namespace Impl
