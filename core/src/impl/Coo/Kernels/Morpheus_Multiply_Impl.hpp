@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022  The University of Edinburgh
  * Copyright 2008-2014 NVIDIA Corporation
  *
  * Contributing Authors:

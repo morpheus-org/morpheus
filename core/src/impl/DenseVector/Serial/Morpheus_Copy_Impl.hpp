@@ -26,7 +26,6 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_AlgorithmTags.hpp>
 
 namespace Morpheus {
 namespace Impl {

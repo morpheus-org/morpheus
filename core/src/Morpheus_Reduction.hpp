@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -24,21 +24,14 @@
 #ifndef MORPHEUS_REDUCTION_HPP
 #define MORPHEUS_REDUCTION_HPP
 
-#include <Morpheus_AlgorithmTags.hpp>
 #include <impl/Morpheus_Reduction_Impl.hpp>
 
 namespace Morpheus {
 
-template <typename ExecSpace, typename Algorithm, typename Vector>
-typename Vector::value_type reduce(const Vector& in,
-                                   typename Vector::index_type size) {
-  return Impl::reduce<ExecSpace>(in, size, typename Vector::tag{}, Algorithm{});
-}
-
 template <typename ExecSpace, typename Vector>
 typename Vector::value_type reduce(const Vector& in,
                                    typename Vector::index_type size) {
-  return Impl::reduce<ExecSpace>(in, size, typename Vector::tag{}, Alg0{});
+  return Impl::reduce<ExecSpace>(in, size, typename Vector::tag{});
 }
 
 }  // namespace Morpheus

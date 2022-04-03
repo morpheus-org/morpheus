@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -145,8 +145,7 @@ class DynamicMatrix
 
   // Resize from a compatible dynamic matrix
   template <class VR, class... PR>
-  inline void resize(
-      const DynamicMatrix<VR, PR...> &src) {
+  inline void resize(const DynamicMatrix<VR, PR...> &src) {
     Morpheus::Impl::Variant::visit(Impl::any_type_resize_from_mat(),
                                    src.const_formats(), _formats);
   }

@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -29,7 +29,6 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_AlgorithmTags.hpp>
 
 #include <impl/Morpheus_CudaUtils.hpp>
 #include <impl/Coo/Kernels/Morpheus_Multiply_Impl.hpp>
@@ -48,7 +47,7 @@ template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
     const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
-    DenseVectorTag, Alg0,
+    DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
@@ -57,18 +56,18 @@ inline void multiply(
   __spmv_coo_flat(A, x, y);
 }
 
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
-inline void multiply(
-    const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
-    DenseVectorTag, Alg1,
-    typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_Cuda_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector1, Vector2>>* = nullptr) {
-  __spmv_coo_serial(A, x, y);
-}
+// template <typename ExecSpace, typename Matrix, typename Vector1,
+//           typename Vector2>
+// inline void multiply(
+//     const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
+//     DenseVectorTag,
+//     typename std::enable_if_t<
+//         !Morpheus::is_kokkos_space_v<ExecSpace> &&
+//         Morpheus::is_Cuda_space_v<ExecSpace> &&
+//         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+//                                Vector1, Vector2>>* = nullptr) {
+//   __spmv_coo_serial(A, x, y);
+// }
 
 template <typename Matrix, typename Vector1, typename Vector2>
 void __spmv_coo_serial(const Matrix& A, const Vector1& x, Vector2& y) {

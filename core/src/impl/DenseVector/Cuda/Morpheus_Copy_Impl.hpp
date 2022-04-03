@@ -29,7 +29,6 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_AlgorithmTags.hpp>
 
 #include <impl/Morpheus_CudaUtils.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_Copy_Impl.hpp>

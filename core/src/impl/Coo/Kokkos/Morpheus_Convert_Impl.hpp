@@ -1,5 +1,5 @@
 /**
- * Morpheus_Print_Impl.hpp
+ * Morpheus_Convert_Impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,34 +21,27 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_DENSEMATRIX_PRINT_IMPL_HPP
-#define MORPHEUS_DENSEMATRIX_PRINT_IMPL_HPP
+#ifndef MORPHEUS_COO_KOKKOS_CONVERT_IMPL_HPP
+#define MORPHEUS_COO_KOKKOS_CONVERT_IMPL_HPP
 
-#include <Morpheus_FormatTags.hpp>
-#include <impl/Morpheus_Utils.hpp>
+#include <Morpheus_TypeTraits.hpp>
 
-#include <iostream>
-#include <iomanip>  // setw, setprecision
+#include <Morpheus_Exceptions.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
-template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, DenseMatrixTag) {
-  using index_type = typename Printable::index_type;
-  print_matrix_header(p, s);
-
-  for (index_type i = 0; i < p.nrows(); i++) {
-    for (index_type j = 0; j < p.ncols(); j++) {
-      s << " " << std::setw(14) << i;
-      s << " " << std::setw(14) << j;
-      s << " " << std::setprecision(4) << std::setw(8) << "(" << p(i, j)
-        << ")\n";
-    }
-  }
+template <typename ExecSpace, typename SourceType, typename DestinationType>
+inline void convert(
+    const SourceType& src, DestinationType& dst, CooTag, CooTag,
+    typename std::enable_if_t<
+        Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>* = nullptr) {
+  throw Morpheus::NotImplementedException("convert<Kokkos>");
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_DENSEMATRIX_PRINT_IMPL_HPP
+#endif  // MORPHEUS_COO_KOKKOS_CONVERT_IMPL_HPP

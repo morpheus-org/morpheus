@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,24 +25,22 @@
 #define MORPHEUS_DYNAMIC_MULTIPLY_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_AlgorithmTags.hpp>
 
 #include <impl/Morpheus_Variant.hpp>
 
 namespace Morpheus {
-template <typename ExecSpace, typename Algorithm, typename Matrix,
-          typename Vector1, typename Vector2>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(const Matrix& A, const Vector1& x, Vector2& y);
 
 namespace Impl {
 
-template <typename ExecSpace, typename Algorithm, typename Matrix,
-          typename Vector1, typename Vector2>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(const Matrix& A, const Vector1& x, Vector2& y, DynamicTag,
-                     DenseVectorTag, DenseVectorTag, Algorithm) {
-  std::visit(
-      [&](auto&& arg) { Morpheus::multiply<ExecSpace, Algorithm>(arg, x, y); },
-      A.const_formats());
+                     DenseVectorTag, DenseVectorTag) {
+  std::visit([&](auto&& arg) { Morpheus::multiply<ExecSpace>(arg, x, y); },
+             A.const_formats());
 }
 
 }  // namespace Impl

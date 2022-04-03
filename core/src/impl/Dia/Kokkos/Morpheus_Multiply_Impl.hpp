@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -26,7 +26,6 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_AlgorithmTags.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -35,7 +34,7 @@ template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
     const Matrix& A, const Vector1& x, Vector2& y, DiaTag, DenseVectorTag,
-    DenseVectorTag, Alg0,
+    DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
@@ -75,46 +74,47 @@ inline void multiply(
       });
 }
 
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
-inline void multiply(
-    const Matrix& A, const Vector1& x, Vector2& y, DiaTag, DenseVectorTag,
-    DenseVectorTag, Alg1,
-    typename std::enable_if_t<
-        Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector1, Vector2>>* = nullptr) {
-  using execution_space  = typename ExecSpace::execution_space;
-  using value_array_type = typename Matrix::value_array_type::value_array_type;
-  using index_array_type = typename Matrix::index_array_type::value_array_type;
-  using index_type       = typename Matrix::index_type;
-  using value_type       = typename Matrix::value_type;
-  using range_policy =
-      Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
+// template <typename ExecSpace, typename Matrix, typename Vector1,
+//           typename Vector2>
+// inline void multiply(
+//     const Matrix& A, const Vector1& x, Vector2& y, DiaTag, DenseVectorTag,
+//     DenseVectorTag,
+//     typename std::enable_if_t<
+//         Morpheus::is_kokkos_space_v<ExecSpace> &&
+//         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+//                                Vector1, Vector2>>* = nullptr) {
+//   using execution_space  = typename ExecSpace::execution_space;
+//   using value_array_type = typename
+//   Matrix::value_array_type::value_array_type; using index_array_type =
+//   typename Matrix::index_array_type::value_array_type; using index_type =
+//   typename Matrix::index_type; using value_type       = typename
+//   Matrix::value_type; using range_policy =
+//       Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
 
-  const value_array_type values                   = A.cvalues().const_view();
-  const typename Vector1::value_array_type x_view = x.const_view();
-  const index_array_type diagonal_offsets = A.cdiagonal_offsets().const_view();
-  typename Vector2::value_array_type y_view = y.view();
-  index_type ndiag = A.cvalues().ncols(), ncols = A.ncols();
+//   const value_array_type values                   = A.cvalues().const_view();
+//   const typename Vector1::value_array_type x_view = x.const_view();
+//   const index_array_type diagonal_offsets =
+//   A.cdiagonal_offsets().const_view(); typename Vector2::value_array_type
+//   y_view = y.view(); index_type ndiag = A.cvalues().ncols(), ncols =
+//   A.ncols();
 
-  range_policy policy(0, A.nrows());
+//   range_policy policy(0, A.nrows());
 
-  Kokkos::parallel_for(
-      policy, KOKKOS_LAMBDA(const index_type row) {
-        value_type sum = y_view[row];
+//   Kokkos::parallel_for(
+//       policy, KOKKOS_LAMBDA(const index_type row) {
+//         value_type sum = y_view[row];
 
-        for (index_type n = 0; n < ndiag; n++) {
-          const index_type col = row + diagonal_offsets[n];
+//         for (index_type n = 0; n < ndiag; n++) {
+//           const index_type col = row + diagonal_offsets[n];
 
-          if (col >= 0 && col < ncols) {
-            sum += values(row, n) * x_view[col];
-          }
-        }
+//           if (col >= 0 && col < ncols) {
+//             sum += values(row, n) * x_view[col];
+//           }
+//         }
 
-        y_view[row] = sum;
-      });
-}
+//         y_view[row] = sum;
+//       });
+// }
 
 }  // namespace Impl
 }  // namespace Morpheus

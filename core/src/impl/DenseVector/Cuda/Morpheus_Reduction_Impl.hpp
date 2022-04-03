@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -27,7 +27,6 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_CUDA)
 
-#include <Morpheus_AlgorithmTags.hpp>
 #include <Morpheus_Copy.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
@@ -41,7 +40,7 @@ namespace Impl {
 template <typename ExecSpace, typename Vector>
 void reduce(
     const Vector& in, Vector& out, unsigned int size, int threads, int blocks,
-    DenseVectorTag, DenseVectorTag, Alg0,
+    DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
@@ -174,7 +173,7 @@ void reduce(
 
 template <typename ExecSpace, typename Vector>
 typename Vector::value_type reduce(
-    const Vector& in, typename Vector::index_type size, DenseVectorTag, Alg0,
+    const Vector& in, typename Vector::index_type size, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
@@ -195,7 +194,7 @@ typename Vector::value_type reduce(
   Vector inter_sums(maxBlocks, 0);
   Vector out(numBlocks, 0);
   reduce<ExecSpace>(in, out, size, numThreads, numBlocks,
-                    typename Vector::tag{}, typename Vector::tag{}, Alg0{});
+                    typename Vector::tag{}, typename Vector::tag{});
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
   getLastCudaError("reduce_kernel: Kernel execution failed");
 #endif
@@ -209,7 +208,7 @@ typename Vector::value_type reduce(
     Morpheus::copy(out, inter_sums, 0, s);
 
     reduce<ExecSpace>(inter_sums, out, s, threads, blocks,
-                      typename Vector::tag{}, typename Vector::tag{}, Alg0{});
+                      typename Vector::tag{}, typename Vector::tag{});
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
     getLastCudaError("reduce_kernel: Kernel execution failed");
 #endif
@@ -221,7 +220,7 @@ typename Vector::value_type reduce(
     typename Vector::HostMirror h_out(s, 0);
     // copy result from device to host
     Morpheus::copy(out, h_out, 0, s);
-    result = reduce<Kokkos::Serial>(h_out, s, typename Vector::tag{}, Alg0{});
+    result = reduce<Kokkos::Serial>(h_out, s, typename Vector::tag{});
   } else {
     // copy final sum from device to host
     typename Vector::HostMirror h_out(1, 0);

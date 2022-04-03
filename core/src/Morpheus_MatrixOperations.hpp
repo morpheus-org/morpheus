@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -24,7 +24,6 @@
 #ifndef MORPHEUS_MATRIXOPERATIONS_HPP
 #define MORPHEUS_MATRIXOPERATIONS_HPP
 
-#include <Morpheus_AlgorithmTags.hpp>
 #include <impl/Morpheus_MatrixOperations_Impl.hpp>
 
 namespace Morpheus {

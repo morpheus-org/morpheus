@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -26,7 +26,6 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_AlgorithmTags.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -35,7 +34,7 @@ inline void waxpby(
     const typename Vector::index_type n,
     const typename Vector::value_type alpha, const Vector& x,
     const typename Vector::value_type beta, const Vector& y, Vector& w,
-    DenseVectorTag, Alg0,
+    DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&

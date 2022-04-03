@@ -1,5 +1,5 @@
 /**
- * Morpheus_WAXPBY_Impl.hpp
+ * Morpheus_Convert_Impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,40 +21,44 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_DENSEVECTOR_OPENMP_WAXPBY_IMPL_HPP
-#define MORPHEUS_DENSEVECTOR_OPENMP_WAXPBY_IMPL_HPP
+#ifndef MORPHEUS_COO_OPENMP_CONVERT_IMPL_HPP
+#define MORPHEUS_COO_OPENMP_CONVERT_IMPL_HPP
 
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_OPENMP)
 
-#include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_TypeTraits.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Vector>
-inline void waxpby(
-    const typename Vector::index_type n,
-    const typename Vector::value_type alpha, const Vector& x,
-    const typename Vector::value_type beta, const Vector& y, Vector& w,
-    DenseVectorTag,
-    typename std::enable_if_t<
+template <typename ExecSpace, typename SourceType, typename DestinationType>
+void convert(
+    const SourceType& src, DestinationType& dst, CooTag, CooTag,
+    typename std::enable_if<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
-  using index_type = typename Vector::index_type;
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
+  using index_type = typename SourceType::index_type;
 
-  if (alpha == 1.0) {
+  dst.resize(src.nrows(), src.ncols(), src.nnnz());
+
+// element-wise copy of indices and values
 #pragma omp parallel for
-    for (index_type i = 0; i < n; i++) w[i] = x[i] + beta * y[i];
-  } else if (beta == 1.0) {
+  for (index_type n = 0; n < src.nnnz(); n++) {
+    dst.row_indices(n) = src.crow_indices(n);
+  }
+
 #pragma omp parallel for
-    for (index_type i = 0; i < n; i++) w[i] = alpha * x[i] + y[i];
-  } else {
+  for (index_type n = 0; n < src.nnnz(); n++) {
+    dst.column_indices(n) = src.ccolumn_indices(n);
+  }
+
 #pragma omp parallel for
-    for (index_type i = 0; i < n; i++) w[i] = alpha * x[i] + beta * y[i];
+  for (index_type n = 0; n < src.nnnz(); n++) {
+    dst.values(n) = src.cvalues(n);
   }
 }
 
@@ -62,4 +66,4 @@ inline void waxpby(
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_ENABLE_OPENMP
-#endif  // MORPHEUS_DENSEVECTOR_OPENMP_WAXPBY_IMPL_HPP
+#endif  // MORPHEUS_COO_OPENMP_CONVERT_IMPL_HPP

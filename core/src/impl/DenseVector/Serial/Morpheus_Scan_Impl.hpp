@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -26,7 +26,6 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_AlgorithmTags.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -34,7 +33,7 @@ namespace Impl {
 template <typename ExecSpace, typename Vector>
 void inclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::index_type start, DenseVectorTag, DenseVectorTag, Alg0,
+    typename Vector::index_type start, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
@@ -51,7 +50,7 @@ void inclusive_scan(
 template <typename ExecSpace, typename Vector>
 void exclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::index_type start, DenseVectorTag, DenseVectorTag, Alg0,
+    typename Vector::index_type start, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
@@ -72,7 +71,7 @@ template <typename ExecSpace, typename Vector1, typename Vector2>
 void inclusive_scan_by_key(
     const Vector1& keys, const Vector2& in, Vector2& out,
     typename Vector2::index_type size, typename Vector2::index_type start,
-    DenseVectorTag, DenseVectorTag, DenseVectorTag, Alg0,
+    DenseVectorTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
@@ -102,7 +101,7 @@ template <typename ExecSpace, typename Vector1, typename Vector2>
 void exclusive_scan_by_key(
     const Vector1& keys, const Vector2& in, Vector2& out,
     typename Vector2::index_type size, typename Vector2::index_type start,
-    DenseVectorTag, DenseVectorTag, DenseVectorTag, Alg0,
+    DenseVectorTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&

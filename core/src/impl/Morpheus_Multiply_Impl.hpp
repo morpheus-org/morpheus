@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
-#define MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
+#ifndef MORPHEUS_IMPL_MULTIPLY_IMPL_HPP
+#define MORPHEUS_IMPL_MULTIPLY_IMPL_HPP
 
 #include <impl/Coo/Serial/Morpheus_Multiply_Impl.hpp>
 #include <impl/Coo/OpenMP/Morpheus_Multiply_Impl.hpp>
@@ -41,4 +41,4 @@
 
 #include <impl/Dynamic/Morpheus_Multiply_Impl.hpp>
 
-#endif  // MORPHEUS_ALGORITHMS_IMPL_MULTIPLY_IMPL_HPP
+#endif  // MORPHEUS_IMPL_MULTIPLY_IMPL_HPP

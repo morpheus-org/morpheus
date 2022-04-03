@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -24,20 +24,9 @@
 #ifndef MORPHEUS_DOT_HPP
 #define MORPHEUS_DOT_HPP
 
-#include <Morpheus_AlgorithmTags.hpp>
 #include <impl/Morpheus_Dot_Impl.hpp>
 
 namespace Morpheus {
-
-template <typename ExecSpace, typename Algorithm, typename Vector1,
-          typename Vector2>
-inline typename Vector1::value_type dot(typename Vector1::index_type n,
-                                        const Vector1& x, const Vector2& y) {
-  static_assert(is_compatible_type<Vector1, Vector2>::value,
-                "x and y must be compatible types");
-  return Impl::dot<ExecSpace>(n, x, y, typename Vector1::tag{},
-                              typename Vector2::tag{}, Algorithm{});
-}
 
 template <typename ExecSpace, typename Vector1, typename Vector2>
 inline typename Vector1::value_type dot(typename Vector1::index_type n,
@@ -45,7 +34,7 @@ inline typename Vector1::value_type dot(typename Vector1::index_type n,
   static_assert(is_compatible_type<Vector1, Vector2>::value,
                 "x and y must be compatible types");
   return Impl::dot<ExecSpace>(n, x, y, typename Vector1::tag{},
-                              typename Vector2::tag{}, Alg0{});
+                              typename Vector2::tag{});
 }
 
 }  // namespace Morpheus

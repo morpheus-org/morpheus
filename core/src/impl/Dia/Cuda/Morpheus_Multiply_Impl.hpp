@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -29,7 +29,6 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_AlgorithmTags.hpp>
 
 #include <impl/Morpheus_CudaUtils.hpp>
 #include <impl/Dia/Kernels/Morpheus_Multiply_Impl.hpp>
@@ -41,7 +40,7 @@ template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
     const Matrix& A, const Vector1& x, Vector2& y, DiaTag, DenseVectorTag,
-    DenseVectorTag, Alg0,
+    DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&

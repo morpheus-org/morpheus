@@ -26,7 +26,6 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_AlgorithmTags.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -35,7 +34,7 @@ template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
     const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
-    DenseVectorTag, Alg0,
+    DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&

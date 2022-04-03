@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_COO_CONVERT_IMPL_HPP
-#define MORPHEUS_COO_CONVERT_IMPL_HPP
+#ifndef MORPHEUS_COO_SERIAL_CONVERT_IMPL_HPP
+#define MORPHEUS_COO_SERIAL_CONVERT_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
@@ -30,13 +30,14 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
     const SourceType& src, DestinationType& dst, CooTag, CooTag,
     typename std::enable_if<
-        std::is_same<typename SourceType::memory_space,
-                     typename DestinationType::memory_space>::value &&
-        is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
@@ -58,4 +59,4 @@ void convert(
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_COO_CONVERT_IMPL_HPP
+#endif  // MORPHEUS_COO_SERIAL_CONVERT_IMPL_HPP

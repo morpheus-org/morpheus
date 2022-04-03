@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -31,7 +31,11 @@
 #include <impl/DenseVector/Morpheus_Convert_Impl.hpp>
 #include <impl/DenseMatrix/Morpheus_Convert_Impl.hpp>
 
-#include <impl/Coo/Morpheus_Convert_Impl.hpp>
+#include <impl/Coo/Serial/Morpheus_Convert_Impl.hpp>
+#include <impl/Coo/OpenMP/Morpheus_Convert_Impl.hpp>
+#include <impl/Coo/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/Coo/Kokkos/Morpheus_Convert_Impl.hpp>
+
 #include <impl/Csr/Morpheus_Convert_Impl.hpp>
 #include <impl/Dia/Morpheus_Convert_Impl.hpp>
 

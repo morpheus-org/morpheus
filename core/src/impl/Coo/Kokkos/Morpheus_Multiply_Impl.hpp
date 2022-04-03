@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2022 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,29 +25,22 @@
 #define MORPHEUS_COO_KOKKOS_MULTIPLY_IMPL_HPP
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_FormatTags.hpp>
-#include <Morpheus_AlgorithmTags.hpp>
+
+#include <Morpheus_Exceptions.hpp>
 
 namespace Morpheus {
-// remove after the function below is implemented
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
-inline void multiply(const Matrix& A, const Vector1& x, Vector2& y);
-
 namespace Impl {
 
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
     const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
-    DenseVectorTag, Alg0,
+    DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                Vector1, Vector2>>* = nullptr) {
-  using execution_space = typename ExecSpace::execution_space;
-
-  Morpheus::multiply<execution_space>(A, x, y);
+  throw Morpheus::NotImplementedException("multiply<Kokkos>");
 }
 
 }  // namespace Impl
