@@ -53,21 +53,11 @@ inline void multiply(
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                Vector1, Vector2>>* = nullptr) {
-  __spmv_coo_flat(A, x, y);
+  switch (A.options()) {
+    case MATOPT_SHORT_ROWS: __spmv_coo_serial(A, x, y); break;
+    default: __spmv_coo_flat(A, x, y);
+  }
 }
-
-// template <typename ExecSpace, typename Matrix, typename Vector1,
-//           typename Vector2>
-// inline void multiply(
-//     const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
-//     DenseVectorTag,
-//     typename std::enable_if_t<
-//         !Morpheus::is_kokkos_space_v<ExecSpace> &&
-//         Morpheus::is_Cuda_space_v<ExecSpace> &&
-//         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-//                                Vector1, Vector2>>* = nullptr) {
-//   __spmv_coo_serial(A, x, y);
-// }
 
 template <typename Matrix, typename Vector1, typename Vector2>
 void __spmv_coo_serial(const Matrix& A, const Vector1& x, Vector2& y) {
