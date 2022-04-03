@@ -36,7 +36,7 @@ namespace Morpheus {
  * \tparam Vector
  *
  * \param A The matrix
- * \param diagonal The diagonal matrix represented as a vector
+ * \param diagonal The matrix diagonal represented as a vector
  *
  * \note The sparsity pattern of the matrix remains unchanged i.e it only
  * updates the non-zero elements on the main diagonal.
@@ -46,6 +46,23 @@ template <typename ExecSpace, typename SparseMatrix, typename Vector>
 void update_diagonal(SparseMatrix& A, const Vector& diagonal) {
   Impl::update_diagonal<ExecSpace>(A, diagonal, typename SparseMatrix::tag{},
                                    typename Vector::tag{});
+}
+
+/**
+ * Gets the main diagonal of the matrix and places it in a vector.
+ *
+ * \tparam ExecSpace
+ * \tparam SparseMatrix
+ * \tparam Vector
+ *
+ * \param A The matrix
+ * \param diagonal The main matrix diagonal represented as a vector
+ *
+ */
+template <typename ExecSpace, typename SparseMatrix, typename Vector>
+void get_diagonal(const SparseMatrix& A, Vector& diagonal) {
+  Impl::get_diagonal<ExecSpace>(A, diagonal, typename SparseMatrix::tag{},
+                                typename Vector::tag{});
 }
 
 /**
@@ -89,6 +106,22 @@ void set_values(SparseMatrix& A, typename IndexVector::value_type m,
                 const IndexVector idxn, ValueVector values) {
   Impl::set_values<ExecSpace>(A, m, idxm, n, idxn, values,
                               typename SparseMatrix::tag{});
+}
+
+/**
+ * Computes the transpose of the given matrix.
+ *
+ * \tparam ExecSpace
+ * \tparam Matrix
+ * \tparam TransposeMatrix
+ *
+ * \param A The matrix
+ * \param B The transposed matrix
+ */
+template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
+void transpose(const Matrix& A, TransposeMatrix& At) {
+  Impl::transpose<ExecSpace>(A, At, typename Matrix::tag{},
+                             typename TransposeMatrix::tag{});
 }
 
 }  // namespace Morpheus
