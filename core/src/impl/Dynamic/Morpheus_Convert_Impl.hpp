@@ -30,44 +30,46 @@
 
 namespace Morpheus {
 // forward decl
-template <typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst);
 
 namespace Impl {
 struct convert_fn {
   using result_type = void;
 
-  template <typename SourceType, typename DestinationType>
+  template <typename ExecSpace, typename SourceType, typename DestinationType>
   result_type operator()(const SourceType& src, DestinationType& dst) {
-    Morpheus::convert(src, dst);
+    Morpheus::convert<ExecSpace>(src, dst);
   }
 };
 
-template <typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, DynamicTag,
              SparseMatTag) {
-  auto f = std::bind(Impl::convert_fn(), std::placeholders::_1, std::ref(dst));
+  auto f = std::bind(Impl::convert_fn<ExecSpace>(), std::placeholders::_1,
+                     std::ref(dst));
   Morpheus::Impl::Variant::visit(f, src.const_formats());
 }
 
-template <typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, SparseMatTag,
              DynamicTag) {
   dst.set_nrows(src.nrows());
   dst.set_ncols(src.ncols());
   dst.set_nnnz(src.nnnz());
-  auto f = std::bind(Impl::convert_fn(), std::cref(src), std::placeholders::_1);
+  auto f = std::bind(Impl::convert_fn<ExecSpace>(), std::cref(src),
+                     std::placeholders::_1);
   Morpheus::Impl::Variant::visit(f, dst.formats());
 }
 
-template <typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst, DynamicTag,
              DynamicTag) {
   dst.set_nrows(src.nrows());
   dst.set_ncols(src.ncols());
   dst.set_nnnz(src.nnnz());
-  Morpheus::Impl::Variant::visit(Impl::convert_fn(), src.const_formats(),
-                                 dst.formats());
+  Morpheus::Impl::Variant::visit(Impl::convert_fn<ExecSpace>(),
+                                 src.const_formats(), dst.formats());
 }
 
 }  // namespace Impl
