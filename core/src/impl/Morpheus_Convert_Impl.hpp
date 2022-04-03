@@ -36,8 +36,15 @@
 #include <impl/Coo/Cuda/Morpheus_Convert_Impl.hpp>
 #include <impl/Coo/Kokkos/Morpheus_Convert_Impl.hpp>
 
-#include <impl/Csr/Morpheus_Convert_Impl.hpp>
-#include <impl/Dia/Morpheus_Convert_Impl.hpp>
+#include <impl/Csr/Serial/Morpheus_Convert_Impl.hpp>
+#include <impl/Csr/OpenMP/Morpheus_Convert_Impl.hpp>
+#include <impl/Csr/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/Csr/Kokkos/Morpheus_Convert_Impl.hpp>
+
+#include <impl/Dia/Serial/Morpheus_Convert_Impl.hpp>
+#include <impl/Dia/OpenMP/Morpheus_Convert_Impl.hpp>
+#include <impl/Dia/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/Dia/Kokkos/Morpheus_Convert_Impl.hpp>
 
 #include <impl/Dynamic/Morpheus_Convert_Impl.hpp>
 

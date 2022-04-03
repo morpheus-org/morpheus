@@ -21,24 +21,23 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_CSR_CONVERT_IMPL_HPP
-#define MORPHEUS_CSR_CONVERT_IMPL_HPP
+#ifndef MORPHEUS_CSR_SERIAL_CONVERT_IMPL_HPP
+#define MORPHEUS_CSR_SERIAL_CONVERT_IMPL_HPP
 
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
 
-#include <impl/Morpheus_Copy_Impl.hpp>
-
 namespace Morpheus {
 namespace Impl {
 
-template <typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
     const SourceType& src, DestinationType& dst, CsrTag, CsrTag,
     typename std::enable_if<
-        std::is_same<typename SourceType::memory_space,
-                     typename DestinationType::memory_space>::value &&
-        is_HostSpace_v<typename SourceType::device_type>>::type* = nullptr) {
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
@@ -57,8 +56,14 @@ void convert(
   }
 }
 
-template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, CsrTag, CooTag) {
+template <typename ExecSpace, typename SourceType, typename DestinationType>
+void convert(
+    const SourceType& src, DestinationType& dst, CsrTag, CooTag,
+    typename std::enable_if<
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
   // Complexity: Linear.  Specifically O(nnz(csr) + max(n_row,n_col))
   using index_type = typename SourceType::index_type;
 
@@ -81,8 +86,14 @@ void convert(const SourceType& src, DestinationType& dst, CsrTag, CooTag) {
   }
 }
 
-template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, CooTag, CsrTag) {
+template <typename ExecSpace, typename SourceType, typename DestinationType>
+void convert(
+    const SourceType& src, DestinationType& dst, CooTag, CsrTag,
+    typename std::enable_if<
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
   // Complexity: Linear.  Specifically O(nnz(coo) + max(n_row,n_col))
   using index_type = typename SourceType::index_type;
 
@@ -124,4 +135,4 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, CsrTag) {
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_CSR_CONVERT_IMPL_HPP
+#endif  // MORPHEUS_CSR_SERIAL_CONVERT_IMPL_HPP

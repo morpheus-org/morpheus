@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_DIA_CONVERT_IMPL_HPP
-#define MORPHEUS_DIA_CONVERT_IMPL_HPP
+#ifndef MORPHEUS_DIA_SERIAL_CONVERT_IMPL_HPP
+#define MORPHEUS_DIA_SERIAL_CONVERT_IMPL_HPP
 
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
@@ -34,13 +34,14 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
     const SourceType& src, DestinationType& dst, DiaTag, DiaTag,
     typename std::enable_if<
-        std::is_same<typename SourceType::memory_space,
-                     typename DestinationType::memory_space>::value &&
-        is_HostSpace_v<typename SourceType::memory_space>>::type* = nullptr) {
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz(),
@@ -58,8 +59,14 @@ void convert(
   }
 }
 
-template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, DiaTag, CooTag) {
+template <typename ExecSpace, typename SourceType, typename DestinationType>
+void convert(
+    const SourceType& src, DestinationType& dst, DiaTag, CooTag,
+    typename std::enable_if<
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
   using value_type = typename SourceType::value_type;
 
@@ -93,8 +100,14 @@ void convert(const SourceType& src, DestinationType& dst, DiaTag, CooTag) {
   }
 }
 
-template <typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag) {
+template <typename ExecSpace, typename SourceType, typename DestinationType>
+void convert(
+    const SourceType& src, DestinationType& dst, CooTag, DiaTag,
+    typename std::enable_if<
+        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_Serial_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
+                               DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
 
   if (src.nnnz() == 0) {
@@ -138,4 +151,4 @@ void convert(const SourceType& src, DestinationType& dst, CooTag, DiaTag) {
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_DIA_CONVERT_IMPL_HPP
+#endif  // MORPHEUS_DIA_SERIAL_CONVERT_IMPL_HPP
