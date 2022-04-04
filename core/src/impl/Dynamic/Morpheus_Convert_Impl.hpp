@@ -34,10 +34,11 @@ template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst);
 
 namespace Impl {
+template <typename ExecSpace>
 struct convert_fn {
   using result_type = void;
 
-  template <typename ExecSpace, typename SourceType, typename DestinationType>
+  template <typename SourceType, typename DestinationType>
   result_type operator()(const SourceType& src, DestinationType& dst) {
     Morpheus::convert<ExecSpace>(src, dst);
   }

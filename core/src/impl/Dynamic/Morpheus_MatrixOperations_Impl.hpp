@@ -66,7 +66,7 @@ inline void get_diagonal(const SparseMatrix& A, Vector& diagonal,
       A.const_formats());
 }
 
-template <typename ExecSpace, typename SparseMatrix, typename Vector>
+template <typename ExecSpace, typename SparseMatrix, typename IndexType, typename ValueType>
 inline void set_value(SparseMatrix& A, IndexType row, IndexType col,
                       ValueType value, Morpheus::DynamicTag) {
   Morpheus::Impl::Variant::visit(
@@ -90,15 +90,15 @@ inline void set_values(SparseMatrix& A, typename IndexVector::value_type m,
 }
 
 template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
-inline void transpose(const SparseMatrix& A, TransposeMatrix& At,
-                      Morpheus::DynamicTag, Morpheus::SparseMatrix) {
+inline void transpose(const Matrix& A, TransposeMatrix& At,
+                      Morpheus::DynamicTag, Impl::SparseMatTag) {
   Morpheus::Impl::Variant::visit(
       [&](auto&& arg) { Morpheus::transpose<ExecSpace>(arg, At); },
       A.const_formats());
 }
 
 template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
-inline void transpose(const SparseMatrix& A, TransposeMatrix& At,
+inline void transpose(const Matrix& A, TransposeMatrix& At,
                       Morpheus::DynamicTag, Morpheus::DynamicTag) {
   Morpheus::Impl::Variant::visit(
       [&](auto&& arg1, auto&& arg2) {

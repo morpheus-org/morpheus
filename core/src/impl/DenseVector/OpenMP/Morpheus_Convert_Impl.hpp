@@ -34,7 +34,7 @@ namespace Morpheus {
 
 namespace Impl {
 
-template <typename SourceType, typename DestinationType>
+template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
     const SourceType& src, DestinationType& dst, DenseVectorTag, DenseVectorTag,
     typename std::enable_if<

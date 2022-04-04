@@ -39,7 +39,7 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
   using traits     = ContainerTraits<Container, ValueType, Properties...>;
   using index_type = typename traits::index_type;
 
-  MatrixBase() : _m(0), _n(0), _nnz(0), {}
+  MatrixBase() : _m(0), _n(0), _nnz(0) {}
 
   template <typename Matrix>
   MatrixBase(const Matrix& m,
