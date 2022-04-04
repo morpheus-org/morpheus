@@ -32,6 +32,7 @@
 #include <Morpheus_Reduction.hpp>
 
 #include <impl/Morpheus_CudaUtils.hpp>
+#include <impl/DenseVector/Cuda/Morpheus_Workspace.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_Dot_Impl.hpp>
 
 namespace Morpheus {
@@ -49,19 +50,29 @@ typename Vector1::value_type dot(
   using index_type = typename Vector1::index_type;
   using value_type = typename Vector1::non_const_value_type;
 
-  const size_t BLOCK_SIZE = 256;
-  const size_t NUM_BLOCKS = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
+//   const size_t BLOCK_SIZE = 256;
+//   const size_t NUM_BLOCKS = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-  Vector1 res_vec(n, 0);
+  cudotspace.allocate<value_type>(n);
 
-  Kernels::dot_kernel<value_type, index_type>
-      <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(n, x.data(), y.data(), res_vec.data());
-
+  Kernels::dot_kernel_part1<256, value_type, index_type>
+      <<<256, 256>>>(n, x.data(), y.data(), cudotspace.data<value_type>());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
   getLastCudaError("dot: Kernel execution failed");
 #endif
 
-  return Morpheus::reduce<ExecSpace>(res_vec, n);
+  Kernels::dot_kernel_part2<256, value_type><<<1, 256>>>(cudotspace.data<value_type>());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("dot: Kernel execution failed");
+#endif
+
+  value_type local_result;
+  cudaMemcpy(&local_result, cudotspace.data<value_type>(), sizeof(value_type), cudaMemcpyDeviceToHost);
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("dot: Kernel execution failed");
+#endif
+
+  return local_result;
 }
 
 }  // namespace Impl
