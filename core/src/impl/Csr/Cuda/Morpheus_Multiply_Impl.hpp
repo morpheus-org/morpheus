@@ -37,16 +37,13 @@ namespace Morpheus {
 namespace Impl {
 
 // forward decl
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
+template <typename Matrix, typename Vector1, typename Vector2>
 void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y);
 
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
+template <typename Matrix, typename Vector1, typename Vector2>
 void __spmv_csr_scalar(const Matrix& A, const Vector1& x, Vector2& y);
 
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
+template <typename ExecSpace, typename Matrix, typename Vector1, typename Vector2>
 inline void multiply(
     const Matrix& A, const Vector1& x, Vector2& y, CsrTag, DenseVectorTag,
     DenseVectorTag,
@@ -61,8 +58,7 @@ inline void multiply(
   }
 }
 
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
+template <typename Matrix, typename Vector1, typename Vector2>
 void __spmv_csr_scalar(const Matrix& A, const Vector1& x, Vector2& y) {
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
@@ -117,8 +113,7 @@ void __spmv_csr_vector_dispatch(const Matrix& A, const Vector1& x, Vector2& y) {
 #endif
 }
 
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
+template <typename Matrix, typename Vector1, typename Vector2>
 void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y) {
   using index_type = typename Matrix::index_type;
 
