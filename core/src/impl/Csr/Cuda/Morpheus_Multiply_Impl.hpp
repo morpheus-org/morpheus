@@ -43,7 +43,8 @@ void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y);
 template <typename Matrix, typename Vector1, typename Vector2>
 void __spmv_csr_scalar(const Matrix& A, const Vector1& x, Vector2& y);
 
-template <typename ExecSpace, typename Matrix, typename Vector1, typename Vector2>
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
 inline void multiply(
     const Matrix& A, const Vector1& x, Vector2& y, CsrTag, DenseVectorTag,
     DenseVectorTag,

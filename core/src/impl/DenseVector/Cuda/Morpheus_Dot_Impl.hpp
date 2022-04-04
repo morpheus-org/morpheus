@@ -50,8 +50,8 @@ typename Vector1::value_type dot(
   using index_type = typename Vector1::index_type;
   using value_type = typename Vector1::non_const_value_type;
 
-//   const size_t BLOCK_SIZE = 256;
-//   const size_t NUM_BLOCKS = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
+  //   const size_t BLOCK_SIZE = 256;
+  //   const size_t NUM_BLOCKS = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
   cudotspace.allocate<value_type>(n);
 
@@ -61,13 +61,15 @@ typename Vector1::value_type dot(
   getLastCudaError("dot: Kernel execution failed");
 #endif
 
-  Kernels::dot_kernel_part2<256, value_type><<<1, 256>>>(cudotspace.data<value_type>());
+  Kernels::dot_kernel_part2<256, value_type>
+      <<<1, 256>>>(cudotspace.data<value_type>());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
   getLastCudaError("dot: Kernel execution failed");
 #endif
 
   value_type local_result;
-  cudaMemcpy(&local_result, cudotspace.data<value_type>(), sizeof(value_type), cudaMemcpyDeviceToHost);
+  cudaMemcpy(&local_result, cudotspace.data<value_type>(), sizeof(value_type),
+             cudaMemcpyDeviceToHost);
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
   getLastCudaError("dot: Kernel execution failed");
 #endif

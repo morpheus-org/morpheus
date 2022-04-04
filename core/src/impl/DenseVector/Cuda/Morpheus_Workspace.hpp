@@ -36,10 +36,10 @@ namespace Morpheus {
 namespace Impl {
 
 class CudaWorkspace {
-  public:
+ public:
   CudaWorkspace() : _workspace(nullptr), _nbytes(0) {}
 
-  ~CudaWorkspace() { _free();}
+  ~CudaWorkspace() { _free(); }
 
   template <typename ValueType>
   void allocate(size_t N) {
@@ -62,8 +62,9 @@ class CudaWorkspace {
   void _malloc(size_t bytes) {
     if (_workspace == nullptr) {
       _nbytes = bytes;
-      if (cudaSuccess != cudaMalloc(&_workspace, bytes)){
+      if (cudaSuccess != cudaMalloc(&_workspace, bytes)) {
         std::cout << "Malloc Failed on Device" << std::endl;
+        exit(EXIT_FAILURE);
       }
     }
   }
@@ -73,7 +74,7 @@ class CudaWorkspace {
       if (cudaSuccess == cudaFree(_workspace)) {
         std::cout << "Free Succeeded!" << std::endl;
         _workspace = nullptr;
-        _nbytes = 0;
+        _nbytes    = 0;
       }
     }
   }

@@ -66,7 +66,8 @@ inline void get_diagonal(const SparseMatrix& A, Vector& diagonal,
       A.const_formats());
 }
 
-template <typename ExecSpace, typename SparseMatrix, typename IndexType, typename ValueType>
+template <typename ExecSpace, typename SparseMatrix, typename IndexType,
+          typename ValueType>
 inline void set_value(SparseMatrix& A, IndexType row, IndexType col,
                       ValueType value, Morpheus::DynamicTag) {
   Morpheus::Impl::Variant::visit(
