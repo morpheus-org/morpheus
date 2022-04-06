@@ -117,3 +117,4 @@ target_include_directories(
   morpheus-core PUBLIC $<INSTALL_INTERFACE:${MORPHEUS_CORE_HEADER_INSTALL_DIR}>)
 
 morpheus_link_tpl(morpheus-core PUBLIC MPARK_VARIANT)
+morpheus_link_tpl(morpheus-core PUBLIC CUBLAS)

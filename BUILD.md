@@ -202,11 +202,23 @@ Options can be enabled by specifying `-DMorpheus_ENABLE_X`.
   
 ## Third-party Libraries (TPLs)
 The following options control enabling TPLs:
+* Morpheus_ENABLE_TPL_CUBLAS: BOOL
+    * Whether to enable CUBLAS
+    * Default: ON if CUDA-enabled Kokkos, otherwise OFF
 * Morpheus_ENABLE_TPL_MPARK_VARIANT
     * Whether to enable the Mpark Variant library
     * BOOL Default: OFF
 
 The following options control `find_package` paths for CMake-based TPLs:
+* Morpheus_CUBLAS_ROOT: PATH
+    * Location of CUBLAS install root.
+    * Default: None or the value of the environment variable CUBLAS_ROOT if set
+* CUBLAS_LIBRARIES: STRING
+    * Optional override for the libraries that comprise TPL CUBLAS.
+    * Default: None. Default common library names will be searched
+* CUBLAS_LIBRARY_DIRS: STRING
+    * Optional override for the library directories that comprise TPL CUBLAS.
+    * Default: None. Default common library locations will be searched
 * MPARK_VARIANT_DIR or MPARK_VARIANT_ROOT
     * Location of MPARK_VARIANT prefix (ROOT) or CMake config file (DIR)
     * PATH Default:

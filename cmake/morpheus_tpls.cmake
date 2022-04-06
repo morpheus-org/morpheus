@@ -7,28 +7,36 @@ macro(MORPHEUS_ADD_TPL_OPTION NAME DEFAULT_VALUE DOCSTRING)
   if(NOT TPL_DEFAULT_DOCSTRING)
     set(TPL_DEFAULT_DOCSTRING "${DEFAULT_VALUE}")
   endif()
-  morpheus_add_option(ENABLE_TPL_${NAME} ${DEFAULT_VALUE} BOOL
+
+  set(_NAME_ORIG ${NAME})
+  set(_NAME ${NAME})
+
+  morpheus_add_option(ENABLE_TPL_${_NAME} ${DEFAULT_VALUE} BOOL
                       "${DOCSTRING} Default: ${TPL_DEFAULT_DOCSTRING}")
-  set(ROOT_DEFAULT $ENV{${NAME}_ROOT})
+  set(ROOT_DEFAULT $ENV{${_NAME_ORIG}_ROOT})
   morpheus_add_option(
-    ${NAME}_ROOT
+    ${_NAME_ORIG}_ROOT
     "${ROOT_DEFAULT}"
     PATH
-    "Location of ${NAME} install root. Default: None or the value of the environment variable ${NAME}_ROOT if set"
+    "Location of ${_NAME} install root. Default: None or the value of the environment variable ${_NAME}_ROOT if set"
   )
-  if(DEFINED TPL_ENABLE_${NAME})
-    if(TPL_ENABLE_${NAME} AND NOT Morpheus_ENABLE_TPL_${NAME})
+  if(DEFINED TPL_ENABLE_${_NAME})
+    if(TPL_ENABLE_${_NAME} AND NOT MORPHEUS_ENABLE_TPL_${_NAME})
       message(
-        "Overriding Morpheus_ENABLE_TPL_${NAME}=OFF with TPL_ENABLE_${NAME}=ON")
-      set(MORPHEUS_ENABLE_TPL_${NAME} ON)
-    elseif(NOT TPL_ENABLE_${NAME} AND Morpheus_ENABLE_TPL_${NAME})
+        "Overriding MORPHEUS_ENABLE_TPL_${_NAME_ORIG}=OFF with TPL_ENABLE_${_NAME}=ON"
+      )
+      set(MORPHEUS_ENABLE_TPL_${_NAME_ORIG} ON)
+      set(MORPHEUS_ENABLE_TPL_${_NAME} ON)
+    elseif(NOT TPL_ENABLE_${_NAME} AND MORPHEUS_ENABLE_TPL_${_NAME})
       message(
-        "Overriding MORPHEUS_ENABLE_TPL_${NAME}=ON with TPL_ENABLE_${NAME}=OFF")
-      set(Morpheus_ENABLE_TPL_${NAME} OFF)
+        "Overriding MORPHEUS_ENABLE_TPL_${_NAME_ORIG}=ON with TPL_ENABLE_${_NAME}=OFF"
+      )
+      set(MORPHEUS_ENABLE_TPL_${_NAME_ORIG} OFF)
+      set(MORPHEUS_ENABLE_TPL_${_NAME} OFF)
     endif()
   endif()
-  if(Morpheus_ENABLE_TPL_${NAME})
-    list(APPEND Morpheus_TPL_LIST ${NAME})
+  if(MORPHEUS_ENABLE_TPL_${_NAME})
+    list(APPEND MORPHEUS_TPL_LIST ${_NAME})
   endif()
 endmacro()
 
@@ -311,7 +319,7 @@ macro(morpheus_export_imported_tpl NAME)
     set(TPL_IMPORTED_NAME Morpheus::${NAME})
   endif()
 
-  get_target_property(LIB_TYPE ${TPL_IMPORTED_NAME} TYPE)
+  get_target_property(LIB_TYPE ${NAME} TYPE)
   if(${LIB_TYPE} STREQUAL "INTERFACE_LIBRARY")
     # This is not an imported target This an interface library that we created
     install(
@@ -322,22 +330,25 @@ macro(morpheus_export_imported_tpl NAME)
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
   else()
     # make sure this also gets "exported" in the config file
-    morpheus_append_config_line("IF(NOT TARGET Morpheus::${NAME})")
+    morpheus_append_config_line("IF(NOT TARGET ${TPL_IMPORTED_NAME})")
     morpheus_append_config_line(
-      "ADD_LIBRARY(Morpheus::${NAME} UNKNOWN IMPORTED)")
+      "ADD_LIBRARY(${TPL_IMPORTED_NAME} UNKNOWN IMPORTED)")
     morpheus_append_config_line(
-      "SET_TARGET_PROPERTIES(Morpheus::${NAME} PROPERTIES")
+      "SET_TARGET_PROPERTIES(${TPL_IMPORTED_NAME} PROPERTIES")
 
     get_target_property(TPL_LIBRARY ${TPL_IMPORTED_NAME} IMPORTED_LOCATION)
     if(TPL_LIBRARY)
-      morpheus_append_config_line("IMPORTED_LOCATION ${TPL_LIBRARY}")
+      morpheus_append_config_line("IMPORTED_LOCATION \"${TPL_LIBRARY}\"")
     endif()
 
     get_target_property(TPL_INCLUDES ${TPL_IMPORTED_NAME}
                         INTERFACE_INCLUDE_DIRECTORIES)
     if(TPL_INCLUDES)
-      morpheus_append_config_line(
-        "INTERFACE_INCLUDE_DIRECTORIES ${TPL_INCLUDES}")
+      # Temporary fix for when TPL_INCLUDES contains a list of paths
+      foreach(tpl_include_path ${TPL_INCLUDES})
+        morpheus_append_config_line(
+          "INTERFACE_INCLUDE_DIRECTORIES \"${tpl_include_path}\"")
+      endforeach()
     endif()
 
     get_target_property(TPL_COMPILE_OPTIONS ${TPL_IMPORTED_NAME}
@@ -360,12 +371,12 @@ macro(morpheus_export_imported_tpl NAME)
                         INTERFACE_LINK_LIBRARIES)
     if(TPL_LINK_LIBRARIES)
       morpheus_append_config_line(
-        "INTERFACE_LINK_LIBRARIES ${TPL_LINK_LIBRARIES}")
+        "INTERFACE_LINK_LIBRARIES \"${TPL_LINK_LIBRARIES}\"")
     endif()
     morpheus_append_config_line(")")
     morpheus_append_config_line("ENDIF()")
+    message(STATUS "After appending:: ${MORPHEUS_TPL_EXPORTS}")
   endif()
-
 endmacro()
 
 macro(morpheus_import_tpl NAME)
@@ -398,10 +409,9 @@ macro(morpheus_import_tpl NAME)
     cmake_policy(SET CMP0074 NEW)
   endif()
 
-  if(Morpheus_ENABLE_TPL_${NAME})
+  if(MORPHEUS_ENABLE_TPL_${NAME})
     # Tack on a TPL here to make sure we avoid using anyone else's find
     find_package(TPL${NAME} REQUIRED MODULE)
-    message(STATUS "Found ${NAME} at ${${NAME}_DIR}")
     if(NOT TPL_${NAME}_IMPORTED_NAME)
       message(
         FATAL_ERROR
@@ -415,11 +425,10 @@ macro(morpheus_import_tpl NAME)
       )
     endif()
     if(NOT TPL_NO_EXPORT)
+      message(STATUS "morpheus_import_tpl ${NAME}")
       morpheus_export_imported_tpl(${NAME} IMPORTED_NAME
                                    ${TPL_${NAME}_IMPORTED_NAME})
     endif()
-
-    message(STATUS "Building with ${NAME} TPL.")
   endif()
 endmacro(morpheus_import_tpl)
 
@@ -438,7 +447,6 @@ function(morpheus_link_tpl TARGET)
                         ${ARGN})
   # the name of the TPL
   set(TPL ${TPL_UNPARSED_ARGUMENTS})
-
   if(NOT TPL_IMPORTED_NAME)
     set(TPL_IMPORTED_NAME Morpheus::${TPL})
   endif()
@@ -454,6 +462,20 @@ function(morpheus_link_tpl TARGET)
     endif()
   endif()
 endfunction()
+
+morpheus_add_option(
+  NO_DEFAULT_CUDA_TPLS OFF BOOL
+  "Whether CUDA TPLs should be enabled by default. Default: OFF")
+set(CUBLAS_DEFAULT ${Morpheus_ENABLE_CUDA})
+if(Morpheus_NO_DEFAULT_CUDA_TPLS)
+  set(CUBLAS_DEFAULT OFF)
+  set(CUSPARSE_DEFAULT OFF)
+endif()
+morpheus_add_tpl_option(
+  CUBLAS ${CUBLAS_DEFAULT} "Whether to enable CUBLAS" DEFAULT_DOCSTRING
+  "ON if CUDA-enabled Kokkos, otherwise OFF")
+
+morpheus_import_tpl(CUBLAS)
 
 morpheus_add_tpl_option(MPARK_VARIANT OFF
                         "Whether to enable Mpark Variant implementation")
