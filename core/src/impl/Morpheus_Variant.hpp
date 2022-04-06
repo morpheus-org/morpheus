@@ -32,7 +32,7 @@
 
 namespace Morpheus {
 namespace Impl {
-#if defined(Morpheus_ENABLE_TPL_MPARK_VARIANT)
+#if defined(MORPHEUS_ENABLE_TPL_MPARK_VARIANT)
 namespace Variant = ::mpark;
 #else
 namespace Variant = ::std;
