@@ -32,6 +32,10 @@
 
 #include <impl/Morpheus_CudaUtils.hpp>
 
+#ifdef MORPHEUS_ENABLE_TPL_CUBLAS
+#include <cublas_v2.h>
+#endif  // MORPHEUS_ENABLE_TPL_CUBLAS
+
 namespace Morpheus {
 namespace Impl {
 
@@ -72,13 +76,45 @@ class CudaWorkspace {
   void _free() {
     if (_workspace != nullptr) {
       if (cudaSuccess == cudaFree(_workspace)) {
-        std::cout << "Free Succeeded!" << std::endl;
         _workspace = nullptr;
         _nbytes    = 0;
       }
     }
   }
 };
+
+#ifdef MORPHEUS_ENABLE_TPL_CUBLAS
+
+class CublasWorkspace {
+ public:
+  CublasWorkspace() : _handle(nullptr) {}
+
+  ~CublasWorkspace() {
+    if (_handle != nullptr) {
+      if (cublasDestroy(_handle) != CUBLAS_STATUS_SUCCESS) {
+        _handle = nullptr;
+      }
+    }
+  }
+
+  void init() {
+    if (_handle == nullptr) {
+      if (cublasCreate(&_handle) != CUBLAS_STATUS_SUCCESS) {
+        printf("CUBLAS initialization failed\n");
+        exit(EXIT_FAILURE);
+      }
+    }
+  }
+
+  cublasHandle_t handle() { return _handle; }
+
+ private:
+  cublasHandle_t _handle;
+};
+
+extern CublasWorkspace cublasdotspace;
+
+#endif  // MORPHEUS_ENABLE_TPL_CUBLAS
 
 extern CudaWorkspace cudotspace;
 

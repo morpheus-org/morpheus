@@ -104,6 +104,76 @@ __launch_bounds__(BLOCKSIZE) __global__
   }
 }
 
+template <typename ValueType, typename IndexType>
+__global__ void DOT_D_ini(IndexType n, ValueType* x, ValueType* y,
+                          ValueType* valpha) {
+  extern __shared__ ValueType vtmp[];
+  // Each thread loads two elements from each chunk
+  // from global to shared memory
+  IndexType tid             = threadIdx.x;
+  IndexType NumBlk          = gridDim.x;   // = 256
+  IndexType BlkSize         = blockDim.x;  // = 192
+  IndexType Chunk           = 2 * NumBlk * BlkSize;
+  IndexType i               = blockIdx.x * (2 * BlkSize) + tid;
+  volatile ValueType* vtmp2 = vtmp;
+
+  // Reduce from n to NumBlk * BlkSize elements. Each thread // operates with
+  // two elements of each chunk
+  vtmp[tid] = 0;
+  while (i < n) {
+    vtmp[tid] += x[i] * y[i];
+    vtmp[tid] += (i + BlkSize < n) ? (x[i + BlkSize] * y[i + BlkSize]) : 0;
+    i += Chunk;
+  }
+  __syncthreads();
+  // Reduce from BlkSize=192 elements to 96, 48, 24, 12, 6, 3 and 1
+  if (tid < 96) {
+    vtmp[tid] += vtmp[tid + 96];
+  }
+  __syncthreads();
+  if (tid < 48) {
+    vtmp[tid] += vtmp[tid + 48];
+  }
+  __syncthreads();
+  if (tid < 24) {
+    vtmp2[tid] += vtmp2[tid + 24];
+    vtmp2[tid] += vtmp2[tid + 12];
+    vtmp2[tid] += vtmp2[tid + 6];
+    vtmp2[tid] += vtmp2[tid + 3];
+  }
+  // Write result for this block to global mem
+  if (tid == 0) valpha[blockIdx.x] = vtmp[0] + vtmp[1] + vtmp[2];
+}
+
+template <typename ValueType, typename IndexType>
+__global__ void DOT_D_fin(ValueType* valpha) {
+  extern __shared__ ValueType vtmp[];
+  // Each thread loads one element from global to shared mem
+  IndexType tid             = threadIdx.x;
+  volatile ValueType* vtmp2 = vtmp;
+  vtmp[tid]                 = valpha[tid];
+  __syncthreads();
+  // Reduce from 256 elements to 128, 64, 32, 16, 8, 2 and 1
+  if (tid < 128) {
+    vtmp[tid] += vtmp[tid + 128];
+  }
+  __syncthreads();
+  if (tid < 64) {
+    vtmp[tid] += vtmp[tid + 64];
+  }
+  __syncthreads();
+  if (tid < 32) {
+    vtmp2[tid] += vtmp2[tid + 32];
+    vtmp2[tid] += vtmp2[tid + 16];
+    vtmp2[tid] += vtmp2[tid + 8];
+    vtmp2[tid] += vtmp2[tid + 4];
+    vtmp2[tid] += vtmp2[tid + 2];
+    vtmp2[tid] += vtmp2[tid + 1];
+  }
+  // Write result for this block to global mem
+  if (tid == 0) valpha[blockIdx.x] = *vtmp;
+}
+
 }  // namespace Kernels
 }  // namespace Impl
 }  // namespace Morpheus

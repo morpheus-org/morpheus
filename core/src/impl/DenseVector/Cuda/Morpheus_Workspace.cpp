@@ -31,6 +31,10 @@ namespace Impl {
 
 CudaWorkspace cudotspace;
 
+#ifdef MORPHEUS_ENABLE_TPL_CUBLAS
+CublasWorkspace cublasdotspace;
+#endif  // MORPHEUS_ENABLE_TPL_CUBLAS
+
 }  // namespace Impl
 }  // namespace Morpheus
 
