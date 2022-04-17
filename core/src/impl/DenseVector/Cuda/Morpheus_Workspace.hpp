@@ -85,7 +85,7 @@ class CudaWorkspace {
 
 #ifdef MORPHEUS_ENABLE_TPL_CUBLAS
 
-class CublasWorkspace {
+class CublasWorkspace : public CudaWorkspace {
  public:
   CublasWorkspace() : _handle(nullptr) {}
 
@@ -103,6 +103,7 @@ class CublasWorkspace {
         printf("CUBLAS initialization failed\n");
         exit(EXIT_FAILURE);
       }
+      cublasSetPointerMode(_handle, CUBLAS_POINTER_MODE_DEVICE);
     }
   }
 

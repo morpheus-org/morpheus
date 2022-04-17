@@ -59,9 +59,13 @@ typename Vector1::value_type dot(
 
 #ifdef MORPHEUS_ENABLE_TPL_CUBLAS
   cublasdotspace.init();
+  cublasdotspace.allocate<value_type>(1);
   index_type incx = 1, incy = 1;
   cublasDdot(cublasdotspace.handle(), n, x.data(), incx, y.data(), incy,
-             &local_result);
+             cublasdotspace.data<value_type>());
+
+  cudaMemcpy(&local_result, cublasdotspace.data<value_type>(),
+             sizeof(value_type), cudaMemcpyDeviceToHost);
 #else
   cudotspace.allocate<value_type>(n);
 
