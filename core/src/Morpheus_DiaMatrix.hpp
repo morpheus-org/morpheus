@@ -236,7 +236,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
                          const index_type num_entries,
                          const index_type num_diagonals) {
     const float max_fill   = 10.0;
-    const float threshold  = 100e6;  // 100M entries
+    const float threshold  = 10e9;  // 100M entries
     const float size       = float(num_diagonals) * float(num_rows);
     const float fill_ratio = size / std::max(1.0f, float(num_entries));
 
