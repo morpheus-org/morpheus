@@ -36,8 +36,8 @@ namespace Impl {
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector1& x, Vector2& y, DiaTag, DenseVectorTag,
-    DenseVectorTag,
+    const Matrix& A, const Vector1& x, Vector2& y, const bool init, DiaTag,
+    DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
@@ -49,7 +49,7 @@ inline void multiply(
 
 #pragma omp parallel for
   for (index_type row = 0; row < A.nrows(); row++) {
-    value_type sum = value_type(0);
+    value_type sum = init ? value_type(0) : y[row];
 
     for (index_type n = 0; n < ndiag; n++) {
       const index_type col = row + A.cdiagonal_offsets(n);

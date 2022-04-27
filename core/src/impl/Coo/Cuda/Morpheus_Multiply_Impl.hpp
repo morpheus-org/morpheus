@@ -38,29 +38,32 @@ namespace Impl {
 
 // forward decl
 template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_coo_flat(const Matrix& A, const Vector1& x, Vector2& y);
+void __spmv_coo_flat(const Matrix& A, const Vector1& x, Vector2& y,
+                     const bool init);
 
 template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_coo_serial(const Matrix& A, const Vector1& x, Vector2& y);
+void __spmv_coo_serial(const Matrix& A, const Vector1& x, Vector2& y,
+                       const bool init);
 
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
-    DenseVectorTag,
+    const Matrix& A, const Vector1& x, Vector2& y, const bool init, CooTag,
+    DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                Vector1, Vector2>>* = nullptr) {
   switch (A.options()) {
-    case MATOPT_SHORT_ROWS: __spmv_coo_serial(A, x, y); break;
-    default: __spmv_coo_flat(A, x, y);
+    case MATOPT_SHORT_ROWS: __spmv_coo_serial(A, x, y, init); break;
+    default: __spmv_coo_flat(A, x, y, init);
   }
 }
 
 template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_coo_serial(const Matrix& A, const Vector1& x, Vector2& y) {
+void __spmv_coo_serial(const Matrix& A, const Vector1& x, Vector2& y,
+                       const bool init) {
   using index_type    = typename Matrix::index_type;
   using value_type    = typename Matrix::value_type;
   const index_type* I = A.crow_indices().data();
@@ -69,6 +72,10 @@ void __spmv_coo_serial(const Matrix& A, const Vector1& x, Vector2& y) {
 
   const value_type* x_ptr = x.data();
   value_type* y_ptr       = y.data();
+
+  if (init) {
+    y.assign(y.size(), 0);
+  }
 
   Kernels::spmv_coo_serial_kernel<index_type, value_type>
       <<<1, 1>>>(A.nnnz(), I, J, V, x_ptr, y_ptr);
@@ -93,11 +100,15 @@ void __spmv_coo_serial(const Matrix& A, const Vector1& x, Vector2& y) {
 //
 //
 template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_coo_flat(const Matrix& A, const Vector1& x, Vector2& y) {
+void __spmv_coo_flat(const Matrix& A, const Vector1& x, Vector2& y,
+                     const bool init) {
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
-  y.assign(y.size(), 0);
+  if (init) {
+    y.assign(y.size(), 0);
+  }
+
   if (A.nnnz() == 0) {
     // empty matrix
     return;

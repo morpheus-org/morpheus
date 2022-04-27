@@ -45,12 +45,12 @@ __global__ void spmv_csr_scalar_kernel(const IndexType nrows,
     const IndexType row_start = Ap[row];
     const IndexType row_end   = Ap[row + 1];
 
-    ValueType sum = 0;
+    ValueType sum = ValueType(0);
 
     for (IndexType jj = row_start; jj < row_end; jj++)
       sum += Ax[jj] * x[Aj[jj]];
 
-    y[row] = sum;
+    y[row] += sum;
   }
 }
 
@@ -107,7 +107,6 @@ __global__ void spmv_csr_vector_kernel(const IndexType nrows,
         ptrs[vector_lane][1];  // same as: row_end   = Ap[row+1];
 
     // initialize local sum
-    // ValueType sum = (thread_lane == 0) ? initialize(y[row]) : ValueType(0);
     ValueType sum = ValueType(0);
 
     if (THREADS_PER_VECTOR == 32 && row_end - row_start > 32) {
@@ -157,7 +156,7 @@ __global__ void spmv_csr_vector_kernel(const IndexType nrows,
     }
 
     // first thread writes the result
-    if (thread_lane == 0) y[row] = ValueType(sdata[threadIdx.x]);
+    if (thread_lane == 0) y[row] += ValueType(sdata[threadIdx.x]);
   }
 }
 

@@ -30,9 +30,16 @@ namespace Morpheus {
 
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
-inline void multiply(const Matrix& A, const Vector1& x, Vector2& y) {
-  Impl::multiply<ExecSpace>(A, x, y, typename Matrix::tag{},
+inline void multiply(const Matrix& A, const Vector1& x, Vector2& y,
+                     const bool init) {
+  Impl::multiply<ExecSpace>(A, x, y, init, typename Matrix::tag{},
                             typename Vector1::tag{}, typename Vector2::tag{});
+}
+
+template <typename ExecSpace, typename Matrix, typename Vector1,
+          typename Vector2>
+inline void multiply(const Matrix& A, const Vector1& x, Vector2& y) {
+  multiply<ExecSpace>(A, x, y, true);
 }
 
 }  // namespace Morpheus

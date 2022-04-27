@@ -38,29 +38,32 @@ namespace Impl {
 
 // forward decl
 template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y);
+void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y,
+                       const bool init);
 
 template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_csr_scalar(const Matrix& A, const Vector1& x, Vector2& y);
+void __spmv_csr_scalar(const Matrix& A, const Vector1& x, Vector2& y,
+                       const bool init);
 
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector1& x, Vector2& y, CsrTag, DenseVectorTag,
-    DenseVectorTag,
+    const Matrix& A, const Vector1& x, Vector2& y, const bool init, CsrTag,
+    DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                Vector1, Vector2>>* = nullptr) {
   switch (A.options()) {
-    case MATOPT_SHORT_ROWS: __spmv_csr_scalar(A, x, y); break;
-    default: __spmv_csr_vector(A, x, y);
+    case MATOPT_SHORT_ROWS: __spmv_csr_scalar(A, x, y, init); break;
+    default: __spmv_csr_vector(A, x, y, init);
   }
 }
 
 template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_csr_scalar(const Matrix& A, const Vector1& x, Vector2& y) {
+void __spmv_csr_scalar(const Matrix& A, const Vector1& x, Vector2& y,
+                       const bool init) {
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
@@ -83,7 +86,8 @@ void __spmv_csr_scalar(const Matrix& A, const Vector1& x, Vector2& y) {
 
 template <size_t THREADS_PER_VECTOR, typename Matrix, typename Vector1,
           typename Vector2>
-void __spmv_csr_vector_dispatch(const Matrix& A, const Vector1& x, Vector2& y) {
+void __spmv_csr_vector_dispatch(const Matrix& A, const Vector1& x, Vector2& y,
+                                const bool init) {
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
@@ -96,6 +100,10 @@ void __spmv_csr_vector_dispatch(const Matrix& A, const Vector1& x, Vector2& y) {
 
   const size_t THREADS_PER_BLOCK = 128;
   const size_t VECTORS_PER_BLOCK = THREADS_PER_BLOCK / THREADS_PER_VECTOR;
+
+  if (init) {
+    y.assign(y.size(), 0);
+  }
 
   const size_t MAX_BLOCKS = max_active_blocks(
       Kernels::spmv_csr_vector_kernel<index_type, value_type, VECTORS_PER_BLOCK,
@@ -115,29 +123,30 @@ void __spmv_csr_vector_dispatch(const Matrix& A, const Vector1& x, Vector2& y) {
 }
 
 template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y) {
+void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y,
+                       const bool init) {
   using index_type = typename Matrix::index_type;
 
   const index_type nnz_per_row = A.nnnz() / A.nrows();
 
   if (nnz_per_row <= 2) {
-    __spmv_csr_vector_dispatch<2>(A, x, y);
+    __spmv_csr_vector_dispatch<2>(A, x, y, init);
     return;
   }
   if (nnz_per_row <= 4) {
-    __spmv_csr_vector_dispatch<4>(A, x, y);
+    __spmv_csr_vector_dispatch<4>(A, x, y, init);
     return;
   }
   if (nnz_per_row <= 8) {
-    __spmv_csr_vector_dispatch<8>(A, x, y);
+    __spmv_csr_vector_dispatch<8>(A, x, y, init);
     return;
   }
   if (nnz_per_row <= 16) {
-    __spmv_csr_vector_dispatch<16>(A, x, y);
+    __spmv_csr_vector_dispatch<16>(A, x, y, init);
     return;
   }
 
-  __spmv_csr_vector_dispatch<32>(A, x, y);
+  __spmv_csr_vector_dispatch<32>(A, x, y, init);
 }
 
 }  // namespace Impl

@@ -39,8 +39,8 @@ namespace Impl {
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector1& x, Vector2& y, DiaTag, DenseVectorTag,
-    DenseVectorTag,
+    const Matrix& A, const Vector1& x, Vector2& y, const bool init, DiaTag,
+    DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Cuda_space_v<ExecSpace> &&
@@ -67,6 +67,10 @@ inline void multiply(
   if (num_diagonals == 0) {
     // empty matrix
     return;
+  }
+
+  if (init) {
+    y.assign(y.size(), 0);
   }
 
   Kernels::spmv_dia_kernel<index_type, value_type, BLOCK_SIZE>

@@ -33,8 +33,8 @@ namespace Impl {
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
-    DenseVectorTag,
+    const Matrix& A, const Vector1& x, Vector2& y, const bool init, CooTag,
+    DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_Serial_space_v<ExecSpace> &&
@@ -43,8 +43,10 @@ inline void multiply(
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
-  for (index_type n = 0; n < A.nrows(); n++) {
-    y[n] = value_type(0);
+  if (init) {
+    for (index_type n = 0; n < A.nrows(); n++) {
+      y[n] = value_type(0);
+    }
   }
 
   for (index_type n = 0; n < A.nnnz(); n++) {

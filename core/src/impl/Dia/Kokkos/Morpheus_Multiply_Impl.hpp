@@ -33,8 +33,8 @@ namespace Impl {
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector1& x, Vector2& y, DiaTag, DenseVectorTag,
-    DenseVectorTag,
+    const Matrix& A, const Vector1& x, Vector2& y, const bool init, DiaTag,
+    DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
@@ -59,7 +59,7 @@ inline void multiply(
       policy, KOKKOS_LAMBDA(const member_type& team_member) {
         const index_type row = team_member.league_rank();
 
-        value_type sum = 0;
+        value_type sum = init ? value_type(0) : y_view[row];
         Kokkos::parallel_reduce(
             Kokkos::TeamThreadRange(team_member, ndiag),
             [=](const int& n, value_type& lsum) {

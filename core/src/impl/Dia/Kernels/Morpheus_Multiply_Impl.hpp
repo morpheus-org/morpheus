@@ -74,7 +74,7 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
         idx += pitch;
       }
 
-      y[row] = sum;
+      y[row] += sum;
     }
 
     // wait until all threads are done reading offsets

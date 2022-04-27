@@ -31,16 +31,19 @@
 namespace Morpheus {
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
-inline void multiply(const Matrix& A, const Vector1& x, Vector2& y);
+inline void multiply(const Matrix& A, const Vector1& x, Vector2& y,
+                     const bool init);
 
 namespace Impl {
 
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
-inline void multiply(const Matrix& A, const Vector1& x, Vector2& y, DynamicTag,
-                     DenseVectorTag, DenseVectorTag) {
-  std::visit([&](auto&& arg) { Morpheus::multiply<ExecSpace>(arg, x, y); },
-             A.const_formats());
+inline void multiply(const Matrix& A, const Vector1& x, Vector2& y,
+                     const bool init, DynamicTag, DenseVectorTag,
+                     DenseVectorTag) {
+  std::visit(
+      [&](auto&& arg) { Morpheus::multiply<ExecSpace>(arg, x, y, init); },
+      A.const_formats());
 }
 
 }  // namespace Impl
