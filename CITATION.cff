@@ -1,0 +1,13 @@
+cff-version: 0.3.1
+title: >-
+  Morpheus: a library for efficient runtime switching
+  of sparse matrix storage formats
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Christodoulos
+    family-names: Stylianou
+    email: c.stylianou@ed.ac.uk
+repository-code: 'https://github.com/morpheus-org/morpheus'
