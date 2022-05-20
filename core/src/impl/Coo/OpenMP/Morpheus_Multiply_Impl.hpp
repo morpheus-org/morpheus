@@ -56,8 +56,6 @@ inline void multiply(
                                Vector1, Vector2>>* = nullptr) {
   using value_type = typename Matrix::value_type;
   using index_type = typename Matrix::index_type;
-  const index_type max_threads =
-      A.nnnz() < threads<index_type>() ? A.nnnz() : threads<index_type>();
 
   if (init) {
 #pragma omp parallel for
@@ -66,49 +64,45 @@ inline void multiply(
     }
   }
 
-#pragma omp parallel num_threads(max_threads)
+#pragma omp parallel
   {
-    const index_type nthreads = omp_get_num_threads();
-    const index_type tid      = omp_get_thread_num();
+    const size_t num_threads     = omp_get_num_threads();
+    const size_t work_per_thread = (A.nnnz() + num_threads - 1) / num_threads;
+    const size_t thread_id       = omp_get_thread_num();
+    const size_t begin           = work_per_thread * thread_id;
+    const size_t end = std::min(begin + work_per_thread, (size_t)A.nnnz());
+    const auto sentinel_row = A.nrows() + 1;
 
-    const index_type thread_start = _split_work(A.nnnz(), nthreads, tid);
-    const index_type thread_stop  = _split_work(A.nnnz(), nthreads, tid + 1);
+    if (begin < end) {
+      const auto first = begin > 0 ? A.crow_indices(begin - 1) : sentinel_row;
+      const auto last  = end < A.nnnz() ? A.crow_indices(end) : sentinel_row;
+      auto n           = begin;
 
-    index_type first_row_start = thread_stop, last_row_stop = thread_stop;
+      // handle non-overlapping rows
+      for (; n < end && A.crow_indices(n) != last; n++) {
+        y[A.crow_indices(n)] += A.cvalues(n) * x[A.ccolumn_indices(n)];
+      }
 
-    for (index_type n = thread_start; n < thread_stop - 1; n++) {
-      if (A.crow_indices(n) != A.crow_indices(n + 1)) {
-        first_row_start = n;
-        break;
+      // handle row overlap with previous thread
+      if (first != sentinel_row) {
+        value_type partial_sum = 0;
+        for (; n < end && A.crow_indices(n) == first; n++) {
+          partial_sum += A.cvalues(n) * x[A.ccolumn_indices(n)];
+        }
+#pragma omp atomic
+        y[first] += partial_sum;
+      }
+
+      // handle row overlap with following thread
+      if (last != sentinel_row) {
+        value_type partial_sum = 0;
+        for (; n < end; n++) {
+          partial_sum += A.cvalues(n) * x[A.ccolumn_indices(n)];
+        }
+#pragma omp atomic
+        y[last] += partial_sum;
       }
     }
-
-    for (index_type n = thread_stop; n < thread_start + 1; n--) {
-      if (A.crow_indices(n) != A.crow_indices(n - 1)) {
-        last_row_stop = n;
-        break;
-      }
-    }
-
-    value_type temp = value_type(0);
-    for (index_type n = thread_start; n < first_row_start; n++) {
-      temp += A.cvalues(n) * x(A.ccolumn_indices(n));
-    }
-
-#pragma omp atomic
-    y[A.crow_indices(thread_start)] += temp;
-
-    for (index_type n = first_row_start; n < last_row_stop; n++) {
-      y[A.crow_indices(n)] += A.cvalues(n) * x(A.ccolumn_indices(n));
-    }
-
-    temp = value_type(0);
-    for (index_type n = last_row_stop; n < thread_stop; n++) {
-      temp += A.cvalues(n) * x(A.ccolumn_indices(n));
-    }
-
-#pragma omp atomic
-    y[A.crow_indices(thread_stop)] += temp;
   }
 }
 
