@@ -64,7 +64,6 @@ endmacro(MORPHEUS_PACKAGE_POSTPROCESS)
 
 macro(MORPHEUS_PROCESS_SUBPACKAGES)
   add_subdirectory(core)
-  add_subdirectory(tests)
   add_subdirectory(examples)
 endmacro()
 
