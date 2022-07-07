@@ -76,70 +76,73 @@ inline void MORPHEUS_EXPECT_EQ(T val1, T val2) {
 
 namespace Test {
 
-TYPED_TEST_CASE(DotTest, ContainerImplementations);
+// TYPED_TEST_CASE(DotTest, ContainerImplementations);
 
-TYPED_TEST(DotTest, SmallTest) {
-  using value_type = typename TestFixture::DenseVector::value_type;
-  using index_type = typename TestFixture::DenseVector::index_type;
+// TYPED_TEST(DotTest, SmallTest) {
+//   using value_type = typename TestFixture::DenseVector::value_type;
+//   using index_type = typename TestFixture::DenseVector::index_type;
 
-  index_type sz  = this->s_size;
-  value_type res = this->s_res;
-  auto x = this->s_x, y = this->s_y;
+//   index_type sz  = this->s_size;
+//   value_type res = this->s_res;
+//   auto x = this->s_x, y = this->s_y;
 
-  auto result = Morpheus::dot<TEST_EXECSPACE>(sz, x, y);
+//   auto result = Morpheus::dot<TEST_EXECSPACE>(sz, x, y);
 
-  // Make sure the correct type is returned by dot
-  EXPECT_EQ((std::is_same<decltype(result), decltype(res)>::value), 1);
+//   // Make sure the correct type is returned by dot
+//   EXPECT_EQ((std::is_same<decltype(result), decltype(res)>::value), 1);
 
-  if (std::is_floating_point<value_type>::value) {
-    EXPECT_PRED_FORMAT2(
-        ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res, result);
-  } else {
-    EXPECT_EQ(res, result);
-  }
-}
+//   if (std::is_floating_point<value_type>::value) {
+//     EXPECT_PRED_FORMAT2(
+//         ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res,
+//         result);
+//   } else {
+//     EXPECT_EQ(res, result);
+//   }
+// }
 
-TYPED_TEST(DotTest, MediumTest) {
-  using value_type = typename TestFixture::DenseVector::value_type;
-  using index_type = typename TestFixture::DenseVector::index_type;
+// TYPED_TEST(DotTest, MediumTest) {
+//   using value_type = typename TestFixture::DenseVector::value_type;
+//   using index_type = typename TestFixture::DenseVector::index_type;
 
-  index_type sz  = this->m_size;
-  value_type res = this->m_res;
-  auto x = this->m_x, y = this->m_y;
+//   index_type sz  = this->m_size;
+//   value_type res = this->m_res;
+//   auto x = this->m_x, y = this->m_y;
 
-  auto result = Morpheus::dot<TEST_EXECSPACE>(sz, x, y);
+//   auto result = Morpheus::dot<TEST_EXECSPACE>(sz, x, y);
 
-  // Make sure the correct type is returned by dot
-  EXPECT_EQ((std::is_same<decltype(result), decltype(res)>::value), 1);
+//   // Make sure the correct type is returned by dot
+//   EXPECT_EQ((std::is_same<decltype(result), decltype(res)>::value), 1);
 
-  if (std::is_floating_point<value_type>::value) {
-    EXPECT_PRED_FORMAT2(
-        ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res, result);
-  } else {
-    EXPECT_EQ(res, result);
-  }
-}
+//   if (std::is_floating_point<value_type>::value) {
+//     EXPECT_PRED_FORMAT2(
+//         ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res,
+//         result);
+//   } else {
+//     EXPECT_EQ(res, result);
+//   }
+// }
 
-TYPED_TEST(DotTest, LargeTest) {
-  using value_type = typename TestFixture::DenseVector::value_type;
-  using index_type = typename TestFixture::DenseVector::index_type;
+// TYPED_TEST(DotTest, LargeTest) {
+//   using value_type = typename TestFixture::DenseVector::value_type;
+//   using index_type = typename TestFixture::DenseVector::index_type;
 
-  index_type sz  = this->l_size;
-  value_type res = this->l_res;
-  auto x = this->l_x, y = this->l_y;
+//   index_type sz  = this->l_size;
+//   value_type res = this->l_res;
+//   auto x = this->l_x, y = this->l_y;
 
-  auto result = Morpheus::dot<TEST_EXECSPACE>(sz, x, y);
+//   auto result = Morpheus::dot<TEST_EXECSPACE>(sz, x, y);
 
-  // Make sure the correct type is returned by dot
-  EXPECT_EQ((std::is_same<decltype(result), decltype(res)>::value), 1);
+//   // Make sure the correct type is returned by dot
+//   EXPECT_EQ((std::is_same<decltype(result), decltype(res)>::value), 1);
 
-  if (std::is_floating_point<value_type>::value) {
-    EXPECT_PRED_FORMAT2(
-        ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res, result);
-  } else {
-    EXPECT_EQ(res, result);
-  }
-}
+//   if (std::is_floating_point<value_type>::value) {
+//     EXPECT_PRED_FORMAT2(
+//         ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res,
+//         result);
+//   } else {
+//     EXPECT_EQ(res, result);
+//   }
+// }
 
 }  // namespace Test
 

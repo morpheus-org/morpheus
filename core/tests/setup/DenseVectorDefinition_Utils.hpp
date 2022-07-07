@@ -66,18 +66,27 @@ struct DenseVectorTypes {
       DefaultIndexType, Space, ArrayLayout>::type;
 };
 
+// using DenseVectorUnary =
+//     ::testing::Types<typename DenseVectorTypes<double, int,
+//     Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::v,
+//                      typename DenseVectorTypes<double, int,
+//                      Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::vl,
+//                      typename DenseVectorTypes<double, int,
+//                      Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::vis,
+//                      typename DenseVectorTypes<double, int,
+//                      Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::vil,
+//                      typename DenseVectorTypes<double, int,
+//                      Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::vils,
+//                      typename DenseVectorTypes<double, int,
+//                      Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::vls>;
 using DenseVectorUnary =
     ::testing::Types<typename DenseVectorTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::v,
-                     typename DenseVectorTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::vl,
-                     typename DenseVectorTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::vis,
-                     typename DenseVectorTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::vil,
-                     typename DenseVectorTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::vils,
-                     typename DenseVectorTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::vls>;
+                                               Kokkos::Serial>::v>;
 
 #endif  // MORPHEUS_CORE_TESTS_DENSEVECTOR_DEFINITION_UTILS_HPP

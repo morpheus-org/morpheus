@@ -52,72 +52,72 @@ class DenseMatrixTypesTest : public ::testing::Test {
 
 namespace Test {
 
-TYPED_TEST_CASE(DenseMatrixUnaryTest, DenseMatrixUnary);
+// TYPED_TEST_CASE(DenseMatrixUnaryTest, DenseMatrixUnary);
 
-TYPED_TEST(DenseMatrixUnaryTest, Traits) {
-  // Check DenseMatrix Specific Traits:
-  // Tag, value_array_type, value_array_pointer, value_array_reference
-  // Repeat that for the HostMirror too
-  // Check value_array_type traits too
-  // Ensure size is of type size_t and not index_type
-  // Add size_type trait
-  static_assert(std::is_same<typename TestFixture::DenseMatrix::tag,
-                             Morpheus::DenseMatrixTag>::value);
-}
+// TYPED_TEST(DenseMatrixUnaryTest, Traits) {
+//   // Check DenseMatrix Specific Traits:
+//   // Tag, value_array_type, value_array_pointer, value_array_reference
+//   // Repeat that for the HostMirror too
+//   // Check value_array_type traits too
+//   // Ensure size is of type size_t and not index_type
+//   // Add size_type trait
+//   static_assert(std::is_same<typename TestFixture::DenseMatrix::tag,
+//                              Morpheus::DenseMatrixTag>::value);
+// }
 
-TYPED_TEST(DenseMatrixUnaryTest, DefaultConstruction) {
-  // DenseMatrix()
-}
+// TYPED_TEST(DenseMatrixUnaryTest, DefaultConstruction) {
+//   // DenseMatrix()
+// }
 
-TYPED_TEST(DenseMatrixUnaryTest, NormalConstruction) {
-  // DenseMatrix(const std::string name, index_type n, value_type val = 0)
-  // DenseMatrix(index_type n, value_type val = 0)
-  // TODO: Change n to size_t
-}
+// TYPED_TEST(DenseMatrixUnaryTest, NormalConstruction) {
+//   // DenseMatrix(const std::string name, index_type n, value_type val = 0)
+//   // DenseMatrix(index_type n, value_type val = 0)
+//   // TODO: Change n to size_t
+// }
 
-TYPED_TEST(DenseMatrixUnaryTest, RandomConstruction) {
-  // DenseMatrix(const std::string name, index_type n, Generator rand_pool,
-  //             const value_type range_low, const value_type range_high)
-  // TODO: Change n to size_t
-}
+// TYPED_TEST(DenseMatrixUnaryTest, RandomConstruction) {
+//   // DenseMatrix(const std::string name, index_type n, Generator rand_pool,
+//   //             const value_type range_low, const value_type range_high)
+//   // TODO: Change n to size_t
+// }
 
-// Changed that to DenseMatrixBinaryTests
-TYPED_TEST(DenseMatrixUnaryTest, ShallowCopySemantics) {
-  // DenseMatrix(const DenseMatrix<VR, PR...>& src, ...)
-  // operator=(const DenseMatrix<VR, PR...>& src)
-  // DenseMatrix(const DenseMatrix&) = default;
-  // DenseMatrix& operator=(const DenseMatrix&) = default;
-}
+// // Changed that to DenseMatrixBinaryTests
+// TYPED_TEST(DenseMatrixUnaryTest, ShallowCopySemantics) {
+//   // DenseMatrix(const DenseMatrix<VR, PR...>& src, ...)
+//   // operator=(const DenseMatrix<VR, PR...>& src)
+//   // DenseMatrix(const DenseMatrix&) = default;
+//   // DenseMatrix& operator=(const DenseMatrix&) = default;
+// }
 
-// Changed that to DenseMatrixBinaryTests
-TYPED_TEST(DenseMatrixUnaryTest, Allocate) {
-  // DenseMatrix& allocate(const std::string name,
-  //                       const DenseMatrix<VR, PR...>& src)
-}
+// // Changed that to DenseMatrixBinaryTests
+// TYPED_TEST(DenseMatrixUnaryTest, Allocate) {
+//   // DenseMatrix& allocate(const std::string name,
+//   //                       const DenseMatrix<VR, PR...>& src)
+// }
 
-TYPED_TEST(DenseMatrixUnaryTest, Assign) {
-  // assign(const index_type n, const value_type val)
-  // TODO: Change n to size_t
-}
+// TYPED_TEST(DenseMatrixUnaryTest, Assign) {
+//   // assign(const index_type n, const value_type val)
+//   // TODO: Change n to size_t
+// }
 
-TYPED_TEST(DenseMatrixUnaryTest, AssignRandom) {
-  // assign(Generator rand_pool, const value_type range_low,
-  //        const value_type range_high)
-}
+// TYPED_TEST(DenseMatrixUnaryTest, AssignRandom) {
+//   // assign(Generator rand_pool, const value_type range_low,
+//   //        const value_type range_high)
+// }
 
-TYPED_TEST(DenseMatrixUnaryTest, Resize) {
-  // resize(index_type n)
-  // resize(const index_type n, const index_type val)
-  // TODO: Change n to size_t
-}
+// TYPED_TEST(DenseMatrixUnaryTest, Resize) {
+//   // resize(index_type n)
+//   // resize(const index_type n, const index_type val)
+//   // TODO: Change n to size_t
+// }
 
-TYPED_TEST(DenseMatrixUnaryTest, UtilRoutines) {
-  // size()
-  // data()
-  // view()
-  // const_view()
-  // name()
-}
+// TYPED_TEST(DenseMatrixUnaryTest, UtilRoutines) {
+//   // size()
+//   // data()
+//   // view()
+//   // const_view()
+//   // name()
+// }
 
 }  // namespace Test
 

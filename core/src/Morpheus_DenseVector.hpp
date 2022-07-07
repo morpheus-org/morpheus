@@ -33,17 +33,67 @@
 
 namespace Morpheus {
 
+/**
+ * \addtogroup containers Containers
+ * \par Overview
+ * Containers bla bla bla
+ *
+ */
+
+/**
+ * \addtogroup containers_1d 1D Containers
+ * \brief One-dimensional Containers
+ * \ingroup containers
+ * \{
+ *
+ */
+/**
+ * @brief The DenseVector container is a one-dimensional container that contains
+ * contiguous elements. It is a polymorphic container in the sense that it can
+ * store scalar or integer type values, on host or device depending how the
+ * template parameters are selected.
+ *
+ * @tparam ValueType type of values to store
+ * @tparam Properties optional properties to modify the behaviour of the
+ * container. Sensible defaults are selected based on the configuration. Please
+ * refer to \ref impl/Morpheus_ContainerTraits.hpp to find out more about the
+ * valid properties.
+ *
+ * \par Overview
+ * TODO
+ *
+ * \par Example
+ * \code
+ * #include <Morpheus_Core.hpp>
+ *
+ * int main(){
+ *  // Construct a vector on host, of size 10 and with values set to 5.0
+ *  Morpheus::DenseVector<double, Kokkos::HostSpace> x(10, 5.0);
+ *
+ *  // Set some values
+ *  x[2] = 5.0;
+ *  x[5] = -2.0;
+ * }
+ * \endcode
+ */
 template <class ValueType, class... Properties>
 class DenseVector
     : public Impl::ContainerTraits<DenseVector, ValueType, Properties...> {
  public:
+  /*! The traits associated with the particular container */
   using traits = Impl::ContainerTraits<DenseVector, ValueType, Properties...>;
-  using type   = typename traits::type;
-  using tag    = typename VectorFormatTag<Morpheus::DenseVectorTag>::tag;
+  /*! The complete type of the container */
+  using type = typename traits::type;
+  /*! The tag associated specificaly to the particular container*/
+  using tag = typename VectorFormatTag<Morpheus::DenseVectorTag>::tag;
 
-  using value_type           = typename traits::value_type;
+  /*! The type of the values held by the container - can be const */
+  using value_type = typename traits::value_type;
+  /*! The non-constant type of the values held by the container */
   using non_const_value_type = typename traits::non_const_value_type;
-  using index_type           = typename traits::index_type;
+  /*! The type of the indices held by the container - can be const */
+  using index_type = typename traits::index_type;
+  /*! The non-constant type of the indices held by the container */
   using non_const_index_type = typename traits::non_const_index_type;
 
   using array_layout    = typename traits::array_layout;
@@ -63,7 +113,6 @@ class DenseVector
   using value_array_pointer   = typename value_array_type::pointer_type;
   using value_array_reference = typename value_array_type::reference_type;
 
- public:
   //   Member functions
   ~DenseVector()                  = default;
   DenseVector(const DenseVector&) = default;
@@ -71,25 +120,53 @@ class DenseVector
   DenseVector& operator=(const DenseVector&) = default;
   DenseVector& operator=(DenseVector&&) = default;
 
+  /**
+   * @brief Construct an empty DenseVector object
+   *
+   */
   inline DenseVector() : _size(0), _values() {}
 
+  /**
+   * @brief Construct a DenseVector object with size \p n and values set to
+   * \p val
+   *
+   * @param n Size of the DenseVector
+   * @param val Value at which the elements of the DenseVector will be set to
+   */
   inline DenseVector(index_type n, value_type val = 0)
       : _size(n), _values("vector", size_t(n)) {
     assign(n, val);
   }
 
+  /**
+   * @brief Construct a DenseVector object from a raw pointer. This is only
+   * enabled if the DenseVector is an unmanaged container.
+   *
+   * @tparam ValuePtr Pointer type
+   * @param n Number of entries
+   * @param ptr Pointer value
+   */
   template <typename ValuePtr>
   explicit DenseVector(
       index_type n, ValuePtr ptr,
-      typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
-          nullptr)
+      typename std::enable_if<std::is_pointer<ValuePtr>::value &&
+                              (memory_traits::is_unmanaged)>::type* = nullptr)
       : _size(n), _values(ptr, size_t(n)) {
     static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
                   "Constructing DenseVector to wrap user memory must supply "
                   "matching pointer type");
   }
 
-  // Constructing a random vector with values from `range_low` to `range_high`
+  /**
+   * @brief Construct a DenseVector object with values from
+   * \p range_low to \p range_high
+   *
+   * @tparam Generator random number generator type
+   * @param n Size of DenseVector
+   * @param rand_pool Random number generator
+   * @param range_low Low bound value to assign
+   * @param range_high Upper bound value to assign
+   */
   template <typename Generator>
   inline DenseVector(index_type n, Generator rand_pool,
                      const value_type range_low, const value_type range_high)
@@ -126,21 +203,47 @@ class DenseVector
     return *this;
   }
 
+  /**
+   * @brief Assigns \p n elements of value \p val to the DenseVector. In the
+   * case where \p n is larger than the actual size of the container, the
+   * container will resize before assignment.
+   *
+   * @param n Number of elements to assign
+   * @param val Value to assign
+   */
   inline void assign(const index_type n, const value_type val) {
     using range_policy = Kokkos::RangePolicy<index_type, execution_space>;
 
     /* Resize if necessary (behavior of std:vector) */
-    this->resize(n);
+    if (n > _size) {
+      this->resize(n);
+    }
 
     range_policy policy(0, n);
     set_functor f(_values, val);
     Kokkos::parallel_for("Morpheus::DenseVector::assign", policy, f);
   }
 
+  /**
+   * @brief Assigns \p n elements of values between \p range_low  and
+   * \p range_high to the DenseVector. In the case where \p n is larger than the
+   * actual size of the container, the container will resize before assignment.
+   *
+   * @tparam Generator random number generator type
+   * @param n Number of elements to assign
+   * @param rand_pool Random number generator
+   * @param range_low Low bound value to assign
+   * @param range_high Upper bound value to assign
+   */
   template <typename Generator>
-  inline void assign(Generator rand_pool, const value_type range_low,
-                     const value_type range_high) {
-    Kokkos::fill_random(_values, rand_pool, range_low, range_high);
+  inline void assign(index_type n, Generator rand_pool,
+                     const value_type range_low, const value_type range_high) {
+    /* Resize if necessary (behavior of std:vector) */
+    if (n > _size) {
+      this->resize(n);
+    }
+    auto vals = Kokkos::subview(_values, std::make_pair(0, n));
+    Kokkos::fill_random(vals, rand_pool, range_low, range_high);
   }
 
   // Element access
@@ -174,8 +277,6 @@ class DenseVector
   index_type _size;
   value_array_type _values;
 
-  // TODO: Shall we set that to private?
- public:
   struct set_functor {
     value_array_type _data;
     value_type _val;
@@ -188,6 +289,8 @@ class DenseVector
   };
 };
 
+/*! \}
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_DENSEVECTOR_HPP
