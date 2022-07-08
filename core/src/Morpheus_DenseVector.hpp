@@ -36,7 +36,7 @@ namespace Morpheus {
 /**
  * \addtogroup containers Containers
  * \par Overview
- * Containers bla bla bla
+ * TODO
  *
  */
 
@@ -115,15 +115,30 @@ class DenseVector
   using value_array_reference = typename value_array_type::reference_type;
 
   //   Member functions
-  ~DenseVector()                  = default;
+  ~DenseVector() = default;
+  /**
+   * @brief Default copy contructor (shallow copy) of a DenseVector container
+   * from another DenseVector container with the same properties.
+   */
   DenseVector(const DenseVector&) = default;
-  DenseVector(DenseVector&&)      = default;
+  /**
+   * @brief Default move contructor (shallow copy) of a DenseVector container
+   * from another DenseVector container with the same properties.
+   */
+  DenseVector(DenseVector&&) = default;
+  /**
+   * @brief Default copy assignment (shallow copy) of a DenseVector container
+   * from another DenseVector container with the same properties.
+   */
   DenseVector& operator=(const DenseVector&) = default;
+  /**
+   * @brief Default move assignment (shallow copy) of a DenseVector container
+   * from another DenseVector container with the same properties.
+   */
   DenseVector& operator=(DenseVector&&) = default;
 
   /**
    * @brief Construct an empty DenseVector object
-   *
    */
   inline DenseVector() : _size(0), _values() {}
 
@@ -247,12 +262,23 @@ class DenseVector
     Kokkos::fill_random(vals, rand_pool, range_low, range_high);
   }
 
-  // Element access
+  /**
+   * @brief Returns a reference to the element with index \p i
+   *
+   * @param i Index of the value to extract
+   * @return Element at index \p i
+   */
   MORPHEUS_FORCEINLINE_FUNCTION value_array_reference
   operator()(const size_t i) const {
     return _values(i);
   }
 
+  /**
+   * @brief Returns a reference to the element with index \p i
+   *
+   * @param i Index of the value to extract
+   * @return Element at index \p i
+   */
   MORPHEUS_FORCEINLINE_FUNCTION value_array_reference
   operator[](const size_t i) const {
     return _values(i);

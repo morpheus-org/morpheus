@@ -54,16 +54,16 @@ namespace Test {
 
 TYPED_TEST_CASE(DenseVectorUnaryTest, DenseVectorUnary);
 
-TYPED_TEST(DenseVectorUnaryTest, Traits) {
-  // Check DenseVector Specific Traits:
-  // Tag, value_array_type, value_array_pointer, value_array_reference
-  // Repeat that for the HostMirror too
-  // Check value_array_type traits too
-  // Ensure size is of type size_t and not index_type
-  // Add size_type trait
-  static_assert(std::is_same<typename TestFixture::DenseVector::tag,
-                             Morpheus::DenseVectorTag>::value);
-}
+// TYPED_TEST(DenseVectorUnaryTest, Traits) {
+//   // Check DenseVector Specific Traits:
+//   // Tag, value_array_type, value_array_pointer, value_array_reference
+//   // Repeat that for the HostMirror too
+//   // Check value_array_type traits too
+//   // Ensure size is of type size_t and not index_type
+//   // Add size_type trait
+//   static_assert(std::is_same<typename TestFixture::DenseVector::tag,
+//                              Morpheus::DenseVectorTag>::value);
+// }
 
 /**
  * @brief Testing default construction of DenseVector container
@@ -87,12 +87,128 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultConstruction) {
 }
 
 /**
+ * @brief Testing default copy assignment of DenseVector container from another
+ * DenseVector container with the same parameters. Resulting container
+ * should be a shallow copy of the original.
+ *
+ */
+TYPED_TEST(DenseVectorUnaryTest, DefaultCopyAssignment) {
+  using Vector     = typename TestFixture::DenseVector;
+  using HostVector = typename TestFixture::HostMirror;
+  using value_type = typename Vector::value_type;
+
+  auto size = 10;
+  Vector x(size, (value_type)5.22);
+  EXPECT_EQ(x.size(), size);
+
+  HostVector xh(x.size(), 0);
+  Morpheus::copy(x, xh);
+
+  HostVector yh = xh;
+  EXPECT_EQ(yh.size(), xh.size());
+
+  xh[4] = (value_type)-4.33;
+  xh[9] = (value_type)-9.44;
+
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_EQ(xh[i], yh[i]);
+  }
+}
+
+/**
+ * @brief Testing default copy construction of DenseVector container from
+ * another DenseVector container with the same parameters. Resulting container
+ * should be a shallow copy of the original.
+ *
+ */
+TYPED_TEST(DenseVectorUnaryTest, DefaultCopyConstructor) {
+  using Vector     = typename TestFixture::DenseVector;
+  using HostVector = typename TestFixture::HostMirror;
+  using value_type = typename Vector::value_type;
+
+  auto size = 10;
+  Vector x(size, (value_type)5.22);
+  EXPECT_EQ(x.size(), size);
+
+  HostVector xh(x.size(), (value_type)0);
+  Morpheus::copy(x, xh);
+
+  HostVector yh(xh);
+  EXPECT_EQ(yh.size(), xh.size());
+
+  xh[4] = (value_type)-4.33;
+  xh[9] = (value_type)-9.44;
+
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_EQ(xh[i], yh[i]);
+  }
+}
+
+/**
+ * @brief Testing default move assignment of DenseVector container from another
+ * DenseVector container with the same parameters. Resulting container should be
+ * a shallow copy of the original.
+ *
+ */
+TYPED_TEST(DenseVectorUnaryTest, DefaultMoveAssignment) {
+  using Vector     = typename TestFixture::DenseVector;
+  using HostVector = typename TestFixture::HostMirror;
+  using value_type = typename Vector::value_type;
+
+  auto size = 10;
+  Vector x(size, (value_type)5.22);
+  EXPECT_EQ(x.size(), size);
+
+  HostVector xh(x.size(), 0);
+  Morpheus::copy(x, xh);
+
+  HostVector yh = std::move(xh);
+  EXPECT_EQ(yh.size(), xh.size());
+
+  xh[4] = (value_type)-4.33;
+  xh[9] = (value_type)-9.44;
+
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_EQ(xh[i], yh[i]);
+  }
+}
+
+/**
+ * @brief Testing default move construction of DenseVector container from
+ * another DenseVector container with the same parameters. Resulting container
+ * should be a shallow copy of the original.
+ *
+ */
+TYPED_TEST(DenseVectorUnaryTest, DefaultMoveConstructor) {
+  using Vector     = typename TestFixture::DenseVector;
+  using HostVector = typename TestFixture::HostMirror;
+  using value_type = typename Vector::value_type;
+
+  auto size = 10;
+  Vector x(size, (value_type)5.22);
+  EXPECT_EQ(x.size(), size);
+
+  HostVector xh(x.size(), 0);
+  Morpheus::copy(x, xh);
+
+  HostVector yh(std::move(xh));
+  EXPECT_EQ(yh.size(), xh.size());
+
+  xh[4] = (value_type)-4.33;
+  xh[9] = (value_type)-9.44;
+
+  yh[0] = 0;
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_EQ(xh[i], yh[i]);
+  }
+}
+
+/**
  * @brief Testing construction of DenseVector container with size `n` and values
  * set at 0 by default
  *
  */
 TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
-  // DenseVector(index_type n, value_type val = 0)
   using Vector     = typename TestFixture::DenseVector;
   using HostVector = typename TestFixture::HostMirror;
   using value_type = typename Vector::value_type;
@@ -119,13 +235,12 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
  *
  */
 TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
-  // DenseVector(index_type n, value_type val)
   using Vector     = typename TestFixture::DenseVector;
   using HostVector = typename TestFixture::HostMirror;
   using value_type = typename Vector::value_type;
 
   auto size      = 100;
-  value_type val = 15;
+  value_type val = 15.22;
 
   Vector x(size, val);
   HostVector xh(size, val);
@@ -221,6 +336,7 @@ TYPED_TEST(DenseVectorUnaryTest, RandomConstruction) {
 TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   using Vector     = typename TestFixture::DenseVector;
   using HostVector = typename TestFixture::HostMirror;
+  using value_type = typename Vector::value_type;
 
   auto size = 10000;
 
@@ -230,61 +346,62 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   EXPECT_EQ(x.size(), size);
   EXPECT_EQ(xh.size(), size);
 
-  x.assign(100, 35);
+  x.assign(100, (value_type)35.22);
   // Make sure we are not resizing if assignment_size < size
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
   for (size_t i = 0; i < 100; i++) {
-    EXPECT_EQ(xh[i], 35.0);
+    EXPECT_EQ(xh[i], (value_type)35.22);
   }
   for (size_t i = 100; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
-  x.assign(1000, 20);
+  x.assign(1000, (value_type)20.33);
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
   for (size_t i = 0; i < 1000; i++) {
-    EXPECT_EQ(xh[i], 20.0);
+    EXPECT_EQ(xh[i], (value_type)20.33);
   }
   for (size_t i = 1000; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
-  x.assign(80, -30);
+  x.assign(80, (value_type)-30.11);
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
   for (size_t i = 0; i < 80; i++) {
-    EXPECT_EQ(xh[i], -30.0);
+    EXPECT_EQ(xh[i], (value_type)-30.11);
   }
   for (size_t i = 80; i < 1000; i++) {
-    EXPECT_EQ(xh[i], 20.0);
+    EXPECT_EQ(xh[i], (value_type)20.33);
   }
   for (size_t i = 1000; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
-  x.assign(size, -1);
+  x.assign(size, (value_type)-1.111);
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
   for (size_t i = 0; i < xh.size(); i++) {
-    EXPECT_EQ(xh[i], -1.0);
+    EXPECT_EQ(xh[i], (value_type)-1.111);
   }
 }
 
 TYPED_TEST(DenseVectorUnaryTest, AssignResize) {
   using Vector     = typename TestFixture::DenseVector;
   using HostVector = typename TestFixture::HostMirror;
+  using value_type = typename Vector::value_type;
 
   auto size = 10000;
   Vector x(size, 0);
 
   // x should resize now that the size we are assigning is larger that `size`
-  x.assign(size + 2000, 10);
+  x.assign(size + 2000, (value_type)10.111);
   EXPECT_EQ(x.size(), size + 2000);
 
   HostVector xh(x.size(), 0);
@@ -292,7 +409,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignResize) {
   Morpheus::copy(x, xh);
 
   for (size_t i = 0; i < xh.size(); i++) {
-    EXPECT_EQ(xh[i], 10.0);
+    EXPECT_EQ(xh[i], (value_type)10.111);
   }
 }
 
@@ -390,7 +507,7 @@ TYPED_TEST(DenseVectorUnaryTest, Resize) {
   using value_type = typename Vector::value_type;
 
   auto original_size            = 1000;
-  const value_type original_val = 10;
+  const value_type original_val = 10.11;
 
   Vector x(original_size, original_val);
   HostVector xh(original_size, 0);
@@ -433,7 +550,7 @@ TYPED_TEST(DenseVectorUnaryTest, ResizeVal) {
   using value_type = typename Vector::value_type;
 
   auto original_size            = 1000;
-  const value_type original_val = 10;
+  const value_type original_val = 10.11;
 
   Vector x(original_size, original_val);
   HostVector xh(original_size, 0);
@@ -441,7 +558,7 @@ TYPED_TEST(DenseVectorUnaryTest, ResizeVal) {
   EXPECT_EQ(xh.size(), original_size);
 
   auto smaller_size            = 100;
-  const value_type smaller_val = 2;
+  const value_type smaller_val = 2.22;
 
   x.resize(smaller_size, smaller_val);
   EXPECT_EQ(x.size(), smaller_size);
@@ -456,7 +573,7 @@ TYPED_TEST(DenseVectorUnaryTest, ResizeVal) {
   }
 
   auto larger_size            = 10000;
-  const value_type larger_val = 33;
+  const value_type larger_val = 33.33;
 
   x.resize(larger_size, larger_val);
   EXPECT_EQ(x.size(), larger_size);
@@ -467,6 +584,38 @@ TYPED_TEST(DenseVectorUnaryTest, ResizeVal) {
   // Values from smaller_size onwards should be set to zero
   for (size_t i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], larger_val);
+  }
+}
+
+TYPED_TEST(DenseVectorUnaryTest, ElementAccess) {
+  using Vector              = typename TestFixture::DenseVector;
+  using HostVector          = typename TestFixture::HostMirror;
+  using value_type          = typename Vector::value_type;
+  using value_array_pointer = typename Vector::value_array_pointer;
+
+  auto size            = 50;
+  const value_type val = 10.11;
+
+  Vector x(size, val);
+  HostVector xh(size, 0);
+  EXPECT_EQ(x.size(), size);
+  EXPECT_EQ(xh.size(), size);
+
+  Morpheus::copy(x, xh);
+  value_array_pointer xptr = xh.data();
+
+  xptr[2]  = (value_type)2.22;
+  xptr[15] = (value_type)15.15;
+  // Values from smaller_size onwards should be set to zero
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_EQ(xh[i], xh(i));
+    if (i == 2) {
+      EXPECT_EQ(xptr[i], (value_type)2.22);
+    } else if (i == 15) {
+      EXPECT_EQ(xptr[i], (value_type)15.15);
+    } else {
+      EXPECT_EQ(xh[i], xh(i));
+    }
   }
 }
 
