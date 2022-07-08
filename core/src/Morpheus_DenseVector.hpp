@@ -108,6 +108,7 @@ class DenseVector
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
+  /*! The type of view that holds the value_type data */
   using value_array_type =
       Kokkos::View<value_type*, array_layout, execution_space, memory_traits>;
   using value_array_pointer   = typename value_array_type::pointer_type;
@@ -133,7 +134,7 @@ class DenseVector
    * @param n Size of the DenseVector
    * @param val Value at which the elements of the DenseVector will be set to
    */
-  inline DenseVector(index_type n, value_type val = 0)
+  inline DenseVector(const size_t n, value_type val = 0)
       : _size(n), _values("vector", size_t(n)) {
     assign(n, val);
   }
@@ -148,10 +149,10 @@ class DenseVector
    */
   template <typename ValuePtr>
   explicit DenseVector(
-      index_type n, ValuePtr ptr,
+      const size_t n, ValuePtr ptr,
       typename std::enable_if<std::is_pointer<ValuePtr>::value &&
                               (memory_traits::is_unmanaged)>::type* = nullptr)
-      : _size(n), _values(ptr, size_t(n)) {
+      : _size(n), _values(ptr, n) {
     static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
                   "Constructing DenseVector to wrap user memory must supply "
                   "matching pointer type");
@@ -168,9 +169,9 @@ class DenseVector
    * @param range_high Upper bound value to assign
    */
   template <typename Generator>
-  inline DenseVector(index_type n, Generator rand_pool,
+  inline DenseVector(const size_t n, Generator rand_pool,
                      const value_type range_low, const value_type range_high)
-      : _size(n), _values("vector", size_t(n)) {
+      : _size(n), _values("vector", n) {
     Kokkos::fill_random(_values, rand_pool, range_low, range_high);
   }
 
@@ -211,8 +212,8 @@ class DenseVector
    * @param n Number of elements to assign
    * @param val Value to assign
    */
-  inline void assign(const index_type n, const value_type val) {
-    using range_policy = Kokkos::RangePolicy<index_type, execution_space>;
+  inline void assign(const size_t n, const value_type val) {
+    using range_policy = Kokkos::RangePolicy<size_t, execution_space>;
 
     /* Resize if necessary (behavior of std:vector) */
     if (n > _size) {
@@ -236,45 +237,80 @@ class DenseVector
    * @param range_high Upper bound value to assign
    */
   template <typename Generator>
-  inline void assign(index_type n, Generator rand_pool,
+  inline void assign(const size_t n, Generator rand_pool,
                      const value_type range_low, const value_type range_high) {
     /* Resize if necessary (behavior of std:vector) */
     if (n > _size) {
       this->resize(n);
     }
-    auto vals = Kokkos::subview(_values, std::make_pair(0, n));
+    auto vals = Kokkos::subview(_values, std::make_pair((size_t)0, n));
     Kokkos::fill_random(vals, rand_pool, range_low, range_high);
   }
 
   // Element access
   MORPHEUS_FORCEINLINE_FUNCTION value_array_reference
-  operator()(index_type i) const {
+  operator()(const size_t i) const {
     return _values(i);
   }
 
   MORPHEUS_FORCEINLINE_FUNCTION value_array_reference
-  operator[](index_type i) const {
+  operator[](const size_t i) const {
     return _values(i);
   }
 
-  inline index_type size() const { return _size; }
+  /**
+   * @brief Returns the size of the container
+   *
+   * @return Integer representing the size of the container
+   */
+  inline size_t size() const { return _size; }
 
+  /**
+   * @brief Returns a pointer to the data at the beginning of the container
+   *
+   * @return Pointer type of the value_type data
+   */
   inline value_array_pointer data() const { return _values.data(); }
+
+  /**
+   * @brief Returns a reference to the beginning of the view that holds the data
+   *
+   * @return Type of view that holds the data
+   */
   inline value_array_type& view() { return _values; }
+
+  /**
+   * @brief Returns a constant reference to the beginning of the view that holds
+   * the data
+   *
+   * @return Constant type of view that holds the data
+   */
   inline const value_array_type& const_view() const { return _values; }
 
-  // Modifiers
-  inline void resize(index_type n) {
+  /**
+   * @brief Resizes DenseVector with size of \p n and sets values to zero.
+   *
+   * @param n New size of the container
+   */
+  inline void resize(const size_t n) {
     Kokkos::resize(_values, size_t(n));
     _size = n;
   }
 
-  inline void resize(const index_type n, const index_type val) {
+  /**
+   * @brief Resizes DenseVector with size of \p n and sets values to \p val.
+   * Note that compared to \p assign() member function, resize operation always
+   * changes the size of the container.
+   *
+   * @param n New size of the container
+   */
+  inline void resize(const size_t n, const value_type val) {
+    resize(n);
     assign(n, val);
   }
 
  private:
-  index_type _size;
+  size_t _size;
   value_array_type _values;
 
   struct set_functor {
@@ -285,7 +321,7 @@ class DenseVector
         : _data(data), _val(val) {}
 
     KOKKOS_INLINE_FUNCTION
-    void operator()(const index_type& i) const { _data(i) = _val; }
+    void operator()(const size_t& i) const { _data(i) = _val; }
   };
 };
 

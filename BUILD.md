@@ -29,9 +29,9 @@ There are also option Third-party Libraries (TPLs)
 cmake ${srcdir} \
  -DCMAKE_CXX_COMPILER=g++ \
  -DCMAKE_INSTALL_PREFIX=${my_install_folder} \
- -DMorpheus_ENABLE_TPL_BLAS=ON
+ -DMorpheus_ENABLE_TPL_CUBLAS=ON
 ```
-which, e.g. activates the BLAS dependency. The full keyword listing is below.
+which, e.g. activates the CUBLAS dependency. The full keyword listing is below.
 
 ## Morpheus CMake Option Listing
 <!-- TODO -->
@@ -213,6 +213,9 @@ The following options control `find_package` paths for CMake-based TPLs:
 * Morpheus_CUBLAS_ROOT: PATH
     * Location of CUBLAS install root.
     * Default: None or the value of the environment variable CUBLAS_ROOT if set
+* GTest_ROOT: PATH
+    * Location of GoogleTest install root.
+    * Default: None or the value of the environment variable GTest_ROOT if set
 * CUBLAS_LIBRARIES: STRING
     * Optional override for the libraries that comprise TPL CUBLAS.
     * Default: None. Default common library names will be searched

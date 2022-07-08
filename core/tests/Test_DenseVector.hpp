@@ -95,11 +95,10 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
   // DenseVector(index_type n, value_type val = 0)
   using Vector     = typename TestFixture::DenseVector;
   using HostVector = typename TestFixture::HostMirror;
-  using index_type = typename Vector::index_type;
   using value_type = typename Vector::value_type;
 
-  index_type size = 100;
-  value_type val  = 0;
+  auto size      = 100;
+  value_type val = 0;
 
   Vector x(size);
   HostVector xh(size);
@@ -109,7 +108,7 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
 
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < x.size(); i++) {
+  for (size_t i = 0; i < x.size(); i++) {
     EXPECT_EQ(xh.data()[i], val);
   }
 }
@@ -123,11 +122,10 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
   // DenseVector(index_type n, value_type val)
   using Vector     = typename TestFixture::DenseVector;
   using HostVector = typename TestFixture::HostMirror;
-  using index_type = typename Vector::index_type;
   using value_type = typename Vector::value_type;
 
-  index_type size = 100;
-  value_type val  = 15;
+  auto size      = 100;
+  value_type val = 15;
 
   Vector x(size, val);
   HostVector xh(size, val);
@@ -137,7 +135,7 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
 
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < x.size(); i++) {
+  for (size_t i = 0; i < x.size(); i++) {
     EXPECT_EQ(xh.data()[i], val);
   }
 }
@@ -184,10 +182,9 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
 TYPED_TEST(DenseVectorUnaryTest, RandomConstruction) {
   using Vector     = typename TestFixture::DenseVector;
   using HostVector = typename TestFixture::HostMirror;
-  using index_type = typename Vector::index_type;
   using value_type = typename Vector::value_type;
 
-  index_type size      = 10000;
+  auto size            = 10000;
   value_type low_bound = -5.0, high_bound = 25.0;
   unsigned long long seed = 5374857;
   Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
@@ -200,7 +197,7 @@ TYPED_TEST(DenseVectorUnaryTest, RandomConstruction) {
 
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < xh.size(); i++) {
+  for (size_t i = 0; i < xh.size(); i++) {
     EXPECT_NE(xh[i], 0.0);
     EXPECT_GT(xh[i], low_bound);
     EXPECT_LT(xh[i], high_bound);
@@ -224,9 +221,8 @@ TYPED_TEST(DenseVectorUnaryTest, RandomConstruction) {
 TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   using Vector     = typename TestFixture::DenseVector;
   using HostVector = typename TestFixture::HostMirror;
-  using index_type = typename Vector::index_type;
 
-  index_type size = 10000;
+  auto size = 10000;
 
   Vector x(size, 0);
   HostVector xh(size, 0);
@@ -239,10 +235,10 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < 100; i++) {
+  for (size_t i = 0; i < 100; i++) {
     EXPECT_EQ(xh[i], 35.0);
   }
-  for (index_type i = 100; i < xh.size(); i++) {
+  for (size_t i = 100; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -250,10 +246,10 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < 1000; i++) {
+  for (size_t i = 0; i < 1000; i++) {
     EXPECT_EQ(xh[i], 20.0);
   }
-  for (index_type i = 1000; i < xh.size(); i++) {
+  for (size_t i = 1000; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -261,13 +257,13 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < 80; i++) {
+  for (size_t i = 0; i < 80; i++) {
     EXPECT_EQ(xh[i], -30.0);
   }
-  for (index_type i = 80; i < 1000; i++) {
+  for (size_t i = 80; i < 1000; i++) {
     EXPECT_EQ(xh[i], 20.0);
   }
-  for (index_type i = 1000; i < xh.size(); i++) {
+  for (size_t i = 1000; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -275,7 +271,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < xh.size(); i++) {
+  for (size_t i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], -1.0);
   }
 }
@@ -283,9 +279,8 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
 TYPED_TEST(DenseVectorUnaryTest, AssignResize) {
   using Vector     = typename TestFixture::DenseVector;
   using HostVector = typename TestFixture::HostMirror;
-  using index_type = typename Vector::index_type;
 
-  index_type size = 10000;
+  auto size = 10000;
   Vector x(size, 0);
 
   // x should resize now that the size we are assigning is larger that `size`
@@ -296,7 +291,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignResize) {
   EXPECT_EQ(xh.size(), x.size());
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < xh.size(); i++) {
+  for (size_t i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 10.0);
   }
 }
@@ -304,9 +299,8 @@ TYPED_TEST(DenseVectorUnaryTest, AssignResize) {
 TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   using Vector     = typename TestFixture::DenseVector;
   using HostVector = typename TestFixture::HostMirror;
-  using index_type = typename Vector::index_type;
 
-  index_type size         = 10000;
+  auto size               = 10000;
   unsigned long long seed = 5374857;
   Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
 
@@ -321,11 +315,11 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < 100; i++) {
+  for (size_t i = 0; i < 100; i++) {
     EXPECT_GT(xh[i], 10);
     EXPECT_LT(xh[i], 30);
   }
-  for (index_type i = 100; i < xh.size(); i++) {
+  for (size_t i = 100; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -334,11 +328,11 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < 1000; i++) {
+  for (size_t i = 0; i < 1000; i++) {
     EXPECT_GT(xh[i], 40);
     EXPECT_LT(xh[i], 50);
   }
-  for (index_type i = 1000; i < xh.size(); i++) {
+  for (size_t i = 1000; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -346,15 +340,15 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < 80; i++) {
+  for (size_t i = 0; i < 80; i++) {
     EXPECT_GT(xh[i], -4);
     EXPECT_LT(xh[i], 5);
   }
-  for (index_type i = 80; i < 1000; i++) {
+  for (size_t i = 80; i < 1000; i++) {
     EXPECT_GT(xh[i], 40);
     EXPECT_LT(xh[i], 50);
   }
-  for (index_type i = 1000; i < xh.size(); i++) {
+  for (size_t i = 1000; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -362,7 +356,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < xh.size(); i++) {
+  for (size_t i = 0; i < xh.size(); i++) {
     EXPECT_GT(xh[i], 60);
     EXPECT_LT(xh[i], 70);
   }
@@ -371,10 +365,8 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
 TYPED_TEST(DenseVectorUnaryTest, AssignRandomResize) {
   using Vector     = typename TestFixture::DenseVector;
   using HostVector = typename TestFixture::HostMirror;
-  using index_type = typename Vector::index_type;
 
-  index_type size         = 10000;
-  unsigned long long seed = 5374857;
+  auto size = 10000, seed = 5374857;
   Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
   Vector x(size, 0);
 
@@ -386,21 +378,99 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomResize) {
   EXPECT_EQ(xh.size(), x.size());
   Morpheus::copy(x, xh);
 
-  for (index_type i = 0; i < xh.size(); i++) {
+  for (size_t i = 0; i < xh.size(); i++) {
     EXPECT_GT(xh[i], 30);
     EXPECT_LT(xh[i], 40);
   }
 }
 
-// TYPED_TEST(DenseVectorUnaryTest, Resize) {
-//   // resize(index_type n)
-//   // resize(const index_type n, const index_type val)
-//   // TODO: Change n to size_t
-// }
+TYPED_TEST(DenseVectorUnaryTest, Resize) {
+  using Vector     = typename TestFixture::DenseVector;
+  using HostVector = typename TestFixture::HostMirror;
+  using value_type = typename Vector::value_type;
+
+  auto original_size            = 1000;
+  const value_type original_val = 10;
+
+  Vector x(original_size, original_val);
+  HostVector xh(original_size, 0);
+  EXPECT_EQ(x.size(), original_size);
+  EXPECT_EQ(xh.size(), original_size);
+
+  size_t smaller_size = 100;
+  x.resize(smaller_size);
+  EXPECT_EQ(x.size(), smaller_size);
+
+  xh.resize(smaller_size);
+  EXPECT_EQ(xh.size(), smaller_size);
+
+  Morpheus::copy(x, xh);
+
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_EQ(xh[i], original_val);
+  }
+
+  auto larger_size = 10000;
+
+  x.resize(larger_size);
+  EXPECT_EQ(x.size(), larger_size);
+  xh.resize(larger_size);
+  EXPECT_EQ(xh.size(), larger_size);
+
+  Morpheus::copy(x, xh);
+  // Values from smaller_size onwards should be set to zero
+  for (size_t i = 0; i < smaller_size; i++) {
+    EXPECT_EQ(xh[i], original_val);
+  }
+  for (size_t i = smaller_size; i < xh.size(); i++) {
+    EXPECT_EQ(xh[i], 0.0);
+  }
+}
+
+TYPED_TEST(DenseVectorUnaryTest, ResizeVal) {
+  using Vector     = typename TestFixture::DenseVector;
+  using HostVector = typename TestFixture::HostMirror;
+  using value_type = typename Vector::value_type;
+
+  auto original_size            = 1000;
+  const value_type original_val = 10;
+
+  Vector x(original_size, original_val);
+  HostVector xh(original_size, 0);
+  EXPECT_EQ(x.size(), original_size);
+  EXPECT_EQ(xh.size(), original_size);
+
+  auto smaller_size            = 100;
+  const value_type smaller_val = 2;
+
+  x.resize(smaller_size, smaller_val);
+  EXPECT_EQ(x.size(), smaller_size);
+
+  xh.resize(smaller_size, 0);
+  EXPECT_EQ(xh.size(), smaller_size);
+
+  Morpheus::copy(x, xh);
+
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_EQ(xh[i], smaller_val);
+  }
+
+  auto larger_size            = 10000;
+  const value_type larger_val = 33;
+
+  x.resize(larger_size, larger_val);
+  EXPECT_EQ(x.size(), larger_size);
+  xh.resize(larger_size, 0);
+  EXPECT_EQ(xh.size(), larger_size);
+
+  Morpheus::copy(x, xh);
+  // Values from smaller_size onwards should be set to zero
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_EQ(xh[i], larger_val);
+  }
+}
 
 // TYPED_TEST(DenseVectorUnaryTest, UtilRoutines) {
-//   // size()
-//   // data()
 //   // view()
 //   // const_view()
 //   // name()
