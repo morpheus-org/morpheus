@@ -43,7 +43,7 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
 
   template <typename Matrix>
   MatrixBase(const Matrix& m,
-             typename std::enable_if<is_matrix_v<Matrix>>::type* = 0)
+             typename std::enable_if<is_matrix_container_v<Matrix>>::type* = 0)
       : _m(m.nrows()), _n(m.ncols()), _nnz(m.nnnz()) {}
 
   MatrixBase(index_type rows, index_type cols, index_type entries = 0)

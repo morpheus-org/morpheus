@@ -191,13 +191,6 @@ class ContainersTest : public ::testing::Test {
 
   using DynamicMatrix = typename ContainerImplementations::DynamicMatrix;
 
-  // You can define per-test set-up logic as usual.
-  void SetUp() override { x.assign(5, 11); }
-
-  // You can define per-test tear-down logic as usual.
-  void TearDown() override {}
-
-  DenseVector x;
 };
 
 #endif  // MORPHEUS_CORE_TESTS_CONTAINER_DEFINITION_UTILS_HPP

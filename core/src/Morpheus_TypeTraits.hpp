@@ -28,10 +28,11 @@
 #include <fwd/Morpheus_Fwd_MatrixBase.hpp>
 #include <fwd/Morpheus_Fwd_DenseMatrix.hpp>
 
+#include <impl/Morpheus_Variant.hpp>
+
 #include <Kokkos_Core.hpp>
 
 #include <type_traits>
-#include <variant>
 
 namespace Morpheus {
 // forward decl
@@ -45,70 +46,230 @@ struct is_kokkos_space_helper : std::false_type {};
 template <typename Space>
 struct is_kokkos_space_helper<KokkosSpace<Space>> : std::true_type {};
 
-}  // namespace Impl
-
-template <typename T, typename Variant>
+template <typename T, typename VariantContainer>
 struct is_variant_member;
 
 template <typename T, typename... Ts>
-struct is_variant_member<T, std::variant<Ts...>>
+struct is_variant_member<T, Variant::variant<Ts...>>
     : public std::disjunction<std::is_same<T, Ts>...> {};
 
+}  // namespace Impl
+
+/**
+ * @brief SFINAE Test to determine if the given type \p T is a member of \p
+ * Variant
+ *
+ * @tparam T Type passed to check if is a member of the variant
+ * @tparam Variant A variant container such as \p std::variant or
+ * \p mpark::variant
+ */
 template <typename T, typename Variant>
 inline constexpr bool is_variant_member_v =
-    is_variant_member<T, Variant>::value;
+    Impl::is_variant_member<T, Variant>::value;
 
-template <typename Tag>
-struct is_matrix
-    : std::integral_constant<bool,
-                             std::is_base_of<Impl::MatrixTag, Tag>::value> {};
+/**
+ * @brief SFINAE Test to determine if the given type \p T has \p tag as a member
+ * trait
+ *
+ * @tparam T Type passed to check if has \p tag as member trait
+ */
+template <class T>
+class has_tag_trait {
+  typedef char yes[1];
+  typedef char no[2];
 
-template <typename Tag>
-inline constexpr bool is_matrix_v = is_matrix<Tag>::value;
+  template <class U>
+  static yes& test(typename U::tag*);
 
-template <typename Tag>
-struct is_container
-    : std::integral_constant<bool,
-                             std::is_base_of<Impl::MatrixTag, Tag>::value ||
-                                 std::is_base_of<Impl::VectorTag, Tag>::value> {
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
 };
 
-template <typename Tag>
-struct is_sparse_matrix
-    : std::integral_constant<bool,
-                             std::is_base_of<Impl::SparseMatTag, Tag>::value> {
+/**
+ * @brief SFINAE Test to determine if the given type \p T is a valid Matrix
+ * Container.
+ *
+ * @tparam T Type passed to check if is a valid Matrix Container.
+ */
+template <class T>
+class is_matrix_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      typename U::tag*,
+      typename std::enable_if<
+          std::is_base_of<Impl::MatrixTag, typename U::tag>::value>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
 };
 
-template <template <class T, class... P> class Container, class T, class... P>
-struct is_sparse_matrix_class
-    : std::integral_constant<
-          bool, std::is_base_of<Impl::MatrixBase<Container, T, P...>,
-                                Container<T, P...>>::value> {};
+/**
+ * @brief Short-hand to \p is_matrix_container SFINAE Test to check if the type
+ * \p T is a valid Matrix Container.
+ *
+ * @tparam T Type passed to check if is a valid Matrix Container.
+ */
+template <typename T>
+inline constexpr bool is_matrix_container_v = is_matrix_container<T>::value;
 
-template <template <class T, class... P> class Container, class T, class... P>
-struct is_dense_matrix_container
-    : std::integral_constant<
-          bool, std::is_same<DenseMatrix<T, P...>, Container<T, P...>>::value> {
+/**
+ * @brief SFINAE Test to determine if the given type \p T is a valid Sparse
+ * Matrix Container.
+ *
+ * @tparam T Type passed to check if is a valid Sparse Matrix Container.
+ */
+template <class T>
+class is_sparse_matrix_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      typename U::tag*,
+      typename std::enable_if<
+          std::is_base_of<Impl::SparseMatTag, typename U::tag>::value>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
 };
 
-template <typename Tag>
-inline constexpr bool is_sparse_matrix_v = is_sparse_matrix<Tag>::value;
+/**
+ * @brief Short-hand to \p is_sparse_matrix_container SFINAE Test to check if
+ * the type \p T is a valid Sparse Matrix Container.
+ *
+ * @tparam T Type passed to check if is a valid Sparse Matrix Container.
+ */
+template <typename T>
+inline constexpr bool is_sparse_matrix_container_v =
+    is_sparse_matrix_container<T>::value;
 
-template <typename Tag>
-struct is_dense_matrix
-    : std::integral_constant<bool,
-                             std::is_base_of<Impl::DenseMatTag, Tag>::value> {};
+/**
+ * @brief SFINAE Test to determine if the given type \p T is a valid Dense
+ * Matrix Container.
+ *
+ * @tparam T Type passed to check if is a valid Dense Matrix Container.
+ */
+template <class T>
+class is_dense_matrix_container {
+  typedef char yes[1];
+  typedef char no[2];
 
-template <typename Tag>
-inline constexpr bool is_dense_matrix_v = is_dense_matrix<Tag>::value;
+  template <class U>
+  static yes& test(
+      typename U::tag*,
+      typename std::enable_if<
+          std::is_base_of<Impl::DenseMatTag, typename U::tag>::value>::type* =
+          nullptr);
 
-template <typename Tag>
-struct is_vector
-    : std::integral_constant<bool,
-                             std::is_base_of<Impl::VectorTag, Tag>::value> {};
+  template <class U>
+  static no& test(...);
 
-template <typename Tag>
-inline constexpr bool is_vector_v = is_vector<Tag>::value;
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_dense_matrix_container SFINAE Test to check if
+ * the type \p T is a valid Dense Matrix Container.
+ *
+ * @tparam T Type passed to check if is a valid Dense Matrix Container.
+ */
+template <typename T>
+inline constexpr bool is_dense_matrix_container_v =
+    is_dense_matrix_container<T>::value;
+
+// template <template <class T, class... P> class Container, class T, class...
+// P> struct is_sparse_matrix_class
+//     : std::integral_constant<
+//           bool, std::is_base_of<Impl::MatrixBase<Container, T, P...>,
+//                                 Container<T, P...>>::value> {};
+
+// template <template <class T, class... P> class Container, class T, class...
+// P> struct is_dense_matrix_container
+//     : std::integral_constant<
+//           bool, std::is_same<DenseMatrix<T, P...>, Container<T,
+//           P...>>::value> {
+// };
+
+/**
+ * @brief SFINAE Test to determine if the given type \p T is a valid Vector
+ * Container.
+ *
+ * @tparam T Type passed to check if is a valid Vector Container.
+ */
+template <class T>
+class is_vector_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      typename U::tag*,
+      typename std::enable_if<
+          std::is_base_of<Impl::VectorTag, typename U::tag>::value>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_vector_container SFINAE Test to check if the type
+ * \p T is a valid Vector Container.
+ *
+ * @tparam T Type passed to check if is a valid Vector Container.
+ */
+template <typename T>
+inline constexpr bool is_vector_container_v = is_vector_container<T>::value;
+
+/**
+ * @brief SFINAE Test to determine if the given type \p T is a valid Container.
+ *
+ * @tparam T Type passed to check if is a valid Vector Container.
+ */
+template <class T>
+class is_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      typename U::tag*,
+      typename std::enable_if<is_matrix_container_v<U> ||
+                              is_vector_container_v<U>>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_vector_container SFINAE Test to check if the type
+ * \p T is a valid Container.
+ *
+ * @tparam T Type passed to check if is a valid Container.
+ */
+template <typename T>
+inline constexpr bool is_container_v = is_container<T>::value;
 
 template <typename T1, typename T2>
 struct is_same_format

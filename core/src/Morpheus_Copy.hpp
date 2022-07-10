@@ -41,8 +41,8 @@ void copy(const SourceType& src, DestinationType& dst,
           const typename SourceType::index_type src_end,
           const typename DestinationType::index_type dst_begin,
           const typename DestinationType::index_type dst_end) {
-  static_assert(is_vector_v<typename SourceType::tag> &&
-                    is_vector_v<typename DestinationType::tag>,
+  static_assert(is_vector_container_v<SourceType> &&
+                    is_vector_container_v<DestinationType>,
                 "Both src and dst must be vectors.");
   MORPHEUS_ASSERT((src_end - src_begin) == (dst_end - dst_begin),
                   "Source slice range ("
