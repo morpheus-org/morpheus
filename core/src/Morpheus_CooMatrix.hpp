@@ -143,7 +143,7 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   template <class VR, class... PR>
   CooMatrix(
       const DynamicMatrix<VR, PR...> &src,
-      typename std::enable_if<is_compatible_container<
+      typename std::enable_if<is_dynamically_compatible<
           CooMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type * =
           nullptr)
       : base(src.nrows(), src.ncols(), src.nnnz()) {
@@ -157,8 +157,8 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   // Throws when active type of dynamic matrix not same to concrete type
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_container<CooMatrix,
-                              typename DynamicMatrix<VR, PR...>::type>::value,
+      is_dynamically_compatible<CooMatrix,
+                                typename DynamicMatrix<VR, PR...>::type>::value,
       CooMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
     auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,

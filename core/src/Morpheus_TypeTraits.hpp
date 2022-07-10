@@ -56,6 +56,36 @@ struct is_variant_member<T, Variant::variant<Ts...>>
 }  // namespace Impl
 
 /**
+ * \addtogroup utilities Utilities
+ * \par Overview
+ * TODO
+ *
+ */
+
+/**
+ * \addtogroup typetraits Type Traits
+ * \brief Various tools for examining the different types available and
+ * relationships between them during compile-time.
+ * \ingroup utilities
+ * \{
+ *
+ */
+
+template <typename T>
+struct IndexType {
+  static_assert(std::is_integral<T>::value, "T needs to be an integral type!");
+  using index_type = T;
+  using type       = IndexType;
+};
+
+template <typename T>
+struct ValueType {
+  static_assert(std::is_scalar<T>::value, "T needs to be a scalar type!");
+  using value_type = T;
+  using type       = ValueType;
+};
+
+/**
  * @brief SFINAE Test to determine if the given type \p T is a member of \p
  * Variant
  *
@@ -192,18 +222,38 @@ template <typename T>
 inline constexpr bool is_dense_matrix_container_v =
     is_dense_matrix_container<T>::value;
 
-// template <template <class T, class... P> class Container, class T, class...
-// P> struct is_sparse_matrix_class
-//     : std::integral_constant<
-//           bool, std::is_base_of<Impl::MatrixBase<Container, T, P...>,
-//                                 Container<T, P...>>::value> {};
+/**
+ * @brief SFINAE Test to determine if the given type \p T is a valid Dynamic
+ * Matrix Container.
+ *
+ * @tparam T Type passed to check if is a valid Dynamic Matrix Container.
+ */
+template <class T>
+class is_dynamic_matrix_container {
+  typedef char yes[1];
+  typedef char no[2];
 
-// template <template <class T, class... P> class Container, class T, class...
-// P> struct is_dense_matrix_container
-//     : std::integral_constant<
-//           bool, std::is_same<DenseMatrix<T, P...>, Container<T,
-//           P...>>::value> {
-// };
+  template <class U>
+  static yes& test(typename U::tag*,
+                   typename std::enable_if<std::is_base_of<
+                       DynamicTag, typename U::tag>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_dynamic_matrix_container SFINAE Test to check if
+ * the type \p T is a valid Dynamic Matrix Container.
+ *
+ * @tparam T Type passed to check if is a valid Dynamic Matrix Container.
+ */
+template <typename T>
+inline constexpr bool is_dynamic_matrix_container_v =
+    is_dynamic_matrix_container<T>::value;
 
 /**
  * @brief SFINAE Test to determine if the given type \p T is a valid Vector
@@ -234,7 +284,7 @@ class is_vector_container {
  * @brief Short-hand to \p is_vector_container SFINAE Test to check if the type
  * \p T is a valid Vector Container.
  *
- * @tparam T Type passed to check if is a valid Vector Container.
+ * @tparam T Type passed to check if is a valid Container.
  */
 template <typename T>
 inline constexpr bool is_vector_container_v = is_vector_container<T>::value;
@@ -242,7 +292,7 @@ inline constexpr bool is_vector_container_v = is_vector_container<T>::value;
 /**
  * @brief SFINAE Test to determine if the given type \p T is a valid Container.
  *
- * @tparam T Type passed to check if is a valid Vector Container.
+ * @tparam T Type passed to check if is a valid Container.
  */
 template <class T>
 class is_container {
@@ -263,7 +313,7 @@ class is_container {
 };
 
 /**
- * @brief Short-hand to \p is_vector_container SFINAE Test to check if the type
+ * @brief Short-hand to \p is_container SFINAE Test to check if the type
  * \p T is a valid Container.
  *
  * @tparam T Type passed to check if is a valid Container.
@@ -271,21 +321,267 @@ class is_container {
 template <typename T>
 inline constexpr bool is_container_v = is_container<T>::value;
 
-template <typename T1, typename T2>
-struct is_same_format
-    : std::integral_constant<
-          bool, std::is_same<typename T1::tag, typename T2::tag>::value> {};
+/**
+ * @brief SFINAE Test to determine if the given type \p T1 is the same format as
+ * type \p T2 - Two containers have the same format if they hold the same tag.
+ *
+ * @tparam T1 Type passed to check if has the same format as \p T2
+ * @tparam T2 Reference type against which we compare.
+ */
+template <class T1, class T2>
+class is_same_format {
+  typedef char yes[1];
+  typedef char no[2];
 
-template <typename T1, typename T2>
-struct is_compatible_container
-    : std::integral_constant<bool,
-                             std::is_same<typename T1::memory_space,
-                                          typename T2::memory_space>::value &&
-                                 std::is_same<typename T1::value_type,
-                                              typename T2::value_type>::value &&
-                                 std::is_same<typename T1::index_type,
-                                              typename T2::index_type>::value> {
+  template <class U1, class U2>
+  static yes& test(
+      typename U1::tag*, typename U2::tag*,
+      typename std::enable_if<
+          is_container_v<U1> && is_container_v<U2> &&
+          std::is_same<typename U1::tag, typename U2::tag>::value>::type* =
+          nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
 };
+
+/**
+ * @brief Short-hand to \p is_same_format SFINAE Test to check if the given type
+ * \p T1 is the same format as type \p T2.
+ *
+ * @tparam T1 Type passed to check if has the same format as \p T2
+ * @tparam T2 Reference type against which we compare.
+ */
+template <typename T1, typename T2>
+inline constexpr bool is_same_format_v = is_same_format<T1, T2>::value;
+
+/**
+ * @brief SFINAE Test to determine if the two types are in the same memory space
+ *
+ * @tparam T1 Type passed to check if is in the same memory space as \p T2
+ * @tparam T2 Type passed to check if is in the same memory space as \p T1
+ */
+template <class T1, class T2>
+class in_same_memory_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(
+      typename U1::memory_space*, typename U2::memory_space*,
+      typename std::enable_if<std::is_same<
+          typename U1::memory_space, typename U2::memory_space>::value>::type* =
+          nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p in_same_memory_space SFINAE Test to check if the
+ * given types are in the same memory space.
+ *
+ * @tparam T1 Type passed to check if is in the same memory space as \p T2
+ * @tparam T2 Type passed to check if is in the same memory space as \p T1
+ */
+template <typename T1, typename T2>
+inline constexpr bool in_same_memory_space_v =
+    in_same_memory_space<T1, T2>::value;
+
+/**
+ * @brief SFINAE Test to determine if the two types have the same layout
+ *
+ * @tparam T1 Type passed to check if has the same layout as \p T2
+ * @tparam T2 Type passed to check if has the same layout as \p T1
+ */
+template <class T1, class T2>
+class have_same_layout {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(
+      typename U1::array_layout*, typename U2::array_layout*,
+      typename std::enable_if<std::is_same<
+          typename U1::array_layout, typename U2::array_layout>::value>::type* =
+          nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p have_same_layout SFINAE Test to check if the
+ * given types have the same layout.
+ *
+ * @tparam T1 Type passed to check if has the same layout as \p T2
+ * @tparam T2 Type passed to check if has the same layout as \p T1
+ */
+template <typename T1, typename T2>
+inline constexpr bool have_same_layout_v = have_same_layout<T1, T2>::value;
+
+/**
+ * @brief SFINAE Test to determine if the two types hold the same value type
+ *
+ * @tparam T1 Type passed to check if holds the same value type as \p T2
+ * @tparam T2 Type passed to check if holds the same value type as \p T1
+ */
+template <class T1, class T2>
+class have_same_value_type {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(
+      typename U1::value_type*, typename U2::value_type*,
+      typename std::enable_if<std::is_same<
+          typename U1::value_type, typename U2::value_type>::value>::type* =
+          nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p have_same_value_type SFINAE Test to check if the
+ * given types hold the same value type.
+ *
+ * @tparam T1 Type passed to check if holds the same value type as \p T2
+ * @tparam T2 Type passed to check if holds the same value type as \p T1
+ */
+template <typename T1, typename T2>
+inline constexpr bool have_same_value_type_v =
+    have_same_value_type<T1, T2>::value;
+
+/**
+ * @brief SFINAE Test to determine if the two types hold the same index type
+ *
+ * @tparam T1 Type passed to check if holds the same index type as \p T2
+ * @tparam T2 Type passed to check if holds the same index type as \p T1
+ */
+template <class T1, class T2>
+class have_same_index_type {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(
+      typename U1::index_type*, typename U2::index_type*,
+      typename std::enable_if<std::is_same<
+          typename U1::index_type, typename U2::index_type>::value>::type* =
+          nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p have_same_index_type SFINAE Test to check if the
+ * given types hold the same index type.
+ *
+ * @tparam T1 Type passed to check if holds the same index type as \p T2
+ * @tparam T2 Type passed to check if holds the same index type as \p T1
+ */
+template <typename T1, typename T2>
+inline constexpr bool have_same_index_type_v =
+    have_same_index_type<T1, T2>::value;
+
+/**
+ * @brief SFINAE to determine if the two types are compatible i.e in the same
+ * memory space, holding the same type of value and indices and with the same
+ * memory layout.
+ *
+ * @tparam T1 First container to compare
+ * @tparam T2 Second container to compare
+ */
+template <class T1, class T2>
+class is_compatible {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(
+      typename U1::tag*, typename U2::tag*,
+      typename std::enable_if<in_same_memory_space_v<U1, U2> &&
+                              have_same_layout_v<U1, U2> &&
+                              have_same_value_type_v<U1, U2> &&
+                              have_same_index_type_v<U1, U2>>::type* = nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_compatible SFINAE Test to check if the
+ * given types are compatible types.
+ *
+ * @tparam T1 First container to compare
+ * @tparam T2 Second container to compare
+ */
+template <typename T1, typename T2>
+inline constexpr bool is_compatible_v = is_compatible<T1, T2>::value;
+
+/**
+ * @brief SFINAE to determine if the two types are dynamically compatible i.e
+ * compatible and at least one of them is a dynamic container.
+ *
+ * @tparam T1 First container to compare
+ * @tparam T2 Second container to compare
+ */
+template <class T1, class T2>
+class is_dynamically_compatible {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(
+      typename U1::tag*, typename U2::tag*,
+      typename std::enable_if<(is_dynamic_matrix_container<U1>::value ||
+                               is_dynamic_matrix_container<U2>::value) &&
+                              is_compatible_v<U1, U2>>::type* = nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_dynamically_compatible SFINAE Test to check if the
+ * given types are dynamically compatible types.
+ *
+ * @tparam T1 First container to compare
+ * @tparam T2 Second container to compare
+ */
+template <typename T1, typename T2>
+inline constexpr bool is_dynamically_compatible_v =
+    is_dynamically_compatible<T1, T2>::value;
 
 template <typename T1, typename T2>
 struct is_compatible_type
@@ -395,7 +691,8 @@ using is_kokkos_space = typename Impl::is_kokkos_space_helper<
 
 template <class T>
 inline constexpr bool is_kokkos_space_v = is_kokkos_space<T>::value;
-
+/*! \}
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_TYPETRAITS_HPP

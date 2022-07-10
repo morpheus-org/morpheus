@@ -164,7 +164,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   template <class VR, class... PR>
   DiaMatrix(
       const DynamicMatrix<VR, PR...> &src,
-      typename std::enable_if<is_compatible_container<
+      typename std::enable_if<is_dynamically_compatible<
           DiaMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type * =
           nullptr)
       : base(src.nrows(), src.ncols(), src.nnnz()) {
@@ -178,8 +178,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   // Throws when active type of dynamic matrix not same to concrete type
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_container<DiaMatrix,
-                              typename DynamicMatrix<VR, PR...>::type>::value,
+      is_dynamically_compatible<DiaMatrix,
+                                typename DynamicMatrix<VR, PR...>::type>::value,
       DiaMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
     auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,

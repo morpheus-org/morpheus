@@ -142,7 +142,7 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   template <class VR, class... PR>
   CsrMatrix(
       const DynamicMatrix<VR, PR...> &src,
-      typename std::enable_if<is_compatible_container<
+      typename std::enable_if<is_dynamically_compatible<
           CsrMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type * =
           nullptr)
       : base(src.nrows(), src.ncols(), src.nnnz()) {
@@ -156,8 +156,8 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   // Throws when active type of dynamic matrix not same to concrete type
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_container<CsrMatrix,
-                              typename DynamicMatrix<VR, PR...>::type>::value,
+      is_dynamically_compatible<CsrMatrix,
+                                typename DynamicMatrix<VR, PR...>::type>::value,
       CsrMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
     auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
