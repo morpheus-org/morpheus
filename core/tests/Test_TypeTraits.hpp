@@ -727,57 +727,54 @@ TEST(TypeTraitsTest, IsSameFormat) {
   EXPECT_EQ(res, 0);
 }
 
-/**
- * @brief The \p is_memory_space checks if the type is a memory space i.e has as
- * a \p memory_space member trait it self.
- *
- */
-TEST(TypeTraitsTest, IsMemorySpace) {
-  // A structure like this meets the requirements of a valid memory space i.e
-  // has a memory_space trait that is the same as it's name
-  struct ValidTestSpace {
-    using memory_space = ValidTestSpace;
-  };
+// /**
+//  * @brief The \p is_memory_space checks if the type is a memory space i.e has
+//  as
+//  * a \p memory_space member trait it self.
+//  *
+//  */
+// TEST(TypeTraitsTest, IsMemorySpace) {
+//   // A structure like this meets the requirements of a valid memory space i.e
+//   // has a memory_space trait that is the same as it's name
+//   struct ValidTestSpace {
+//     using memory_space = ValidTestSpace;
+//   };
 
-  struct InvalidTestSpace {
-    using memory_space = int;
-  };
+//   struct InvalidTestSpace {
+//     using memory_space = int;
+//   };
 
-  bool res = Morpheus::is_memory_space<ValidTestSpace>::value;
-  EXPECT_EQ(res, 1);
+//   bool res = Morpheus::is_memory_space<ValidTestSpace>::value;
+//   EXPECT_EQ(res, 1);
 
-  // Kokkos Memory Space
-  res = Morpheus::is_memory_space<Kokkos::HostSpace>::value;
-  EXPECT_EQ(res, 1);
+//   // Kokkos Memory Space
+//   res = Morpheus::is_memory_space<Kokkos::HostSpace>::value;
+//   EXPECT_EQ(res, 1);
 
-  // Kokkos Execution Space
-  res = Morpheus::is_memory_space<TEST_EXECSPACE>::value;
-  EXPECT_EQ(res, 0);
+//   // Kokkos Execution Space
+//   res = Morpheus::is_memory_space<TEST_EXECSPACE>::value;
+//   EXPECT_EQ(res, 0);
 
-  res = Morpheus::is_memory_space<InvalidTestSpace>::value;
-  EXPECT_EQ(res, 0);
+//   res = Morpheus::is_memory_space<InvalidTestSpace>::value;
+//   EXPECT_EQ(res, 0);
 
-  res = Morpheus::is_memory_space_v<ValidTestSpace>;
-  EXPECT_EQ(res, 1);
+//   res = Morpheus::is_memory_space_v<ValidTestSpace>;
+//   EXPECT_EQ(res, 1);
 
-  // Kokkos Memory Space
-  res = Morpheus::is_memory_space_v<Kokkos::HostSpace>;
-  EXPECT_EQ(res, 1);
+//   // Kokkos Memory Space
+//   res = Morpheus::is_memory_space_v<Kokkos::HostSpace>;
+//   EXPECT_EQ(res, 1);
 
-  // Kokkos Execution Space
-  res = Morpheus::is_memory_space_v<TEST_EXECSPACE>;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::is_memory_space_v<InvalidTestSpace>;
-  EXPECT_EQ(res, 0);
-}
+//   res = Morpheus::is_memory_space_v<InvalidTestSpace>;
+//   EXPECT_EQ(res, 0);
+// }
 
 /**
- * @brief The \p is_supported_memory_space checks if the type has a valid and
+ * @brief The \p is_memory_space checks if the type has a valid and
  * supported memory space.
  *
  */
-TEST(TypeTraitsTest, IsSupportedMemorySpace) {
+TEST(TypeTraitsTest, IsMemorySpace) {
   // A structure like this meets the requirements of a valid memory space i.e
   // has a memory_space trait that is the same as it's name BUT this is not
   // supported as a MemorySpace
@@ -785,41 +782,49 @@ TEST(TypeTraitsTest, IsSupportedMemorySpace) {
     using memory_space = TestSpace;
   };
 
-  bool res = Morpheus::is_supported_memory_space<TestSpace>::value;
+  bool res = Morpheus::is_memory_space<TestSpace>::value;
   EXPECT_EQ(res, 0);
 
   // Built-in type
-  res = Morpheus::is_supported_memory_space<int>::value;
+  res = Morpheus::is_memory_space<int>::value;
   EXPECT_EQ(res, 0);
 
 // Kokkos Memory Space
 #if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
-  res = Morpheus::is_supported_memory_space<Kokkos::HostSpace>::value;
+  res = Morpheus::is_memory_space<Kokkos::HostSpace>::value;
   EXPECT_EQ(res, 1);
 #endif
 
 #if defined(MORPHEUS_ENABLE_CUDA)
-  res = Morpheus::is_supported_memory_space<Kokkos::CudaSpace>::value;
+  res = Morpheus::is_memory_space<Kokkos::CudaSpace>::value;
   EXPECT_EQ(res, 1);
 #endif
 
-  res = Morpheus::is_supported_memory_space_v<TestSpace>;
+  // Kokkos Execution Space
+  res = Morpheus::is_memory_space<TEST_EXECSPACE>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_memory_space<TestSpace>::value;
   EXPECT_EQ(res, 0);
 
   // Built-in type
-  res = Morpheus::is_supported_memory_space_v<int>;
+  res = Morpheus::is_memory_space_v<int>;
   EXPECT_EQ(res, 0);
 
 // Kokkos Memory Space
 #if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
-  res = Morpheus::is_supported_memory_space_v<Kokkos::HostSpace>;
+  res = Morpheus::is_memory_space_v<Kokkos::HostSpace>;
   EXPECT_EQ(res, 1);
 #endif
 
 #if defined(MORPHEUS_ENABLE_CUDA)
-  res = Morpheus::is_supported_memory_space_v<Kokkos::CudaSpace>;
+  res = Morpheus::is_memory_space_v<Kokkos::CudaSpace>;
   EXPECT_EQ(res, 1);
 #endif
+
+  // Kokkos Execution Space
+  res = Morpheus::is_memory_space_v<TEST_EXECSPACE>;
+  EXPECT_EQ(res, 1);
 }
 
 /**
@@ -906,7 +911,7 @@ TEST(TypeTraitsTest, IsLayout) {
   struct TestLayout {
     using array_layout = TestLayout;
   };
-  // Valid layout structure but not supported
+  // Has array_layout but not valid
   bool res = Morpheus::is_layout<TestLayout>::value;
   EXPECT_EQ(res, 0);
   // Valid Layouts
@@ -920,7 +925,7 @@ TEST(TypeTraitsTest, IsLayout) {
   res = Morpheus::is_layout<Kokkos::LayoutStride>::value;
   EXPECT_EQ(res, 0);
 
-  // Valid layout structure but not supported
+  // Has array_layout but not valid
   res = Morpheus::is_layout_v<TestLayout>;
   EXPECT_EQ(res, 0);
   // Valid Layouts
@@ -944,8 +949,7 @@ TEST(TypeTraitsTest, IsSameLayout) {
   struct TestLayout {
     using array_layout = TestLayout;
   };
-  // Valid Layout structures but not supported so invalid layout hence
-  // eventhough the same test fails
+  // Has array_layout but not valid
   bool res = Morpheus::is_same_layout<TestLayout, TestLayout>::value;
   EXPECT_EQ(res, 0);
 
@@ -976,8 +980,7 @@ TEST(TypeTraitsTest, IsSameLayout) {
                                  Kokkos::LayoutStride>::value;
   EXPECT_EQ(res, 0);
 
-  // Valid Layout structures but not supported so invalid layout hence
-  // eventhough the same test fails
+  // Has array_layout but not valid
   res = Morpheus::is_same_layout_v<TestLayout, TestLayout>;
   EXPECT_EQ(res, 0);
 
@@ -1302,7 +1305,19 @@ TEST(TypeTraitsTest, IsSameIndexType) {
   EXPECT_EQ(res, 0);
 }
 
-TEST(TypeTraitsTest, IsCompatible) { EXPECT_EQ(0, 1); }
+TEST(TypeTraitsTest, IsCompatible) {
+  struct TestStruct {
+    using index_type   = int;
+    using value_type   = double;
+    using memory_space = Kokkos::HostSpace;
+    using array_layout = Kokkos::LayoutRight;
+  };
+
+  bool res = Morpheus::is_compatible<TestStruct, TestStruct>::value;
+  EXPECT_EQ(res, 1);
+
+  EXPECT_EQ(0, 1);
+}
 
 TEST(TypeTraitsTest, IsDynamicallyCompatible) {
   // Same types but not dynamic containers

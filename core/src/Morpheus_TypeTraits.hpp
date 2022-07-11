@@ -406,8 +406,7 @@ template <typename T1, typename T2>
 inline constexpr bool is_same_format_v = is_same_format<T1, T2>::value;
 
 /**
- * @brief Checks if the given type \p T is a memory space i.e has as a
- * \p memory_space member trait it self.
+ * @brief Checks if the given type \p T is a valid supported memory space.
  *
  * @tparam T Type passed for check.
  */
@@ -417,9 +416,15 @@ class is_memory_space {
   typedef char no[2];
 
   template <class U>
-  static yes& test(typename U::memory_space*,
-                   typename std::enable_if<std::is_base_of<
-                       typename U::memory_space, U>::value>::type* = nullptr);
+  static yes& test(
+      U*,
+      typename std::enable_if<
+#if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
+          std::is_same<typename U::memory_space, Kokkos::HostSpace>::value ||
+#elif defined(MORPHEUS_ENABLE_CUDA)
+          std::is_same<typename U::memory_space, Kokkos::CudaSpace>::value ||
+#endif
+          false>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -437,46 +442,6 @@ template <typename T>
 inline constexpr bool is_memory_space_v = is_memory_space<T>::value;
 
 /**
- * @brief Checks if the given type \p T is a valid supported memory space.
- *
- * @tparam T Type passed for check.
- */
-template <class T>
-class is_supported_memory_space {
-  typedef char yes[1];
-  typedef char no[2];
-
-  template <class U>
-  static yes& test(
-      typename U::memory_space*,
-      typename std::enable_if<is_memory_space_v<U> &&
-                              (
-#if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
-                                  std::is_same<typename U::memory_space,
-                                               Kokkos::HostSpace>::value ||
-#elif defined(MORPHEUS_ENABLE_CUDA)
-                                  std::is_same<typename U::memory_space,
-                                               Kokkos::CudaSpace>::value ||
-#endif
-                                  false)>::type* = nullptr);
-
-  template <class U>
-  static no& test(...);
-
- public:
-  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
-};
-
-/**
- * @brief Short-hand to \p is_supported_memory_space.
- *
- * @tparam T Type passed for check.
- */
-template <typename T>
-inline constexpr bool is_supported_memory_space_v =
-    is_supported_memory_space<T>::value;
-
-/**
  * @brief Checks if the two types are in the same valid supported memory space
  *
  * @tparam T1 First type passed for comparison.
@@ -489,10 +454,9 @@ class is_same_memory_space {
 
   template <class U1, class U2>
   static yes& test(
-      typename U1::memory_space*, typename U2::memory_space*,
+      U1*, U2*,
       typename std::enable_if<
-          is_supported_memory_space<U1>::value &&
-          is_supported_memory_space<U2>::value &&
+          is_memory_space<U1>::value && is_memory_space<U2>::value &&
           std::is_same<typename U1::memory_space,
                        typename U2::memory_space>::value>::type* = nullptr);
 
@@ -527,9 +491,8 @@ class is_layout {
 
   template <class U>
   static yes& test(
-      typename U::array_layout*,
+      U*,
       typename std::enable_if<
-          std::is_base_of<typename U::array_layout, U>::value &&
           (std::is_same<Kokkos::LayoutLeft, typename U::array_layout>::value ||
            std::is_same<Kokkos::LayoutRight,
                         typename U::array_layout>::value)>::type* = nullptr);
@@ -562,7 +525,7 @@ class is_same_layout {
 
   template <class U1, class U2>
   static yes& test(
-      typename U1::array_layout*, typename U2::array_layout*,
+      U1*, U2*,
       typename std::enable_if<
           is_layout_v<U1> && is_layout_v<U2> &&
           std::is_same<typename U1::array_layout,
@@ -597,9 +560,8 @@ class is_value_type {
 
   template <class U>
   static yes& test(
-      typename U::value_type*,
-      typename std::enable_if<
-          std::is_scalar<typename U::value_type>::value>::type* = nullptr);
+      U*, typename std::enable_if<
+              std::is_scalar<typename U::value_type>::value>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -629,7 +591,7 @@ class is_same_value_type {
 
   template <class U1, class U2>
   static yes& test(
-      typename U1::value_type*, typename U2::value_type*,
+      U1*, U2*,
       typename std::enable_if<
           is_value_type_v<U1> && is_value_type_v<U2> &&
           std::is_same<typename U1::value_type,
@@ -664,7 +626,7 @@ class is_index_type {
 
   template <class U>
   static yes& test(
-      typename U::index_type*,
+      U*,
       typename std::enable_if<
           std::is_integral<typename U::index_type>::value>::type* = nullptr);
 
@@ -696,7 +658,7 @@ class is_same_index_type {
 
   template <class U1, class U2>
   static yes& test(
-      typename U1::index_type*, typename U2::index_type*,
+      U1*, U2*,
       typename std::enable_if<
           is_index_type_v<U1> && is_index_type_v<U2> &&
           std::is_same<typename U1::index_type,
@@ -720,12 +682,11 @@ template <typename T1, typename T2>
 inline constexpr bool is_same_index_type_v = is_same_index_type<T1, T2>::value;
 
 /**
- * @brief SFINAE to determine if the two types are compatible i.e in the same
- * memory space, holding the same type of value and indices and with the same
- * memory layout.
+ * @brief Checks if the two types are compatible containers i.e are in the same
+ * memory space and have the same layout, index and value type.
  *
- * @tparam T1 First container to compare
- * @tparam T2 Second container to compare
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <class T1, class T2>
 class is_compatible {
@@ -733,12 +694,15 @@ class is_compatible {
   typedef char no[2];
 
   template <class U1, class U2>
-  static yes& test(
-      typename U1::tag*, typename U2::tag*,
-      typename std::enable_if<
-          is_same_memory_space_v<U1, U2> && is_same_layout_v<U1, U2> &&
-          is_same_value_type_v<U1, U2> && is_same_index_type_v<U1, U2>>::type* =
-          nullptr);
+  static yes& test(U1*, U2*,
+                   typename std::enable_if<
+                       //  is_same_memory_space_v<U1, U2>
+                       //  &&
+                       is_same_layout_v<U1, U2>
+                       //  &&
+                       // is_same_value_type_v<U1, U2> &&
+                       // is_same_index_type_v<U1, U2>
+                       >::type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -749,21 +713,20 @@ class is_compatible {
 };
 
 /**
- * @brief Short-hand to \p is_compatible SFINAE Test to check if the
- * given types are compatible types.
+ * @brief Short-hand to \p is_compatible.
  *
- * @tparam T1 First container to compare
- * @tparam T2 Second container to compare
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <typename T1, typename T2>
 inline constexpr bool is_compatible_v = is_compatible<T1, T2>::value;
 
 /**
- * @brief SFINAE to determine if the two types are dynamically compatible i.e
- * compatible and at least one of them is a dynamic container.
+ * @brief Checks if the two types are dynamically compatible containers i.e are
+ * compatible containers and at least one of them is also a dynamic container.
  *
- * @tparam T1 First container to compare
- * @tparam T2 Second container to compare
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <class T1, class T2>
 class is_dynamically_compatible {
@@ -786,11 +749,10 @@ class is_dynamically_compatible {
 };
 
 /**
- * @brief Short-hand to \p is_dynamically_compatible SFINAE Test to check if the
- * given types are dynamically compatible types.
+ * @brief Short-hand to \p is_dynamically_compatible.
  *
- * @tparam T1 First container to compare
- * @tparam T2 Second container to compare
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <typename T1, typename T2>
 inline constexpr bool is_dynamically_compatible_v =
