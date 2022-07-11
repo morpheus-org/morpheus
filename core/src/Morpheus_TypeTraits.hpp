@@ -406,7 +406,78 @@ template <typename T1, typename T2>
 inline constexpr bool is_same_format_v = is_same_format<T1, T2>::value;
 
 /**
- * @brief Checks if the two types are in the same memory space
+ * @brief Checks if the given type \p T is a memory space i.e has as a \p
+ * memory_space member trait it self.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_memory_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(typename U::memory_space*,
+                   typename std::enable_if<std::is_base_of<
+                       typename U::memory_space, U>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_memory_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_memory_space_v = is_memory_space<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid supported memory space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_supported_memory_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      typename U::memory_space*,
+      typename std::enable_if<is_memory_space_v<U> &&
+                              (
+#if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
+                                  std::is_same<typename U::memory_space,
+                                               Kokkos::HostSpace>::value ||
+#elif defined(MORPHEUS_ENABLE_CUDA)
+                                  std::is_same<typename U::memory_space,
+                                               Kokkos::CudaSpace>::value ||
+#endif
+                                  false)>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_supported_memory_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_supported_memory_space_v =
+    is_supported_memory_space<T>::value;
+
+/**
+ * @brief Checks if the two types are in the same valid supported memory space
  *
  * @tparam T1 First type passed for comparison.
  * @tparam T2 Second type passed for comparison.
@@ -415,13 +486,15 @@ template <class T1, class T2>
 class in_same_memory_space {
   typedef char yes[1];
   typedef char no[2];
-  // TODO: Add check for if this is a valid memory space
+
   template <class U1, class U2>
   static yes& test(
       typename U1::memory_space*, typename U2::memory_space*,
-      typename std::enable_if<std::is_same<
-          typename U1::memory_space, typename U2::memory_space>::value>::type* =
-          nullptr);
+      typename std::enable_if<
+          is_supported_memory_space<U1>::value &&
+          is_supported_memory_space<U2>::value &&
+          std::is_same<typename U1::memory_space,
+                       typename U2::memory_space>::value>::type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -432,11 +505,10 @@ class in_same_memory_space {
 };
 
 /**
- * @brief Short-hand to \p in_same_memory_space SFINAE Test to check if the
- * given types are in the same memory space.
+ * @brief Short-hand to \p in_same_memory_space.
  *
- * @tparam T1 Type passed to check if is in the same memory space as \p T2
- * @tparam T2 Type passed to check if is in the same memory space as \p T1
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <typename T1, typename T2>
 inline constexpr bool in_same_memory_space_v =

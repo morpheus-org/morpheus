@@ -505,6 +505,11 @@ TEST(TypeTraitsTest, IsDesnseVectorContainer) {
   EXPECT_EQ(res, 1);
 }
 
+/**
+ * @brief The \p is_container checks if the passed type has the \p tag member
+ * trait and if it is a valid Morpheus Container i.e either a Vector or Matrix.
+ *
+ */
 TEST(TypeTraitsTest, IsContainer) {
   bool res = Morpheus::is_container<Impl::with_tag<int>>::value;
   EXPECT_EQ(res, 0);
@@ -543,6 +548,11 @@ TEST(TypeTraitsTest, IsContainer) {
   EXPECT_EQ(res, 1);
 }
 
+/**
+ * @brief The \p is_dynamic_matrix_container checks if the passed type has the
+ * \p tag member trait and if it is a valid Dynamic Matrix Container
+ *
+ */
 TEST(TypeTraitsTest, IsDynamicContainer) {
   bool res = Morpheus::is_dynamic_matrix_container<Impl::with_tag<int>>::value;
   EXPECT_EQ(res, 0);
@@ -597,103 +607,279 @@ TEST(TypeTraitsTest, IsDynamicContainer) {
   EXPECT_EQ(res, 1);
 }
 
+/**
+ * @brief The \p is_same_format checks if the two types have the same format i.e
+ * are valid Morpheus Containers and have the same tag as member trait.
+ *
+ */
 TEST(TypeTraitsTest, IsSameFormat) {
   // Same types
-  bool res = Morpheus::is_same_format<Morpheus::CooMatrix<double>,
-                                      Morpheus::CooMatrix<double>>::value;
+  bool res = Morpheus::is_same_format<Impl::with_tag<Morpheus::CooTag>,
+                                      Impl::with_tag<Morpheus::CooTag>>::value;
   EXPECT_EQ(res, 1);
 
-  res = Morpheus::is_same_format<Morpheus::CooMatrix<double>,
-                                 Morpheus::CooMatrix<float>>::value;
+  res = Morpheus::is_same_format<Impl::with_tag<Morpheus::DynamicTag>,
+                                 Impl::with_tag<Morpheus::DynamicTag>>::value;
   EXPECT_EQ(res, 1);
 
-  // Same Matrix Format but different type
-  res = Morpheus::is_same_format<Morpheus::CooMatrix<double>,
-                                 Morpheus::CooMatrix<double, long long>>::value;
+  res =
+      Morpheus::is_same_format<Impl::with_tag<Morpheus::DenseVectorTag>,
+                               Impl::with_tag<Morpheus::DenseVectorTag>>::value;
   EXPECT_EQ(res, 1);
 
-  // DynamicMatrices
-  res = Morpheus::is_same_format<Morpheus::DynamicMatrix<double>,
-                                 Morpheus::DynamicMatrix<double>>::value;
+  res =
+      Morpheus::is_same_format<Impl::with_tag<Morpheus::DenseMatrixTag>,
+                               Impl::with_tag<Morpheus::DenseMatrixTag>>::value;
   EXPECT_EQ(res, 1);
 
-  res = Morpheus::is_same_format<Morpheus::DynamicMatrix<double>,
-                                 Morpheus::DynamicMatrix<float>>::value;
+  res = Morpheus::is_same_format<
+      Impl::with_tag<Morpheus::Impl::SparseMatTag>,
+      Impl::with_tag<Morpheus::Impl::SparseMatTag>>::value;
   EXPECT_EQ(res, 1);
 
-  // Different Matrix Formats
-  res = Morpheus::is_same_format<Morpheus::CooMatrix<double>,
-                                 Morpheus::CsrMatrix<double>>::value;
+  // Check against derived formats
+  res = Morpheus::is_same_format<
+      Impl::with_tag<Morpheus::CooTag>,
+      Impl::with_tag<Morpheus::Impl::SparseMatTag>>::value;
   EXPECT_EQ(res, 0);
 
-  // Dense and Sparse Container
-  res = Morpheus::is_same_format<Morpheus::DenseMatrix<double>,
-                                 Morpheus::CsrMatrix<double>>::value;
+  res = Morpheus::is_same_format<
+      Impl::with_tag<Morpheus::CooTag>,
+      Impl::with_tag<Morpheus::Impl::MatrixTag>>::value;
   EXPECT_EQ(res, 0);
 
-  // Dense and Dense Container
-  res = Morpheus::is_same_format<Morpheus::DenseMatrix<double>,
-                                 Morpheus::DenseVector<double>>::value;
+  // Check against different formats
+  res = Morpheus::is_same_format<Impl::with_tag<Morpheus::CooTag>,
+                                 Impl::with_tag<Morpheus::CsrTag>>::value;
   EXPECT_EQ(res, 0);
 
-  // Morpheus Container with built-in type
-  res = Morpheus::is_same_format<Morpheus::DenseMatrix<double>, int>::value;
+  res = Morpheus::is_same_format<Impl::with_tag<Morpheus::DenseMatrixTag>,
+                                 Impl::with_tag<Morpheus::CsrTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  res =
+      Morpheus::is_same_format<Impl::with_tag<Morpheus::DenseMatrixTag>,
+                               Impl::with_tag<Morpheus::DenseVectorTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  // Morpheus format against built-in type
+  res = Morpheus::is_same_format<Impl::with_tag<Morpheus::DenseMatrixTag>,
+                                 Impl::with_tag<int>>::value;
   EXPECT_EQ(res, 0);
 
   // Built-in types
-  res = Morpheus::is_same_format_v<int, int>;
+  res =
+      Morpheus::is_same_format<Impl::with_tag<int>, Impl::with_tag<int>>::value;
   EXPECT_EQ(res, 0);
 
   // Same types
-  res = Morpheus::is_same_format_v<Morpheus::CooMatrix<double>,
-                                   Morpheus::CooMatrix<double>>;
+  res = Morpheus::is_same_format_v<Impl::with_tag<Morpheus::CooTag>,
+                                   Impl::with_tag<Morpheus::CooTag>>;
   EXPECT_EQ(res, 1);
 
-  res = Morpheus::is_same_format_v<Morpheus::CooMatrix<double>,
-                                   Morpheus::CooMatrix<float>>;
+  res = Morpheus::is_same_format_v<Impl::with_tag<Morpheus::DynamicTag>,
+                                   Impl::with_tag<Morpheus::DynamicTag>>;
   EXPECT_EQ(res, 1);
 
-  // Same Matrix Format but different type
-  res = Morpheus::is_same_format_v<Morpheus::CooMatrix<double>,
-                                   Morpheus::CooMatrix<double, long long>>;
+  res = Morpheus::is_same_format_v<Impl::with_tag<Morpheus::DenseVectorTag>,
+                                   Impl::with_tag<Morpheus::DenseVectorTag>>;
   EXPECT_EQ(res, 1);
 
-  // DynamicMatrices
-  res = Morpheus::is_same_format_v<Morpheus::DynamicMatrix<double>,
-                                   Morpheus::DynamicMatrix<double>>;
+  res = Morpheus::is_same_format_v<Impl::with_tag<Morpheus::DenseMatrixTag>,
+                                   Impl::with_tag<Morpheus::DenseMatrixTag>>;
   EXPECT_EQ(res, 1);
 
-  res = Morpheus::is_same_format_v<Morpheus::DynamicMatrix<double>,
-                                   Morpheus::DynamicMatrix<float>>;
+  res =
+      Morpheus::is_same_format_v<Impl::with_tag<Morpheus::Impl::SparseMatTag>,
+                                 Impl::with_tag<Morpheus::Impl::SparseMatTag>>;
   EXPECT_EQ(res, 1);
 
-  // Different Matrix Formats
-  res = Morpheus::is_same_format_v<Morpheus::CooMatrix<double>,
-                                   Morpheus::CsrMatrix<double>>;
+  // Check against derived formats
+  res =
+      Morpheus::is_same_format_v<Impl::with_tag<Morpheus::CooTag>,
+                                 Impl::with_tag<Morpheus::Impl::SparseMatTag>>;
   EXPECT_EQ(res, 0);
 
-  // Dense and Sparse Container
-  res = Morpheus::is_same_format_v<Morpheus::DenseMatrix<double>,
-                                   Morpheus::CsrMatrix<double>>;
+  res = Morpheus::is_same_format_v<Impl::with_tag<Morpheus::CooTag>,
+                                   Impl::with_tag<Morpheus::Impl::MatrixTag>>;
   EXPECT_EQ(res, 0);
 
-  // Dense and Dense Container
-  res = Morpheus::is_same_format_v<Morpheus::DenseMatrix<double>,
-                                   Morpheus::DenseVector<double>>;
+  // Check against different formats
+  res = Morpheus::is_same_format_v<Impl::with_tag<Morpheus::CooTag>,
+                                   Impl::with_tag<Morpheus::CsrTag>>;
   EXPECT_EQ(res, 0);
 
-  // Morpheus Container with built-in type
-  res = Morpheus::is_same_format_v<Morpheus::DenseMatrix<double>, int>;
+  res = Morpheus::is_same_format_v<Impl::with_tag<Morpheus::DenseMatrixTag>,
+                                   Impl::with_tag<Morpheus::CsrTag>>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_format_v<Impl::with_tag<Morpheus::DenseMatrixTag>,
+                                   Impl::with_tag<Morpheus::DenseVectorTag>>;
+  EXPECT_EQ(res, 0);
+
+  // Morpheus format against built-in type
+  res = Morpheus::is_same_format_v<Impl::with_tag<Morpheus::DenseMatrixTag>,
+                                   Impl::with_tag<int>>;
   EXPECT_EQ(res, 0);
 
   // Built-in types
-  res = Morpheus::is_same_format_v<int, int>;
+  res = Morpheus::is_same_format_v<Impl::with_tag<int>, Impl::with_tag<int>>;
   EXPECT_EQ(res, 0);
-
-  EXPECT_EQ(0, 1);
 }
 
-TEST(TypeTraitsTest, InSameMemorySpace) { EXPECT_EQ(0, 1); }
+TEST(TypeTraitsTest, IsMemorySpace) {
+  // A structure like this meets the requirements of a valid memory space i.e
+  // has a memory_space trait that is the same as it's name
+  struct ValidTestSpace {
+    using memory_space = ValidTestSpace;
+  };
+
+  struct InvalidTestSpace {
+    using memory_space = int;
+  };
+
+  bool res = Morpheus::is_memory_space<ValidTestSpace>::value;
+  EXPECT_EQ(res, 1);
+
+  // Kokkos Memory Space
+  res = Morpheus::is_memory_space<Kokkos::HostSpace>::value;
+  EXPECT_EQ(res, 1);
+
+  // Kokkos Execution Space
+  res = Morpheus::is_memory_space<TEST_EXECSPACE>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_memory_space<InvalidTestSpace>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_memory_space_v<ValidTestSpace>;
+  EXPECT_EQ(res, 1);
+
+  // Kokkos Memory Space
+  res = Morpheus::is_memory_space_v<Kokkos::HostSpace>;
+  EXPECT_EQ(res, 1);
+
+  // Kokkos Execution Space
+  res = Morpheus::is_memory_space_v<TEST_EXECSPACE>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_memory_space_v<InvalidTestSpace>;
+  EXPECT_EQ(res, 0);
+}
+
+TEST(TypeTraitsTest, IsSupportedMemorySpace) {
+  // A structure like this meets the requirements of a valid memory space i.e
+  // has a memory_space trait that is the same as it's name BUT this is not
+  // supported as a MemorySpace
+  struct TestSpace {
+    using memory_space = TestSpace;
+  };
+
+  bool res = Morpheus::is_supported_memory_space<TestSpace>::value;
+  EXPECT_EQ(res, 0);
+
+  // Built-in type
+  res = Morpheus::is_supported_memory_space<int>::value;
+  EXPECT_EQ(res, 0);
+
+// Kokkos Memory Space
+#if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
+  res = Morpheus::is_supported_memory_space<Kokkos::HostSpace>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+  res = Morpheus::is_supported_memory_space<Kokkos::CudaSpace>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
+  res = Morpheus::is_supported_memory_space_v<TestSpace>;
+  EXPECT_EQ(res, 0);
+
+  // Built-in type
+  res = Morpheus::is_supported_memory_space_v<int>;
+  EXPECT_EQ(res, 0);
+
+// Kokkos Memory Space
+#if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
+  res = Morpheus::is_supported_memory_space_v<Kokkos::HostSpace>;
+  EXPECT_EQ(res, 1);
+#endif
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+  res = Morpheus::is_supported_memory_space_v<Kokkos::CudaSpace>;
+  EXPECT_EQ(res, 1);
+#endif
+}
+
+TEST(TypeTraitsTest, InSameMemorySpace) {
+  struct TestSpace {
+    using memory_space = TestSpace;
+  };
+
+  bool res = Morpheus::in_same_memory_space<TestSpace, TestSpace>::value;
+  EXPECT_EQ(res, 0);
+
+  // Built-in type
+  res = Morpheus::in_same_memory_space<int, int>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::in_same_memory_space<TestSpace, int>::value;
+  EXPECT_EQ(res, 0);
+
+// Kokkos Memory Space
+#if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
+  res = Morpheus::in_same_memory_space<Kokkos::HostSpace,
+                                       Kokkos::HostSpace>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::in_same_memory_space<Kokkos::HostSpace, TestSpace>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+  res = Morpheus::in_same_memory_space<Kokkos::HostSpace,
+                                       Kokkos::CudaSpace>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::in_same_memory_space<Kokkos::CudaSpace,
+                                       Kokkos::CudaSpace>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::in_same_memory_space<Kokkos::CudaSpace, TestSpace>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
+  res = Morpheus::in_same_memory_space_v<TestSpace, TestSpace>;
+  EXPECT_EQ(res, 0);
+
+  // Built-in type
+  res = Morpheus::in_same_memory_space_v<int, int>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::in_same_memory_space_v<TestSpace, int>;
+  EXPECT_EQ(res, 0);
+
+// Kokkos Memory Space
+#if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
+  res = Morpheus::in_same_memory_space_v<Kokkos::HostSpace, Kokkos::HostSpace>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::in_same_memory_space_v<Kokkos::HostSpace, TestSpace>;
+  EXPECT_EQ(res, 0);
+#endif
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+  res = Morpheus::in_same_memory_space_v<Kokkos::HostSpace, Kokkos::CudaSpace>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::in_same_memory_space_v<Kokkos::CudaSpace, Kokkos::CudaSpace>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::in_same_memory_space_v<Kokkos::CudaSpace, TestSpace>;
+  EXPECT_EQ(res, 0);
+#endif
+}
 
 TEST(TypeTraitsTest, HaveSameLayout) {
   // Explicit Kokkos Layouts check
