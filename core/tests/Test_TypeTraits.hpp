@@ -727,6 +727,11 @@ TEST(TypeTraitsTest, IsSameFormat) {
   EXPECT_EQ(res, 0);
 }
 
+/**
+ * @brief The \p is_memory_space checks if the type is a memory space i.e has as
+ * a \p memory_space member trait it self.
+ *
+ */
 TEST(TypeTraitsTest, IsMemorySpace) {
   // A structure like this meets the requirements of a valid memory space i.e
   // has a memory_space trait that is the same as it's name
@@ -767,6 +772,11 @@ TEST(TypeTraitsTest, IsMemorySpace) {
   EXPECT_EQ(res, 0);
 }
 
+/**
+ * @brief The \p is_supported_memory_space checks if the type has a valid and
+ * supported memory space.
+ *
+ */
 TEST(TypeTraitsTest, IsSupportedMemorySpace) {
   // A structure like this meets the requirements of a valid memory space i.e
   // has a memory_space trait that is the same as it's name BUT this is not
@@ -812,379 +822,485 @@ TEST(TypeTraitsTest, IsSupportedMemorySpace) {
 #endif
 }
 
+/**
+ * @brief The \p is_same_memory_space checks if two types are in the same valid
+ * and supported memory space.
+ *
+ */
 TEST(TypeTraitsTest, InSameMemorySpace) {
   struct TestSpace {
     using memory_space = TestSpace;
   };
 
-  bool res = Morpheus::in_same_memory_space<TestSpace, TestSpace>::value;
+  bool res = Morpheus::is_same_memory_space<TestSpace, TestSpace>::value;
   EXPECT_EQ(res, 0);
 
   // Built-in type
-  res = Morpheus::in_same_memory_space<int, int>::value;
+  res = Morpheus::is_same_memory_space<int, int>::value;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::in_same_memory_space<TestSpace, int>::value;
+  res = Morpheus::is_same_memory_space<TestSpace, int>::value;
   EXPECT_EQ(res, 0);
 
 // Kokkos Memory Space
 #if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
-  res = Morpheus::in_same_memory_space<Kokkos::HostSpace,
+  res = Morpheus::is_same_memory_space<Kokkos::HostSpace,
                                        Kokkos::HostSpace>::value;
   EXPECT_EQ(res, 1);
 
-  res = Morpheus::in_same_memory_space<Kokkos::HostSpace, TestSpace>::value;
+  res = Morpheus::is_same_memory_space<Kokkos::HostSpace, TestSpace>::value;
   EXPECT_EQ(res, 0);
 #endif
 
 #if defined(MORPHEUS_ENABLE_CUDA)
-  res = Morpheus::in_same_memory_space<Kokkos::HostSpace,
+  res = Morpheus::is_same_memory_space<Kokkos::HostSpace,
                                        Kokkos::CudaSpace>::value;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::in_same_memory_space<Kokkos::CudaSpace,
+  res = Morpheus::is_same_memory_space<Kokkos::CudaSpace,
                                        Kokkos::CudaSpace>::value;
   EXPECT_EQ(res, 1);
 
-  res = Morpheus::in_same_memory_space<Kokkos::CudaSpace, TestSpace>::value;
+  res = Morpheus::is_same_memory_space<Kokkos::CudaSpace, TestSpace>::value;
   EXPECT_EQ(res, 0);
 #endif
 
-  res = Morpheus::in_same_memory_space_v<TestSpace, TestSpace>;
+  res = Morpheus::is_same_memory_space_v<TestSpace, TestSpace>;
   EXPECT_EQ(res, 0);
 
   // Built-in type
-  res = Morpheus::in_same_memory_space_v<int, int>;
+  res = Morpheus::is_same_memory_space_v<int, int>;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::in_same_memory_space_v<TestSpace, int>;
+  res = Morpheus::is_same_memory_space_v<TestSpace, int>;
   EXPECT_EQ(res, 0);
 
 // Kokkos Memory Space
 #if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
-  res = Morpheus::in_same_memory_space_v<Kokkos::HostSpace, Kokkos::HostSpace>;
+  res = Morpheus::is_same_memory_space_v<Kokkos::HostSpace, Kokkos::HostSpace>;
   EXPECT_EQ(res, 1);
 
-  res = Morpheus::in_same_memory_space_v<Kokkos::HostSpace, TestSpace>;
+  res = Morpheus::is_same_memory_space_v<Kokkos::HostSpace, TestSpace>;
   EXPECT_EQ(res, 0);
 #endif
 
 #if defined(MORPHEUS_ENABLE_CUDA)
-  res = Morpheus::in_same_memory_space_v<Kokkos::HostSpace, Kokkos::CudaSpace>;
+  res = Morpheus::is_same_memory_space_v<Kokkos::HostSpace, Kokkos::CudaSpace>;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::in_same_memory_space_v<Kokkos::CudaSpace, Kokkos::CudaSpace>;
+  res = Morpheus::is_same_memory_space_v<Kokkos::CudaSpace, Kokkos::CudaSpace>;
   EXPECT_EQ(res, 1);
 
-  res = Morpheus::in_same_memory_space_v<Kokkos::CudaSpace, TestSpace>;
+  res = Morpheus::is_same_memory_space_v<Kokkos::CudaSpace, TestSpace>;
   EXPECT_EQ(res, 0);
 #endif
 }
 
-TEST(TypeTraitsTest, HaveSameLayout) {
-  // Explicit Kokkos Layouts check
-  bool res =
-      Morpheus::have_same_layout<Kokkos::LayoutLeft, Kokkos::LayoutLeft>::value;
+/**
+ * @brief The \p is_layout checks if the type has a valid and
+ * supported layout i.e an \p array_layout member trait and is either
+ * \p Kokkos::LayoutLeft or \p Kokkos::LayoutRight.
+ *
+ */
+TEST(TypeTraitsTest, IsLayout) {
+  struct TestLayout {
+    using array_layout = TestLayout;
+  };
+  // Valid layout structure but not supported
+  bool res = Morpheus::is_layout<TestLayout>::value;
+  EXPECT_EQ(res, 0);
+  // Valid Layouts
+  res = Morpheus::is_layout<Kokkos::LayoutRight>::value;
   EXPECT_EQ(res, 1);
 
-  // Explicit Kokkos Layouts check
-  res = Morpheus::have_same_layout<Kokkos::LayoutRight,
-                                   Kokkos::LayoutRight>::value;
+  res = Morpheus::is_layout<Kokkos::LayoutLeft>::value;
   EXPECT_EQ(res, 1);
 
-  // Explicit Kokkos Layouts check
-  res = Morpheus::have_same_layout<Kokkos::LayoutLeft,
-                                   Kokkos::LayoutRight>::value;
+  // Valid Kokkos Layout but not supported by Morpheus
+  res = Morpheus::is_layout<Kokkos::LayoutStride>::value;
   EXPECT_EQ(res, 0);
 
-  // Explicit Kokkos Layouts check
-  res = Morpheus::have_same_layout<Kokkos::LayoutRight,
-                                   Kokkos::LayoutLeft>::value;
+  // Valid layout structure but not supported
+  res = Morpheus::is_layout_v<TestLayout>;
   EXPECT_EQ(res, 0);
+  // Valid Layouts
+  res = Morpheus::is_layout_v<Kokkos::LayoutRight>;
+  EXPECT_EQ(res, 1);
 
-  res = Morpheus::have_same_layout<int, int>::value;
+  res = Morpheus::is_layout_v<Kokkos::LayoutLeft>;
+  EXPECT_EQ(res, 1);
+
+  // Valid Kokkos Layout but not supported by Morpheus
+  res = Morpheus::is_layout_v<Kokkos::LayoutStride>;
   EXPECT_EQ(res, 0);
-
-  // Same containers with same default layout
-  res = Morpheus::have_same_layout<Morpheus::CooMatrix<double>,
-                                   Morpheus::CooMatrix<double>>::value;
-  EXPECT_EQ(res, 1);
-
-  // Same containers with explicit same layout
-  res = Morpheus::have_same_layout<
-      Morpheus::CooMatrix<double, Kokkos::LayoutLeft>,
-      Morpheus::CooMatrix<double, Kokkos::LayoutLeft>>::value;
-  EXPECT_EQ(res, 1);
-
-  // Same containers with explicit same layout
-  res = Morpheus::have_same_layout<
-      Morpheus::CooMatrix<double, Kokkos::LayoutRight>,
-      Morpheus::CooMatrix<double, Kokkos::LayoutRight>>::value;
-  EXPECT_EQ(res, 1);
-
-  // Same containers with explicit different layout
-  res = Morpheus::have_same_layout<
-      Morpheus::CooMatrix<double, Kokkos::LayoutLeft>,
-      Morpheus::CooMatrix<double, Kokkos::LayoutRight>>::value;
-  EXPECT_EQ(res, 0);
-
-  // Different containers with same default layout
-  res = Morpheus::have_same_layout<Morpheus::CooMatrix<double>,
-                                   Morpheus::CsrMatrix<double>>::value;
-  EXPECT_EQ(res, 1);
-
-  // Different containers with explicit same layout
-  res = Morpheus::have_same_layout<
-      Morpheus::CooMatrix<double, Kokkos::LayoutLeft>,
-      Morpheus::CsrMatrix<double, Kokkos::LayoutLeft>>::value;
-  EXPECT_EQ(res, 1);
-
-  // Different containers with explicit same layout
-  res = Morpheus::have_same_layout<
-      Morpheus::CooMatrix<double, Kokkos::LayoutRight>,
-      Morpheus::CsrMatrix<double, Kokkos::LayoutRight>>::value;
-  EXPECT_EQ(res, 1);
-
-  // Different containers with explicit different layout
-  res = Morpheus::have_same_layout<
-      Morpheus::CooMatrix<double, Kokkos::LayoutLeft>,
-      Morpheus::CsrMatrix<double, Kokkos::LayoutRight>>::value;
-  EXPECT_EQ(res, 0);
-
-  // Explicit Kokkos Layouts check
-  res = Morpheus::have_same_layout_v<Kokkos::LayoutLeft, Kokkos::LayoutLeft>;
-  EXPECT_EQ(res, 1);
-
-  // Explicit Kokkos Layouts check
-  res = Morpheus::have_same_layout_v<Kokkos::LayoutRight, Kokkos::LayoutRight>;
-  EXPECT_EQ(res, 1);
-
-  // Explicit Kokkos Layouts check
-  res = Morpheus::have_same_layout_v<Kokkos::LayoutLeft, Kokkos::LayoutRight>;
-  EXPECT_EQ(res, 0);
-
-  // Explicit Kokkos Layouts check
-  res = Morpheus::have_same_layout_v<Kokkos::LayoutRight, Kokkos::LayoutLeft>;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::have_same_layout_v<int, int>;
-  EXPECT_EQ(res, 0);
-
-  // Same containers with same default layout
-  res = Morpheus::have_same_layout_v<Morpheus::CooMatrix<double>,
-                                     Morpheus::CooMatrix<double>>;
-  EXPECT_EQ(res, 1);
-
-  // Same containers with explicit same layout
-  res = Morpheus::have_same_layout_v<
-      Morpheus::CooMatrix<double, Kokkos::LayoutLeft>,
-      Morpheus::CooMatrix<double, Kokkos::LayoutLeft>>;
-  EXPECT_EQ(res, 1);
-
-  // Same containers with explicit same layout
-  res = Morpheus::have_same_layout_v<
-      Morpheus::CooMatrix<double, Kokkos::LayoutRight>,
-      Morpheus::CooMatrix<double, Kokkos::LayoutRight>>;
-  EXPECT_EQ(res, 1);
-
-  // Same containers with explicit different layout
-  res = Morpheus::have_same_layout_v<
-      Morpheus::CooMatrix<double, Kokkos::LayoutLeft>,
-      Morpheus::CooMatrix<double, Kokkos::LayoutRight>>;
-  EXPECT_EQ(res, 0);
-
-  // Different containers with same default layout
-  res = Morpheus::have_same_layout_v<Morpheus::CooMatrix<double>,
-                                     Morpheus::CsrMatrix<double>>;
-  EXPECT_EQ(res, 1);
-
-  // Different containers with explicit same layout
-  res = Morpheus::have_same_layout_v<
-      Morpheus::CooMatrix<double, Kokkos::LayoutLeft>,
-      Morpheus::CsrMatrix<double, Kokkos::LayoutLeft>>;
-  EXPECT_EQ(res, 1);
-
-  // Different containers with explicit same layout
-  res = Morpheus::have_same_layout_v<
-      Morpheus::CooMatrix<double, Kokkos::LayoutRight>,
-      Morpheus::CsrMatrix<double, Kokkos::LayoutRight>>;
-  EXPECT_EQ(res, 1);
-
-  // Different containers with explicit different layout
-  res = Morpheus::have_same_layout_v<
-      Morpheus::CooMatrix<double, Kokkos::LayoutLeft>,
-      Morpheus::CsrMatrix<double, Kokkos::LayoutRight>>;
-  EXPECT_EQ(res, 0);
-
-  EXPECT_EQ(0, 1);
 }
 
-TEST(TypeTraitsTest, HaveSameValueType) {
-  // Built-in types
-  bool res = Morpheus::have_same_value_type<int, int>::value;
+/**
+ * @brief The \p is_same_layout checks if two types are have the same valid and
+ * supported layout.
+ *
+ */
+TEST(TypeTraitsTest, IsSameLayout) {
+  struct TestLayout {
+    using array_layout = TestLayout;
+  };
+  // Valid Layout structures but not supported so invalid layout hence
+  // eventhough the same test fails
+  bool res = Morpheus::is_same_layout<TestLayout, TestLayout>::value;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::have_same_value_type<float, int>::value;
+  res = Morpheus::is_same_layout<TestLayout, Kokkos::LayoutLeft>::value;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::have_same_value_type<int, float>::value;
+  // Valid Layouts and same
+  res = Morpheus::is_same_layout<Kokkos::LayoutLeft, Kokkos::LayoutLeft>::value;
+  EXPECT_EQ(res, 1);
+
+  // Valid but different layouts
+  res =
+      Morpheus::is_same_layout<Kokkos::LayoutRight, Kokkos::LayoutLeft>::value;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::have_same_value_type<float, float>::value;
+  // Valid Layouts and same
+  res =
+      Morpheus::is_same_layout<Kokkos::LayoutRight, Kokkos::LayoutRight>::value;
+  EXPECT_EQ(res, 1);
+
+  // Valid Layouts and different - first not supported
+  res = Morpheus::is_same_layout<Kokkos::LayoutStride,
+                                 Kokkos::LayoutRight>::value;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::have_same_value_type<Morpheus::ValueType<int>,
-                                       Morpheus::ValueType<int>>::value;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type<Morpheus::ValueType<float>,
-                                       Morpheus::ValueType<int>>::value;
+  // Valid Layouts but not supported so fails
+  res = Morpheus::is_same_layout<Kokkos::LayoutStride,
+                                 Kokkos::LayoutStride>::value;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::have_same_value_type<Morpheus::ValueType<int>,
-                                       Morpheus::ValueType<float>>::value;
+  // Valid Layout structures but not supported so invalid layout hence
+  // eventhough the same test fails
+  res = Morpheus::is_same_layout_v<TestLayout, TestLayout>;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::have_same_value_type<Morpheus::ValueType<float>,
-                                       Morpheus::ValueType<float>>::value;
-  EXPECT_EQ(res, 1);
-
-  // Same container with same value type
-  res = Morpheus::have_same_value_type<Morpheus::CooMatrix<double>,
-                                       Morpheus::CooMatrix<double>>::value;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type<Morpheus::CooMatrix<float>,
-                                       Morpheus::CooMatrix<float>>::value;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type<Morpheus::CooMatrix<int>,
-                                       Morpheus::CooMatrix<int>>::value;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type<Morpheus::CooMatrix<long long>,
-                                       Morpheus::CooMatrix<long long>>::value;
-  EXPECT_EQ(res, 1);
-
-  // Same container with different value type
-  res = Morpheus::have_same_value_type<Morpheus::CooMatrix<double>,
-                                       Morpheus::CooMatrix<float>>::value;
+  res = Morpheus::is_same_layout_v<TestLayout, Kokkos::LayoutLeft>;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::have_same_value_type<Morpheus::CooMatrix<float>,
-                                       Morpheus::CooMatrix<int>>::value;
+  // Valid Layouts and same
+  res = Morpheus::is_same_layout_v<Kokkos::LayoutLeft, Kokkos::LayoutLeft>;
+  EXPECT_EQ(res, 1);
+
+  // Valid but different layouts
+  res = Morpheus::is_same_layout_v<Kokkos::LayoutRight, Kokkos::LayoutLeft>;
   EXPECT_EQ(res, 0);
 
-  // Different container with same value type
-  res = Morpheus::have_same_value_type<Morpheus::CooMatrix<double>,
-                                       Morpheus::CsrMatrix<double>>::value;
+  // Valid Layouts and same
+  res = Morpheus::is_same_layout_v<Kokkos::LayoutRight, Kokkos::LayoutRight>;
   EXPECT_EQ(res, 1);
 
-  res = Morpheus::have_same_value_type<Morpheus::CsrMatrix<float>,
-                                       Morpheus::CooMatrix<float>>::value;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type<Morpheus::CooMatrix<int>,
-                                       Morpheus::CsrMatrix<int>>::value;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type<Morpheus::CsrMatrix<long long>,
-                                       Morpheus::CooMatrix<long long>>::value;
-  EXPECT_EQ(res, 1);
-
-  // Different container with different value type
-  res = Morpheus::have_same_value_type<Morpheus::CooMatrix<double>,
-                                       Morpheus::CsrMatrix<float>>::value;
+  // Valid Layouts and different - first not supported
+  res = Morpheus::is_same_layout_v<Kokkos::LayoutStride, Kokkos::LayoutRight>;
   EXPECT_EQ(res, 0);
 
-  res = Morpheus::have_same_value_type<Morpheus::CsrMatrix<float>,
-                                       Morpheus::CooMatrix<int>>::value;
+  // Valid Layouts but not supported so fails
+  res = Morpheus::is_same_layout_v<Kokkos::LayoutStride, Kokkos::LayoutStride>;
   EXPECT_EQ(res, 0);
-  ////////////////////////
-  res = Morpheus::have_same_value_type_v<int, int>;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::have_same_value_type_v<float, int>;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::have_same_value_type_v<int, float>;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::have_same_value_type_v<float, float>;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::ValueType<int>,
-                                         Morpheus::ValueType<int>>;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::ValueType<float>,
-                                         Morpheus::ValueType<int>>;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::ValueType<int>,
-                                         Morpheus::ValueType<float>>;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::ValueType<float>,
-                                         Morpheus::ValueType<float>>;
-  EXPECT_EQ(res, 1);
-
-  // Same container with same value type
-  res = Morpheus::have_same_value_type_v<Morpheus::CooMatrix<double>,
-                                         Morpheus::CooMatrix<double>>;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::CooMatrix<float>,
-                                         Morpheus::CooMatrix<float>>;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::CooMatrix<int>,
-                                         Morpheus::CooMatrix<int>>;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::CooMatrix<long long>,
-                                         Morpheus::CooMatrix<long long>>;
-  EXPECT_EQ(res, 1);
-
-  // Same container with different value type
-  res = Morpheus::have_same_value_type_v<Morpheus::CooMatrix<double>,
-                                         Morpheus::CooMatrix<float>>;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::CooMatrix<float>,
-                                         Morpheus::CooMatrix<int>>;
-  EXPECT_EQ(res, 0);
-
-  // Different container with same value type
-  res = Morpheus::have_same_value_type_v<Morpheus::CooMatrix<double>,
-                                         Morpheus::CsrMatrix<double>>;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::CsrMatrix<float>,
-                                         Morpheus::CooMatrix<float>>;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::CooMatrix<int>,
-                                         Morpheus::CsrMatrix<int>>;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::CsrMatrix<long long>,
-                                         Morpheus::CooMatrix<long long>>;
-  EXPECT_EQ(res, 1);
-
-  // Different container with different value type
-  res = Morpheus::have_same_value_type_v<Morpheus::CooMatrix<double>,
-                                         Morpheus::CsrMatrix<float>>;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::have_same_value_type_v<Morpheus::CsrMatrix<float>,
-                                         Morpheus::CooMatrix<int>>;
-  EXPECT_EQ(res, 0);
-
-  EXPECT_EQ(0, 1);
 }
 
-TEST(TypeTraitsTest, HaveSameIndexType) { EXPECT_EQ(0, 1); }
+/**
+ * @brief The \p is_value_type checks if the type has a valid value type i.e a
+ * \p value_type member trait that is scalar.
+ *
+ */
+TEST(TypeTraitsTest, IsValueType) {
+  bool res = Morpheus::is_value_type<Morpheus::ValueType<float>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_value_type<Morpheus::ValueType<double>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_value_type<Morpheus::ValueType<int>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_value_type<Morpheus::ValueType<long long>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_value_type<float>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_value_type<int>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_value_type<std::vector<double>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_value_type<std::vector<std::string>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_value_type_v<Morpheus::ValueType<float>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_value_type_v<Morpheus::ValueType<double>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_value_type_v<Morpheus::ValueType<int>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_value_type_v<Morpheus::ValueType<long long>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_value_type_v<float>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_value_type_v<int>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_value_type_v<std::vector<double>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_value_type_v<std::vector<std::string>>;
+  EXPECT_EQ(res, 0);
+}
+
+/**
+ * @brief The \p is_same_value_type checks if two types have the same value_type
+ * i.e they are both scalars.
+ *
+ */
+TEST(TypeTraitsTest, IsSameValueType) {
+  bool res = Morpheus::is_same_value_type<Morpheus::ValueType<float>,
+                                          Morpheus::ValueType<float>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<float>,
+                                     std::vector<float>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<float>, float>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<int>,
+                                     Morpheus::ValueType<int>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<int>,
+                                     std::vector<int>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<int>, int>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<double>,
+                                     Morpheus::ValueType<double>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<double>,
+                                     std::vector<double>>::value;
+  EXPECT_EQ(res, 1);
+
+  res =
+      Morpheus::is_same_value_type<Morpheus::ValueType<double>, double>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<long long>,
+                                     Morpheus::ValueType<long long>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<long long>,
+                                     std::vector<long long>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<long long>,
+                                     long long>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<int>,
+                                     Morpheus::ValueType<long long>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<double>,
+                                     Morpheus::ValueType<long long>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type<Morpheus::ValueType<double>,
+                                     Morpheus::ValueType<float>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<float>,
+                                       Morpheus::ValueType<float>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<float>,
+                                       std::vector<float>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<float>, float>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<int>,
+                                       Morpheus::ValueType<int>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<int>,
+                                       std::vector<int>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<int>, int>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<double>,
+                                       Morpheus::ValueType<double>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<double>,
+                                       std::vector<double>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<double>, double>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<long long>,
+                                       Morpheus::ValueType<long long>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<long long>,
+                                       std::vector<long long>>;
+  EXPECT_EQ(res, 1);
+
+  res =
+      Morpheus::is_same_value_type_v<Morpheus::ValueType<long long>, long long>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<int>,
+                                       Morpheus::ValueType<long long>>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<double>,
+                                       Morpheus::ValueType<long long>>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_value_type_v<Morpheus::ValueType<double>,
+                                       Morpheus::ValueType<float>>;
+  EXPECT_EQ(res, 0);
+}
+
+/**
+ * @brief The \p is_index_type checks if the type has a valid index type i.e a
+ * \p index_type member trait that is of integral type.
+ *
+ */
+TEST(TypeTraitsTest, IsIndexType) {
+  struct TestIndex {
+    using index_type = double;
+  };
+  bool res = Morpheus::is_index_type<TestIndex>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_index_type<Morpheus::IndexType<int>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_index_type<Morpheus::IndexType<long long>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_index_type<float>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_index_type<int>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_index_type<std::vector<double>>::value;
+  EXPECT_EQ(res, 0);
+
+  // std::vector doesn't have an index_type but it's value_type is int
+  res = Morpheus::is_index_type<std::vector<int>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_index_type<std::vector<std::string>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_index_type_v<TestIndex>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_index_type_v<Morpheus::IndexType<int>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_index_type_v<Morpheus::IndexType<long long>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_index_type_v<float>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_index_type_v<int>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_index_type_v<std::vector<double>>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_index_type_v<std::vector<long long>>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_index_type_v<std::vector<std::string>>;
+  EXPECT_EQ(res, 0);
+}
+
+/**
+ * @brief The \p is_same_index_type checks if two types have the same index_type
+ * i.e they are both integrals.
+ *
+ */
+TEST(TypeTraitsTest, IsSameIndexType) {
+  bool res = Morpheus::is_same_index_type<Morpheus::IndexType<int>,
+                                          Morpheus::IndexType<int>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_index_type<Morpheus::IndexType<int>,
+                                     std::vector<int>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_index_type<Morpheus::IndexType<int>, int>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_index_type<Morpheus::IndexType<long long>,
+                                     Morpheus::IndexType<long long>>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_index_type<Morpheus::IndexType<long long>,
+                                     std::vector<long long>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_index_type<Morpheus::IndexType<long long>,
+                                     long long>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_index_type<Morpheus::IndexType<int>,
+                                     Morpheus::IndexType<long long>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_index_type_v<Morpheus::IndexType<int>,
+                                       Morpheus::IndexType<int>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_index_type_v<Morpheus::IndexType<int>,
+                                       std::vector<int>>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_index_type_v<Morpheus::IndexType<int>, int>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_index_type_v<Morpheus::IndexType<long long>,
+                                       Morpheus::IndexType<long long>>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_same_index_type_v<Morpheus::IndexType<long long>,
+                                       std::vector<long long>>;
+  EXPECT_EQ(res, 0);
+
+  res =
+      Morpheus::is_same_index_type_v<Morpheus::IndexType<long long>, long long>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_same_index_type_v<Morpheus::IndexType<int>,
+                                       Morpheus::IndexType<long long>>;
+  EXPECT_EQ(res, 0);
+}
 
 TEST(TypeTraitsTest, IsCompatible) { EXPECT_EQ(0, 1); }
 

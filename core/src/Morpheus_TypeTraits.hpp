@@ -406,8 +406,8 @@ template <typename T1, typename T2>
 inline constexpr bool is_same_format_v = is_same_format<T1, T2>::value;
 
 /**
- * @brief Checks if the given type \p T is a memory space i.e has as a \p
- * memory_space member trait it self.
+ * @brief Checks if the given type \p T is a memory space i.e has as a
+ * \p memory_space member trait it self.
  *
  * @tparam T Type passed for check.
  */
@@ -483,7 +483,7 @@ inline constexpr bool is_supported_memory_space_v =
  * @tparam T2 Second type passed for comparison.
  */
 template <class T1, class T2>
-class in_same_memory_space {
+class is_same_memory_space {
   typedef char yes[1];
   typedef char no[2];
 
@@ -505,32 +505,68 @@ class in_same_memory_space {
 };
 
 /**
- * @brief Short-hand to \p in_same_memory_space.
+ * @brief Short-hand to \p is_same_memory_space.
  *
  * @tparam T1 First type passed for comparison.
  * @tparam T2 Second type passed for comparison.
  */
 template <typename T1, typename T2>
-inline constexpr bool in_same_memory_space_v =
-    in_same_memory_space<T1, T2>::value;
+inline constexpr bool is_same_memory_space_v =
+    is_same_memory_space<T1, T2>::value;
 
 /**
- * @brief SFINAE Test to determine if the two types have the same layout
+ * @brief Checks if the given type \p T is a layout i.e has as a
+ * \p array_layout member trait it self and is one of the supported layouts.
  *
- * @tparam T1 Type passed to check if has the same layout as \p T2
- * @tparam T2 Type passed to check if has the same layout as \p T1
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_layout {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      typename U::array_layout*,
+      typename std::enable_if<
+          std::is_base_of<typename U::array_layout, U>::value &&
+          (std::is_same<Kokkos::LayoutLeft, typename U::array_layout>::value ||
+           std::is_same<Kokkos::LayoutRight,
+                        typename U::array_layout>::value)>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_layout.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_layout_v = is_layout<T>::value;
+
+/**
+ * @brief Checks if the two types have the same valid supported layout
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <class T1, class T2>
-class have_same_layout {
+class is_same_layout {
   typedef char yes[1];
   typedef char no[2];
 
   template <class U1, class U2>
   static yes& test(
       typename U1::array_layout*, typename U2::array_layout*,
-      typename std::enable_if<std::is_same<
-          typename U1::array_layout, typename U2::array_layout>::value>::type* =
-          nullptr);
+      typename std::enable_if<
+          is_layout_v<U1> && is_layout_v<U2> &&
+          std::is_same<typename U1::array_layout,
+                       typename U2::array_layout>::value>::type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -541,32 +577,63 @@ class have_same_layout {
 };
 
 /**
- * @brief Short-hand to \p have_same_layout SFINAE Test to check if the
- * given types have the same layout.
+ * @brief Short-hand to \p is_same_layout.
  *
- * @tparam T1 Type passed to check if has the same layout as \p T2
- * @tparam T2 Type passed to check if has the same layout as \p T1
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <typename T1, typename T2>
-inline constexpr bool have_same_layout_v = have_same_layout<T1, T2>::value;
+inline constexpr bool is_same_layout_v = is_same_layout<T1, T2>::value;
 
 /**
- * @brief SFINAE Test to determine if the two types hold the same value type
+ * @brief Checks if the given type \p T has a valid value type i.e a scalar
  *
- * @tparam T1 Type passed to check if holds the same value type as \p T2
- * @tparam T2 Type passed to check if holds the same value type as \p T1
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_value_type {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      typename U::value_type*,
+      typename std::enable_if<
+          std::is_scalar<typename U::value_type>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_value_type.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_value_type_v = is_value_type<T>::value;
+
+/**
+ * @brief Checks if the two types have the same valid value type.
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <class T1, class T2>
-class have_same_value_type {
+class is_same_value_type {
   typedef char yes[1];
   typedef char no[2];
 
   template <class U1, class U2>
   static yes& test(
       typename U1::value_type*, typename U2::value_type*,
-      typename std::enable_if<std::is_same<
-          typename U1::value_type, typename U2::value_type>::value>::type* =
-          nullptr);
+      typename std::enable_if<
+          is_value_type_v<U1> && is_value_type_v<U2> &&
+          std::is_same<typename U1::value_type,
+                       typename U2::value_type>::value>::type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -577,33 +644,63 @@ class have_same_value_type {
 };
 
 /**
- * @brief Short-hand to \p have_same_value_type SFINAE Test to check if the
- * given types hold the same value type.
+ * @brief Short-hand to \p is_value_type.
  *
- * @tparam T1 Type passed to check if holds the same value type as \p T2
- * @tparam T2 Type passed to check if holds the same value type as \p T1
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <typename T1, typename T2>
-inline constexpr bool have_same_value_type_v =
-    have_same_value_type<T1, T2>::value;
+inline constexpr bool is_same_value_type_v = is_same_value_type<T1, T2>::value;
 
 /**
- * @brief SFINAE Test to determine if the two types hold the same index type
+ * @brief Checks if the given type \p T has a valid index type i.e an integral
  *
- * @tparam T1 Type passed to check if holds the same index type as \p T2
- * @tparam T2 Type passed to check if holds the same index type as \p T1
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_index_type {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      typename U::index_type*,
+      typename std::enable_if<
+          std::is_integral<typename U::index_type>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_index_type.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_index_type_v = is_index_type<T>::value;
+
+/**
+ * @brief Checks if the two types have the same valid index type.
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <class T1, class T2>
-class have_same_index_type {
+class is_same_index_type {
   typedef char yes[1];
   typedef char no[2];
 
   template <class U1, class U2>
   static yes& test(
       typename U1::index_type*, typename U2::index_type*,
-      typename std::enable_if<std::is_same<
-          typename U1::index_type, typename U2::index_type>::value>::type* =
-          nullptr);
+      typename std::enable_if<
+          is_index_type_v<U1> && is_index_type_v<U2> &&
+          std::is_same<typename U1::index_type,
+                       typename U2::index_type>::value>::type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -614,15 +711,13 @@ class have_same_index_type {
 };
 
 /**
- * @brief Short-hand to \p have_same_index_type SFINAE Test to check if the
- * given types hold the same index type.
+ * @brief Short-hand to \p is_same_index_type.
  *
- * @tparam T1 Type passed to check if holds the same index type as \p T2
- * @tparam T2 Type passed to check if holds the same index type as \p T1
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <typename T1, typename T2>
-inline constexpr bool have_same_index_type_v =
-    have_same_index_type<T1, T2>::value;
+inline constexpr bool is_same_index_type_v = is_same_index_type<T1, T2>::value;
 
 /**
  * @brief SFINAE to determine if the two types are compatible i.e in the same
@@ -640,10 +735,10 @@ class is_compatible {
   template <class U1, class U2>
   static yes& test(
       typename U1::tag*, typename U2::tag*,
-      typename std::enable_if<in_same_memory_space_v<U1, U2> &&
-                              have_same_layout_v<U1, U2> &&
-                              have_same_value_type_v<U1, U2> &&
-                              have_same_index_type_v<U1, U2>>::type* = nullptr);
+      typename std::enable_if<
+          is_same_memory_space_v<U1, U2> && is_same_layout_v<U1, U2> &&
+          is_same_value_type_v<U1, U2> && is_same_index_type_v<U1, U2>>::type* =
+          nullptr);
 
   template <class U1, class U2>
   static no& test(...);
