@@ -71,6 +71,11 @@ struct is_variant_member<T, Variant::variant<Ts...>>
  *
  */
 
+/**
+ * @brief A wrapper that checks if the provided type is an integral type.
+ *
+ * @tparam T Type passed for check.
+ */
 template <typename T>
 struct IndexType {
   static_assert(std::is_integral<T>::value, "T needs to be an integral type!");
@@ -78,6 +83,11 @@ struct IndexType {
   using type       = IndexType;
 };
 
+/**
+ * @brief A wrapper that checks if the provided type is a scalar type.
+ *
+ * @tparam T Type passed for check.
+ */
 template <typename T>
 struct ValueType {
   static_assert(std::is_scalar<T>::value, "T needs to be a scalar type!");
@@ -193,7 +203,7 @@ inline constexpr bool is_sparse_matrix_container_v =
     is_sparse_matrix_container<T>::value;
 
 /**
- * @brief Check if the given type \p T is a valid Dense Matrix Container i.e
+ * @brief Checks if the given type \p T is a valid Dense Matrix Container i.e
  * has a \p tag member trait that is a derived class of \p DenseMatTag.
  *
  * @tparam T Type passed for check.
@@ -220,50 +230,17 @@ class is_dense_matrix_container {
 /**
  * @brief Short-hand to \p is_dense_matrix_container.
  *
- * @tparam T Type passed for checks.
+ * @tparam T Type passed for check.
  */
 template <typename T>
 inline constexpr bool is_dense_matrix_container_v =
     is_dense_matrix_container<T>::value;
 
 /**
- * @brief SFINAE Test to determine if the given type \p T is a valid Dynamic
- * Matrix Container.
+ * @brief Checks if the given type \p T is a valid Vector Container i.e
+ * has a \p tag member trait that is a derived class of \p VectorTag.
  *
- * @tparam T Type passed to check if is a valid Dynamic Matrix Container.
- */
-template <class T>
-class is_dynamic_matrix_container {
-  typedef char yes[1];
-  typedef char no[2];
-
-  template <class U>
-  static yes& test(typename U::tag*,
-                   typename std::enable_if<std::is_base_of<
-                       DynamicTag, typename U::tag>::value>::type* = nullptr);
-
-  template <class U>
-  static no& test(...);
-
- public:
-  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
-};
-
-/**
- * @brief Short-hand to \p is_dynamic_matrix_container SFINAE Test to check if
- * the type \p T is a valid Dynamic Matrix Container.
- *
- * @tparam T Type passed to check if is a valid Dynamic Matrix Container.
- */
-template <typename T>
-inline constexpr bool is_dynamic_matrix_container_v =
-    is_dynamic_matrix_container<T>::value;
-
-/**
- * @brief SFINAE Test to determine if the given type \p T is a valid Vector
- * Container.
- *
- * @tparam T Type passed to check if is a valid Vector Container.
+ * @tparam T Type passed for check.
  */
 template <class T>
 class is_vector_container {
@@ -285,18 +262,53 @@ class is_vector_container {
 };
 
 /**
- * @brief Short-hand to \p is_vector_container SFINAE Test to check if the type
- * \p T is a valid Vector Container.
+ * @brief Short-hand to \p is_vector_container.
  *
- * @tparam T Type passed to check if is a valid Container.
+ * @tparam T Type passed for check.
  */
 template <typename T>
 inline constexpr bool is_vector_container_v = is_vector_container<T>::value;
 
 /**
- * @brief SFINAE Test to determine if the given type \p T is a valid Container.
+ * @brief Checks if the given type \p T is a valid Dense Vector Container i.e
+ * has a \p tag member trait that is a derived class of \p DenseVectorTag.
  *
- * @tparam T Type passed to check if is a valid Container.
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_dense_vector_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      typename U::tag*,
+      typename std::enable_if<
+          std::is_base_of<DenseVectorTag, typename U::tag>::value>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_dense_vector_container.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_dense_vector_container_v =
+    is_dense_vector_container<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid Morpheus Container i.e
+ * has a \p tag member trait and is either a Morpheus Matrix or Vector
+ * container.
+ *
+ * @tparam T Type passed for check.
  */
 template <class T>
 class is_container {
@@ -317,20 +329,51 @@ class is_container {
 };
 
 /**
- * @brief Short-hand to \p is_container SFINAE Test to check if the type
- * \p T is a valid Container.
+ * @brief Short-hand to \p is_container.
  *
- * @tparam T Type passed to check if is a valid Container.
+ * @tparam T Type passed for check.
  */
 template <typename T>
 inline constexpr bool is_container_v = is_container<T>::value;
 
 /**
- * @brief SFINAE Test to determine if the given type \p T1 is the same format as
- * type \p T2 - Two containers have the same format if they hold the same tag.
+ * @brief Checks if the given type \p T is a valid Dynamic Matrix Container i.e
+ * has a \p tag member trait and is a derived class of \p DynamicTag.
  *
- * @tparam T1 Type passed to check if has the same format as \p T2
- * @tparam T2 Reference type against which we compare.
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_dynamic_matrix_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(typename U::tag*,
+                   typename std::enable_if<std::is_base_of<
+                       DynamicTag, typename U::tag>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_dynamic_matrix_container.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_dynamic_matrix_container_v =
+    is_dynamic_matrix_container<T>::value;
+
+/**
+ * @brief Checks if the two types have the same format i.e both are valid
+ * containers and have the same \p tag member trait.
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <class T1, class T2>
 class is_same_format {
@@ -354,26 +397,25 @@ class is_same_format {
 };
 
 /**
- * @brief Short-hand to \p is_same_format SFINAE Test to check if the given type
- * \p T1 is the same format as type \p T2.
+ * @brief Short-hand to \p is_same_format.
  *
- * @tparam T1 Type passed to check if has the same format as \p T2
- * @tparam T2 Reference type against which we compare.
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <typename T1, typename T2>
 inline constexpr bool is_same_format_v = is_same_format<T1, T2>::value;
 
 /**
- * @brief SFINAE Test to determine if the two types are in the same memory space
+ * @brief Checks if the two types are in the same memory space
  *
- * @tparam T1 Type passed to check if is in the same memory space as \p T2
- * @tparam T2 Type passed to check if is in the same memory space as \p T1
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
  */
 template <class T1, class T2>
 class in_same_memory_space {
   typedef char yes[1];
   typedef char no[2];
-
+  // TODO: Add check for if this is a valid memory space
   template <class U1, class U2>
   static yes& test(
       typename U1::memory_space*, typename U2::memory_space*,
