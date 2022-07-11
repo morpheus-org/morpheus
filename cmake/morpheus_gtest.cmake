@@ -1,8 +1,8 @@
 message(STATUS "Setting up Morpheus_Gtest library")
 
-find_package(GTest CONFIG REQUIRED)
+find_package(GTest CONFIG)
 if(NOT GTest_FOUND)
-  message(STATUS "Find module did not produce valid IMPORTED_NAME for GTest")
+  message(STATUS "find_package could not find GTest - Downloading GTest")
   include(FetchContent)
   FetchContent_Declare(
     googletest
