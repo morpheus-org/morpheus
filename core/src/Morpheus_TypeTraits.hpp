@@ -86,22 +86,21 @@ struct ValueType {
 };
 
 /**
- * @brief SFINAE Test to determine if the given type \p T is a member of \p
- * Variant
+ * @brief Checks if the given type \p T is a member of \p Variant container such
+ * as \p std::variant or \p mpark::variant
  *
- * @tparam T Type passed to check if is a member of the variant
- * @tparam Variant A variant container such as \p std::variant or
- * \p mpark::variant
+ * @tparam T Type passed for check
+ * @tparam Variant A variant container
+ *
  */
 template <typename T, typename Variant>
 inline constexpr bool is_variant_member_v =
     Impl::is_variant_member<T, Variant>::value;
 
 /**
- * @brief SFINAE Test to determine if the given type \p T has \p tag as a member
- * trait
+ * @brief Checks if \p T has \p tag as a member trait.
  *
- * @tparam T Type passed to check if has \p tag as member trait
+ * @tparam T Type passed for check
  */
 template <class T>
 class has_tag_trait {
@@ -119,10 +118,18 @@ class has_tag_trait {
 };
 
 /**
- * @brief SFINAE Test to determine if the given type \p T is a valid Matrix
- * Container.
+ * @brief Short-hand for \p has_tag_trait.
  *
- * @tparam T Type passed to check if is a valid Matrix Container.
+ * @tparam T Type passed for check
+ */
+template <typename T>
+inline constexpr bool has_tag_trait_v = has_tag_trait<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid Matrix Container i.e has a
+ * \p tag member trait that is a derived class of \p MatrixTag.
+ *
+ * @tparam T Type passed for check.
  */
 template <class T>
 class is_matrix_container {
@@ -144,19 +151,18 @@ class is_matrix_container {
 };
 
 /**
- * @brief Short-hand to \p is_matrix_container SFINAE Test to check if the type
- * \p T is a valid Matrix Container.
+ * @brief Short-hand to \p is_matrix_container.
  *
- * @tparam T Type passed to check if is a valid Matrix Container.
+ * @tparam T Type passed for check.
  */
 template <typename T>
 inline constexpr bool is_matrix_container_v = is_matrix_container<T>::value;
 
 /**
- * @brief SFINAE Test to determine if the given type \p T is a valid Sparse
- * Matrix Container.
+ * @brief Checks if the given type \p T is a valid Sparse Matrix Container i.e
+ * has a \p tag member trait that is a derived class of \p SparseMatTag.
  *
- * @tparam T Type passed to check if is a valid Sparse Matrix Container.
+ * @tparam T Type passed for check.
  */
 template <class T>
 class is_sparse_matrix_container {
@@ -178,20 +184,19 @@ class is_sparse_matrix_container {
 };
 
 /**
- * @brief Short-hand to \p is_sparse_matrix_container SFINAE Test to check if
- * the type \p T is a valid Sparse Matrix Container.
+ * @brief Short-hand to \p is_sparse_matrix_container.
  *
- * @tparam T Type passed to check if is a valid Sparse Matrix Container.
+ * @tparam T Type passed for check.
  */
 template <typename T>
 inline constexpr bool is_sparse_matrix_container_v =
     is_sparse_matrix_container<T>::value;
 
 /**
- * @brief SFINAE Test to determine if the given type \p T is a valid Dense
- * Matrix Container.
+ * @brief Check if the given type \p T is a valid Dense Matrix Container i.e
+ * has a \p tag member trait that is a derived class of \p DenseMatTag.
  *
- * @tparam T Type passed to check if is a valid Dense Matrix Container.
+ * @tparam T Type passed for check.
  */
 template <class T>
 class is_dense_matrix_container {
@@ -213,10 +218,9 @@ class is_dense_matrix_container {
 };
 
 /**
- * @brief Short-hand to \p is_dense_matrix_container SFINAE Test to check if
- * the type \p T is a valid Dense Matrix Container.
+ * @brief Short-hand to \p is_dense_matrix_container.
  *
- * @tparam T Type passed to check if is a valid Dense Matrix Container.
+ * @tparam T Type passed for checks.
  */
 template <typename T>
 inline constexpr bool is_dense_matrix_container_v =
