@@ -116,6 +116,17 @@ struct IndexedTypeList {
   using type = typename std::tuple_element<N, std::tuple<Ts...>>::type;
 };
 
+/*! \cond */
+/**
+ * @brief Base case of a \p TypeList of sets.
+ */
+template <typename... Head_>
+struct TypeList<Set<Head_...>> {
+  using Head = Set<Head_...>;
+  using Tail = void;
+};
+/*! \endcond */
+
 /**
  * @brief Compile-time linked-list like type list specialisation for when the
  * types passed are \p Set.
@@ -127,12 +138,6 @@ template <typename... Head_, typename... Tail_>
 struct TypeList<Set<Head_...>, Tail_...> {
   using Head = Set<Head_...>;
   using Tail = TypeList<Tail_...>;
-};
-
-template <typename... Head_>
-struct TypeList<Set<Head_...>> {
-  using Head = Set<Head_...>;
-  using Tail = void;
 };
 
 /**
