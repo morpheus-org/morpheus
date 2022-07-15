@@ -36,6 +36,7 @@ namespace Morpheus {
  *
  */
 
+/*! \cond */
 // Forward declarations
 template <typename... Ts>
 struct TypeList;
@@ -82,6 +83,7 @@ struct cross_product<TypeList<Set<T...>, Ts...>, TypeList<Us...>> {
       typename cross_product<TypeList<Ts...>, TypeList<Us...>>::type>::type;
 };
 }  // namespace Impl
+/*! \endcond */
 
 /**
  * @brief Compile-time type list
@@ -193,6 +195,9 @@ struct cross_product<TypeList<Ts...>, TypeList<Us...>> {
   using type =
       typename Impl::cross_product<TypeList<Ts...>, TypeList<Us...>>::type;
 };
+
+/*! \}
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_METAPROGRAMMING_HPP
