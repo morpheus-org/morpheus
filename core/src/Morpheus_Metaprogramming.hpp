@@ -156,11 +156,11 @@ struct TypeList<Set<Head_...>, Tail_...> {
  *
  *  // concat<<A, B>, <C, D>> = <A, B, C, D>
  *  using concat_res = typename Morpheus::concat<TypeList<A, B>,
- *                                               TypeList<C, D>>::type
+ *                                               TypeList<C, D>>::type;
  *  // reference result
- *  res = TypeList<A, B, C, D>
+ *  using res = TypeList<A, B, C, D>;
  *
- *  std::cout << std::is_same<product_res, res>::value << std::endl; // prints 1
+ *  std::cout << std::is_same<concat_res, res>::value << std::endl; // prints 1
  *
  * }
  * \endcode
@@ -186,9 +186,9 @@ struct concat<TypeList<Ts...>, TypeList<Us...>> {
  *
  *  // <A, B> x <C, D> = <<A, C>, <A, D>, <B, C>, <B, D>>
  *  using product_res = typename Morpheus::cross_product<TypeList<A, B>,
- *                                                       TypeList<C, D>>::type
+ *                                                       TypeList<C, D>>::type;
  *  // reference result
- *  res = TypeList<Set<A,C>, Set<A,D>, Set<B,C>, Set<B,D>>
+ *  using res = TypeList<Set<A,C>, Set<A,D>, Set<B,C>, Set<B,D>>;
  *
  *  std::cout << std::is_same<product_res, res>::value << std::endl; // prints 1
  *
