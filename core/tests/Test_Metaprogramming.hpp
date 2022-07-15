@@ -149,6 +149,63 @@ TEST(MetaprogrammingTest, CrossProduct) {
   EXPECT_EQ(res, 1);
 }
 
+/**
+ * @brief Checks the compile-time cross product of between many type lists of
+ * types
+ * e.g <A,B> x <C,D> x <E,F>
+ *      = <set<A,C>, set<A,D>, set<B,C>, set<B,D>> x <E, F>
+ *      = <set<A,C,E>, set<A,C,F>, set<A,D,E>, set<A,D,F>,
+ *         set<B,C,E>, set<B,C,F>, set<B,D,E>, set<B,D,F>>
+ *
+ */
+TEST(MetaprogrammingTest, MultipleCrossProducts) {
+  // Types
+  struct A {};
+  struct B {};
+  struct C {};
+  struct D {};
+  struct E {};
+  struct F {};
+
+  // <A,B> x <C,D> x <E,F>
+  // = <set<A,C>, set<A,D>, set<B,C>, set<B,D>> x <E, F>
+  // = <set<A,C,E>, set<A,C,F>, set<A,D,E>, set<A,D,F>,
+  // 	set<B,C,E>, set<B,C,F>, set<B,D,E>, set<B,D,F>>
+
+  // <A,B> x <C,D>
+  // = <set<A,C>, set<A,D>, set<B,C>, set<B,D>>
+  using cross1 =
+      typename Morpheus::cross_product<Morpheus::TypeList<A, B>,
+                                       Morpheus::TypeList<C, D>>::type;
+  // <set<A,C>, set<A,D>, set<B,C>, set<B,D>> x <E, F>
+  // = <set<A,C,E>, set<A,C,F>, set<A,D,E>, set<A,D,F>,
+  // 	set<B,C,E>, set<B,C,F>, set<B,D,E>, set<B,D,F>>
+  using cross2 =
+      typename Morpheus::cross_product<cross1, Morpheus::TypeList<E, F>>::type;
+
+  bool res = std::is_same<
+      cross2, Morpheus::TypeList<Morpheus::Set<A, C, E>, Morpheus::Set<A, C, F>,
+                                 Morpheus::Set<A, D, E>, Morpheus::Set<A, D, F>,
+                                 Morpheus::Set<B, C, E>, Morpheus::Set<B, C, F>,
+                                 Morpheus::Set<B, D, E>,
+                                 Morpheus::Set<B, D, F>>>::value;
+  EXPECT_EQ(res, 1);
+
+  // <set<A,C>, set<A,D>, set<B,C>, set<B,D>> x <set<E, F>>
+  // = <set<A,C,set<E,F>>, set<A,D,set<E,F>>,
+  //    set<B,C,set<E,F>>, set<B,D,set<E,F>>>
+  using cross3 = typename Morpheus::cross_product<
+      cross1, Morpheus::TypeList<Morpheus::Set<E, F>>>::type;
+
+  res = std::is_same<
+      cross3,
+      Morpheus::TypeList<Morpheus::Set<A, C, Morpheus::Set<E, F>>,
+                         Morpheus::Set<A, D, Morpheus::Set<E, F>>,
+                         Morpheus::Set<B, C, Morpheus::Set<E, F>>,
+                         Morpheus::Set<B, D, Morpheus::Set<E, F>>>>::value;
+  EXPECT_EQ(res, 1);
+}
+
 }  // namespace Test
 
 #endif  // TEST_CORE_TEST_METAPROGRAMMING_HPP
