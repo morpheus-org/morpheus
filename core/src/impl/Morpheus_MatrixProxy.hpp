@@ -24,26 +24,21 @@
 #ifndef MORPHEUS_MATRIXPROXY_HPP
 #define MORPHEUS_MATRIXPROXY_HPP
 
+#include <Morpheus_Metaprogramming.hpp>
 #include <impl/Morpheus_Variant.hpp>
 
-#include <tuple>
-
 namespace Morpheus {
-// Compile-time type list with indexed access
-template <class... Args>
-struct TypeList {
-  template <std::size_t N>
-  using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
-};
+namespace Impl {
 
 template <class... Formats>
 struct MatrixFormatsProxy {
   using type = MatrixFormatsProxy<Formats...>;
 
   using variant   = Morpheus::Impl::Variant::variant<Formats...>;
-  using type_list = TypeList<Formats...>;
+  using type_list = IndexedTypeList<Formats...>;
 };
 
+}  // namespace Impl
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_MATRIXPROXY_HPP

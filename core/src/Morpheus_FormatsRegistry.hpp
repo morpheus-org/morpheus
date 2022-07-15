@@ -36,7 +36,7 @@ namespace Morpheus {
 
 template <class ValueType, class... Properties>
 struct MatrixFormats {
-  using formats_proxy = typename MatrixFormatsProxy<
+  using formats_proxy = typename Impl::MatrixFormatsProxy<
       typename CooMatrix<ValueType, Properties...>::type,
       typename CsrMatrix<ValueType, Properties...>::type,
       typename DiaMatrix<ValueType, Properties...>::type>::type;
