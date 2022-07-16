@@ -322,8 +322,8 @@ void read_matrix_market_stream(
     Container<T, P...>& mtx, Stream& input, Morpheus::Impl::SparseMatTag,
     typename std::enable_if<
         is_container<typename Container<T, P...>::tag>::value &&
-        is_HostSpace_v<typename Container<T, P...>::memory_space>>::type* =
-        nullptr) {
+        is_host_memory_space_v<typename Container<T, P...>::memory_space>>::
+        type* = nullptr) {
   // read banner
   matrix_market_banner banner;
   read_matrix_market_banner(banner, input);
@@ -386,7 +386,7 @@ void write_matrix_market_stream(
     const Container<T, P...>& mtx, Stream& output, Morpheus::Impl::SparseMatTag,
     typename std::enable_if<
         is_container<typename Container<T, P...>::tag>::value &&
-        is_Host_Memoryspace_v<typename Container<T, P...>::memory_space>>::
+        is_host_memory_space_v<typename Container<T, P...>::memory_space>>::
         type* = nullptr) {
   // general sparse case
   Morpheus::CooMatrix<T, P...> coo;

@@ -40,7 +40,7 @@ void update_diagonal(
     SparseMatrix& A, const Vector& diagonal, CooTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
   using index_type = typename SparseMatrix::index_type;
@@ -60,7 +60,7 @@ void get_diagonal(
     SparseMatrix& A, const Vector& diagonal, CooTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
@@ -72,7 +72,7 @@ void set_value(SparseMatrix& A, IndexType row, IndexType col, ValueType value,
                CooTag,
                typename std::enable_if_t<
                    !Morpheus::is_kokkos_space_v<ExecSpace> &&
-                   Morpheus::is_OpenMP_space_v<ExecSpace> &&
+                   Morpheus::is_openmp_execution_space_v<ExecSpace> &&
                    Morpheus::has_access_v<typename ExecSpace::execution_space,
                                           SparseMatrix>>* = nullptr) {
   throw Morpheus::NotImplementedException("set_value not implemented yet");
@@ -86,7 +86,7 @@ void set_values(
     const ValueVector values, CooTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, IndexVector, ValueVector>>* =
         nullptr) {
@@ -98,7 +98,7 @@ void transpose(
     const Matrix& A, TransposeMatrix& At, CooTag, CooTag,
     typename std::enable_if_t<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                TransposeMatrix>>* = nullptr) {
   throw Morpheus::NotImplementedException("transpose not implemented yet");

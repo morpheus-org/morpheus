@@ -40,7 +40,7 @@ void convert(
     const SourceType& src, DestinationType& dst, DenseMatrixTag, DenseMatrixTag,
     typename std::enable_if<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
@@ -63,7 +63,7 @@ void convert(
     const SourceType& src, DestinationType& dst, DenseMatrixTag, DenseVectorTag,
     typename std::enable_if<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;
@@ -85,7 +85,7 @@ void convert(
     const SourceType& src, DestinationType& dst, DenseMatrixTag, CooTag,
     typename std::enable_if<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>::type* = nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos::OpenMP>");
@@ -96,7 +96,7 @@ void convert(
     const SourceType& src, DestinationType& dst, CooTag, DenseMatrixTag,
     typename std::enable_if<
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
+        Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>::type* = nullptr) {
   using index_type = typename SourceType::index_type;

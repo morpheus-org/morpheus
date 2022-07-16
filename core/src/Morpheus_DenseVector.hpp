@@ -194,15 +194,15 @@ class DenseVector
   template <class VR, class... PR>
   inline DenseVector(
       const DenseVector<VR, PR...>& src,
-      typename std::enable_if<is_compatible_type<
+      typename std::enable_if<is_format_compatible<
           DenseVector, typename DenseVector<VR, PR...>::type>::value>::type* =
           nullptr)
       : _size(src.size()), _values(src.const_view()) {}
 
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_type<DenseVector,
-                         typename DenseVector<VR, PR...>::type>::value,
+      is_format_compatible<DenseVector,
+                           typename DenseVector<VR, PR...>::type>::value,
       DenseVector&>::type
   operator=(const DenseVector<VR, PR...>& src) {
     _size   = src.size();

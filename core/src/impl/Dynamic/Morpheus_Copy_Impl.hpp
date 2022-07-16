@@ -43,7 +43,7 @@ struct copy_fn {
   result_type operator()(
       const SourceType& src, DestinationType& dst,
       typename std::enable_if<
-          is_compatible_type<SourceType, DestinationType>::value ||
+          is_format_compatible<SourceType, DestinationType>::value ||
           is_compatible_from_different_space<
               SourceType, DestinationType>::value>::type* = nullptr) {
     dst.resize(src);
@@ -55,7 +55,7 @@ struct copy_fn {
   result_type operator()(
       const SourceType& src, DestinationType& dst,
       typename std::enable_if<
-          !(is_compatible_type<SourceType, DestinationType>::value ||
+          !(is_format_compatible<SourceType, DestinationType>::value ||
             is_compatible_from_different_space<
                 SourceType, DestinationType>::value)>::type* = nullptr) {
     throw Morpheus::FormatConversionException(

@@ -108,7 +108,7 @@ class DynamicMatrix
   template <class VR, class... PR>
   DynamicMatrix(
       const DynamicMatrix<VR, PR...> &src,
-      typename std::enable_if<is_compatible_type<
+      typename std::enable_if<is_format_compatible<
           DynamicMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type
           * = nullptr)
       : base(src.nrows(), src.ncols(), src.nnnz()) {
@@ -120,8 +120,8 @@ class DynamicMatrix
   // Assignment from another compatible dynamic matrix type
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_type<DynamicMatrix,
-                         typename DynamicMatrix<VR, PR...>::type>::value,
+      is_format_compatible<DynamicMatrix,
+                           typename DynamicMatrix<VR, PR...>::type>::value,
       DynamicMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
     base::resize(src.nrows(), src.ncols(), src.nnnz());
@@ -135,7 +135,7 @@ class DynamicMatrix
 
   template <typename... Args>
   inline void resize(const index_type m, const index_type n,
-                     const index_type nnz, Args &&...args) {
+                     const index_type nnz, Args &&... args) {
     base::resize(m, n, nnz);
     auto f = std::bind(Impl::any_type_resize<ValueType, Properties...>(),
                        std::placeholders::_1, m, n, nnz,

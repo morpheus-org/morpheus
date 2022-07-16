@@ -31,7 +31,7 @@ namespace Morpheus {
 template <typename ExecSpace, typename Vector1, typename Vector2>
 inline typename Vector1::value_type dot(typename Vector1::index_type n,
                                         const Vector1& x, const Vector2& y) {
-  static_assert(is_compatible_type<Vector1, Vector2>::value,
+  static_assert(is_format_compatible<Vector1, Vector2>::value,
                 "x and y must be compatible types");
   return Impl::dot<ExecSpace>(n, x, y, typename Vector1::tag{},
                               typename Vector2::tag{});

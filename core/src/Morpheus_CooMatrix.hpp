@@ -113,7 +113,7 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   // Needs to be a compatible type
   template <class VR, class... PR>
   CooMatrix(const CooMatrix<VR, PR...> &src,
-            typename std::enable_if<is_compatible_type<
+            typename std::enable_if<is_format_compatible<
                 CooMatrix, typename CooMatrix<VR, PR...>::type>::value>::type
                 * = nullptr)
       : base(src.nrows(), src.ncols(), src.nnnz()),
@@ -124,7 +124,8 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_type<CooMatrix, typename CooMatrix<VR, PR...>::type>::value,
+      is_format_compatible<CooMatrix,
+                           typename CooMatrix<VR, PR...>::type>::value,
       CooMatrix &>::type
   operator=(const CooMatrix<VR, PR...> &src) {
     this->set_nrows(src.nrows());

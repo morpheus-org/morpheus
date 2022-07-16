@@ -132,7 +132,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   // Construct from another matrix type (Shallow)
   template <class VR, class... PR>
   DiaMatrix(const DiaMatrix<VR, PR...> &src,
-            typename std::enable_if<is_compatible_type<
+            typename std::enable_if<is_format_compatible<
                 DiaMatrix, typename DiaMatrix<VR, PR...>::type>::value>::type
                 * = nullptr)
       : base(src.nrows(), src.ncols(), src.nnnz()),
@@ -144,7 +144,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   // Assignment from another matrix type (Shallow)
   template <class VR, class... PR>
   typename std::enable_if<
-      is_compatible_type<DiaMatrix, typename DiaMatrix<VR, PR...>::type>::value,
+      is_format_compatible<DiaMatrix,
+                           typename DiaMatrix<VR, PR...>::type>::value,
       DiaMatrix &>::type
   operator=(const DiaMatrix<VR, PR...> &src) {
     this->set_nrows(src.nrows());
