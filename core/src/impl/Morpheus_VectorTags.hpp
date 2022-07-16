@@ -27,8 +27,8 @@
 #include <type_traits>
 
 namespace Morpheus {
-
 namespace Impl {
+
 /**
  * @brief Tag used to mark containers as Vectors
  *
@@ -58,8 +58,8 @@ class is_vector_tag {
 
   template <class U>
   static yes& test(
-      U*, typename std::enable_if<
-              std::is_base_of<Impl::VectorTag, U>::value>::type* = nullptr);
+      U*, typename std::enable_if<std::is_base_of<VectorTag, U>::value>::type* =
+              nullptr);
 
   template <class U>
   static no& test(...);
@@ -89,8 +89,9 @@ class has_vector_tag {
 
   template <class U>
   static yes& test(
-      U*, typename std::enable_if<is_vector_tag_v<typename U::tag>>::type* =
-              nullptr);
+      U*,
+      typename std::enable_if<is_vector_tag<typename U::tag>::value>::type* =
+          nullptr);
 
   template <class U>
   static no& test(...);
@@ -151,9 +152,8 @@ class has_sparse_vector_tag {
 
   template <class U>
   static yes& test(
-      U*,
-      typename std::enable_if<is_sparse_vector_tag_v<typename U::tag>>::type* =
-          nullptr);
+      U*, typename std::enable_if<
+              is_sparse_vector_tag<typename U::tag>::value>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -214,9 +214,8 @@ class has_dense_vector_tag {
 
   template <class U>
   static yes& test(
-      U*,
-      typename std::enable_if<is_dense_vector_tag_v<typename U::tag>>::type* =
-          nullptr);
+      U*, typename std::enable_if<
+              is_dense_vector_tag<typename U::tag>::value>::type* = nullptr);
 
   template <class U>
   static no& test(...);

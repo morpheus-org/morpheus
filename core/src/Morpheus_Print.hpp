@@ -25,12 +25,13 @@
 #define MORPHEUS_PRINT_HPP
 
 #include <impl/Morpheus_Print_Impl.hpp>
+#include <impl/Dynamic/Morpheus_Print_Impl.hpp>
 
 namespace Morpheus {
 
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s) {
-  Morpheus::Impl::print(p, s, typename Printable::tag());
+  Impl::print(p, s);
 }
 
 template <typename Printable>

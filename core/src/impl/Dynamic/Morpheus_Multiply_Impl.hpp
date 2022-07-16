@@ -26,24 +26,23 @@
 
 #include <Morpheus_FormatTags.hpp>
 
+#include <impl/Morpheus_Multiply_Impl.hpp>
 #include <impl/Morpheus_Variant.hpp>
 
 namespace Morpheus {
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
-inline void multiply(const Matrix& A, const Vector1& x, Vector2& y,
-                     const bool init);
-
 namespace Impl {
 
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
-inline void multiply(const Matrix& A, const Vector1& x, Vector2& y,
-                     const bool init, DynamicTag, DenseVectorTag,
-                     DenseVectorTag) {
-  std::visit(
-      [&](auto&& arg) { Morpheus::multiply<ExecSpace>(arg, x, y, init); },
-      A.const_formats());
+inline void multiply(
+    const Matrix& A, const Vector1& x, Vector2& y, const bool init,
+    typename std::enable_if<
+        Morpheus::is_dynamic_matrix_format_container<Matrix>::value &&
+        Morpheus::is_dense_vector_format_container<Vector1>::value &&
+        Morpheus::is_dense_vector_format_container<Vector2>::value>::type* =
+        nullptr) {
+  std::visit([&](auto&& arg) { Impl::multiply<ExecSpace>(arg, x, y, init); },
+             A.const_formats());
 }
 
 }  // namespace Impl

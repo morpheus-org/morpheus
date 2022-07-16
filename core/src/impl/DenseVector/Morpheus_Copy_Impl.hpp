@@ -39,8 +39,12 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, DenseVectorTag,
-          DenseVectorTag) {
+void copy(
+    const SourceType& src, DestinationType& dst,
+    typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<SourceType> &&
+        Morpheus::is_dense_vector_format_container_v<DestinationType>>::type* =
+        nullptr) {
   MORPHEUS_ASSERT(
       dst.size() == src.size(),
       "Destination vector must be of equal size to the source vector");
@@ -54,8 +58,11 @@ void copy(const SourceType& src, DestinationType& dst,
           const typename SourceType::index_type src_begin,
           const typename SourceType::index_type src_end,
           const typename DestinationType::index_type dst_begin,
-          const typename DestinationType::index_type dst_end, DenseVectorTag,
-          DenseVectorTag) {
+          const typename DestinationType::index_type dst_end,
+          typename std::enable_if_t<
+              Morpheus::is_dense_vector_format_container_v<SourceType> &&
+              Morpheus::is_dense_vector_format_container_v<DestinationType>>* =
+              nullptr) {
   auto src_sub =
       Kokkos::subview(src.const_view(), std::make_pair(src_begin, src_end));
   auto dst_sub =

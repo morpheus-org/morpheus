@@ -34,8 +34,9 @@ namespace Impl {
 
 template <typename ExecSpace, typename Vector>
 typename Vector::value_type reduce(
-    const Vector& in, typename Vector::index_type size, DenseVectorTag,
+    const Vector& in, typename Vector::index_type size,
     typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =

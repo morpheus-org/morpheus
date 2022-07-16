@@ -33,7 +33,10 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, DenseVectorTag) {
+void print(
+    const Printable& p, Stream& s,
+    typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Printable>>* = nullptr) {
   using index_type = typename Printable::index_type;
   s << "<" << p.size() << "> with " << p.size() << " entries\n";
 

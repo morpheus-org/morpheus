@@ -27,50 +27,59 @@
 #include <Morpheus_FormatTags.hpp>
 
 #include <impl/Morpheus_Variant.hpp>
+#include <impl/Morpheus_Convert_Impl.hpp>
 
 namespace Morpheus {
-// forward decl
-template <typename ExecSpace, typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst);
-
 namespace Impl {
+
 template <typename ExecSpace>
 struct convert_fn {
   using result_type = void;
 
   template <typename SourceType, typename DestinationType>
   result_type operator()(const SourceType& src, DestinationType& dst) {
-    Morpheus::convert<ExecSpace>(src, dst);
+    Impl::convert<ExecSpace>(src, dst);
   }
 };
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, DynamicTag,
-             SparseMatTag) {
+void convert(
+    const SourceType& src, DestinationType& dst,
+    typename std::enable_if<
+        Morpheus::is_dynamic_matrix_format_container<SourceType>::value &&
+        Morpheus::is_sparse_matrix_container<DestinationType>::value>::type* =
+        nullptr) {
   auto f = std::bind(Impl::convert_fn<ExecSpace>(), std::placeholders::_1,
                      std::ref(dst));
-  Morpheus::Impl::Variant::visit(f, src.const_formats());
+  Impl::Variant::visit(f, src.const_formats());
 }
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, SparseMatTag,
-             DynamicTag) {
+void convert(const SourceType& src, DestinationType& dst,
+             typename std::enable_if<
+                 Morpheus::is_sparse_matrix_container<SourceType>::value &&
+                 Morpheus::is_dynamic_matrix_format_container<
+                     DestinationType>::value>::type* = nullptr) {
   dst.set_nrows(src.nrows());
   dst.set_ncols(src.ncols());
   dst.set_nnnz(src.nnnz());
   auto f = std::bind(Impl::convert_fn<ExecSpace>(), std::cref(src),
                      std::placeholders::_1);
-  Morpheus::Impl::Variant::visit(f, dst.formats());
+  Impl::Variant::visit(f, dst.formats());
 }
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
-void convert(const SourceType& src, DestinationType& dst, DynamicTag,
-             DynamicTag) {
+void convert(
+    const SourceType& src, DestinationType& dst,
+    typename std::enable_if<
+        Morpheus::is_dynamic_matrix_format_container<SourceType>::value &&
+        Morpheus::is_dynamic_matrix_format_container<DestinationType>::value>::
+        type* = nullptr) {
   dst.set_nrows(src.nrows());
   dst.set_ncols(src.ncols());
   dst.set_nnnz(src.nnnz());
-  Morpheus::Impl::Variant::visit(Impl::convert_fn<ExecSpace>(),
-                                 src.const_formats(), dst.formats());
+  Impl::Variant::visit(Impl::convert_fn<ExecSpace>(), src.const_formats(),
+                       dst.formats());
 }
 
 }  // namespace Impl

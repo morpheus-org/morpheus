@@ -319,11 +319,10 @@ void read_array_stream(Morpheus::DenseMatrix<ValueType, Properties...>& mtx,
 template <template <class, class...> class Container, class T, class... P,
           typename Stream>
 void read_matrix_market_stream(
-    Container<T, P...>& mtx, Stream& input, Morpheus::Impl::SparseMatTag,
-    typename std::enable_if<
-        is_container<typename Container<T, P...>::tag>::value &&
-        is_host_memory_space_v<typename Container<T, P...>::memory_space>>::
-        type* = nullptr) {
+    Container<T, P...>& mtx, Stream& input,
+    typename std::enable_if<is_sparse_matrix_container_v<Container<T, P...>> &&
+                            is_host_memory_space_v<typename Container<
+                                T, P...>::memory_space>>::type* = nullptr) {
   // read banner
   matrix_market_banner banner;
   read_matrix_market_banner(banner, input);
@@ -340,18 +339,21 @@ void read_matrix_market_stream(
   }
 }
 
-template <typename Matrix, typename Stream>
-void read_matrix_market_stream(Matrix& mtx, Stream& input,
-                               Morpheus::DenseVectorTag) {
+template <typename Vector, typename Stream>
+void read_matrix_market_stream(
+    Vector& vec, Stream& input,
+    typename std::enable_if<
+        Morpheus::is_dense_vector_format_container_v<Vector>>::type* =
+        nullptr) {
   // array1d case
-  using ValueType = typename Matrix::value_type;
-  using Space     = Kokkos::Serial;
+  using ValueType = typename Vector::value_type;
+  using Space     = Kokkos::DefaultHostExecutionSpace;
 
   Morpheus::DenseMatrix<ValueType, Space> temp;
 
   Morpheus::Io::read_matrix_market_stream(temp, input);
 
-  Morpheus::copy(temp, mtx);
+  Morpheus::copy(temp, vec);
 }
 
 template <typename Stream, typename ScalarType>
@@ -383,11 +385,10 @@ void write_coordinate_stream(
 template <template <class, class...> class Container, class T, class... P,
           typename Stream>
 void write_matrix_market_stream(
-    const Container<T, P...>& mtx, Stream& output, Morpheus::Impl::SparseMatTag,
-    typename std::enable_if<
-        is_container<typename Container<T, P...>::tag>::value &&
-        is_host_memory_space_v<typename Container<T, P...>::memory_space>>::
-        type* = nullptr) {
+    const Container<T, P...>& mtx, Stream& output,
+    typename std::enable_if<is_sparse_matrix_container_v<Container<T, P...>> &&
+                            is_host_memory_space_v<typename Container<
+                                T, P...>::memory_space>>::type* = nullptr) {
   // general sparse case
   Morpheus::CooMatrix<T, P...> coo;
   Morpheus::convert(mtx, coo);
@@ -396,8 +397,11 @@ void write_matrix_market_stream(
 }
 
 template <typename Matrix, typename Stream>
-void write_matrix_market_stream(const Matrix& mtx, Stream& output,
-                                Morpheus::DenseVectorTag) {
+void write_matrix_market_stream(
+    const Matrix& mtx, Stream& output,
+    typename std::enable_if<
+        Morpheus::is_dense_vector_format_container_v<Matrix>>::type* =
+        nullptr) {
   using ValueType = typename Matrix::value_type;
 
   if (std::is_floating_point_v<ValueType> || std::is_integral_v<ValueType>) {
@@ -416,8 +420,11 @@ void write_matrix_market_stream(const Matrix& mtx, Stream& output,
 }
 
 template <typename Matrix, typename Stream>
-void write_matrix_market_stream(const Matrix& mtx, Stream& output,
-                                Morpheus::DenseMatrixTag) {
+void write_matrix_market_stream(
+    const Matrix& mtx, Stream& output,
+    typename std::enable_if<
+        Morpheus::is_dense_matrix_format_container_v<Matrix>>::type* =
+        nullptr) {
   using ValueType = typename Matrix::value_type;
 
   if (std::is_floating_point_v<ValueType> || std::is_integral_v<ValueType>) {

@@ -29,6 +29,8 @@
 #include <fwd/Morpheus_Fwd_DenseMatrix.hpp>
 
 #include <impl/Morpheus_Variant.hpp>
+#include <impl/Morpheus_MatrixTags.hpp>
+#include <impl/Morpheus_VectorTags.hpp>
 
 #include <Kokkos_Core.hpp>
 
@@ -56,6 +58,8 @@ namespace Morpheus {
 // forward decl
 template <typename Space>
 struct GenericSpace;
+
+struct DynamicMatrixFormatTag;
 
 namespace Impl {
 template <typename T>
@@ -152,7 +156,8 @@ class is_matrix_container {
 
   template <class U>
   static yes& test(
-      U*, typename std::enable_if<Impl::has_matrix_tag_v<U>>::type* = nullptr);
+      U*,
+      typename std::enable_if<Impl::has_matrix_tag<U>::value>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -249,7 +254,8 @@ class is_vector_container {
 
   template <class U>
   static yes& test(
-      U*, typename std::enable_if<Impl::is_vector_tag_v<U>>::type* = nullptr);
+      U*,
+      typename std::enable_if<Impl::has_vector_tag<U>::value>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -1045,12 +1051,12 @@ class is_format_compatible_different_space {
   typedef char no[2];
 
   template <class U1, class U2>
-  static yes& test(U1*, U2*,
-                   typename std::enable_if<
-                       has_same_format<U1, U2> && is_memory_space_v<U1> &&
-                       is_memory_space_v<U2> && is_layout_v<U1> &&
-                       is_layout_v<U2> && is_same_value_type_v<U1, U2> &&
-                       is_same_index_type_v<U1, U2>>::type* = nullptr);
+  static yes& test(
+      U1*, U2*,
+      typename std::enable_if<
+          !has_same_memory_space_v<U1, U2> && has_same_format_v<U1, U2> &&
+          has_same_layout_v<U1, U2> && has_same_value_type_v<U1, U2> &&
+          has_same_index_type_v<U1, U2>>::type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -1060,16 +1066,16 @@ class is_format_compatible_different_space {
       sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
 };
 
-template <typename T1, typename T2>
-struct is_format_compatible_different_space
-    : std::integral_constant<
-          bool, is_same_format<T1, T2>::value &&
-                    !std::is_same<typename T1::memory_space,
-                                  typename T2::memory_space>::value &&
-                    std::is_same<typename T1::value_type,
-                                 typename T2::value_type>::value &&
-                    std::is_same<typename T1::index_type,
-                                 typename T2::index_type>::value> {};
+// template <typename T1, typename T2>
+// struct is_format_compatible_different_space
+//     : std::integral_constant<
+//           bool, is_same_format<T1, T2>::value &&
+//                     !std::is_same<typename T1::memory_space,
+//                                   typename T2::memory_space>::value &&
+//                     std::is_same<typename T1::value_type,
+//                                  typename T2::value_type>::value &&
+//                     std::is_same<typename T1::index_type,
+//                                  typename T2::index_type>::value> {};
 
 /**
  * @brief Provides the member type which is the same as T, except that its

@@ -34,7 +34,10 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, CsrTag) {
+void print(const Printable& p, Stream& s,
+           typename std::enable_if<
+               Morpheus::is_csr_matrix_format_container_v<Printable>>::type* =
+               nullptr) {
   using index_type = typename Printable::index_type;
   print_matrix_header(p, s);
 

@@ -40,10 +40,10 @@ namespace Impl {
 template <typename ExecSpace, typename Vector>
 void reduce(
     const Vector& in, Vector& out, unsigned int size, int threads, int blocks,
-    DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_Cuda_space_v<ExecSpace> &&
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
+        Morpheus::is_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
   using value_type = typename Vector::value_type;
@@ -173,10 +173,11 @@ void reduce(
 
 template <typename ExecSpace, typename Vector>
 typename Vector::value_type reduce(
-    const Vector& in, typename Vector::index_type size, DenseVectorTag,
+    const Vector& in, typename Vector::index_type size,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_Cuda_space_v<ExecSpace> &&
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
+        Morpheus::is_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
   using value_type = typename Vector::value_type;
@@ -207,8 +208,7 @@ typename Vector::value_type reduce(
     getNumBlocksAndThreads<int>(s, maxBlocks, maxThreads, blocks, threads);
     Morpheus::copy(out, inter_sums, 0, s);
 
-    reduce<ExecSpace>(inter_sums, out, s, threads, blocks,
-                      typename Vector::tag{}, typename Vector::tag{});
+    Impl::reduce<ExecSpace>(inter_sums, out, s, threads, blocks);
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
     getLastCudaError("reduce_kernel: Kernel execution failed");
 #endif
@@ -220,7 +220,7 @@ typename Vector::value_type reduce(
     typename Vector::HostMirror h_out(s, 0);
     // copy result from device to host
     Morpheus::copy(out, h_out, 0, s);
-    result = reduce<Kokkos::Serial>(h_out, s, typename Vector::tag{});
+    result = reduce<Kokkos::Serial>(h_out, s);
   } else {
     // copy final sum from device to host
     typename Vector::HostMirror h_out(1, 0);

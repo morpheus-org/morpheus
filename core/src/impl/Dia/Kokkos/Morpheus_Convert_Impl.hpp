@@ -33,8 +33,10 @@ namespace Impl {
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 inline void convert(
-    const SourceType& src, DestinationType& dst, DiaTag, DiaTag,
+    const SourceType& src, DestinationType& dst,
     typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<SourceType> &&
+        Morpheus::is_dia_matrix_format_container_v<DestinationType> &&
         Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>* = nullptr) {
@@ -43,8 +45,10 @@ inline void convert(
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 inline void convert(
-    const SourceType& src, DestinationType& dst, DiaTag, CooTag,
+    const SourceType& src, DestinationType& dst,
     typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<SourceType> &&
+        Morpheus::is_coo_matrix_format_container_v<DestinationType> &&
         Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>* = nullptr) {
@@ -53,8 +57,10 @@ inline void convert(
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 inline void convert(
-    const SourceType& src, DestinationType& dst, CooTag, DiaTag,
+    const SourceType& src, DestinationType& dst,
     typename std::enable_if_t<
+        Morpheus::is_coo_matrix_format_container_v<SourceType> &&
+        Morpheus::is_dia_matrix_format_container_v<DestinationType> &&
         Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>* = nullptr) {

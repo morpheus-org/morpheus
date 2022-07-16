@@ -35,7 +35,10 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, DiaTag) {
+void print(const Printable& p, Stream& s,
+           typename std::enable_if<
+               Morpheus::is_dia_matrix_format_container_v<Printable>>::type* =
+               nullptr) {
   print_matrix_header(p, s);
 
   using index_type       = typename Printable::index_type;

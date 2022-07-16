@@ -36,8 +36,9 @@ namespace Impl {
 template <typename ExecSpace, typename Vector>
 void inclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::index_type start, DenseVectorTag, DenseVectorTag,
+    typename Vector::index_type start,
     typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
@@ -62,8 +63,9 @@ void inclusive_scan(
 template <typename ExecSpace, typename Vector>
 void exclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::index_type start, DenseVectorTag, DenseVectorTag,
+    typename Vector::index_type start,
     typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
         !Morpheus::is_kokkos_space_v<ExecSpace> &&
         Morpheus::is_OpenMP_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =

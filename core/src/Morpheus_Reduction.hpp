@@ -31,7 +31,7 @@ namespace Morpheus {
 template <typename ExecSpace, typename Vector>
 typename Vector::value_type reduce(const Vector& in,
                                    typename Vector::index_type size) {
-  return Impl::reduce<ExecSpace>(in, size, typename Vector::tag{});
+  return Impl::reduce<ExecSpace>(in, size);
 }
 
 }  // namespace Morpheus

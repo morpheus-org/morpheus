@@ -33,6 +33,4 @@
 #include <impl/Csr/Morpheus_Print_Impl.hpp>
 #include <impl/Dia/Morpheus_Print_Impl.hpp>
 
-#include <impl/Dynamic/Morpheus_Print_Impl.hpp>
-
 #endif  // MORPHEUS_PRINT_IMPL_HPP

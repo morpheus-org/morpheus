@@ -33,8 +33,9 @@ namespace Impl {
 template <typename ExecSpace, typename Vector1, typename Vector2>
 inline typename Vector1::value_type dot(
     typename Vector1::index_type n, const Vector1& x, const Vector2& y,
-    DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector1> &&
+        Morpheus::is_dense_vector_format_container_v<Vector2> &&
         Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
                                Vector2>>* = nullptr) {

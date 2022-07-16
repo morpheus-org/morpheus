@@ -33,8 +33,9 @@ namespace Impl {
 template <typename ExecSpace, typename Vector>
 void inclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::index_type start, DenseVectorTag, DenseVectorTag,
+    typename Vector::index_type start,
     typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
@@ -50,8 +51,9 @@ void inclusive_scan(
 template <typename ExecSpace, typename Vector>
 void exclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::index_type start, DenseVectorTag, DenseVectorTag,
+    typename Vector::index_type start,
     typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
@@ -71,8 +73,9 @@ template <typename ExecSpace, typename Vector1, typename Vector2>
 void inclusive_scan_by_key(
     const Vector1& keys, const Vector2& in, Vector2& out,
     typename Vector2::index_type size, typename Vector2::index_type start,
-    DenseVectorTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector1> &&
+        Morpheus::is_dense_vector_format_container_v<Vector2> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
@@ -101,8 +104,9 @@ template <typename ExecSpace, typename Vector1, typename Vector2>
 void exclusive_scan_by_key(
     const Vector1& keys, const Vector2& in, Vector2& out,
     typename Vector2::index_type size, typename Vector2::index_type start,
-    DenseVectorTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector1> &&
+        Morpheus::is_dense_vector_format_container_v<Vector2> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,

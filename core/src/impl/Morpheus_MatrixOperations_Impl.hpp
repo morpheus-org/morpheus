@@ -40,6 +40,4 @@
 #include <impl/Dia/Cuda/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Dia/Kokkos/Morpheus_MatrixOperations_Impl.hpp>
 
-#include <impl/Dynamic/Morpheus_MatrixOperations_Impl.hpp>
-
 #endif  // MORPHEUS_IMPL_MATRIXOPERATIONS_IMPL_HPP

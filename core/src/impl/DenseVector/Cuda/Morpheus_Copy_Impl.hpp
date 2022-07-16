@@ -40,10 +40,12 @@ template <typename ExecSpace, typename KeyType, typename SourceType,
           typename DestinationType>
 void copy_by_key(
     const KeyType keys, const SourceType& src, DestinationType& dst,
-    DenseVectorTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_Cuda_space_v<ExecSpace> &&
+        Morpheus::is_dense_vector_format_container_v<KeyType> &&
+        Morpheus::is_dense_vector_format_container_v<SourceType> &&
+        Morpheus::is_dense_vector_format_container_v<DestinationType> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
+        Morpheus::is_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, KeyType,
                                SourceType, DestinationType>>* = nullptr) {
   using index_type = typename KeyType::value_type;

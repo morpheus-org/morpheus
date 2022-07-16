@@ -32,21 +32,21 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename SparseMatrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector>
 void update_diagonal(
-    SparseMatrix& A, const Vector& diagonal, DiaTag, DenseVectorTag,
+    Matrix& A, const Vector& diagonal,
     typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Matrix> &&
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               SparseMatrix, Vector>>* = nullptr) {
-  using execution_space = typename ExecSpace::execution_space;
-  using value_array_type =
-      typename SparseMatrix::value_array_type::value_array_type;
-  using index_array_type =
-      typename SparseMatrix::index_array_type::value_array_type;
-  using array_type = typename Vector::value_array_type;
-  using index_type = typename SparseMatrix::index_type;
-  using value_type = typename SparseMatrix::value_type;
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
+  using execution_space  = typename ExecSpace::execution_space;
+  using value_array_type = typename Matrix::value_array_type::value_array_type;
+  using index_array_type = typename Matrix::index_array_type::value_array_type;
+  using array_type       = typename Vector::value_array_type;
+  using index_type       = typename Matrix::index_type;
+  using value_type       = typename Matrix::value_type;
   using range_policy =
       Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
 
@@ -71,45 +71,52 @@ void update_diagonal(
       });
 }
 
-template <typename ExecSpace, typename SparseMatrix, typename Vector>
+template <typename ExecSpace, typename Matrix, typename Vector>
 void get_diagonal(
-    SparseMatrix& A, const Vector& diagonal, DiaTag, DenseVectorTag,
+    Matrix& A, const Vector& diagonal,
     typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Matrix> &&
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               SparseMatrix, Vector>>* = nullptr) {
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               Vector>>* = nullptr) {
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
 }
 
-template <typename ExecSpace, typename SparseMatrix, typename IndexType,
+template <typename ExecSpace, typename Matrix, typename IndexType,
           typename ValueType>
-void set_value(SparseMatrix& A, IndexType row, IndexType col, ValueType value,
-               DiaTag,
-               typename std::enable_if_t<
-                   Morpheus::is_generic_space_v<ExecSpace> &&
-                   Morpheus::has_access_v<typename ExecSpace::execution_space,
-                                          SparseMatrix>>* = nullptr) {
+void set_value(
+    Matrix& A, IndexType row, IndexType col, ValueType value,
+    typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Matrix> &&
+        Morpheus::is_generic_space_v<ExecSpace> &&
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix>>* =
+        nullptr) {
   throw Morpheus::NotImplementedException("set_value not implemented yet");
 }
 
-template <typename ExecSpace, typename SparseMatrix, typename IndexVector,
+template <typename ExecSpace, typename Matrix, typename IndexVector,
           typename ValueVector>
 void set_values(
-    SparseMatrix& A, typename IndexVector::value_type m, const IndexVector idxm,
+    Matrix& A, typename IndexVector::value_type m, const IndexVector idxm,
     typename IndexVector::value_type n, const IndexVector idxn,
-    const ValueVector values, DiaTag, DenseVectorTag, DenseVectorTag,
+    const ValueVector values,
     typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Matrix> &&
+        Morpheus::is_dense_vector_format_container_v<IndexVector> &&
+        Morpheus::is_dense_vector_format_container_v<ValueVector> &&
         Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space,
-                               SparseMatrix, IndexVector, ValueVector>>* =
-        nullptr) {
+        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+                               IndexVector, ValueVector>>* = nullptr) {
   throw Morpheus::NotImplementedException("set_values not implemented yet");
 }
 
 template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
 void transpose(
-    const Matrix& A, TransposeMatrix& At, DiaTag, DiaTag,
+    const Matrix& A, TransposeMatrix& At,
     typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Matrix> &&
+        Morpheus::is_dia_matrix_format_container_v<TransposeMatrix> &&
         Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                TransposeMatrix>>* = nullptr) {

@@ -26,85 +26,85 @@
 
 #include <Morpheus_FormatTags.hpp>
 
+#include <impl/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Morpheus_Variant.hpp>
 
 namespace Morpheus {
-// fwd decl
-template <typename ExecSpace, typename SparseMatrix, typename Vector>
-inline void update_diagonal(SparseMatrix& A, const Vector& diagonal);
-
-template <typename ExecSpace, typename SparseMatrix, typename Vector>
-void get_diagonal(const SparseMatrix& A, Vector& diagonal);
-
-template <typename ExecSpace, typename SparseMatrix, typename IndexType,
-          typename ValueType>
-void set_value(SparseMatrix& A, IndexType row, IndexType col, ValueType value);
-
-template <typename ExecSpace, typename SparseMatrix, typename IndexVector,
-          typename ValueVector>
-void set_values(SparseMatrix& A, typename IndexVector::value_type m,
-                const IndexVector idxm, typename IndexVector::value_type n,
-                const IndexVector idxn, ValueVector values);
-
-template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
-void transpose(const Matrix& A, TransposeMatrix& At);
-
 namespace Impl {
-template <typename ExecSpace, typename SparseMatrix, typename Vector>
-inline void update_diagonal(SparseMatrix& A, const Vector& diagonal,
-                            Morpheus::DynamicTag, Morpheus::DenseVectorTag) {
-  Morpheus::Impl::Variant::visit(
-      [&](auto&& arg) { Morpheus::update_diagonal<ExecSpace>(arg, diagonal); },
+template <typename ExecSpace, typename Matrix, typename Vector>
+inline void update_diagonal(
+    Matrix& A, const Vector& diagonal,
+    typename std::enable_if<
+        Morpheus::is_dynamic_matrix_format_container<Matrix>::value &&
+        Morpheus::is_dense_vector_format_container<Vector>::value>::type* =
+        nullptr) {
+  Impl::Variant::visit(
+      [&](auto&& arg) { Impl::update_diagonal<ExecSpace>(arg, diagonal); },
       A.formats());
 }
 
-template <typename ExecSpace, typename SparseMatrix, typename Vector>
-inline void get_diagonal(const SparseMatrix& A, Vector& diagonal,
-                         Morpheus::DynamicTag, Morpheus::DenseVectorTag) {
-  Morpheus::Impl::Variant::visit(
-      [&](auto&& arg) { Morpheus::get_diagonal<ExecSpace>(arg, diagonal); },
+template <typename ExecSpace, typename Matrix, typename Vector>
+inline void get_diagonal(
+    const Matrix& A, Vector& diagonal,
+    typename std::enable_if<
+        Morpheus::is_dynamic_matrix_format_container<Matrix>::value &&
+        Morpheus::is_dense_vector_format_container<Vector>::value>::type* =
+        nullptr) {
+  Impl::Variant::visit(
+      [&](auto&& arg) { Impl::get_diagonal<ExecSpace>(arg, diagonal); },
       A.const_formats());
 }
 
-template <typename ExecSpace, typename SparseMatrix, typename IndexType,
+template <typename ExecSpace, typename Matrix, typename IndexType,
           typename ValueType>
-inline void set_value(SparseMatrix& A, IndexType row, IndexType col,
-                      ValueType value, Morpheus::DynamicTag) {
-  Morpheus::Impl::Variant::visit(
-      [&](auto&& arg) { Morpheus::set_value<ExecSpace>(arg, row, col, value); },
+inline void set_value(
+    Matrix& A, IndexType row, IndexType col, ValueType value,
+    typename std::enable_if<
+        Morpheus::is_dynamic_matrix_format_container<Matrix>::value>::type* =
+        nullptr) {
+  Impl::Variant::visit(
+      [&](auto&& arg) { Impl::set_value<ExecSpace>(arg, row, col, value); },
       A.formats());
 }
 
-template <typename ExecSpace, typename SparseMatrix, typename IndexVector,
+template <typename ExecSpace, typename Matrix, typename IndexVector,
           typename ValueVector>
-inline void set_values(SparseMatrix& A, typename IndexVector::value_type m,
-                       const IndexVector idxm,
-                       typename IndexVector::value_type n,
-                       const IndexVector idxn, ValueVector values,
-                       Morpheus::DynamicTag, Morpheus::DenseVectorTag,
-                       Morpheus::DenseVectorTag) {
-  Morpheus::Impl::Variant::visit(
+inline void set_values(
+    Matrix& A, typename IndexVector::value_type m, const IndexVector idxm,
+    typename IndexVector::value_type n, const IndexVector idxn,
+    ValueVector values,
+    typename std::enable_if<
+        Morpheus::is_dynamic_matrix_format_container<Matrix>::value &&
+        Morpheus::is_dense_vector_format_container<IndexVector>::value &&
+        Morpheus::is_dense_vector_format_container<ValueVector>::value>::type* =
+        nullptr) {
+  Impl::Variant::visit(
       [&](auto&& arg) {
-        Morpheus::set_value<ExecSpace>(arg, m, idxm, n, idxn, values);
+        Impl::set_value<ExecSpace>(arg, m, idxm, n, idxn, values);
       },
       A.formats());
 }
 
 template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
-inline void transpose(const Matrix& A, TransposeMatrix& At,
-                      Morpheus::DynamicTag, Impl::SparseMatTag) {
-  Morpheus::Impl::Variant::visit(
-      [&](auto&& arg) { Morpheus::transpose<ExecSpace>(arg, At); },
-      A.const_formats());
+inline void transpose(
+    const Matrix& A, TransposeMatrix& At,
+    typename std::enable_if<
+        Morpheus::is_dynamic_matrix_format_container<Matrix>::value &&
+        Morpheus::is_sparse_matrix_container<TransposeMatrix>::value>::type* =
+        nullptr) {
+  Impl::Variant::visit([&](auto&& arg) { Impl::transpose<ExecSpace>(arg, At); },
+                       A.const_formats());
 }
 
 template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
-inline void transpose(const Matrix& A, TransposeMatrix& At,
-                      Morpheus::DynamicTag, Morpheus::DynamicTag) {
-  Morpheus::Impl::Variant::visit(
-      [&](auto&& arg1, auto&& arg2) {
-        Morpheus::transpose<ExecSpace>(arg1, arg2);
-      },
+inline void transpose(
+    const Matrix& A, TransposeMatrix& At,
+    typename std::enable_if<
+        Morpheus::is_dynamic_matrix_format_container<Matrix>::value &&
+        Morpheus::is_dynamic_matrix_format_container<TransposeMatrix>::value>::
+        type* = nullptr) {
+  Impl::Variant::visit(
+      [&](auto&& arg1, auto&& arg2) { Impl::transpose<ExecSpace>(arg1, arg2); },
       A.const_formats(), A.formats());
 }
 

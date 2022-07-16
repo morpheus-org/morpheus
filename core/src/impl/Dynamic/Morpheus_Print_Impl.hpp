@@ -26,16 +26,10 @@
 
 #include <Morpheus_FormatTags.hpp>
 
+#include <impl/Morpheus_Print_Impl.hpp>
 #include <impl/Morpheus_Variant.hpp>
 
 namespace Morpheus {
-// forward decl
-template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s);
-
-template <typename Printable>
-void print(const Printable& p);
-
 namespace Impl {
 
 struct print_fn {
@@ -47,15 +41,17 @@ struct print_fn {
   // }
   template <typename Printable>
   result_type operator()(const Printable& p) const {
-    Morpheus::print(p);
+    Impl::print(p);
   }
 };
 
 template <typename Printable, typename Stream>
-void print(const Printable& p, Stream& s, DynamicTag) {
+void print(const Printable& p, Stream& s,
+           typename std::enable_if<Morpheus::is_dynamic_matrix_format_container<
+               Printable>::value>::type* = nullptr) {
   print_matrix_header(p, s);
   // TODO: Using a stream in this way doesn't seem to work
-  Morpheus::Impl::Variant::visit([&](auto&& arg) { Morpheus::print(arg); },
+  Morpheus::Impl::Variant::visit([&](auto&& arg) { Impl::print(arg); },
                                  p.const_formats());
 }
 

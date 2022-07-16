@@ -66,7 +66,7 @@ struct DenseMatrixFormatTag : public Impl::DenseMatrixTag {};
  * Dense Format
  *
  */
-struct DenseVectorFormatTag : public Impl::VectorTag {};
+struct DenseVectorFormatTag : public Impl::DenseVectorTag {};
 
 /**
  * @brief Checks if the given type \p T is a valid COO Sparse Matrix Format
@@ -84,7 +84,7 @@ class is_coo_matrix_format_container {
   static yes& test(
       U*,
       typename std::enable_if<
-          is_matrix_container_v<U> &&
+          is_matrix_container<U>::value &&
           std::is_same<CooFormatTag, typename U::tag>::value>::type* = nullptr);
 
   template <class U>
@@ -261,7 +261,7 @@ class is_dense_vector_format_container {
   static yes& test(
       U*,
       typename std::enable_if<
-          is_matrix_container_v<U> &&
+          is_vector_container<U>::value &&
           std::is_same<DenseVectorFormatTag, typename U::tag>::value>::type* =
           nullptr);
 

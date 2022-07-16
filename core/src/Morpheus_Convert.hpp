@@ -26,23 +26,25 @@
 
 #include <Morpheus_DynamicMatrix.hpp>
 #include <impl/Morpheus_Convert_Impl.hpp>
+#include <impl/Dynamic/Morpheus_Convert_Impl.hpp>
 
 namespace Morpheus {
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst) {
-  Impl::convert<ExecSpace>(src, dst, typename SourceType::tag(),
-                typename DestinationType::tag());
+  Impl::convert<ExecSpace>(src, dst);
 }
 
 template <typename ExecSpace, typename SourceType>
 void convert(SourceType& src, const formats_e index) {
-  Morpheus::CooMatrix<typename SourceType::value_type, typename SourceType::index_type, 
-                      typename SourceType::array_layout, typename SourceType::execution_space,
-                      typename SourceType::memory_traits> temp;
-  Morpheus::convert<ExecSpace>(src, temp);
+  Morpheus::CooMatrix<
+      typename SourceType::value_type, typename SourceType::index_type,
+      typename SourceType::array_layout, typename SourceType::execution_space,
+      typename SourceType::memory_traits>
+      temp;
+  Impl::convert<ExecSpace>(src, temp);
   src.activate(index);
-  Morpheus::convert<ExecSpace>(temp, src);
+  Impl::convert<ExecSpace>(temp, src);
 }
 
 template <typename ExecSpace, typename SourceType>

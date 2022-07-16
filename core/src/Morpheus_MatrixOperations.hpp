@@ -25,6 +25,7 @@
 #define MORPHEUS_MATRIXOPERATIONS_HPP
 
 #include <impl/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Dynamic/Morpheus_MatrixOperations_Impl.hpp>
 
 namespace Morpheus {
 
@@ -32,7 +33,7 @@ namespace Morpheus {
  * Updates the main diagonal of the matrix with contents of the diagonal vector.
  *
  * \tparam ExecSpace
- * \tparam SparseMatrix
+ * \tparam Matrix
  * \tparam Vector
  *
  * \param A The matrix
@@ -42,34 +43,32 @@ namespace Morpheus {
  * updates the non-zero elements on the main diagonal.
  *
  */
-template <typename ExecSpace, typename SparseMatrix, typename Vector>
-void update_diagonal(SparseMatrix& A, const Vector& diagonal) {
-  Impl::update_diagonal<ExecSpace>(A, diagonal, typename SparseMatrix::tag{},
-                                   typename Vector::tag{});
+template <typename ExecSpace, typename Matrix, typename Vector>
+void update_diagonal(Matrix& A, const Vector& diagonal) {
+  Impl::update_diagonal<ExecSpace>(A, diagonal);
 }
 
 /**
  * Gets the main diagonal of the matrix and places it in a vector.
  *
  * \tparam ExecSpace
- * \tparam SparseMatrix
+ * \tparam Matrix
  * \tparam Vector
  *
  * \param A The matrix
  * \param diagonal The main matrix diagonal represented as a vector
  *
  */
-template <typename ExecSpace, typename SparseMatrix, typename Vector>
-void get_diagonal(const SparseMatrix& A, Vector& diagonal) {
-  Impl::get_diagonal<ExecSpace>(A, diagonal, typename SparseMatrix::tag{},
-                                typename Vector::tag{});
+template <typename ExecSpace, typename Matrix, typename Vector>
+void get_diagonal(const Matrix& A, Vector& diagonal) {
+  Impl::get_diagonal<ExecSpace>(A, diagonal);
 }
 
 /**
  * Set a single entry into a matrix.
  *
  * \tparam ExecSpace
- * \tparam SparseMatrix
+ * \tparam Matrix
  * \tparam IndexType
  * \tparam ValueType
  *
@@ -78,17 +77,17 @@ void get_diagonal(const SparseMatrix& A, Vector& diagonal) {
  * \param col The column location of the entry
  * \param value The value to insert
  */
-template <typename ExecSpace, typename SparseMatrix, typename IndexType,
+template <typename ExecSpace, typename Matrix, typename IndexType,
           typename ValueType>
-void set_value(SparseMatrix& A, IndexType row, IndexType col, ValueType value) {
-  Impl::set_value(A, row, col, value, typename SparseMatrix::tag{});
+void set_value(Matrix& A, IndexType row, IndexType col, ValueType value) {
+  Impl::set_value(A, row, col, value);
 }
 
 /**
  * Inserts or adds a block of values into a matrix.
  *
  * \tparam ExecSpace
- * \tparam SparseMatrix
+ * \tparam Matrix
  * \tparam IndexVector
  * \tparam ValueVector
  *
@@ -99,13 +98,12 @@ void set_value(SparseMatrix& A, IndexType row, IndexType col, ValueType value) {
  * \param idxn Column global indices
  * \param values A logically two-dimensional array of values
  */
-template <typename ExecSpace, typename SparseMatrix, typename IndexVector,
+template <typename ExecSpace, typename Matrix, typename IndexVector,
           typename ValueVector>
-void set_values(SparseMatrix& A, typename IndexVector::value_type m,
+void set_values(Matrix& A, typename IndexVector::value_type m,
                 const IndexVector idxm, typename IndexVector::value_type n,
                 const IndexVector idxn, ValueVector values) {
-  Impl::set_values<ExecSpace>(A, m, idxm, n, idxn, values,
-                              typename SparseMatrix::tag{});
+  Impl::set_values<ExecSpace>(A, m, idxm, n, idxn, values);
 }
 
 /**
@@ -120,8 +118,7 @@ void set_values(SparseMatrix& A, typename IndexVector::value_type m,
  */
 template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
 void transpose(const Matrix& A, TransposeMatrix& At) {
-  Impl::transpose<ExecSpace>(A, At, typename Matrix::tag{},
-                             typename TransposeMatrix::tag{});
+  Impl::transpose<ExecSpace>(A, At);
 }
 
 }  // namespace Morpheus

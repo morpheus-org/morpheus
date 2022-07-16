@@ -39,6 +39,4 @@
 #include <impl/Dia/Cuda/Morpheus_Multiply_Impl.hpp>
 #include <impl/Dia/Kokkos/Morpheus_Multiply_Impl.hpp>
 
-#include <impl/Dynamic/Morpheus_Multiply_Impl.hpp>
-
 #endif  // MORPHEUS_IMPL_MULTIPLY_IMPL_HPP

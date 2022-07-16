@@ -33,9 +33,11 @@ namespace Impl {
 template <typename ExecSpace, typename Matrix, typename Vector1,
           typename Vector2>
 inline void multiply(
-    const Matrix& A, const Vector1& x, Vector2& y, const bool init, DiaTag,
-    DenseVectorTag, DenseVectorTag,
+    const Matrix& A, const Vector1& x, Vector2& y, const bool init,
     typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Matrix> &&
+        Morpheus::is_dense_vector_format_container_v<Vector1> &&
+        Morpheus::is_dense_vector_format_container_v<Vector2> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,

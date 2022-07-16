@@ -53,18 +53,18 @@
 #include <impl/Dia/Cuda/Morpheus_Convert_Impl.hpp>
 #include <impl/Dia/Kokkos/Morpheus_Convert_Impl.hpp>
 
-#include <impl/Dynamic/Morpheus_Convert_Impl.hpp>
-
 namespace Morpheus {
 namespace Impl {
 
 // convert src -> coo_matrix -> dst
 template <typename ExecSpace, typename SourceType, typename DestinationType,
           typename Format1, typename Format2>
-void convert(const SourceType& src, DestinationType& dst, Format1, Format2,
-             typename std::enable_if_t<!std::is_same_v<Format1, DynamicTag> &&
-                                       !std::is_same_v<Format2, DynamicTag>>* =
-                 nullptr) {
+void convert(
+    const SourceType& src, DestinationType& dst,
+    typename std::enable_if_t<
+        is_matrix_container_v<SourceType> && is_container_v<DestinationType> &&
+        !is_dynamic_matrix_format_container_v<SourceType> &&
+        !is_dynamic_matrix_format_container_v<DestinationType>>* = nullptr) {
   using ValueType   = typename SourceType::value_type;
   using IndexType   = typename SourceType::index_type;
   using ArrayLayout = typename SourceType::array_layout;
@@ -73,8 +73,8 @@ void convert(const SourceType& src, DestinationType& dst, Format1, Format2,
   using Coo = CooMatrix<ValueType, IndexType, ArrayLayout, MemorySpace>;
   Coo tmp;
 
-  Morpheus::Impl::convert<ExecSpace>(src, tmp, Format1(), typename Coo::tag());
-  Morpheus::Impl::convert<ExecSpace>(tmp, dst, typename Coo::tag(), Format2());
+  Impl::convert<ExecSpace>(src, tmp);
+  Impl::convert<ExecSpace>(tmp, dst);
 }
 
 }  // namespace Impl

@@ -45,9 +45,12 @@ typename Vector::value_type find_max_element(const Vector& vec) {
 }
 
 template <typename Vector1, typename Vector2>
-void counting_sort_by_key(Vector1& keys, Vector2& vals,
-                          typename Vector1::value_type min,
-                          typename Vector1::value_type max, DenseVectorTag) {
+void counting_sort_by_key(
+    Vector1& keys, Vector2& vals, typename Vector1::value_type min,
+    typename Vector1::value_type max,
+    typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector1> &&
+        Morpheus::is_dense_vector_format_container_v<Vector2>>* = nullptr) {
   using index_type = typename Vector1::index_type;
   if (min < 0)
     throw Morpheus::InvalidInputException(
@@ -85,11 +88,13 @@ void counting_sort_by_key(Vector1& keys, Vector2& vals,
 }
 
 template <typename Matrix>
-void sort_by_row_and_column(Matrix& mat, CooTag,
-                            typename Matrix::index_type min_row = 0,
-                            typename Matrix::index_type max_row = 0,
-                            typename Matrix::index_type min_col = 0,
-                            typename Matrix::index_type max_col = 0) {
+void sort_by_row_and_column(
+    Matrix& mat, typename Matrix::index_type min_row = 0,
+    typename Matrix::index_type max_row = 0,
+    typename Matrix::index_type min_col = 0,
+    typename Matrix::index_type max_col = 0,
+    typename std::enable_if_t<
+        Morpheus::is_coo_matrix_format_container_v<Matrix>>* = nullptr) {
   using index_type  = typename Matrix::index_type;
   using index_array = typename Matrix::index_array_type;
   using value_array = typename Matrix::value_array_type;
@@ -115,8 +120,7 @@ void sort_by_row_and_column(Matrix& mat, CooTag,
   {
     index_array temp(mat.column_indices().size());
     Morpheus::copy(mat.column_indices(), temp);
-    Morpheus::Impl::counting_sort_by_key(temp, permutation, minc, maxc,
-                                         typename index_array::tag());
+    Morpheus::Impl::counting_sort_by_key(temp, permutation, minc, maxc);
 
     if (mat.row_indices().size() != temp.size()) {
       temp.resize(mat.row_indices().size());
@@ -125,7 +129,7 @@ void sort_by_row_and_column(Matrix& mat, CooTag,
     Morpheus::copy_by_key<space>(permutation, temp, mat.row_indices());
 
     Morpheus::Impl::counting_sort_by_key(mat.row_indices(), permutation, minr,
-                                         maxr, typename index_array::tag());
+                                         maxr);
     Morpheus::copy(mat.column_indices(), temp);
     Morpheus::copy_by_key<space>(permutation, temp, mat.column_indices());
   }
@@ -138,7 +142,10 @@ void sort_by_row_and_column(Matrix& mat, CooTag,
 }
 
 template <typename Matrix>
-bool is_sorted(Matrix& mat, CooTag) {
+bool is_sorted(
+    Matrix& mat,
+    typename std::enable_if_t<
+        Morpheus::is_coo_matrix_format_container_v<Matrix>>* = nullptr) {
   using index_type = typename Matrix::index_array_type::index_type;
 
   if (mat.row_indices().size() != mat.column_indices().size()) {

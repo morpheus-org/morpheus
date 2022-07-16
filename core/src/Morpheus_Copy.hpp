@@ -24,15 +24,16 @@
 #ifndef MORPHEUS_COPY_HPP
 #define MORPHEUS_COPY_HPP
 
-#include <impl/Morpheus_Copy_Impl.hpp>
+#include <Morpheus_MatrixTags.hpp>
 #include <impl/Morpheus_Utils.hpp>
+#include <impl/Morpheus_Copy_Impl.hpp>
+#include <impl/Dynamic/Morpheus_Copy_Impl.hpp>
 
 namespace Morpheus {
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst) {
-  Impl::copy(src, dst, typename SourceType::tag(),
-             typename DestinationType::tag());
+  Impl::copy(src, dst);
 }
 
 template <typename SourceType, typename DestinationType>
@@ -41,8 +42,8 @@ void copy(const SourceType& src, DestinationType& dst,
           const typename SourceType::index_type src_end,
           const typename DestinationType::index_type dst_begin,
           const typename DestinationType::index_type dst_end) {
-  static_assert(is_vector_container_v<SourceType> &&
-                    is_vector_container_v<DestinationType>,
+  static_assert(is_dense_vector_format_container_v<SourceType> &&
+                    is_dense_vector_format_container_v<DestinationType>,
                 "Both src and dst must be vectors.");
   MORPHEUS_ASSERT((src_end - src_begin) == (dst_end - dst_begin),
                   "Source slice range ("
@@ -50,8 +51,7 @@ void copy(const SourceType& src, DestinationType& dst,
                       << ") should be equal to the destination slice range ("
                       << dst_begin << ", " << dst_end << ").");
 
-  Impl::copy(src, dst, src_begin, src_end, dst_begin, dst_end,
-             typename SourceType::tag(), typename DestinationType::tag());
+  Impl::copy(src, dst, src_begin, src_end, dst_begin, dst_end);
 }
 
 template <typename SourceType, typename DestinationType>
@@ -65,9 +65,7 @@ template <typename ExecSpace, typename KeyType, typename SourceType,
           typename DestinationType>
 void copy_by_key(const KeyType keys, const SourceType& src,
                  DestinationType& dst) {
-  Impl::copy_by_key<ExecSpace>(keys, src, dst, typename KeyType::tag(),
-                               typename SourceType::tag(),
-                               typename DestinationType::tag());
+  Impl::copy_by_key<ExecSpace>(keys, src, dst);
 }
 
 }  // namespace Morpheus

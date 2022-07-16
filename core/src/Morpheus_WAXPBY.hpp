@@ -33,7 +33,7 @@ inline void waxpby(const typename Vector::index_type n,
                    const typename Vector::value_type alpha, const Vector& x,
                    const typename Vector::value_type beta, const Vector& y,
                    Vector& w) {
-  Impl::waxpby<ExecSpace>(n, alpha, x, beta, y, w, typename Vector::tag{});
+  Impl::waxpby<ExecSpace>(n, alpha, x, beta, y, w);
 }
 
 }  // namespace Morpheus

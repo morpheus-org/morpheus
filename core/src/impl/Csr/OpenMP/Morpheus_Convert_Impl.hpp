@@ -37,8 +37,10 @@ namespace Impl {
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
-    const SourceType& src, DestinationType& dst, CsrTag, CsrTag,
+    const SourceType& src, DestinationType& dst,
     typename std::enable_if<
+        Morpheus::is_csr_matrix_format_container_v<SourceType> &&
+        Morpheus::is_csr_matrix_format_container_v<DestinationType> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
@@ -66,8 +68,10 @@ void convert(
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
-    const SourceType& src, DestinationType& dst, CsrTag, CooTag,
+    const SourceType& src, DestinationType& dst,
     typename std::enable_if<
+        Morpheus::is_csr_matrix_format_container_v<SourceType> &&
+        Morpheus::is_coo_matrix_format_container_v<DestinationType> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
@@ -98,8 +102,10 @@ void convert(
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
-    const SourceType& src, DestinationType& dst, CooTag, CsrTag,
+    const SourceType& src, DestinationType& dst,
     typename std::enable_if<
+        Morpheus::is_coo_matrix_format_container_v<SourceType> &&
+        Morpheus::is_csr_matrix_format_container_v<DestinationType> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
