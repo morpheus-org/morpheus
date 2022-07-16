@@ -85,7 +85,7 @@ class DenseVector
   /*! The complete type of the container */
   using type = typename traits::type;
   /*! The tag associated specificaly to the particular container*/
-  using tag = typename VectorFormatTag<Morpheus::DenseVectorTag>::tag;
+  using tag = typename VectorFormatTag<Morpheus::DenseVectorFormatTag>::tag;
 
   /*! The type of the values held by the container - can be const */
   using value_type = typename traits::value_type;

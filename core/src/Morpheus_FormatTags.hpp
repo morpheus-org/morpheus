@@ -24,18 +24,262 @@
 #ifndef MORPHEUS_FORMATTAGS_HPP
 #define MORPHEUS_FORMATTAGS_HPP
 
+#include <Morpheus_TypeTraits.hpp>
+
 #include <impl/Morpheus_MatrixTags.hpp>
 #include <impl/Morpheus_VectorTags.hpp>
 
 namespace Morpheus {
+/**
+ * @brief Tag used to mark containers as Matrix containers (Sparse) with
+ * Coordinate (COO) Storage Format
+ *
+ */
+struct CooFormatTag : public Impl::SparseMatrixTag {};
+/**
+ * @brief Tag used to mark containers as Matrix containers (Sparse) with
+ * Compressed Sparse Row (CSR) Storage Format
+ *
+ */
+struct CsrFormatTag : public Impl::SparseMatrixTag {};
+/**
+ * @brief Tag used to mark containers as Matrix containers (Sparse) with
+ * Diagonal (DIA) Storage Format
+ *
+ */
+struct DiaFormatTag : public Impl::SparseMatrixTag {};
+/**
+ * @brief Tag used to mark containers as Matrix container with
+ * Dynamic Storage Format.
+ *
+ */
+struct DynamicMatrixFormatTag : public Impl::MatrixTag {};
 
-struct CooTag : public Impl::SparseMatTag {};
-struct CsrTag : public Impl::SparseMatTag {};
-struct DiaTag : public Impl::SparseMatTag {};
-struct DynamicTag : public Impl::SparseMatTag {};
+/**
+ * @brief Tag used to mark containers as Matrix containers (Dense) with
+ * Dense Format
+ *
+ */
+struct DenseMatrixFormatTag : public Impl::DenseMatrixTag {};
+/**
+ * @brief Tag used to mark containers as Vector Containers (Dense) with
+ * Dense Format
+ *
+ */
+struct DenseVectorFormatTag : public Impl::VectorTag {};
 
-struct DenseMatrixTag : public Impl::DenseMatTag {};
-struct DenseVectorTag : public Impl::VectorTag {};
+/**
+ * @brief Checks if the given type \p T is a valid COO Sparse Matrix Format
+ * Container i.e is valid matrix container and has \p CooFormatTag as \p tag
+ * member trait.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_coo_matrix_format_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<
+          is_matrix_container_v<U> &&
+          std::is_same<CooFormatTag, typename U::tag>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_coo_matrix_format_container.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_coo_matrix_format_container_v =
+    is_coo_matrix_format_container<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid CSR Sparse Matrix Format
+ * Container i.e is valid matrix container and has \p CsrFormatTag as \p tag
+ * member trait.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_csr_matrix_format_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<
+          is_matrix_container_v<U> &&
+          std::is_same<CsrFormatTag, typename U::tag>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_csr_matrix_format_container.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_csr_matrix_format_container_v =
+    is_csr_matrix_format_container<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid DIA Sparse Matrix Format
+ * Container i.e is valid matrix container and has \p DiaFormatTag as \p tag
+ * member trait.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_dia_matrix_format_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<
+          is_matrix_container_v<U> &&
+          std::is_same<DiaFormatTag, typename U::tag>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_dia_matrix_format_container.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_dia_matrix_format_container_v =
+    is_dia_matrix_format_container<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid Dynamic Matrix Format
+ * Container i.e is valid matrix container and has \p DynamicMatrixFormatTag as
+ * \p tag member trait.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_dynamic_matrix_format_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<
+          is_matrix_container_v<U> &&
+          std::is_same<DynamicMatrixFormatTag, typename U::tag>::value>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_dynamic_matrix_format_container.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_dynamic_matrix_format_container_v =
+    is_dynamic_matrix_format_container<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid Dense Matrix Format
+ * Container i.e is valid matrix container and has \p DenseMatrixFormatTag as \p
+ * tag member trait.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_dense_matrix_format_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<
+          is_matrix_container_v<U> &&
+          std::is_same<DenseMatrixFormatTag, typename U::tag>::value>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_dense_matrix_format_container.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_dense_matrix_format_container_v =
+    is_dense_matrix_format_container<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid Dense Vector Format
+ * Container i.e is valid vector container and has \p DenseVectorFormatTag as \p
+ * tag member trait.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_dense_vector_format_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<
+          is_matrix_container_v<U> &&
+          std::is_same<DenseVectorFormatTag, typename U::tag>::value>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_dense_vector_format_container.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_dense_vector_format_container_v =
+    is_dense_vector_format_container<T>::value;
 
 }  // namespace Morpheus
 

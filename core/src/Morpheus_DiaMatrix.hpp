@@ -41,7 +41,7 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   using traits = Impl::ContainerTraits<DiaMatrix, ValueType, Properties...>;
   using type   = typename traits::type;
   using base   = Impl::MatrixBase<DiaMatrix, ValueType, Properties...>;
-  using tag    = typename MatrixFormatTag<DiaTag>::tag;
+  using tag    = typename MatrixFormatTag<DiaFormatTag>::tag;
 
   using value_type           = typename traits::value_type;
   using non_const_value_type = typename traits::non_const_value_type;

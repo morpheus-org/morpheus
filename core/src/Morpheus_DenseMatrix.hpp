@@ -40,7 +40,7 @@ class DenseMatrix
   using traits = Impl::ContainerTraits<DenseMatrix, ValueType, Properties...>;
   using type   = typename traits::type;
   using base   = Impl::MatrixBase<DenseMatrix, ValueType, Properties...>;
-  using tag    = typename MatrixFormatTag<Morpheus::DenseMatrixTag>::tag;
+  using tag    = typename MatrixFormatTag<Morpheus::DenseMatrixFormatTag>::tag;
 
   using value_type           = typename traits::value_type;
   using non_const_value_type = typename traits::non_const_value_type;

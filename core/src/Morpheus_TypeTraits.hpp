@@ -139,8 +139,9 @@ template <typename T>
 inline constexpr bool has_tag_trait_v = has_tag_trait<T>::value;
 
 /**
- * @brief Checks if the given type \p T is a valid Matrix Container i.e has a
- * \p tag member trait that is a derived class of \p MatrixTag.
+ * @brief A valid Matrix container is the one that has a valid Matrix tag i.e
+ * satisfies the \p has_matrix_tag check. Note that both dense and sparse
+ * matrices should be valid matrix containers.
  *
  * @tparam T Type passed for check.
  */
@@ -151,10 +152,7 @@ class is_matrix_container {
 
   template <class U>
   static yes& test(
-      typename U::tag*,
-      typename std::enable_if<
-          std::is_base_of<Impl::MatrixTag, typename U::tag>::value>::type* =
-          nullptr);
+      U*, typename std::enable_if<Impl::has_matrix_tag_v<U>>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -172,8 +170,10 @@ template <typename T>
 inline constexpr bool is_matrix_container_v = is_matrix_container<T>::value;
 
 /**
- * @brief Checks if the given type \p T is a valid Sparse Matrix Container i.e
- * has a \p tag member trait that is a derived class of \p SparseMatTag.
+ * @brief A valid Sparse Matrix container is the one that has a valid Sparse
+ * Matrix tag i.e satisfies the \p has_sparse_matrix_tag check. Note that any
+ * supported sparse matrix storage format should be a valid Sparse Matrix
+ * Container.
  *
  * @tparam T Type passed for check.
  */
@@ -184,10 +184,8 @@ class is_sparse_matrix_container {
 
   template <class U>
   static yes& test(
-      typename U::tag*,
-      typename std::enable_if<
-          std::is_base_of<Impl::SparseMatTag, typename U::tag>::value>::type* =
-          nullptr);
+      U*, typename std::enable_if<Impl::has_sparse_matrix_tag_v<U>>::type* =
+              nullptr);
 
   template <class U>
   static no& test(...);
@@ -206,8 +204,8 @@ inline constexpr bool is_sparse_matrix_container_v =
     is_sparse_matrix_container<T>::value;
 
 /**
- * @brief Checks if the given type \p T is a valid Dense Matrix Container i.e
- * has a \p tag member trait that is a derived class of \p DenseMatTag.
+ * @brief A valid Dense Matrix container is the one that has a valid Dense
+ * Matrix tag i.e satisfies the \p has_dense_matrix_tag check.
  *
  * @tparam T Type passed for check.
  */
@@ -218,10 +216,8 @@ class is_dense_matrix_container {
 
   template <class U>
   static yes& test(
-      typename U::tag*,
-      typename std::enable_if<
-          std::is_base_of<Impl::DenseMatTag, typename U::tag>::value>::type* =
-          nullptr);
+      U*, typename std::enable_if<Impl::has_dense_matrix_tag_v<U>>::type* =
+              nullptr);
 
   template <class U>
   static no& test(...);
@@ -240,8 +236,9 @@ inline constexpr bool is_dense_matrix_container_v =
     is_dense_matrix_container<T>::value;
 
 /**
- * @brief Checks if the given type \p T is a valid Vector Container i.e
- * has a \p tag member trait that is a derived class of \p VectorTag.
+ * @brief A valid Vector container is the one that has a valid Vector tag i.e
+ * satisfies the \p has_vector_tag check. Note that a Vector container could be
+ * either dense or sparse.
  *
  * @tparam T Type passed for check.
  */
@@ -252,10 +249,7 @@ class is_vector_container {
 
   template <class U>
   static yes& test(
-      typename U::tag*,
-      typename std::enable_if<
-          std::is_base_of<Impl::VectorTag, typename U::tag>::value>::type* =
-          nullptr);
+      U*, typename std::enable_if<Impl::is_vector_tag_v<U>>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -272,44 +266,44 @@ class is_vector_container {
 template <typename T>
 inline constexpr bool is_vector_container_v = is_vector_container<T>::value;
 
-/**
- * @brief Checks if the given type \p T is a valid Dense Vector Container i.e
- * has a \p tag member trait that is a derived class of \p DenseVectorTag.
- *
- * @tparam T Type passed for check.
- */
-template <class T>
-class is_dense_vector_container {
-  typedef char yes[1];
-  typedef char no[2];
+// /**
+//  * @brief Checks if the given type \p T is a valid Dense Vector Container i.e
+//  * has a \p tag member trait that is a derived class of \p DenseVectorTag.
+//  *
+//  * @tparam T Type passed for check.
+//  */
+// template <class T>
+// class is_dense_vector_container {
+//   typedef char yes[1];
+//   typedef char no[2];
 
-  template <class U>
-  static yes& test(
-      typename U::tag*,
-      typename std::enable_if<
-          std::is_base_of<DenseVectorTag, typename U::tag>::value>::type* =
-          nullptr);
+//   template <class U>
+//   static yes& test(
+//       typename U::tag*,
+//       typename std::enable_if<
+//           std::is_base_of<DenseVectorTag, typename U::tag>::value>::type* =
+//           nullptr);
 
-  template <class U>
-  static no& test(...);
+//   template <class U>
+//   static no& test(...);
 
- public:
-  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
-};
+//  public:
+//   static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+// };
 
-/**
- * @brief Short-hand to \p is_dense_vector_container.
- *
- * @tparam T Type passed for check.
- */
-template <typename T>
-inline constexpr bool is_dense_vector_container_v =
-    is_dense_vector_container<T>::value;
+// /**
+//  * @brief Short-hand to \p is_dense_vector_container.
+//  *
+//  * @tparam T Type passed for check.
+//  */
+// template <typename T>
+// inline constexpr bool is_dense_vector_container_v =
+//     is_dense_vector_container<T>::value;
 
 /**
  * @brief Checks if the given type \p T is a valid Morpheus Container i.e
- * has a \p tag member trait and is either a Morpheus Matrix or Vector
- * container.
+ * is either a valid matrix or a vector container that satisfies
+ * \p is_matrix_container or \p is_vector_container.
  *
  * @tparam T Type passed for check.
  */
@@ -320,9 +314,8 @@ class is_container {
 
   template <class U>
   static yes& test(
-      typename U::tag*,
-      typename std::enable_if<is_matrix_container_v<U> ||
-                              is_vector_container_v<U>>::type* = nullptr);
+      U*, typename std::enable_if<is_matrix_container_v<U> ||
+                                  is_vector_container_v<U>>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -341,7 +334,8 @@ inline constexpr bool is_container_v = is_container<T>::value;
 
 /**
  * @brief Checks if the given type \p T is a valid Dynamic Matrix Container i.e
- * has a \p tag member trait and is a derived class of \p DynamicTag.
+ * is valid matrix container and has a \p tag member trait and is a derived
+ * class of \p DynamicMatrixFormatTag.
  *
  * @tparam T Type passed for check.
  */
@@ -351,9 +345,12 @@ class is_dynamic_matrix_container {
   typedef char no[2];
 
   template <class U>
-  static yes& test(typename U::tag*,
-                   typename std::enable_if<std::is_base_of<
-                       DynamicTag, typename U::tag>::value>::type* = nullptr);
+  static yes& test(
+      U*,
+      typename std::enable_if<is_matrix_container_v<U> &&
+                              std::is_base_of<DynamicMatrixFormatTag,
+                                              typename U::tag>::value>::type* =
+          nullptr);
 
   template <class U>
   static no& test(...);
@@ -379,7 +376,7 @@ inline constexpr bool is_dynamic_matrix_container_v =
  * @tparam T2 Second type passed for comparison.
  */
 template <class T1, class T2>
-class is_same_format {
+class has_same_format {
   typedef char yes[1];
   typedef char no[2];
 
@@ -400,13 +397,13 @@ class is_same_format {
 };
 
 /**
- * @brief Short-hand to \p is_same_format.
+ * @brief Short-hand to \p has_same_format.
  *
  * @tparam T1 First type passed for comparison.
  * @tparam T2 Second type passed for comparison.
  */
 template <typename T1, typename T2>
-inline constexpr bool is_same_format_v = is_same_format<T1, T2>::value;
+inline constexpr bool has_same_format_v = has_same_format<T1, T2>::value;
 
 /**
  * @brief Checks if the given type \p T is a valid supported memory space.
@@ -419,16 +416,14 @@ class is_memory_space {
   typedef char no[2];
 
   template <class U>
-  static yes& test(
-      U*,
-      typename std::enable_if<
+  static yes& test(U*, typename std::enable_if<
 #if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
-          std::is_same<typename U::memory_space, Kokkos::HostSpace>::value ||
+                           std::is_same<U, Kokkos::HostSpace>::value ||
 #endif
 #if defined(MORPHEUS_ENABLE_CUDA)
-          std::is_same<typename U::memory_space, Kokkos::CudaSpace>::value ||
+                           std::is_same<U, Kokkos::CudaSpace>::value ||
 #endif
-          false>::type* = nullptr);
+                           false>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -446,6 +441,36 @@ template <typename T>
 inline constexpr bool is_memory_space_v = is_memory_space<T>::value;
 
 /**
+ * @brief Checks if the given type \p T has a valid supported memory space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_memory_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<
+              is_memory_space_v<typename U::memory_space>>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_memory_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_memory_space_v = has_memory_space<T>::value;
+
+/**
  * @brief Checks if the two types are in the same valid supported memory space
  *
  * @tparam T1 First type passed for comparison.
@@ -459,10 +484,9 @@ class is_same_memory_space {
   template <class U1, class U2>
   static yes& test(
       U1*, U2*,
-      typename std::enable_if<
-          is_memory_space<U1>::value && is_memory_space<U2>::value &&
-          std::is_same<typename U1::memory_space,
-                       typename U2::memory_space>::value>::type* = nullptr);
+      typename std::enable_if<is_memory_space<U1>::value &&
+                              is_memory_space<U2>::value &&
+                              std::is_same<U1, U2>::value>::type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -483,6 +507,44 @@ inline constexpr bool is_same_memory_space_v =
     is_same_memory_space<T1, T2>::value;
 
 /**
+ * @brief Checks if the two types have the same valid supported memory space
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
+ */
+template <class T1, class T2>
+class has_same_memory_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(
+      U1*, U2*,
+      typename std::enable_if<
+          is_memory_space<typename U1::memory_space>::value &&
+          is_memory_space<typename U2::memory_space>::value &&
+          std::is_same<typename U1::memory_space,
+                       typename U2::memory_space>::value>::type* = nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_same_memory_space.
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
+ */
+template <typename T1, typename T2>
+inline constexpr bool has_same_memory_space_v =
+    has_same_memory_space<T1, T2>::value;
+
+/**
  * @brief Checks if the given type \p T is a layout i.e has as a
  * \p array_layout member trait it self and is one of the supported layouts.
  *
@@ -495,11 +557,9 @@ class is_layout {
 
   template <class U>
   static yes& test(
-      U*,
-      typename std::enable_if<
-          (std::is_same<Kokkos::LayoutLeft, typename U::array_layout>::value ||
-           std::is_same<Kokkos::LayoutRight,
-                        typename U::array_layout>::value)>::type* = nullptr);
+      U*, typename std::enable_if<
+              (std::is_same<Kokkos::LayoutLeft, U>::value ||
+               std::is_same<Kokkos::LayoutRight, U>::value)>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -517,6 +577,38 @@ template <typename T>
 inline constexpr bool is_layout_v = is_layout<T>::value;
 
 /**
+ * @brief Checks if the given type \p T has a layout i.e has as a
+ * \p array_layout member trait it self and is one of the supported layouts.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_layout {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<is_layout_v<typename U::array_layout>>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_layout.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_layout_v = has_layout<T>::value;
+
+/**
  * @brief Checks if the two types have the same valid supported layout
  *
  * @tparam T1 First type passed for comparison.
@@ -530,10 +622,8 @@ class is_same_layout {
   template <class U1, class U2>
   static yes& test(
       U1*, U2*,
-      typename std::enable_if<
-          is_layout_v<U1> && is_layout_v<U2> &&
-          std::is_same<typename U1::array_layout,
-                       typename U2::array_layout>::value>::type* = nullptr);
+      typename std::enable_if<is_layout_v<U1> && is_layout_v<U2> &&
+                              std::is_same<U1, U2>::value>::type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -553,7 +643,42 @@ template <typename T1, typename T2>
 inline constexpr bool is_same_layout_v = is_same_layout<T1, T2>::value;
 
 /**
- * @brief Checks if the given type \p T has a valid value type i.e a scalar
+ * @brief Checks if the two types have the same valid supported layout
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
+ */
+template <class T1, class T2>
+class has_same_layout {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(
+      U1*, U2*,
+      typename std::enable_if<is_same_layout_v<
+          typename U1::array_layout, typename U2::array_layout>>::type* =
+          nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_same_layout.
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
+ */
+template <typename T1, typename T2>
+inline constexpr bool has_same_layout_v = has_same_layout<T1, T2>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid value type i.e a scalar
  *
  * @tparam T Type passed for check.
  */
@@ -564,8 +689,7 @@ class is_value_type {
 
   template <class U>
   static yes& test(
-      U*, typename std::enable_if<
-              std::is_scalar<typename U::value_type>::value>::type* = nullptr);
+      U*, typename std::enable_if<std::is_scalar<U>::value>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -583,7 +707,38 @@ template <typename T>
 inline constexpr bool is_value_type_v = is_value_type<T>::value;
 
 /**
- * @brief Checks if the two types have the same valid value type.
+ * @brief Checks if the given type \p T has a valid value type i.e a scalar
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_value_type {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<is_value_type_v<typename U::value_type>>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_value_type.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_value_type_v = has_value_type<T>::value;
+
+/**
+ * @brief Checks if the two types are of type value_type and the same.
  *
  * @tparam T1 First type passed for comparison.
  * @tparam T2 Second type passed for comparison.
@@ -596,10 +751,8 @@ class is_same_value_type {
   template <class U1, class U2>
   static yes& test(
       U1*, U2*,
-      typename std::enable_if<
-          is_value_type_v<U1> && is_value_type_v<U2> &&
-          std::is_same<typename U1::value_type,
-                       typename U2::value_type>::value>::type* = nullptr);
+      typename std::enable_if<is_value_type_v<U1> && is_value_type_v<U2> &&
+                              std::is_same<U1, U2>::value>::type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -610,7 +763,7 @@ class is_same_value_type {
 };
 
 /**
- * @brief Short-hand to \p is_value_type.
+ * @brief Short-hand to \p is_same_value_type.
  *
  * @tparam T1 First type passed for comparison.
  * @tparam T2 Second type passed for comparison.
@@ -619,7 +772,42 @@ template <typename T1, typename T2>
 inline constexpr bool is_same_value_type_v = is_same_value_type<T1, T2>::value;
 
 /**
- * @brief Checks if the given type \p T has a valid index type i.e an integral
+ * @brief Checks if the two types have the same valid value type.
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
+ */
+template <class T1, class T2>
+class has_same_value_type {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(
+      U1*, U2*,
+      typename std::enable_if<is_same_value_type_v<
+          typename U1::value_type, typename U2::value_type>>::type* = nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_same_value_type.
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
+ */
+template <typename T1, typename T2>
+inline constexpr bool has_same_value_type_v =
+    has_same_value_type<T1, T2>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid index type i.e an integral
  *
  * @tparam T Type passed for check.
  */
@@ -630,9 +818,7 @@ class is_index_type {
 
   template <class U>
   static yes& test(
-      U*,
-      typename std::enable_if<
-          std::is_integral<typename U::index_type>::value>::type* = nullptr);
+      U*, typename std::enable_if<std::is_integral<U>::value>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -650,7 +836,38 @@ template <typename T>
 inline constexpr bool is_index_type_v = is_index_type<T>::value;
 
 /**
- * @brief Checks if the two types have the same valid index type.
+ * @brief Checks if the given type \p T has a valid index type i.e an integral
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_index_type {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<is_index_type_v<typename U::index_type>>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_index_type.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_index_type_v = has_index_type<T>::value;
+
+/**
+ * @brief Checks if the two types is of type index_type and are the same.
  *
  * @tparam T1 First type passed for comparison.
  * @tparam T2 Second type passed for comparison.
@@ -663,10 +880,8 @@ class is_same_index_type {
   template <class U1, class U2>
   static yes& test(
       U1*, U2*,
-      typename std::enable_if<
-          is_index_type_v<U1> && is_index_type_v<U2> &&
-          std::is_same<typename U1::index_type,
-                       typename U2::index_type>::value>::type* = nullptr);
+      typename std::enable_if<is_index_type_v<U1> && is_index_type_v<U2> &&
+                              std::is_same<U1, U2>::value>::type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -686,6 +901,41 @@ template <typename T1, typename T2>
 inline constexpr bool is_same_index_type_v = is_same_index_type<T1, T2>::value;
 
 /**
+ * @brief Checks if the two types have the same valid index type.
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
+ */
+template <class T1, class T2>
+class has_same_index_type {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(
+      U1*, U2*,
+      typename std::enable_if<is_same_index_type_v<
+          typename U1::index_type, typename U2::index_type>>::type* = nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_same_index_type.
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
+ */
+template <typename T1, typename T2>
+inline constexpr bool has_same_index_type_v =
+    has_same_index_type<T1, T2>::value;
+
+/**
  * @brief Checks if the two types are compatible containers i.e are in the same
  * memory space and have the same layout, index and value type.
  *
@@ -700,10 +950,10 @@ class is_compatible {
   template <class U1, class U2>
   static yes& test(
       U1*, U2*,
-      typename std::enable_if<
-          is_same_memory_space_v<U1, U2> && is_same_layout_v<U1, U2> &&
-          is_same_value_type_v<U1, U2> && is_same_index_type_v<U1, U2>>::type* =
-          nullptr);
+      typename std::enable_if<has_same_memory_space_v<U1, U2> &&
+                              has_same_layout_v<U1, U2> &&
+                              has_same_value_type_v<U1, U2> &&
+                              has_same_index_type_v<U1, U2>>::type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -768,7 +1018,7 @@ inline constexpr bool is_dynamically_compatible_v =
  */
 template <typename T1, typename T2>
 struct is_format_compatible
-    : std::integral_constant<bool, is_same_format_v<T1, T2> &&
+    : std::integral_constant<bool, has_same_format_v<T1, T2> &&
                                        is_compatible_v<T1, T2>> {};
 
 /**
@@ -781,8 +1031,37 @@ template <typename T1, typename T2>
 inline constexpr bool is_format_compatible_v =
     is_format_compatible<T1, T2>::value;
 
+/**
+ * @brief Checks if the two types are format compatible containers but from
+ * different memory space i.e have the same storage format and are compatible
+ * containers with relaxed memory space and layout requirements.
+ *
+ * @tparam T1 First type passed for comparison.
+ * @tparam T2 Second type passed for comparison.
+ */
+template <class T1, class T2>
+class is_format_compatible_different_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(U1*, U2*,
+                   typename std::enable_if<
+                       has_same_format<U1, U2> && is_memory_space_v<U1> &&
+                       is_memory_space_v<U2> && is_layout_v<U1> &&
+                       is_layout_v<U2> && is_same_value_type_v<U1, U2> &&
+                       is_same_index_type_v<U1, U2>>::type* = nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
+
 template <typename T1, typename T2>
-struct is_compatible_from_different_space
+struct is_format_compatible_different_space
     : std::integral_constant<
           bool, is_same_format<T1, T2>::value &&
                     !std::is_same<typename T1::memory_space,
@@ -1003,41 +1282,111 @@ inline constexpr bool is_openmp_execution_space_v =
 #endif  // MORPHEUS_ENABLE_OPENMP
 
 #if defined(MORPHEUS_ENABLE_CUDA)
-template <class ExecSpace>
-inline constexpr bool is_Cuda_space_v =
-    std::is_same<typename ExecSpace::execution_space,
-                 Kokkos::Cuda::execution_space>::value;
+/**
+ * @brief Checks if the given type \p T is a Cuda execution space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_cuda_execution_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<
+#if defined(MORPHEUS_ENABLE_CUDA)
+              std::is_same<typename U::execution_space, Kokkos::Cuda>::value ||
+#endif
+              false>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_cuda_execution_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_cuda_execution_space_v =
+    is_cuda_execution_space<T>::value;
 #endif  // MORPHEUS_ENABLE_CUDA
 
-// Takes arbitrary number of containers and checks if ExecSpace has access to
-// all of them
+/*! \cond */
+namespace Impl {
 template <typename ExecSpace, typename... Ts>
 struct has_access;
+
+template <class T1, class T2>
+class has_access<T1, T2> {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U1, class U2>
+  static yes& test(
+      U1*, U2*,
+      typename std::enable_if<
+          is_execution_space_v<U1> && is_memory_space_v<U2> &&
+          Kokkos::SpaceAccessibility<
+              U1, typename U2::memory_space>::accessible>::type* = nullptr);
+
+  template <class U1, class U2>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
+};
 
 template <typename ExecSpace, typename T, typename... Ts>
 struct has_access<ExecSpace, T, Ts...> {
   static const bool value =
-      Kokkos::Impl::SpaceAccessibility<ExecSpace,
-                                       typename T::memory_space>::accessible &&
-      has_access<ExecSpace, Ts...>::value;
+      has_access<ExecSpace, T>::value && has_access<ExecSpace, Ts...>::value;
+};
+}  // namespace Impl
+/*! \endcond */
+
+/**
+ * @brief Takes arbitrary number of containers and checks if \p ExecSpace has
+ * access to the memory space of all of them. Note that each container must have
+ * a valid \p memory_space trait.
+ *
+ * @tparam ExecSpace Execution Space
+ * @tparam Ts Aribtrary number of containers
+ */
+template <typename ExecSpace, typename... Ts>
+struct has_access {
+  static const bool value = Impl::has_access<ExecSpace, Ts...>::value;
 };
 
-template <typename ExecSpace, typename T>
-struct has_access<ExecSpace, T> {
-  static_assert(is_execution_space_v<ExecSpace>,
-                "ExecSpace must be a valid execution space");
-  static const bool value =
-      Kokkos::Impl::SpaceAccessibility<ExecSpace,
-                                       typename T::memory_space>::accessible;
-};
+/**
+ * @brief Short-hand to \p has_access.
+ *
+ * @tparam ExecSpace Execution Space
+ * @tparam Ts Aribtrary number of containers
+ */
+template <typename ExecSpace, typename... Ts>
+inline constexpr bool has_access_v = has_access<ExecSpace, Ts...>::value;
 
-template <class ExecSpace, class... T>
-inline constexpr bool has_access_v = has_access<ExecSpace, T...>::value;
-
+/**
+ * @brief Checks if the given type \p T is a valid generic space.
+ *
+ * @tparam T Type passed for check.
+ */
 template <typename T>
 using is_generic_space = typename Impl::is_generic_space_helper<
     typename std::remove_cv<T>::type>::type;
 
+/**
+ * @brief Short-hand to \p is_generic_space.
+ *
+ * @tparam T Type passed for check.
+ */
 template <class T>
 inline constexpr bool is_generic_space_v = is_generic_space<T>::value;
 
@@ -1069,7 +1418,7 @@ class has_generic_space {
 };
 
 /**
- * @brief Short-hand to \p has_generic_space_v.
+ * @brief Short-hand to \p has_generic_space.
  *
  * @tparam T Type passed for check.
  */

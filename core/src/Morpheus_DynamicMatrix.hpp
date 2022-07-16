@@ -43,7 +43,7 @@ class DynamicMatrix
   using traits = Impl::ContainerTraits<DynamicMatrix, ValueType, Properties...>;
   using type   = typename traits::type;
   using base   = Impl::MatrixBase<DynamicMatrix, ValueType, Properties...>;
-  using tag    = typename MatrixFormatTag<Morpheus::DynamicTag>::tag;
+  using tag    = typename MatrixFormatTag<Morpheus::DynamicFormatTag>::tag;
 
   using value_type           = typename traits::value_type;
   using non_const_value_type = typename traits::non_const_value_type;

@@ -40,7 +40,7 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   using traits = Impl::ContainerTraits<CooMatrix, ValueType, Properties...>;
   using type   = typename traits::type;
   using base   = Impl::MatrixBase<CooMatrix, ValueType, Properties...>;
-  using tag    = typename MatrixFormatTag<Morpheus::CooTag>::tag;
+  using tag    = typename MatrixFormatTag<Morpheus::CooFormatTag>::tag;
 
   using value_type           = typename traits::value_type;
   using non_const_value_type = typename traits::non_const_value_type;

@@ -39,7 +39,7 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   using traits = Impl::ContainerTraits<CsrMatrix, ValueType, Properties...>;
   using type   = typename traits::type;
   using base   = Impl::MatrixBase<CsrMatrix, ValueType, Properties...>;
-  using tag    = typename MatrixFormatTag<Morpheus::CsrTag>::tag;
+  using tag    = typename MatrixFormatTag<Morpheus::CsrFormatTag>::tag;
 
   using value_type           = typename traits::value_type;
   using non_const_value_type = typename traits::non_const_value_type;
