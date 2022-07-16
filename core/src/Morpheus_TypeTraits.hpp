@@ -55,14 +55,14 @@ namespace Morpheus {
 /*! \cond */
 // forward decl
 template <typename Space>
-struct KokkosSpace;
+struct GenericSpace;
 
 namespace Impl {
 template <typename T>
-struct is_kokkos_space_helper : std::false_type {};
+struct is_generic_space_helper : std::false_type {};
 
 template <typename Space>
-struct is_kokkos_space_helper<KokkosSpace<Space>> : std::true_type {};
+struct is_generic_space_helper<GenericSpace<Space>> : std::true_type {};
 
 template <typename T, typename VariantContainer>
 struct is_variant_member;
@@ -1034,19 +1034,48 @@ struct has_access<ExecSpace, T> {
 template <class ExecSpace, class... T>
 inline constexpr bool has_access_v = has_access<ExecSpace, T...>::value;
 
-template <typename T, typename = void>
-struct has_kokkos_space : std::false_type {};
-
 template <typename T>
-struct has_kokkos_space<T, std::void_t<typename T::kokkos_space>>
-    : std::true_type {};
-
-template <typename T>
-using is_kokkos_space = typename Impl::is_kokkos_space_helper<
+using is_generic_space = typename Impl::is_generic_space_helper<
     typename std::remove_cv<T>::type>::type;
 
 template <class T>
-inline constexpr bool is_kokkos_space_v = is_kokkos_space<T>::value;
+inline constexpr bool is_generic_space_v = is_generic_space<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a valid generic space i.e
+ * has a generic execution space trait and it is a valid execution and memory
+ * space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_generic_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<
+          is_execution_space_v<typename U::generic_space::execution_space> &&
+          is_memory_space_v<typename U::generic_space::memory_space> &&
+          is_generic_space_v<typename U::generic_space>>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_generic_space_v.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_generic_space_v = has_generic_space<T>::value;
+
 /*! \}
  */
 }  // namespace Morpheus

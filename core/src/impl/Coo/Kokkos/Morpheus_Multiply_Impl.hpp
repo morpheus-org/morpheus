@@ -37,7 +37,7 @@ inline void multiply(
     const Matrix& A, const Vector1& x, Vector2& y, CooTag, DenseVectorTag,
     DenseVectorTag,
     typename std::enable_if_t<
-        Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                Vector1, Vector2>>* = nullptr) {
   throw Morpheus::NotImplementedException("multiply<Kokkos>");

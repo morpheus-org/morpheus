@@ -35,7 +35,7 @@ void inclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
     typename Vector::index_type start, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
@@ -52,7 +52,7 @@ void exclusive_scan(
     const Vector& in, Vector& out, typename Vector::index_type size,
     typename Vector::index_type start, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {
@@ -73,7 +73,7 @@ void inclusive_scan_by_key(
     typename Vector2::index_type size, typename Vector2::index_type start,
     DenseVectorTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
                                Vector2>>* = nullptr) {
@@ -103,7 +103,7 @@ void exclusive_scan_by_key(
     typename Vector2::index_type size, typename Vector2::index_type start,
     DenseVectorTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
                                Vector2>>* = nullptr) {

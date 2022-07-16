@@ -35,7 +35,7 @@ template <typename ExecSpace, typename SourceType, typename DestinationType>
 inline void convert(
     const SourceType& src, DestinationType& dst, CsrTag, CsrTag,
     typename std::enable_if_t<
-        Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>* = nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos>");
@@ -45,7 +45,7 @@ template <typename ExecSpace, typename SourceType, typename DestinationType>
 inline void convert(
     const SourceType& src, DestinationType& dst, CsrTag, CooTag,
     typename std::enable_if_t<
-        Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>* = nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos>");
@@ -55,7 +55,7 @@ template <typename ExecSpace, typename SourceType, typename DestinationType>
 inline void convert(
     const SourceType& src, DestinationType& dst, CooTag, CsrTag,
     typename std::enable_if_t<
-        Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>* = nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos>");

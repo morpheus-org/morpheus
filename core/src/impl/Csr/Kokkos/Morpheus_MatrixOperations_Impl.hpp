@@ -36,7 +36,7 @@ template <typename ExecSpace, typename SparseMatrix, typename Vector>
 void update_diagonal(
     SparseMatrix& A, const Vector& diagonal, CsrTag, DenseVectorTag,
     typename std::enable_if_t<
-        Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
@@ -69,7 +69,7 @@ template <typename ExecSpace, typename SparseMatrix, typename Vector>
 void get_diagonal(
     SparseMatrix& A, const Vector& diagonal, CsrTag, DenseVectorTag,
     typename std::enable_if_t<
-        Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
@@ -80,7 +80,7 @@ template <typename ExecSpace, typename SparseMatrix, typename IndexType,
 void set_value(SparseMatrix& A, IndexType row, IndexType col, ValueType value,
                CsrTag,
                typename std::enable_if_t<
-                   Morpheus::is_kokkos_space_v<ExecSpace> &&
+                   Morpheus::is_generic_space_v<ExecSpace> &&
                    Morpheus::has_access_v<typename ExecSpace::execution_space,
                                           SparseMatrix>>* = nullptr) {
   throw Morpheus::NotImplementedException("set_value not implemented yet");
@@ -93,7 +93,7 @@ void set_values(
     typename IndexVector::value_type n, const IndexVector idxn,
     const ValueVector values, CsrTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
-        Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, IndexVector, ValueVector>>* =
         nullptr) {
@@ -104,7 +104,7 @@ template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
 void transpose(
     const Matrix& A, TransposeMatrix& At, CsrTag, CsrTag,
     typename std::enable_if_t<
-        Morpheus::is_kokkos_space_v<ExecSpace> &&
+        Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                TransposeMatrix>>* = nullptr) {
   throw Morpheus::NotImplementedException("transpose not implemented yet");

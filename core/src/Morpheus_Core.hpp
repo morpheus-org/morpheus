@@ -49,7 +49,7 @@
 #include <Morpheus_WAXPBY.hpp>
 
 // Functionality
-#include <Morpheus_KokkosSpace.hpp>
+#include <Morpheus_GenericSpace.hpp>
 #include <Morpheus_MirrorContainers.hpp>
 #include <Morpheus_TypeTraits.hpp>
 

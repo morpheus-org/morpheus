@@ -1827,9 +1827,112 @@ TEST(TypeTraitsTest, IsCudaSpace) { EXPECT_EQ(0, 1); }
 
 TEST(TypeTraitsTest, HasAccess) { EXPECT_EQ(0, 1); }
 
-TEST(TypeTraitsTest, HasKokkosSpace) { EXPECT_EQ(0, 1); }
+/**
+ * @brief The \p has_generic_space checks if a type has a valid generic space
+ * trait.
+ *
+ */
+TEST(TypeTraitsTest, HasGenericSpace) {
+  bool res = Morpheus::has_generic_space<int>::value;
+  EXPECT_EQ(res, 0);
 
-TEST(TypeTraitsTest, IsKokkosSpace) { EXPECT_EQ(0, 1); }
+  struct TestNotGeneric {
+    using generic_space = Kokkos::DefaultHostExecutionSpace;
+  };
+
+  // TestNotGeneric has a generic_space trait but that is not a generic space
+  res = Morpheus::has_generic_space<TestNotGeneric>::value;
+  EXPECT_EQ(res, 0);
+
+  struct TestGeneric {
+    using generic_space =
+        Morpheus::GenericSpace<Kokkos::DefaultHostExecutionSpace>;
+  };
+
+  // TestNotGeneric has a generic_space trait which is also a generic space
+  res = Morpheus::has_generic_space<TestGeneric>::value;
+  EXPECT_EQ(res, 1);
+
+  // Testing alias
+  res = Morpheus::has_generic_space_v<int>;
+  EXPECT_EQ(res, 0);
+
+  // TestNotGeneric has a generic_space trait but that is not a generic space
+  res = Morpheus::has_generic_space_v<TestNotGeneric>;
+  EXPECT_EQ(res, 0);
+
+  // TestNotGeneric has a generic_space trait which is also a generic space
+  res = Morpheus::has_generic_space_v<TestGeneric>;
+  EXPECT_EQ(res, 1);
+}
+
+/**
+ * @brief The \p is_generic_space checks if a type is a valid generic space
+ * trait.
+ *
+ */
+TEST(TypeTraitsTest, IsGenericSpace) {
+  bool res = Morpheus::is_generic_space<int>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_generic_space<Kokkos::DefaultHostExecutionSpace>::value;
+  EXPECT_EQ(res, 0);
+
+#if defined(MORPHEUS_ENABLE_SERIAL)
+  res = Morpheus::is_generic_space<Kokkos::Serial>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_generic_space<Morpheus::Generic::Serial>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+  res = Morpheus::is_generic_space<Kokkos::OpenMP>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_generic_space<Morpheus::Generic::OpenMP>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+  res = Morpheus::is_generic_space<Kokkos::Cuda>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_generic_space<Morpheus::Generic::Cuda>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
+  // Testing alias
+  res = Morpheus::is_generic_space_v<int>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_generic_space_v<Kokkos::DefaultHostExecutionSpace>;
+  EXPECT_EQ(res, 0);
+
+#if defined(MORPHEUS_ENABLE_SERIAL)
+  res = Morpheus::is_generic_space_v<Kokkos::Serial>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_generic_space_v<Morpheus::Generic::Serial>;
+  EXPECT_EQ(res, 1);
+#endif
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+  res = Morpheus::is_generic_space_v<Kokkos::OpenMP>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_generic_space_v<Morpheus::Generic::OpenMP>;
+  EXPECT_EQ(res, 1);
+#endif
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+  res = Morpheus::is_generic_space_v<Kokkos::Cuda>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_generic_space_v<Morpheus::Generic::Cuda>;
+  EXPECT_EQ(res, 1);
+#endif
+}
 }  // namespace Test
 
 #endif  // TEST_CORE_TEST_TYPETRAITS_HPP

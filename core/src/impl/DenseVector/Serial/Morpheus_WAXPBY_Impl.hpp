@@ -36,7 +36,7 @@ inline void waxpby(
     const typename Vector::value_type beta, const Vector& y, Vector& w,
     DenseVectorTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
         nullptr) {

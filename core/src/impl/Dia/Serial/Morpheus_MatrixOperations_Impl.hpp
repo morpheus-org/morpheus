@@ -36,7 +36,7 @@ template <typename ExecSpace, typename SparseMatrix, typename Vector>
 void update_diagonal(
     SparseMatrix& A, const Vector& diagonal, DiaTag, DenseVectorTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
@@ -61,7 +61,7 @@ template <typename ExecSpace, typename SparseMatrix, typename Vector>
 void get_diagonal(
     SparseMatrix& A, const Vector& diagonal, DiaTag, DenseVectorTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, Vector>>* = nullptr) {
@@ -73,7 +73,7 @@ template <typename ExecSpace, typename SparseMatrix, typename IndexType,
 void set_value(SparseMatrix& A, IndexType row, IndexType col, ValueType value,
                DiaTag,
                typename std::enable_if_t<
-                   !Morpheus::is_kokkos_space_v<ExecSpace> &&
+                   !Morpheus::is_generic_space_v<ExecSpace> &&
                    Morpheus::is_serial_execution_space_v<ExecSpace> &&
                    Morpheus::has_access_v<typename ExecSpace::execution_space,
                                           SparseMatrix>>* = nullptr) {
@@ -87,7 +87,7 @@ void set_values(
     typename IndexVector::value_type n, const IndexVector idxn,
     const ValueVector values, DiaTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space,
                                SparseMatrix, IndexVector, ValueVector>>* =
@@ -99,7 +99,7 @@ template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
 void transpose(
     const Matrix& A, TransposeMatrix& At, DiaTag, DiaTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                TransposeMatrix>>* = nullptr) {

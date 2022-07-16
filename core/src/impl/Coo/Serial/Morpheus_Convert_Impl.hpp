@@ -34,7 +34,7 @@ template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
     const SourceType& src, DestinationType& dst, CooTag, CooTag,
     typename std::enable_if<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>::type* = nullptr) {

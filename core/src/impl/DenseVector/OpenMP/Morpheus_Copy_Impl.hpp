@@ -39,7 +39,7 @@ void copy_by_key(
     const KeyType keys, const SourceType& src, DestinationType& dst,
     DenseVectorTag, DenseVectorTag, DenseVectorTag,
     typename std::enable_if_t<
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
+        !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, KeyType,
                                SourceType, DestinationType>>* = nullptr) {
