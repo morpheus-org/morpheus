@@ -27,12 +27,209 @@
 #include <type_traits>
 
 namespace Morpheus {
-
 namespace Impl {
+/**
+ * @brief Tag used to mark containers as Matrices
+ *
+ */
 struct MatrixTag {};
+/**
+ * @brief Tag used to mark containers as Sparse Matrices
+ *
+ */
+struct SparseMatrixTag : public MatrixTag {};
+/**
+ * @brief Tag used to mark containers as Dense Matrices
+ *
+ */
+struct DenseMatrixTag : public MatrixTag {};
 
-struct SparseMatTag : public Impl::MatrixTag {};
-struct DenseMatTag : public Impl::MatrixTag {};
+/**
+ * @brief Checks if the given type \p T is a valid Matrix Tag i.e is a derived
+ * class of \p MatrixTag
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_matrix_tag {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<std::is_base_of<MatrixTag, U>::value>::type* =
+              nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_matrix_tag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_matrix_tag_v = is_matrix_tag<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a tag trait of type \p MatrixTag
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_matrix_tag {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<is_matrix_tag_v<typename U::tag>>::type* =
+              nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_matrix_tag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_matrix_tag_v = has_matrix_tag<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid Sparse Matrix Tag i.e
+ * is a derived class of \p SparseMatrixTag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_sparse_matrix_tag {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<
+              std::is_base_of<SparseMatrixTag, U>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_sparse_matrix_tag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_sparse_matrix_tag_v = is_sparse_matrix_tag<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a valid Sparse Matrix Tag i.e
+ * has a \p tag member trait that is a derived class of \p SparseMatrixTag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_sparse_matrix_tag {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<is_sparse_matrix_tag_v<typename U::tag>>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_sparse_matrix_tag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_sparse_matrix_tag_v = has_sparse_matrix_tag<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid Dense Matrix Container i.e
+ * it is a derived class of \p DenseMatrixTag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_dense_matrix_tag {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<
+              std::is_base_of<DenseMatrixTag, U>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_dense_matrix_tag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_dense_matrix_tag_v = is_dense_matrix_tag<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a valid Dense Matrix Tag i.e
+ * has a \p tag member trait that is a derived class of \p DenseMatrixTag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_dense_matrix_tag {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<is_dense_matrix_tag_v<typename U::tag>>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_dense_matrix_tag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_dense_matrix_tag_v = has_dense_matrix_tag<T>::value;
 
 }  // namespace Impl
 
