@@ -35,6 +35,24 @@
 #include <type_traits>
 
 namespace Morpheus {
+
+/**
+ * \addtogroup utilities Utilities
+ * \par Overview
+ * TODO
+ *
+ */
+
+/**
+ * \addtogroup typetraits Type Traits
+ * \brief Various tools for examining the different types available and
+ * relationships between them during compile-time.
+ * \ingroup utilities
+ * \{
+ *
+ */
+
+/*! \cond */
 // forward decl
 template <typename Space>
 struct KokkosSpace;
@@ -54,22 +72,7 @@ struct is_variant_member<T, Variant::variant<Ts...>>
     : public std::disjunction<std::is_same<T, Ts>...> {};
 
 }  // namespace Impl
-
-/**
- * \addtogroup utilities Utilities
- * \par Overview
- * TODO
- *
- */
-
-/**
- * \addtogroup typetraits Type Traits
- * \brief Various tools for examining the different types available and
- * relationships between them during compile-time.
- * \ingroup utilities
- * \{
- *
- */
+/*! \endcond */
 
 /**
  * @brief A wrapper that checks if the provided type is an integral type.
