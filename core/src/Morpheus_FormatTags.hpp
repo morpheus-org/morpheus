@@ -32,7 +32,7 @@
 namespace Morpheus {
 
 /**
- * \addtogroup tags Tags
+ * \addtogroup storage_format_tags Storage Format Tags
  * \brief Data structures used to tag data types
  * \ingroup wrappers_and_tags
  * \{
@@ -80,6 +80,7 @@ struct DenseVectorFormatTag : public Impl::DenseVectorTag {};
  */
 
 /**
+ * \addtogroup typetraits Type Traits
  * \ingroup utilities
  * \{
  *
@@ -297,9 +298,9 @@ class is_dense_vector_format_container {
 template <typename T>
 inline constexpr bool is_dense_vector_format_container_v =
     is_dense_vector_format_container<T>::value;
-
-/**
+/*
  * \}
+ *
  */
 }  // namespace Morpheus
 
