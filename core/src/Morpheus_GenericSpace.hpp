@@ -28,6 +28,21 @@
 
 namespace Morpheus {
 /**
+ * \addtogroup wrappers_and_tags Wrappers and Tags
+ * \par Overview
+ * TODO
+ *
+ */
+
+/**
+ * \addtogroup wrappers Wrappers
+ * \brief Data structures used to wrap around data types
+ * \ingroup wrappers_and_tags
+ * \{
+ *
+ */
+
+/**
  * @brief A wrapper that converts a valid custom space into a generic one. This
  * is helpful if we want to distinguish algorithms that explicitly use a custom
  * backend from the ones that we want to use a performance portable kernel and
@@ -65,9 +80,11 @@ struct GenericSpace {
   using memory_space    = typename Space::memory_space;
   using device_type     = typename Space::device_type;
 };
-
-#if defined(MORPHEUS_ENABLE_SERIAL)
+/*
+ * \}
+ */
 namespace Generic {
+#if defined(MORPHEUS_ENABLE_SERIAL)
 /**
  * @brief A Generic Space that launches kernels in serial from the performance
  * portable backend (Kokkos)
@@ -93,7 +110,7 @@ using OpenMP = Morpheus::GenericSpace<Kokkos::OpenMP>;
  */
 using Cuda = Morpheus::GenericSpace<Kokkos::Cuda>;
 #endif
-}
+}  // namespace Generic
 
 /*! \cond */
 namespace Impl {

@@ -30,6 +30,14 @@
 #include <impl/Morpheus_VectorTags.hpp>
 
 namespace Morpheus {
+
+/**
+ * \addtogroup tags Tags
+ * \brief Data structures used to tag data types
+ * \ingroup wrappers_and_tags
+ * \{
+ *
+ */
 /**
  * @brief Tag used to mark containers as Matrix containers (Sparse) with
  * Coordinate (COO) Storage Format
@@ -67,6 +75,15 @@ struct DenseMatrixFormatTag : public Impl::DenseMatrixTag {};
  *
  */
 struct DenseVectorFormatTag : public Impl::DenseVectorTag {};
+/*
+ * \}
+ */
+
+/**
+ * \ingroup utilities
+ * \{
+ *
+ */
 
 /**
  * @brief Checks if the given type \p T is a valid COO Sparse Matrix Format
@@ -281,6 +298,9 @@ template <typename T>
 inline constexpr bool is_dense_vector_format_container_v =
     is_dense_vector_format_container<T>::value;
 
+/**
+ * \}
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_FORMATTAGS_HPP
