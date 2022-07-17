@@ -315,9 +315,10 @@ class is_dynamic_matrix_container {
   typedef char no[2];
 
   template <class U>
-  static yes& test(U*,
-                   typename std::enable_if<has_dynamic_matrix_tag_v<U>>::value >
-                       ::type* = nullptr);
+  static yes& test(
+      U*,
+      typename std::enable_if<Impl::has_dynamic_matrix_tag<U>::value>::type* =
+          nullptr);
 
   template <class U>
   static no& test(...);
