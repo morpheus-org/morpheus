@@ -40,6 +40,20 @@ namespace Morpheus {
  *
  */
 
+namespace Impl{
+// TODO: Merge this and set_functor from DenseMatrix in a single definition and place in Impl directory
+template<typename View, typename ValueType>
+struct set_functor {
+    View _data;
+    ValueType _val;
+
+    set_functor(View data, ValueType val)
+        : _data(data), _val(val) {}
+
+    KOKKOS_INLINE_FUNCTION
+    void operator()(const size_t& i) const { _data(i) = _val; }
+  };
+}
 /**
  * \addtogroup containers_1d 1D Containers
  * \brief One-dimensional Containers
@@ -47,6 +61,7 @@ namespace Morpheus {
  * \{
  *
  */
+ 
 /**
  * @brief The DenseVector container is a one-dimensional container that contains
  * contiguous elements. It is a polymorphic container in the sense that it can
@@ -236,7 +251,7 @@ class DenseVector
     }
 
     range_policy policy(0, n);
-    set_functor f(_values, val);
+    Impl::set_functor f(_values, val);
     Kokkos::parallel_for("Morpheus::DenseVector::assign", policy, f);
   }
 
@@ -338,17 +353,6 @@ class DenseVector
  private:
   size_t _size;
   value_array_type _values;
-
-  struct set_functor {
-    value_array_type _data;
-    value_type _val;
-
-    set_functor(value_array_type data, value_type val)
-        : _data(data), _val(val) {}
-
-    KOKKOS_INLINE_FUNCTION
-    void operator()(const size_t& i) const { _data(i) = _val; }
-  };
 };
 
 /*! \}  // end of containers_1d group
