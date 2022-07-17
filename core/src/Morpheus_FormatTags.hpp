@@ -80,13 +80,6 @@ struct DenseVectorFormatTag : public Impl::DenseVectorTag {};
  */
 
 /**
- * \addtogroup typetraits Type Traits
- * \ingroup utilities
- * \{
- *
- */
-
-/**
  * @brief Checks if the given type \p T is a valid COO Sparse Matrix Format
  * Container i.e is valid matrix container and has \p CooFormatTag as \p tag
  * member trait.
@@ -298,10 +291,6 @@ class is_dense_vector_format_container {
 template <typename T>
 inline constexpr bool is_dense_vector_format_container_v =
     is_dense_vector_format_container<T>::value;
-/*
- * \}
- *
- */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_FORMATTAGS_HPP
