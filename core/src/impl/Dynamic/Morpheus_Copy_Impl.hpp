@@ -40,10 +40,10 @@ struct copy_fn {
   template <typename SourceType, typename DestinationType>
   result_type operator()(
       const SourceType& src, DestinationType& dst,
-      typename std::enable_if<
+      typename std::enable_if_t<
           is_format_compatible<SourceType, DestinationType>::value ||
           is_format_compatible_different_space<
-              SourceType, DestinationType>::value>::type* = nullptr) {
+              SourceType, DestinationType>::value>* = nullptr) {
     dst.resize(src);
     Impl::copy(src, dst);
   }
@@ -52,10 +52,10 @@ struct copy_fn {
   template <typename SourceType, typename DestinationType>
   result_type operator()(
       const SourceType& src, DestinationType& dst,
-      typename std::enable_if<
+      typename std::enable_if_t<
           !(is_format_compatible<SourceType, DestinationType>::value ||
             is_format_compatible_different_space<
-                SourceType, DestinationType>::value)>::type* = nullptr) {
+                SourceType, DestinationType>::value)>* = nullptr) {
     throw Morpheus::FormatConversionException(
         "Morpheus::copy() is only available between the same container types "
         "(" +
@@ -67,12 +67,11 @@ struct copy_fn {
 };
 
 template <typename SourceType, typename DestinationType>
-void copy(
-    const SourceType& src, DestinationType& dst,
-    typename std::enable_if<
-        Morpheus::is_dynamic_matrix_format_container<SourceType>::value &&
-        Morpheus::is_sparse_matrix_container<DestinationType>::value>::type* =
-        nullptr) {
+void copy(const SourceType& src, DestinationType& dst,
+          typename std::enable_if_t<
+              Morpheus::is_dynamic_matrix_format_container<SourceType>::value &&
+              Morpheus::is_sparse_matrix_container<DestinationType>::value>* =
+              nullptr) {
   if (src.const_formats().index() == static_cast<int>(dst.format_enum())) {
     auto f = std::bind(Impl::copy_fn(), std::placeholders::_1, std::ref(dst));
     Morpheus::Impl::Variant::visit(f, src.const_formats());
@@ -86,11 +85,12 @@ void copy(
 }
 
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst,
-          typename std::enable_if<
-              Morpheus::is_sparse_matrix_container<SourceType>::value &&
-              Morpheus::is_dynamic_matrix_format_container<
-                  DestinationType>::value>::type* = nullptr) {
+void copy(
+    const SourceType& src, DestinationType& dst,
+    typename std::enable_if_t<
+        Morpheus::is_sparse_matrix_container<SourceType>::value &&
+        Morpheus::is_dynamic_matrix_format_container<DestinationType>::value>* =
+        nullptr) {
   dst.activate(src.format_enum());
   dst.resize(src);
 
@@ -99,11 +99,12 @@ void copy(const SourceType& src, DestinationType& dst,
 }
 
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst,
-          typename std::enable_if<
-              Morpheus::is_dynamic_matrix_format_container<SourceType>::value &&
-              Morpheus::is_dynamic_matrix_format_container<
-                  DestinationType>::value>::type* = nullptr) {
+void copy(
+    const SourceType& src, DestinationType& dst,
+    typename std::enable_if_t<
+        Morpheus::is_dynamic_matrix_format_container<SourceType>::value &&
+        Morpheus::is_dynamic_matrix_format_container<DestinationType>::value>* =
+        nullptr) {
   dst.activate(src.active_index());
   dst.resize(src);
 

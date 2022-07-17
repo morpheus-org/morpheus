@@ -28,6 +28,7 @@
 #if defined(MORPHEUS_ENABLE_OPENMP)
 
 #include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_GenericSpace.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {

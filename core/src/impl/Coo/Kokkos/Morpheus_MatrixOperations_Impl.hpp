@@ -26,7 +26,7 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-
+#include <Morpheus_GenericSpace.hpp>
 #include <Morpheus_Exceptions.hpp>
 
 namespace Morpheus {

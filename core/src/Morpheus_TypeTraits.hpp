@@ -56,17 +56,9 @@ namespace Morpheus {
 
 /*! \cond */
 // forward decl
-template <typename Space>
-struct GenericSpace;
-
 struct DynamicMatrixFormatTag;
 
 namespace Impl {
-template <typename T>
-struct is_generic_space_helper : std::false_type {};
-
-template <typename Space>
-struct is_generic_space_helper<GenericSpace<Space>> : std::true_type {};
 
 template <typename T, typename VariantContainer>
 struct is_variant_member;
@@ -272,40 +264,6 @@ class is_vector_container {
 template <typename T>
 inline constexpr bool is_vector_container_v = is_vector_container<T>::value;
 
-// /**
-//  * @brief Checks if the given type \p T is a valid Dense Vector Container i.e
-//  * has a \p tag member trait that is a derived class of \p DenseVectorTag.
-//  *
-//  * @tparam T Type passed for check.
-//  */
-// template <class T>
-// class is_dense_vector_container {
-//   typedef char yes[1];
-//   typedef char no[2];
-
-//   template <class U>
-//   static yes& test(
-//       typename U::tag*,
-//       typename std::enable_if<
-//           std::is_base_of<DenseVectorTag, typename U::tag>::value>::type* =
-//           nullptr);
-
-//   template <class U>
-//   static no& test(...);
-
-//  public:
-//   static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
-// };
-
-// /**
-//  * @brief Short-hand to \p is_dense_vector_container.
-//  *
-//  * @tparam T Type passed for check.
-//  */
-// template <typename T>
-// inline constexpr bool is_dense_vector_container_v =
-//     is_dense_vector_container<T>::value;
-
 /**
  * @brief Checks if the given type \p T is a valid Morpheus Container i.e
  * is either a valid matrix or a vector container that satisfies
@@ -422,14 +380,12 @@ class is_memory_space {
   typedef char no[2];
 
   template <class U>
-  static yes& test(U*, typename std::enable_if<
-#if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
-                           std::is_same<U, Kokkos::HostSpace>::value ||
-#endif
+  static yes& test(
+      U*, typename std::enable_if<std::is_same<U, Kokkos::HostSpace>::value ||
 #if defined(MORPHEUS_ENABLE_CUDA)
-                           std::is_same<U, Kokkos::CudaSpace>::value ||
+                                  std::is_same<U, Kokkos::CudaSpace>::value ||
 #endif
-                           false>::type* = nullptr);
+                                  false>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -526,11 +482,9 @@ class has_same_memory_space {
   template <class U1, class U2>
   static yes& test(
       U1*, U2*,
-      typename std::enable_if<
-          is_memory_space<typename U1::memory_space>::value &&
-          is_memory_space<typename U2::memory_space>::value &&
-          std::is_same<typename U1::memory_space,
-                       typename U2::memory_space>::value>::type* = nullptr);
+      typename std::enable_if<is_same_memory_space<
+          typename U1::memory_space, typename U2::memory_space>::value>::type* =
+          nullptr);
 
   template <class U1, class U2>
   static no& test(...);
@@ -1066,17 +1020,6 @@ class is_format_compatible_different_space {
       sizeof(test<T1, T2>(nullptr, nullptr)) == sizeof(yes);
 };
 
-// template <typename T1, typename T2>
-// struct is_format_compatible_different_space
-//     : std::integral_constant<
-//           bool, is_same_format<T1, T2>::value &&
-//                     !std::is_same<typename T1::memory_space,
-//                                   typename T2::memory_space>::value &&
-//                     std::is_same<typename T1::value_type,
-//                                  typename T2::value_type>::value &&
-//                     std::is_same<typename T1::index_type,
-//                                  typename T2::index_type>::value> {};
-
 /**
  * @brief Provides the member type which is the same as T, except that its
  * topmost const- and reference-qualifiers are removed
@@ -1214,6 +1157,7 @@ template <typename T>
 inline constexpr bool is_host_execution_space_v =
     is_host_execution_space<T>::value;
 
+#if defined(MORPHEUS_ENABLE_SERIAL)
 /**
  * @brief Checks if the given type \p T is a Serial execution space.
  *
@@ -1230,7 +1174,7 @@ class is_serial_execution_space {
       typename std::enable_if<
 #if defined(MORPHEUS_ENABLE_SERIAL)
           std::is_same<typename U::execution_space, Kokkos::Serial>::value ||
-#endif
+#endif  // MORPHEUS_ENABLE_SERIAL
           false>::type* = nullptr);
 
   template <class U>
@@ -1248,6 +1192,7 @@ class is_serial_execution_space {
 template <typename T>
 inline constexpr bool is_serial_execution_space_v =
     is_serial_execution_space<T>::value;
+#endif  // MORPHEUS_ENABLE_SERIAL
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
 /**
@@ -1266,7 +1211,7 @@ class is_openmp_execution_space {
       typename std::enable_if<
 #if defined(MORPHEUS_ENABLE_OPENMP)
           std::is_same<typename U::execution_space, Kokkos::OpenMP>::value ||
-#endif
+#endif  // MORPHEUS_ENABLE_OPENMP
           false>::type* = nullptr);
 
   template <class U>
@@ -1284,7 +1229,6 @@ class is_openmp_execution_space {
 template <typename T>
 inline constexpr bool is_openmp_execution_space_v =
     is_openmp_execution_space<T>::value;
-
 #endif  // MORPHEUS_ENABLE_OPENMP
 
 #if defined(MORPHEUS_ENABLE_CUDA)
@@ -1303,7 +1247,7 @@ class is_cuda_execution_space {
       U*, typename std::enable_if<
 #if defined(MORPHEUS_ENABLE_CUDA)
               std::is_same<typename U::execution_space, Kokkos::Cuda>::value ||
-#endif
+#endif  // MORPHEUS_ENABLE_CUDA
               false>::type* = nullptr);
 
   template <class U>
@@ -1337,7 +1281,7 @@ class has_access<T1, T2> {
   static yes& test(
       U1*, U2*,
       typename std::enable_if<
-          is_execution_space_v<U1> && is_memory_space_v<U2> &&
+          is_execution_space_v<U1> && has_memory_space_v<U2> &&
           Kokkos::SpaceAccessibility<
               U1, typename U2::memory_space>::accessible>::type* = nullptr);
 
@@ -1354,6 +1298,7 @@ struct has_access<ExecSpace, T, Ts...> {
   static const bool value =
       has_access<ExecSpace, T>::value && has_access<ExecSpace, Ts...>::value;
 };
+
 }  // namespace Impl
 /*! \endcond */
 
@@ -1378,58 +1323,6 @@ struct has_access {
  */
 template <typename ExecSpace, typename... Ts>
 inline constexpr bool has_access_v = has_access<ExecSpace, Ts...>::value;
-
-/**
- * @brief Checks if the given type \p T is a valid generic space.
- *
- * @tparam T Type passed for check.
- */
-template <typename T>
-using is_generic_space = typename Impl::is_generic_space_helper<
-    typename std::remove_cv<T>::type>::type;
-
-/**
- * @brief Short-hand to \p is_generic_space.
- *
- * @tparam T Type passed for check.
- */
-template <class T>
-inline constexpr bool is_generic_space_v = is_generic_space<T>::value;
-
-/**
- * @brief Checks if the given type \p T has a valid generic space i.e
- * has a generic execution space trait and it is a valid execution and memory
- * space.
- *
- * @tparam T Type passed for check.
- */
-template <class T>
-class has_generic_space {
-  typedef char yes[1];
-  typedef char no[2];
-
-  template <class U>
-  static yes& test(
-      U*,
-      typename std::enable_if<
-          is_execution_space_v<typename U::generic_space::execution_space> &&
-          is_memory_space_v<typename U::generic_space::memory_space> &&
-          is_generic_space_v<typename U::generic_space>>::type* = nullptr);
-
-  template <class U>
-  static no& test(...);
-
- public:
-  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
-};
-
-/**
- * @brief Short-hand to \p has_generic_space.
- *
- * @tparam T Type passed for check.
- */
-template <typename T>
-inline constexpr bool has_generic_space_v = has_generic_space<T>::value;
 
 /*! \}
  */

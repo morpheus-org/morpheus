@@ -25,6 +25,7 @@
 #define MORPHEUS_DENSEVECTOR_SERIAL_DOT_IMPL_HPP
 
 #include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_GenericSpace.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {

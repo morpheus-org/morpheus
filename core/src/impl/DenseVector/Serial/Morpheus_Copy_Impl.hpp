@@ -25,6 +25,7 @@
 #define MORPHEUS_DENSEVECTOR_SERIAL_COPY_IMPL_HPP
 
 #include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_GenericSpace.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {

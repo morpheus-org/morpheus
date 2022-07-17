@@ -31,6 +31,7 @@
 #include <impl/DenseVector/Serial/Morpheus_Copy_Impl.hpp>
 #include <impl/DenseVector/OpenMP/Morpheus_Copy_Impl.hpp>
 #include <impl/DenseVector/Cuda/Morpheus_Copy_Impl.hpp>
+
 #include <Kokkos_Core.hpp>
 
 #include <utility>  // std::pair
@@ -39,12 +40,11 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void copy(
-    const SourceType& src, DestinationType& dst,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<SourceType> &&
-        Morpheus::is_dense_vector_format_container_v<DestinationType>>::type* =
-        nullptr) {
+void copy(const SourceType& src, DestinationType& dst,
+          typename std::enable_if_t<
+              Morpheus::is_dense_vector_format_container_v<SourceType> &&
+              Morpheus::is_dense_vector_format_container_v<DestinationType>>* =
+              nullptr) {
   MORPHEUS_ASSERT(
       dst.size() == src.size(),
       "Destination vector must be of equal size to the source vector");

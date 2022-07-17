@@ -25,6 +25,7 @@
 #define MORPHEUS_CSR_SERIAL_MATRIXOPERATIONS_IMPL_HPP
 
 #include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_GenericSpace.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 #include <Morpheus_Exceptions.hpp>

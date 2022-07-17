@@ -33,8 +33,11 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void copy(const SourceType& src, DestinationType& dst, DenseMatrixTag,
-          DenseMatrixTag) {
+void copy(const SourceType& src, DestinationType& dst,
+          typename std::enable_if_t<
+              Morpheus::is_dense_matrix_format_container_v<SourceType> &&
+              Morpheus::is_dense_matrix_format_container_v<DestinationType>>* =
+              nullptr) {
   MORPHEUS_ASSERT(
       (dst.nrows() == src.nrows()) && (dst.ncols() == src.ncols()),
       "Destination matrix must have equal shape to the source matrix");

@@ -29,6 +29,7 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_GenericSpace.hpp>
 
 #include <impl/Morpheus_CudaUtils.hpp>
 #include <impl/Coo/Kernels/Morpheus_Multiply_Impl.hpp>

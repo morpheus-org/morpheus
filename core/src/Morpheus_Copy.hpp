@@ -25,6 +25,7 @@
 #define MORPHEUS_COPY_HPP
 
 #include <Morpheus_MatrixTags.hpp>
+
 #include <impl/Morpheus_Utils.hpp>
 #include <impl/Morpheus_Copy_Impl.hpp>
 #include <impl/Dynamic/Morpheus_Copy_Impl.hpp>
@@ -33,7 +34,7 @@ namespace Morpheus {
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst) {
-  Impl::copy(src, dst);
+  Morpheus::Impl::copy(src, dst);
 }
 
 template <typename SourceType, typename DestinationType>
@@ -51,7 +52,7 @@ void copy(const SourceType& src, DestinationType& dst,
                       << ") should be equal to the destination slice range ("
                       << dst_begin << ", " << dst_end << ").");
 
-  Impl::copy(src, dst, src_begin, src_end, dst_begin, dst_end);
+  Morpheus::Impl::copy(src, dst, src_begin, src_end, dst_begin, dst_end);
 }
 
 template <typename SourceType, typename DestinationType>

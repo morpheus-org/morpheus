@@ -27,7 +27,6 @@
 #include <Morpheus_TypeTraits.hpp>
 
 namespace Morpheus {
-
 /**
  * @brief A wrapper that converts a valid custom space into a generic one. This
  * is helpful if we want to distinguish algorithms that explicitly use a custom
@@ -57,7 +56,7 @@ template <typename Space>
 struct GenericSpace {
   static_assert(is_execution_space_v<Space>,
                 "Space needs to have a valid Execution Space!");
-  static_assert(is_memory_space_v<Space>,
+  static_assert(has_memory_space_v<Space>,
                 "Space needs to have a valid Memory Space!");
   using generic_space = GenericSpace;
   using type          = Space;
@@ -95,6 +94,65 @@ using OpenMP = Morpheus::GenericSpace<Kokkos::OpenMP>;
 using Cuda = Morpheus::GenericSpace<Kokkos::Cuda>;
 #endif
 }
+
+/*! \cond */
+namespace Impl {
+template <typename T>
+struct is_generic_space_helper : std::false_type {};
+
+template <typename Space>
+struct is_generic_space_helper<GenericSpace<Space>> : std::true_type {};
+}  // namespace Impl
+/*! \endcond */
+
+/**
+ * @brief Checks if the given type \p T is a valid generic space i.e is a
+ * \p GenericSpace container
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+using is_generic_space = typename Impl::is_generic_space_helper<
+    typename std::remove_cv<T>::type>::type;
+
+/**
+ * @brief Short-hand to \p is_generic_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+inline constexpr bool is_generic_space_v = is_generic_space<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a valid generic space i.e
+ * has a generic execution space trait that is a valid generic space
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_generic_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<
+              is_generic_space_v<typename U::generic_space>>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_generic_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_generic_space_v = has_generic_space<T>::value;
 
 }  // namespace Morpheus
 

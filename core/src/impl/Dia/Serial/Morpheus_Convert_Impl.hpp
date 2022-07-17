@@ -27,6 +27,7 @@
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_GenericSpace.hpp>
 
 // TODO: Remove use of set during Coo to Dia Conversion
 #include <set>

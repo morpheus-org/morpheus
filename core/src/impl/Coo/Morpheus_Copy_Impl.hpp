@@ -33,12 +33,11 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename SourceType, typename DestinationType>
-void copy(
-    const SourceType& src, DestinationType& dst,
-    typename std::enable_if<
-        Morpheus::is_coo_matrix_format_container_v<SourceType> &&
-        Morpheus::is_coo_matrix_format_container_v<DestinationType>>::type* =
-        nullptr) {
+void copy(const SourceType& src, DestinationType& dst,
+          typename std::enable_if_t<
+              Morpheus::is_coo_matrix_format_container_v<SourceType> &&
+              Morpheus::is_coo_matrix_format_container_v<DestinationType>>* =
+              nullptr) {
   MORPHEUS_ASSERT(
       (dst.nrows() == src.nrows()) && (dst.ncols() == src.ncols()),
       "Destination matrix must have equal shape to the source matrix");

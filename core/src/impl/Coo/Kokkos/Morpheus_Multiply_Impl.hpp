@@ -25,7 +25,7 @@
 #define MORPHEUS_COO_KOKKOS_MULTIPLY_IMPL_HPP
 
 #include <Morpheus_TypeTraits.hpp>
-
+#include <Morpheus_GenericSpace.hpp>
 #include <Morpheus_Exceptions.hpp>
 
 namespace Morpheus {

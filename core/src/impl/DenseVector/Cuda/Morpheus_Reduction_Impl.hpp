@@ -30,6 +30,8 @@
 #include <Morpheus_Copy.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_GenericSpace.hpp>
+
 #include <impl/DenseVector/Kernels/Morpheus_Reduction_Impl.hpp>
 #include <impl/DenseVector/Serial/Morpheus_Reduction_Impl.hpp>
 #include <impl/Morpheus_CudaUtils.hpp>
