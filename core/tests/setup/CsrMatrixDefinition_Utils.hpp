@@ -45,6 +45,7 @@ struct CsrMatrixTypes {
       Morpheus::CsrMatrix<ValueType, ArrayLayout>, ValueType, DefaultIndexType,
       DefaultSpace, ArrayLayout>::type;
 
+
   // <ValueType, IndexType, Space>
   using vis = typename Impl::ContainerTester<
       Morpheus::CsrMatrix<ValueType, IndexType, Space>, ValueType, IndexType,
@@ -66,18 +67,21 @@ struct CsrMatrixTypes {
       DefaultIndexType, Space, ArrayLayout>::type;
 };
 
+// using CsrMatrixUnary =
+//     ::testing::Types<typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::v,
+//                      typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vl,
+//                      typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vis,
+//                      typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vil,
+//                      typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vils,
+//                      typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vls>;
 using CsrMatrixUnary =
     ::testing::Types<typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::v,
-                     typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vl,
-                     typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vis,
-                     typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vil,
-                     typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vils,
-                     typename CsrMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vls>;
+                                             TEST_EXECSPACE>::vis>;
 
 #endif  // MORPHEUS_CORE_TESTS_CSRMATRIX_DEFINITION_UTILS_HPP

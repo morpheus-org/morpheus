@@ -163,13 +163,15 @@ struct ContainerTypes_vls {
                                                     ArrayLayout, Space>::vls;
 };
 
+// using ContainerImplementations = ::testing::Types<
+//     ContainerTypes_v<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
+//     ContainerTypes_vl<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
+//     ContainerTypes_vis<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
+//     ContainerTypes_vil<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
+//     ContainerTypes_vils<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
+//     ContainerTypes_vls<double, int, Kokkos::LayoutRight, Kokkos::Serial>>;
 using ContainerImplementations = ::testing::Types<
-    ContainerTypes_v<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
-    ContainerTypes_vl<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
-    ContainerTypes_vis<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
-    ContainerTypes_vil<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
-    ContainerTypes_vils<double, int, Kokkos::LayoutRight, Kokkos::Serial>,
-    ContainerTypes_vls<double, int, Kokkos::LayoutRight, Kokkos::Serial>>;
+    ContainerTypes_vis<double, int, Kokkos::LayoutRight, TEST_EXECSPACE>>;
 
 // TODO: Create similar class for when using different algorithms
 // and setup a small, medium and large case vectors with assigned values

@@ -66,18 +66,21 @@ struct DiaMatrixTypes {
       DefaultIndexType, Space, ArrayLayout>::type;
 };
 
+// using DiaMatrixUnary =
+//     ::testing::Types<typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::v,
+//                      typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vl,
+//                      typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vis,
+//                      typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vil,
+//                      typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vils,
+//                      typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vls>;
 using DiaMatrixUnary =
     ::testing::Types<typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::v,
-                     typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vl,
-                     typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vis,
-                     typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vil,
-                     typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vils,
-                     typename DiaMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vls>;
+                                             TEST_EXECSPACE>::vis>;
 
 #endif  // MORPHEUS_CORE_TESTS_DIAMATRIX_DEFINITION_UTILS_HPP

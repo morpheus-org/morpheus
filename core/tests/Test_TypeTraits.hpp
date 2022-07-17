@@ -1482,7 +1482,108 @@ TEST(TypeTraitsTest, IsFormatCompatible) {
  * value and index types but different memory space.
  *
  */
-TEST(TypeTraitsTest, IsFormatCompatibleDifferentSpace) { EXPECT_EQ(0, 1); }
+TEST(TypeTraitsTest, IsFormatCompatibleDifferentSpace) {
+  // Same format, layout, value and index types - Same Space
+  bool res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, int, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+  // Same format, layout, value and index types - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::CudaSpace, Kokkos::LayoutRight,
+                       Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutRight,
+                       Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 1);
+
+  // Different format, same layout, value and index types - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::CudaSpace, Kokkos::LayoutRight,
+                       Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutRight,
+                       Morpheus::CsrFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  // Different layout, same format, value and index types - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::CudaSpace, Kokkos::LayoutRight,
+                       Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutLeft,
+                       Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  // Different value type, same format layout and index type - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::CudaSpace, Kokkos::LayoutRight,
+                       Morpheus::CooFormatTag>,
+      Impl::TestStruct<float, int, Kokkos::HostSpace, Kokkos::LayoutRight,
+                       Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  // Different index type, same format layout and value type - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::CudaSpace, Kokkos::LayoutRight,
+                       Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, long long, Kokkos::HostSpace,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
+  // Different format, same layout, value and index types - Same Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, int, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutRight, Morpheus::CsrFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  // Different layout, same format, value and index types - Same Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, int, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutLeft, Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  // Different value type, same format layout and index type - Same Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>,
+      Impl::TestStruct<float, int, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  // Different index type, same format layout and value type - Same Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, long long, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  // Dynamic format, layout, value and index types - Same Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutRight, Morpheus::DynamicMatrixFormatTag>,
+      Impl::TestStruct<double, int, typename TEST_EXECSPACE::memory_space,
+                       Kokkos::LayoutRight,
+                       Morpheus::DynamicMatrixFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+  // Dynamic format, layout, value and index types - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::CudaSpace, Kokkos::LayoutRight,
+                       Morpheus::DynamicMatrixFormatTag>,
+      Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutRight,
+                       Morpheus::DynamicMatrixFormatTag>>::value;
+  EXPECT_EQ(res, 1);
+#endif
+}
 
 /**
  * @brief The \p remove_cvref removes the topmost const- and
@@ -1782,7 +1883,38 @@ TEST(TypeTraitsTest, IsOpenMPExecutionSpace) {
  * execution space.
  *
  */
-TEST(TypeTraitsTest, IsCudaExecutionSpace) { EXPECT_EQ(0, 1); }
+TEST(TypeTraitsTest, IsCudaExecutionSpace) {
+  struct A {};
+  bool res = Morpheus::is_cuda_execution_space<int>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_cuda_execution_space<A>::value;
+  EXPECT_EQ(res, 0);
+
+#if defined(MORPHEUS_ENABLE_SERIAL)
+  res = Morpheus::is_cuda_execution_space<Kokkos::Serial>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+  res = Morpheus::is_cuda_execution_space<Kokkos::OpenMP>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
+  res = Morpheus::is_cuda_execution_space<
+      Kokkos::DefaultHostExecutionSpace>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_cuda_execution_space<Kokkos::Cuda>::value;
+  EXPECT_EQ(res, 1);
+
+  /* Testing Alias */
+  res = Morpheus::is_cuda_execution_space_v<A>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_cuda_execution_space_v<Kokkos::DefaultHostExecutionSpace>;
+  EXPECT_EQ(res, 0);
+}
 #endif  // MORPHEUS_ENABLE_CUDA
 
 /**
@@ -1803,8 +1935,38 @@ TEST(TypeTraitsTest, HasAccess) {
                              Impl::with_memspace<Kokkos::HostSpace>,
                              Impl::with_memspace<Kokkos::HostSpace>,
                              Impl::with_memspace<Kokkos::HostSpace>>::value;
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+  res = Morpheus::has_access<Kokkos::Cuda,
+                             Impl::with_memspace<Kokkos::HostSpace>>::value;
+  EXPECT_EQ(res, 0);
+
+  res =
+      Morpheus::has_access<Kokkos::Cuda, Impl::with_memspace<Kokkos::HostSpace>,
+                           Impl::with_memspace<Kokkos::HostSpace>,
+                           Impl::with_memspace<Kokkos::HostSpace>,
+                           Impl::with_memspace<Kokkos::HostSpace>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::has_access<Kokkos::Cuda,
+                             Impl::with_memspace<Kokkos::CudaSpace>>::value;
   EXPECT_EQ(res, 1);
-  EXPECT_EQ(0, 1);
+
+  res =
+      Morpheus::has_access<Kokkos::Cuda, Impl::with_memspace<Kokkos::HostSpace>,
+                           Impl::with_memspace<Kokkos::CudaSpace>,
+                           Impl::with_memspace<Kokkos::HostSpace>,
+                           Impl::with_memspace<Kokkos::HostSpace>>::value;
+  EXPECT_EQ(res, 0);
+
+  res =
+      Morpheus::has_access<Kokkos::Cuda, Impl::with_memspace<Kokkos::CudaSpace>,
+                           Impl::with_memspace<Kokkos::CudaSpace>,
+                           Impl::with_memspace<Kokkos::CudaSpace>,
+                           Impl::with_memspace<Kokkos::CudaSpace>>::value;
+  EXPECT_EQ(res, 1);
+#endif
+  EXPECT_EQ(res, 1);
 }
 
 }  // namespace Test

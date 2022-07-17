@@ -66,18 +66,22 @@ struct DenseMatrixTypes {
       DefaultIndexType, Space, ArrayLayout>::type;
 };
 
+// using DenseMatrixUnary =
+//     ::testing::Types<typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::v,
+//                      typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::vl,
+//                      typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::vis,
+//                      typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::vil,
+//                      typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::vils,
+//                      typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                                Kokkos::Serial>::vls>;
+
 using DenseMatrixUnary =
     ::testing::Types<typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::v,
-                     typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::vl,
-                     typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::vis,
-                     typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::vil,
-                     typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::vils,
-                     typename DenseMatrixTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::vls>;
+                                             TEST_EXECSPACE>::vis>;
 
 #endif  // MORPHEUS_CORE_TESTS_DENSEMATRIX_DEFINITION_UTILS_HPP

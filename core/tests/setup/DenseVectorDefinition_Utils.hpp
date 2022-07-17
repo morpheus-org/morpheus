@@ -87,6 +87,6 @@ struct DenseVectorTypes {
 //                                                Kokkos::Serial>::vls>;
 using DenseVectorUnary =
     ::testing::Types<typename DenseVectorTypes<double, int, Kokkos::LayoutRight,
-                                               Kokkos::Serial>::v>;
+                                             TEST_EXECSPACE>::vis>;
 
 #endif  // MORPHEUS_CORE_TESTS_DENSEVECTOR_DEFINITION_UTILS_HPP

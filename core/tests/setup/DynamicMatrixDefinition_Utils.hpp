@@ -66,18 +66,21 @@ struct DynamicMatrixTypes {
       DefaultIndexType, Space, ArrayLayout>::type;
 };
 
-using DynamicMatrixUnary = ::testing::Types<
-    typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
-                                Kokkos::Serial>::v,
-    typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
-                                Kokkos::Serial>::vl,
-    typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
-                                Kokkos::Serial>::vis,
-    typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
-                                Kokkos::Serial>::vil,
-    typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
-                                Kokkos::Serial>::vils,
-    typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
-                                Kokkos::Serial>::vls>;
+// using DynamicMatrixUnary = ::testing::Types<
+//     typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                 Kokkos::Serial>::v,
+//     typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                 Kokkos::Serial>::vl,
+//     typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                 Kokkos::Serial>::vis,
+//     typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                 Kokkos::Serial>::vil,
+//     typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                 Kokkos::Serial>::vils,
+//     typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                 Kokkos::Serial>::vls>;
+using DynamicMatrixUnary =
+    ::testing::Types<typename DynamicMatrixTypes<double, int, Kokkos::LayoutRight,
+                                             TEST_EXECSPACE>::vis>;
 
 #endif  // MORPHEUS_CORE_TESTS_DYNAMICMATRIX_DEFINITION_UTILS_HPP

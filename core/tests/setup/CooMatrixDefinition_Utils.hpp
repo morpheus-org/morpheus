@@ -66,18 +66,21 @@ struct CooMatrixTypes {
       DefaultIndexType, Space, ArrayLayout>::type;
 };
 
+// using CooMatrixUnary =
+//     ::testing::Types<typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::v,
+//                      typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vl,
+//                      typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vis,
+//                      typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vil,
+//                      typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vils,
+//                      typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
+//                                              Kokkos::Serial>::vls>;
 using CooMatrixUnary =
     ::testing::Types<typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::v,
-                     typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vl,
-                     typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vis,
-                     typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vil,
-                     typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vils,
-                     typename CooMatrixTypes<double, int, Kokkos::LayoutRight,
-                                             Kokkos::Serial>::vls>;
+                                             TEST_EXECSPACE>::vis>;
 
 #endif  // MORPHEUS_CORE_TESTS_COOMATRIX_DEFINITION_UTILS_HPP

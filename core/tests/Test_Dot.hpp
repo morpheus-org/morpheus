@@ -56,11 +56,15 @@ class DotTest : public ::testing::Test {
     x_.resize(sz_);
     y_.resize(sz_);
 
+    typename DenseVector::HostMirror xh_(sz_, 0), yh_(sz_, 0);
     for (int i = 0; i < sz_; i++) {
-      x_(i) = i + 1;
-      y_(i) = sz_ - i;
+      xh_(i) = i + 1;
+      yh_(i) = sz_ - i;
       result += (i + 1) * (sz_ - i);
     }
+
+    Morpheus::copy(xh_, x_);
+    Morpheus::copy(yh_, y_);
   }
 };
 
