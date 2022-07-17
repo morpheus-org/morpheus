@@ -34,7 +34,7 @@ class DenseVectorUnaryTest : public ::testing::Test {
  public:
   using DenseVector = UnaryContainer;
   using HostMirror  = typename UnaryContainer::HostMirror;
-  // No need for setup and tear-down in this case, mainly care about the types
+  // No need for setup and tear-down in this case, mainly care about types
   // any setup and tear-down will be made by each individual test
 };
 
@@ -87,7 +87,8 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultConstruction) {
 }
 
 /**
- * @brief Testing default copy assignment of DenseVector container from another
+ * @brief Testing default copy assignment of DenseVector container from
+ another
  * DenseVector container with the same parameters. Resulting container
  * should be a shallow copy of the original.
  *
@@ -117,7 +118,8 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyAssignment) {
 
 /**
  * @brief Testing default copy construction of DenseVector container from
- * another DenseVector container with the same parameters. Resulting container
+ * another DenseVector container with the same parameters. Resulting
+ container
  * should be a shallow copy of the original.
  *
  */
@@ -145,8 +147,10 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyConstructor) {
 }
 
 /**
- * @brief Testing default move assignment of DenseVector container from another
- * DenseVector container with the same parameters. Resulting container should be
+ * @brief Testing default move assignment of DenseVector container from
+ another
+ * DenseVector container with the same parameters. Resulting container should
+ be
  * a shallow copy of the original.
  *
  */
@@ -175,7 +179,8 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveAssignment) {
 
 /**
  * @brief Testing default move construction of DenseVector container from
- * another DenseVector container with the same parameters. Resulting container
+ * another DenseVector container with the same parameters. Resulting
+ container
  * should be a shallow copy of the original.
  *
  */
@@ -204,7 +209,8 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveConstructor) {
 }
 
 /**
- * @brief Testing construction of DenseVector container with size `n` and values
+ * @brief Testing construction of DenseVector container with size `n` and
+ values
  * set at 0 by default
  *
  */
@@ -230,7 +236,8 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
 }
 
 /**
- * @brief Testing construction of DenseVector container with size `n` and values
+ * @brief Testing construction of DenseVector container with size `n` and
+ values
  * set at 0 by default
  *
  */

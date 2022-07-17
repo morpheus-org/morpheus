@@ -93,8 +93,7 @@ TYPED_TEST(DotTest, SmallTest) {
 
   if (std::is_floating_point<value_type>::value) {
     EXPECT_PRED_FORMAT2(
-        ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res,
-        result);
+        ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res, result);
   } else {
     EXPECT_EQ(res, result);
   }
