@@ -39,25 +39,30 @@
 namespace Morpheus {
 
 /**
- * \addtogroup utilities Utilities
+ * \defgroup utilities Utilities
  * \par Overview
  * TODO
  *
  */
-
 /**
- * \addtogroup typetraits Type Traits
+ * \defgroup typetraits Type Traits
  * \brief Various tools for examining the different types available and
  * relationships between them during compile-time.
  * \ingroup utilities
- * \{
  *
  */
 
-/*! \cond */
-// forward decl
-struct DynamicMatrixFormatTag;
+/**
+ * \addtogroup utilities Utilities
+ * \{
+ */
+/**
+ * \addtogroup typetraits Type Traits
+ * \ingroup utilities
+ * \{
+ */
 
+/*! \cond */
 namespace Impl {
 
 template <typename T, typename VariantContainer>
@@ -297,9 +302,10 @@ template <typename T>
 inline constexpr bool is_container_v = is_container<T>::value;
 
 /**
- * @brief Checks if the given type \p T is a valid Dynamic Matrix Container i.e
- * is valid matrix container and has a \p tag member trait and is a derived
- * class of \p DynamicMatrixFormatTag.
+ * @brief A valid Dynamic Matrix container is the one that has a valid Dynamic
+ * Matrix tag i.e satisfies the \p has_dynamic_matrix_tag check. Note that any
+ * supported dynamic matrix storage format should be a valid Dynamic Matrix
+ * Container.
  *
  * @tparam T Type passed for check.
  */
@@ -309,12 +315,9 @@ class is_dynamic_matrix_container {
   typedef char no[2];
 
   template <class U>
-  static yes& test(
-      U*,
-      typename std::enable_if<is_matrix_container_v<U> &&
-                              std::is_base_of<DynamicMatrixFormatTag,
-                                              typename U::tag>::value>::type* =
-          nullptr);
+  static yes& test(U*,
+                   typename std::enable_if<has_dynamic_matrix_tag_v<U>>::value >
+                       ::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -1324,6 +1327,8 @@ struct has_access {
 template <typename ExecSpace, typename... Ts>
 inline constexpr bool has_access_v = has_access<ExecSpace, Ts...>::value;
 
+/*! \}
+ */
 /*! \}
  */
 }  // namespace Morpheus

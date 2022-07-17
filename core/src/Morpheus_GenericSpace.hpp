@@ -28,18 +28,15 @@
 
 namespace Morpheus {
 /**
- * \addtogroup wrappers_and_tags Wrappers and Tags
+ * \defgroup wrappers_and_tags Wrappers and Tags
  * \par Overview
  * TODO
- *
  */
-
 /**
  * \addtogroup wrappers Wrappers
  * \brief Data structures used to wrap around data types
  * \ingroup wrappers_and_tags
  * \{
- *
  */
 
 /**
@@ -80,10 +77,22 @@ struct GenericSpace {
   using memory_space    = typename Space::memory_space;
   using device_type     = typename Space::device_type;
 };
-/*
- * \}
- */
+
 namespace Generic {
+
+/**
+ * @brief A Generic Space that launches kernels in the default Host Space
+ *
+ */
+using DefaultHostExecutionSpace =
+    Morpheus::GenericSpace<Kokkos::DefaultHostExecutionSpace>;
+
+/**
+ * @brief A Generic Space that launches kernels in the default Host Space
+ *
+ */
+struct TestStr {};
+
 #if defined(MORPHEUS_ENABLE_SERIAL)
 /**
  * @brief A Generic Space that launches kernels in serial from the performance
@@ -112,6 +121,9 @@ using Cuda = Morpheus::GenericSpace<Kokkos::Cuda>;
 #endif
 }  // namespace Generic
 
+/*! \} // end of wrappers group
+ */
+
 /*! \cond */
 namespace Impl {
 template <typename T>
@@ -122,6 +134,12 @@ struct is_generic_space_helper<GenericSpace<Space>> : std::true_type {};
 }  // namespace Impl
 /*! \endcond */
 
+/**
+ * \addtogroup typetraits Type Traits
+ * \ingroup utilities
+ * \{
+ *
+ */
 /**
  * @brief Checks if the given type \p T is a valid generic space i.e is a
  * \p GenericSpace container
@@ -171,6 +189,8 @@ class has_generic_space {
 template <typename T>
 inline constexpr bool has_generic_space_v = has_generic_space<T>::value;
 
+/*! \} // end of typetraits group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_GENERICSPACE_HPP

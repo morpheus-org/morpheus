@@ -351,7 +351,7 @@ class DenseVector
   };
 };
 
-/*! \}
+/*! \}  // end of containers_1d group
  */
 }  // namespace Morpheus
 

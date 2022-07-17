@@ -61,7 +61,7 @@ struct DiaFormatTag : public Impl::SparseMatrixTag {};
  * Dynamic Storage Format.
  *
  */
-struct DynamicMatrixFormatTag : public Impl::MatrixTag {};
+struct DynamicMatrixFormatTag : public Impl::DynamicMatrixTag {};
 
 /**
  * @brief Tag used to mark containers as Matrix containers (Dense) with
@@ -75,10 +75,16 @@ struct DenseMatrixFormatTag : public Impl::DenseMatrixTag {};
  *
  */
 struct DenseVectorFormatTag : public Impl::DenseVectorTag {};
-/*
- * \}
+
+/*! \} // end of storage_format_tags group
  */
 
+/**
+ * \addtogroup typetraits Type Traits
+ * \ingroup utilities
+ * \{
+ *
+ */
 /**
  * @brief Checks if the given type \p T is a valid COO Sparse Matrix Format
  * Container i.e is valid matrix container and has \p CooFormatTag as \p tag
@@ -291,6 +297,9 @@ class is_dense_vector_format_container {
 template <typename T>
 inline constexpr bool is_dense_vector_format_container_v =
     is_dense_vector_format_container<T>::value;
+
+/*! \} // end of typetraits group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_FORMATTAGS_HPP

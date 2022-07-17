@@ -43,6 +43,11 @@ struct SparseMatrixTag : public MatrixTag {};
  *
  */
 struct DenseMatrixTag : public MatrixTag {};
+/**
+ * @brief Tag used to mark containers as Dynamic Matrices
+ *
+ */
+struct DynamicMatrixTag : public MatrixTag {};
 
 /**
  * @brief Checks if the given type \p T is a valid Matrix Tag i.e is a derived
@@ -230,6 +235,70 @@ class has_dense_matrix_tag {
  */
 template <typename T>
 inline constexpr bool has_dense_matrix_tag_v = has_dense_matrix_tag<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid Dynamic Matrix Container i.e
+ * it is a derived class of \p DynamicMatrixTag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_dynamic_matrix_tag {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<
+              std::is_base_of<DynamicMatrixTag, U>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_dynamic_matrix_tag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_dynamic_matrix_tag_v = is_dynamic_matrix_tag<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a valid Dynamic Matrix Tag i.e
+ * has a \p tag member trait that is a derived class of \p DynamicMatrixTag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_dynamic_matrix_tag {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<is_dynamic_matrix_tag_v<typename U::tag>>::type* =
+          nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_dense_matrix_tag.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_dynamic_matrix_tag_v =
+    has_dynamic_matrix_tag<T>::value;
 
 }  // namespace Impl
 
