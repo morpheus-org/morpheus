@@ -40,12 +40,15 @@ namespace Morpheus {
  */
 
 /**
- * @brief A wrapper that converts a valid custom space into a generic one. This
- * is helpful if we want to distinguish algorithms that explicitly use a custom
- * backend from the ones that we want to use a performance portable kernel and
- * effectively keep a single source implementation.
+ * @brief A wrapper that converts a valid custom space into a generic one.
  *
  * @tparam Space A space to be converted as a generic.
+ *
+ * \par Overview
+ * A wrapper like that is helpful if we want to distinguish algorithms that
+ * explicitly use a custom backend from the ones that we want to use a
+ * performance portable kernel and effectively keep a single source
+ * implementation.
  *
  * \par Example
  * \code
@@ -159,10 +162,13 @@ template <class T>
 inline constexpr bool is_generic_space_v = is_generic_space<T>::value;
 
 /**
- * @brief Checks if the given type \p T has a valid generic space i.e
- * has a generic execution space trait that is a valid generic space
+ * @brief Checks if the given type \p T has a valid generic space
  *
  * @tparam T Type passed for check.
+ *
+ * \par Overview
+ * For a type to have a generic space we mean that it has a \p generic_space
+ * trait that is a valid generic space satisfying the \p is_generic_space check.
  */
 template <class T>
 class has_generic_space {

@@ -52,16 +52,6 @@ namespace Morpheus {
  *
  */
 
-/**
- * \addtogroup utilities Utilities
- * \{
- */
-/**
- * \addtogroup typetraits Type Traits
- * \ingroup utilities
- * \{
- */
-
 /*! \cond */
 namespace Impl {
 
@@ -75,6 +65,12 @@ struct is_variant_member<T, Variant::variant<Ts...>>
 }  // namespace Impl
 /*! \endcond */
 
+/**
+ * \addtogroup wrappers Wrappers
+ * \brief Data structures used to wrap around data types
+ * \ingroup wrappers_and_tags
+ * \{
+ */
 /**
  * @brief A wrapper that checks if the provided type is an integral type.
  *
@@ -98,6 +94,14 @@ struct ValueType {
   using value_type = T;
   using type       = ValueType;
 };
+/*! \} // end of wrappers group
+ */
+
+/**
+ * \addtogroup typetraits Type Traits
+ * \ingroup utilities
+ * \{
+ */
 
 /**
  * @brief Checks if the given type \p T is a member of \p Variant container such
@@ -1328,9 +1332,7 @@ struct has_access {
 template <typename ExecSpace, typename... Ts>
 inline constexpr bool has_access_v = has_access<ExecSpace, Ts...>::value;
 
-/*! \}
- */
-/*! \}
+/*! \} end of typetraits group
  */
 }  // namespace Morpheus
 
