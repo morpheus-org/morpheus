@@ -42,7 +42,7 @@ void convert(
         Morpheus::is_dia_matrix_format_container_v<SourceType> &&
         Morpheus::is_dia_matrix_format_container_v<DestinationType> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_Cuda_space_v<ExecSpace> &&
+        Morpheus::is_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>::type* = nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos::Cuda>");
@@ -55,7 +55,7 @@ void convert(
         Morpheus::is_dia_matrix_format_container_v<SourceType> &&
         Morpheus::is_coo_matrix_format_container_v<DestinationType> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_Cuda_space_v<ExecSpace> &&
+        Morpheus::is_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>::type* = nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos::Cuda>");
@@ -68,7 +68,7 @@ void convert(
         Morpheus::is_coo_matrix_format_container_v<SourceType> &&
         Morpheus::is_dia_matrix_format_container_v<DestinationType> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_Cuda_space_v<ExecSpace> &&
+        Morpheus::is_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
                                DestinationType>>::type* = nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos::Cuda>");

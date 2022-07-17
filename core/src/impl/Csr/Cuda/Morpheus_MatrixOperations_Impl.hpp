@@ -40,7 +40,7 @@ namespace Impl {
 
 template <typename ExecSpace, typename Matrix, typename Vector>
 void update_diagonal(
-    Matrix& A, const Vector& diagonal, CsrTag, DenseVectorTag,
+    Matrix& A, const Vector& diagonal,
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
@@ -108,7 +108,7 @@ void set_values(
 
 template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
 void transpose(
-    const Matrix& A, TransposeMatrix& At, CsrTag, CsrTag,
+    const Matrix& A, TransposeMatrix& At, 
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Matrix> &&
         Morpheus::is_csr_matrix_format_container_v<TransposeMatrix> &&
