@@ -50,37 +50,86 @@ struct cross_product;
 template <typename... T>
 struct concat;
 
-// template <typename T1, typename T2, typename T3, typename T4>
-// struct Set {
-//   value_type   = T1;
-//   index_type   = T2;
-//   array_layout = T3;
-//   space        = T4;
-// };
-
 namespace Impl {
+// forward decl
 template <typename T, typename U>
 struct cross_product;
+template <typename... T>
+struct concat;
 
-// Partially specialise the empty case for the first TypeList.
+template <typename... Ts, typename... Us>
+struct concat<TypeList<Ts...>, TypeList<Us...>> {
+  using type = TypeList<Ts..., Us...>;
+};
+
+// Partially specialise the empty cases.
 template <typename... Us>
 struct cross_product<TypeList<>, TypeList<Us...>> {
   using type = TypeList<>;
 };
 
-template <typename T, typename... Ts, typename... Us>
-struct cross_product<TypeList<T, Ts...>, TypeList<Us...>> {
-  using type = typename concat<
-      TypeList<Set<T, Us>...>,
-      typename cross_product<TypeList<Ts...>, TypeList<Us...>>::type>::type;
+template <typename... Us>
+struct cross_product<TypeList<Us...>, TypeList<>> {
+  using type = TypeList<>;
 };
 
-// Cross Product - TypeList of Sets x TypeList of types
-template <typename... T, typename... Ts, typename... Us>
-struct cross_product<TypeList<Set<T...>, Ts...>, TypeList<Us...>> {
+template <>
+struct cross_product<TypeList<>, TypeList<>> {
+  using type = TypeList<>;
+};
+
+// Generic Case
+template <typename T, typename... Ts, typename U, typename... Us>
+struct cross_product<TypeList<T, Ts...>, TypeList<U, Us...>> {
   using type = typename concat<
-      TypeList<Set<T..., Us>...>,
-      typename cross_product<TypeList<Ts...>, TypeList<Us...>>::type>::type;
+      typename concat<
+          TypeList<Set<T, U>>,
+          typename cross_product<TypeList<T>, TypeList<Us...>>::type>::type,
+      typename cross_product<TypeList<Ts...>, TypeList<U, Us...>>::type>::type;
+};
+
+/**
+ * @brief Specialization where the first type list contains a Set and the second
+ * type list contains a Type
+ *
+ */
+template <typename... T, typename... Ts, typename U, typename... Us>
+struct cross_product<TypeList<Set<T...>, Ts...>, TypeList<U, Us...>> {
+  using type = typename concat<
+      typename concat<TypeList<Set<T..., U>>,
+                      typename cross_product<TypeList<Set<T...>>,
+                                             TypeList<Us...>>::type>::type,
+      typename cross_product<TypeList<Ts...>, TypeList<U, Us...>>::type>::type;
+};
+
+/**
+ * @brief Specialization where the first type list contains a Type and the
+ * second type list contains a Set
+ *
+ */
+template <typename T, typename... Ts, typename... U, typename... Us>
+struct cross_product<TypeList<T, Ts...>, TypeList<Set<U...>, Us...>> {
+  using type = typename concat<
+      typename concat<
+          TypeList<Set<T, U...>>,
+          typename cross_product<TypeList<T>, TypeList<Us...>>::type>::type,
+      typename cross_product<TypeList<Ts...>,
+                             TypeList<Set<U...>, Us...>>::type>::type;
+};
+
+/**
+ * @brief Specialization where the both type lists contains a Set as a first
+ * element
+ *
+ */
+template <typename... T, typename... Ts, typename... U, typename... Us>
+struct cross_product<TypeList<Set<T...>, Ts...>, TypeList<Set<U...>, Us...>> {
+  using type = typename concat<
+      typename concat<TypeList<Set<T..., U...>>,
+                      typename cross_product<TypeList<Set<T...>>,
+                                             TypeList<Us...>>::type>::type,
+      typename cross_product<TypeList<Ts...>,
+                             TypeList<Set<U...>, Us...>>::type>::type;
 };
 }  // namespace Impl
 /*! \endcond */
@@ -167,7 +216,7 @@ struct TypeList<Set<Head_...>, Tail_...> {
  */
 template <typename... Ts, typename... Us>
 struct concat<TypeList<Ts...>, TypeList<Us...>> {
-  using type = TypeList<Ts..., Us...>;
+  using type = typename Impl::concat<TypeList<Ts...>, TypeList<Us...>>::type;
 };
 
 /**
@@ -199,6 +248,84 @@ template <typename... Ts, typename... Us>
 struct cross_product<TypeList<Ts...>, TypeList<Us...>> {
   using type =
       typename Impl::cross_product<TypeList<Ts...>, TypeList<Us...>>::type;
+};
+
+/**
+ * @brief A \p Default tag is used to denote the use of default types.
+ *
+ */
+struct Default {};
+
+template <class T>
+class is_default {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<std::is_same<U, Default>::value>::type* =
+              nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+template <typename T>
+inline constexpr bool is_default_v = is_default<T>::value;
+
+template <typename... Ts>
+struct UnaryContainer {};
+
+template <template <class...> class Container, typename T, typename ValueType>
+struct UnaryContainer<Container<T>, Set<ValueType, Default, Default, Default>> {
+  using type = Container<ValueType>;
+};
+
+template <template <class...> class Container, typename T, typename ValueType,
+          typename IndexType>
+struct UnaryContainer<Container<T>,
+                      Set<ValueType, IndexType, Default, Default>> {
+  using type = Container<ValueType, IndexType>;
+};
+
+template <template <class...> class Container, typename T, typename ValueType,
+          typename Layout>
+struct UnaryContainer<Container<T>, Set<ValueType, Default, Layout, Default>> {
+  using type = Container<ValueType, Layout>;
+};
+
+template <template <class...> class Container, typename T, typename ValueType,
+          typename Space>
+struct UnaryContainer<Container<T>, Set<ValueType, Default, Default, Space>> {
+  using type = Container<ValueType, Space>;
+};
+
+template <template <class...> class Container, typename T, typename ValueType,
+          typename IndexType, typename Layout>
+struct UnaryContainer<Container<T>,
+                      Set<ValueType, IndexType, Layout, Default>> {
+  using type = Container<ValueType, IndexType, Layout>;
+};
+
+template <template <class...> class Container, typename T, typename ValueType,
+          typename IndexType, typename Space>
+struct UnaryContainer<Container<T>, Set<ValueType, IndexType, Default, Space>> {
+  using type = Container<ValueType, IndexType, Space>;
+};
+
+template <template <class...> class Container, typename T, typename ValueType,
+          typename Layout, typename Space>
+struct UnaryContainer<Container<T>, Set<ValueType, Default, Layout, Space>> {
+  using type = Container<ValueType, Layout, Space>;
+};
+
+template <template <class...> class Container, typename T, typename ValueType,
+          typename IndexType, typename Layout, typename Space>
+struct UnaryContainer<Container<T>, Set<ValueType, IndexType, Layout, Space>> {
+  using type = Container<ValueType, IndexType, Layout, Space>;
 };
 
 /*! \}

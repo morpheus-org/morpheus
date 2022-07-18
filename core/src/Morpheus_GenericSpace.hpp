@@ -91,10 +91,11 @@ using DefaultHostExecutionSpace =
     Morpheus::GenericSpace<Kokkos::DefaultHostExecutionSpace>;
 
 /**
- * @brief A Generic Space that launches kernels in the default Host Space
+ * @brief A Generic Space that launches kernels in the default Space
  *
  */
-struct TestStr {};
+using DefaultExecutionSpace =
+    Morpheus::GenericSpace<Kokkos::DefaultExecutionSpace>;
 
 #if defined(MORPHEUS_ENABLE_SERIAL)
 /**
