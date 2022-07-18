@@ -1,0 +1,11 @@
+digraph "Tags"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=box];
+  rankdir=LR;
+  Node1 [label="Tags",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Data structures used to tag data types."];
+  Node3 [label="Utilities",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__utilities.html",tooltip=" "];
+  Node2 [label="Wrappers and Tags",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group__wrappers__and__tags.html",tooltip=" "];
+  Node2->Node1 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node3 [shape=plaintext, label="Morpheus::is_coo_matrix\l_format_container", color="orange", dir="none", style="dashed"];
+}

@@ -1,0 +1,10 @@
+digraph "Morpheus::is_sparse_matrix_class&lt; Container, T, P &gt;"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="Morpheus::is_sparse\l_matrix_class\< Container,\l T, P \>",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node2 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="std::integral_constant\l\< bool, std::is_base_of\l\< Impl::MatrixBase\< Container,\l T, P... \>, Container\< T, P...\l \> \>::value \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+}

@@ -1,0 +1,10 @@
+digraph "Morpheus::is_compatible_from_different_space&lt; T1, T2 &gt;"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="Morpheus::is_compatible\l_from_different_space\l\< T1, T2 \>",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node2 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="std::integral_constant\l\< bool, is_same_format\l\< T1, T2 \>::value &&!std\l::is_same\< T1::memory_space,\l T2::memory_space \>::value\l &&std::is_same\< T1::value_type,\l T2::value_type \>::value &&std\l::is_same\< T1::index_type, T2::index\l_type \>::value \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+}
