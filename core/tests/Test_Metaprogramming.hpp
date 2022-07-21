@@ -250,6 +250,52 @@ TEST(MetaprogrammingTest, UnaryContainer_DenseVector) {
   using def_layout = Kokkos::LayoutRight;
   bool res;
 
+  using U_v     = Morpheus::UnaryContainer<con, f, D, D, D>;
+  using ref_U_v = Morpheus::DenseVector<f>;
+  VALIDATE_UNARY_CONTAINER(res, U_v, ref_U_v, f, int, def_layout, def_space);
+
+  using U_vi     = Morpheus::UnaryContainer<con, f, i, D, D>;
+  using ref_U_vi = Morpheus::DenseVector<f, i>;
+  VALIDATE_UNARY_CONTAINER(res, U_vi, ref_U_vi, f, i, def_layout, def_space);
+
+  using U_vl     = Morpheus::UnaryContainer<con, f, D, l, D>;
+  using ref_U_vl = Morpheus::DenseVector<f, l>;
+  VALIDATE_UNARY_CONTAINER(res, U_vl, ref_U_vl, f, int, l, def_space);
+
+  using U_vs     = Morpheus::UnaryContainer<con, f, D, D, s>;
+  using ref_U_vs = Morpheus::DenseVector<f, s>;
+  VALIDATE_UNARY_CONTAINER(res, U_vs, ref_U_vs, f, int,
+                           typename s::array_layout, s);
+
+  using U_vil     = Morpheus::UnaryContainer<con, f, i, l, D>;
+  using ref_U_vil = Morpheus::DenseVector<f, i, l>;
+  VALIDATE_UNARY_CONTAINER(res, U_vil, ref_U_vil, f, i, l, def_space);
+
+  using U_vis     = Morpheus::UnaryContainer<con, f, i, D, s>;
+  using ref_U_vis = Morpheus::DenseVector<f, i, s>;
+  VALIDATE_UNARY_CONTAINER(res, U_vis, ref_U_vis, f, i, def_layout, s);
+
+  using U_vls     = Morpheus::UnaryContainer<con, f, D, l, s>;
+  using ref_U_vls = Morpheus::DenseVector<f, l, s>;
+  VALIDATE_UNARY_CONTAINER(res, U_vls, ref_U_vls, f, int, l, s);
+
+  using U_vils     = Morpheus::UnaryContainer<con, f, i, l, s>;
+  using ref_U_vils = Morpheus::DenseVector<f, i, l, s>;
+  VALIDATE_UNARY_CONTAINER(res, U_vils, ref_U_vils, f, i, l, s);
+}
+
+TEST(MetaprogrammingTest, UnaryContainer_DenseVector_FromSet) {
+  using D   = Morpheus::Default;
+  using f   = float;
+  using i   = long long;
+  using l   = Kokkos::LayoutLeft;
+  using s   = Kokkos::Serial;
+  using con = Morpheus::DenseVector<double>;
+
+  using def_space  = Kokkos::DefaultExecutionSpace;
+  using def_layout = Kokkos::LayoutRight;
+  bool res;
+
   using v       = Morpheus::Set<f, D, D, D>;
   using U_v     = Morpheus::UnaryContainer<con, v>;
   using ref_U_v = Morpheus::DenseVector<f>;
@@ -292,7 +338,7 @@ TEST(MetaprogrammingTest, UnaryContainer_DenseVector) {
   VALIDATE_UNARY_CONTAINER(res, U_vils, ref_U_vils, f, i, l, s);
 }
 
-TEST(MetaprogrammingTest, UnaryContainer_CooMatrix) {
+TEST(MetaprogrammingTest, UnaryContainer_CooMatrix_FromSet) {
   using D   = Morpheus::Default;
   using f   = float;
   using i   = long long;
@@ -346,7 +392,7 @@ TEST(MetaprogrammingTest, UnaryContainer_CooMatrix) {
   VALIDATE_UNARY_CONTAINER(res, U_vils, ref_U_vils, f, i, l, s);
 }
 
-TEST(MetaprogrammingTest, UnaryContainer_DynamicMatrix) {
+TEST(MetaprogrammingTest, UnaryContainer_DynamicMatrix_FromSet) {
   using D   = Morpheus::Default;
   using f   = float;
   using i   = long long;
