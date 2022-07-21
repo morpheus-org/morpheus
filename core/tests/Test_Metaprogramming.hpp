@@ -168,12 +168,14 @@ TEST(MetaprogrammingTest, CrossProduct) {
 }
 
 /**
- * @brief Checks the compile-time cross product of between many type lists of
- * types
+ * @brief Checks the compile-time cross product of many type lists of
+ * types. Each product is a separate result type which is then propagated to the
+ * next.
+ *
  * e.g <A,B> x <C,D> x <E,F>
- *      = <set<A,C>, set<A,D>, set<B,C>, set<B,D>> x <E, F>
- *      = <set<A,C,E>, set<A,C,F>, set<A,D,E>, set<A,D,F>,
- *         set<B,C,E>, set<B,C,F>, set<B,D,E>, set<B,D,F>>
+ *      = <A, B> x <[C, E], [C, F], [D, E], [D, F]>
+ *      = <[A, C, E], [A, C, F], [A, D, E], [A, D, F]
+ *         [B, C, E], [B, C, F], [B, D, E], [B, D, F]>
  *
  */
 TEST(MetaprogrammingTest, MultipleCrossProducts) {
@@ -219,6 +221,39 @@ TEST(MetaprogrammingTest, MultipleCrossProducts) {
       cross3, Morpheus::TypeList<
                   Morpheus::Set<A, C, E, F>, Morpheus::Set<A, D, E, F>,
                   Morpheus::Set<B, C, E, F>, Morpheus::Set<B, D, E, F>>>::value;
+  EXPECT_EQ(res, 1);
+}
+
+/**
+ * @brief Checks the compile-time cross product of many type lists of
+ * types using a nested cross product i.e we only get the final type.
+ *
+ * e.g <A,B> x <C,D> x <E,F>
+ *      = <[A, C, E], [A, C, F], [A, D, E], [A, D, F]
+ *         [B, C, E], [B, C, F], [B, D, E], [B, D, F]>
+ *
+ */
+TEST(MetaprogrammingTest, NestedCrossProduct) {
+  // Types
+  struct A {};
+  struct B {};
+  struct C {};
+  struct D {};
+  struct E {};
+  struct F {};
+  using T1 = Morpheus::TypeList<A, B>;
+  using T2 = Morpheus::TypeList<C, D>;
+  using T3 = Morpheus::TypeList<E, F>;
+
+  // Nested cross product
+  using types_set = typename Morpheus::cross_product<
+      T1, typename Morpheus::cross_product<T2, T3>::type>::type;
+  using ref_set =
+      Morpheus::TypeList<Morpheus::Set<A, C, E>, Morpheus::Set<A, C, F>,
+                         Morpheus::Set<A, D, E>, Morpheus::Set<A, D, F>,
+                         Morpheus::Set<B, C, E>, Morpheus::Set<B, C, F>,
+                         Morpheus::Set<B, D, E>, Morpheus::Set<B, D, F>>;
+  bool res = std::is_same<types_set, ref_set>::value;
   EXPECT_EQ(res, 1);
 }
 

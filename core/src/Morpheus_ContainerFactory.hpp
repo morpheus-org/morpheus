@@ -24,7 +24,7 @@
 #ifndef MORPHEUS_CONTAINERFACTORY_HPP
 #define MORPHEUS_CONTAINERFACTORY_HPP
 
-#include <Morpheus_Metaprogramming.hpp>
+#include <impl/Morpheus_ContainerFactory.hpp>
 
 namespace Morpheus {
 
@@ -81,64 +81,6 @@ inline constexpr bool is_default_v = is_default<T>::value;
 /*! \} // end of typetraits group
  */
 
-/*! \cond */
-namespace Impl {
-template <typename... Ts>
-struct UnaryContainer {};
-
-template <template <class...> class Container, typename T, typename ValueType>
-struct UnaryContainer<Container<T>, ValueType, Default, Default, Default> {
-  using type = Container<ValueType>;
-};
-
-template <template <class...> class Container, typename T, typename ValueType,
-          typename IndexType>
-struct UnaryContainer<Container<T>, ValueType, IndexType, Default, Default> {
-  using type = Container<ValueType, IndexType>;
-};
-
-template <template <class...> class Container, typename T, typename ValueType,
-          typename Layout>
-struct UnaryContainer<Container<T>, ValueType, Default, Layout, Default> {
-  using type = Container<ValueType, Layout>;
-};
-
-template <template <class...> class Container, typename T, typename ValueType,
-          typename Space>
-struct UnaryContainer<Container<T>, ValueType, Default, Default, Space> {
-  using type = Container<ValueType, Space>;
-};
-
-template <template <class...> class Container, typename T, typename ValueType,
-          typename IndexType, typename Layout>
-struct UnaryContainer<Container<T>, ValueType, IndexType, Layout, Default> {
-  using type = Container<ValueType, IndexType, Layout>;
-};
-
-template <template <class...> class Container, typename T, typename ValueType,
-          typename IndexType, typename Space>
-struct UnaryContainer<Container<T>, ValueType, IndexType, Default, Space> {
-  using type = Container<ValueType, IndexType, Space>;
-};
-
-template <template <class...> class Container, typename T, typename ValueType,
-          typename Layout, typename Space>
-struct UnaryContainer<Container<T>, ValueType, Default, Layout, Space> {
-  using type = Container<ValueType, Layout, Space>;
-};
-
-template <template <class...> class Container, typename T, typename ValueType,
-          typename IndexType, typename Layout, typename Space>
-struct UnaryContainer<Container<T>, ValueType, IndexType, Layout, Space> {
-  using type = Container<ValueType, IndexType, Layout, Space>;
-};
-}  // namespace Impl
-
-template <typename... Ts>
-struct UnaryContainer {};
-
-/*! \endcond */
-
 /**
  * \addtogroup generic_containers Generic Containers
  * \brief Generic containers constructed from the various supported data
@@ -149,52 +91,22 @@ struct UnaryContainer {};
  */
 
 /**
- * @brief A wrapper that constructs a container type from the template
- * parameters provided.
+ * @brief A wrapper that constructs a new container type from \p ContainerType
+ using as type arguments the types in \p TypeSet.
  *
  * \par Overview
- * A wrapper that constructs a container type from the template
- * parameters provided. In the case where a template argument is passed as a \p
- * Default this is ignored and not passed in the definition of the type. Note
- * that the \p Container argument needs to specify a complete container type out
- * of which we will be extracting which container that is and define a new type
- * with the rest of the template arguments.
+ * A wrapper that constructs a container type from a set of Type parameters.
+ In the case where a template argument is passed as a \p Default this is
+ ignored and not passed in the definition of the type. Note that the \p
+ Container argument needs to specify a complete container type out of which
+ we will be extracting which container that is and define a new type with
+ the rest of the template arguments.
+ * @brief Generates a \p UnaryContainer from the arguments of the \p Set
+ passed.
  *
- * \par Example
- * \code
- * #include <Morpheus_Core.hpp>
- *
- * int main(){
- *  using D = Morpheus::Default; // Short-hand for default tag
- *  using ref = Morpheus::DenseVector<double>;
- *  using Container = Morpheus::UnaryContainer<ref, float, D, D,
- *                                                  Kokkos::Serial>;
- *
- *  // The result type where the default arguments are ignored.
- *  using res = Morpheus::DenseVector<float, Kokkos::Serial>;
- *  std::cout << std::is_same<Container, res>::value << std::endl; // prints 1
- *
- * }
- * \endcode
- *
- * @tparam Container The container type from which the new type will be
+ * @tparam ContainerType The container type from which the new type will be
  * generated from.
- * @tparam T The required ValueType of Container.
- * @tparam Ts The new types out of which the new container type is created.
- */
-template <template <class...> class Container, typename T, typename... Ts>
-struct UnaryContainer<Container<T>, Ts...> {
-  using type = typename Impl::UnaryContainer<Container<T>, Ts...>::type;
-};
-
-/**
- * @brief Specialization of \p UnaryContainer that packs the template arguments
- * as a \p Set.
- *
- * @tparam Container The container type from which the new type will be
- * generated from.
- * @tparam T The required ValueType of Container.
- * @tparam Ts The new types out of which the new container type is created.
+ * @tparam TypeSet A \p Set of types.
  *
  * \par Example
  * \code
@@ -207,18 +119,42 @@ struct UnaryContainer<Container<T>, Ts...> {
  *  using Container = Morpheus::UnaryContainer<ref, params>;
  *
  *  using res = Morpheus::DenseVector<float, Kokkos::Serial>;
- *  std::cout << std::is_same<Container, res>::value << std::endl; // prints 1
+ *  std::cout << std::is_same<Container, res>::value << std::endl; // prints
+ 1
  *
  * }
  * \endcode
  */
-template <template <class...> class Container, typename T, typename... Ts>
-struct UnaryContainer<Container<T>, Set<Ts...>> {
-  using type = typename UnaryContainer<Container<T>, Ts...>::type;
+template <typename ContainerType, typename TypeSet>
+struct UnaryContainer {
+  using type = typename Impl::UnaryContainerProxy<ContainerType, TypeSet>::type;
 };
-
 /*! \} // end of generic_containers group
  */
+
+/**
+ * \addtogroup metaprogramming Metaprogramming
+ * \ingroup utilities
+ * \{
+ *
+ */
+
+/**
+ * @brief Generates a \p TypeList of \p UnaryContainer where each container
+ is a
+ * specific Morpheus Container type with a variadic number of template
+ * arguments.
+ *
+ * @tparam Container One of Morpheus supported \p Containers
+ * @tparam U A type list of all the combination.
+ */
+template <typename Container, typename U>
+struct generate_unary_typelist {
+  using type = typename Impl::generate_unary_typelist<Container, U>::type;
+};
+/*! \} // end of metaprogramming group
+ */
+
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_CONTAINERFACTORY_HPP

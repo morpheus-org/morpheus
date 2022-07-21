@@ -24,6 +24,8 @@
 #ifndef MORPHEUS_METAPROGRAMMING_HPP
 #define MORPHEUS_METAPROGRAMMING_HPP
 
+#include <impl/Morpheus_Metaprogramming.hpp>
+
 #include <tuple>
 
 namespace Morpheus {
@@ -35,104 +37,6 @@ namespace Morpheus {
  * \{
  *
  */
-
-/*! \cond */
-// Forward declarations
-template <typename... Ts>
-struct TypeList;
-template <typename... Ts>
-struct Set;
-template <class... Ts>
-struct IndexedTypeList;
-
-template <typename T, typename U>
-struct cross_product;
-template <typename... T>
-struct concat;
-
-namespace Impl {
-// forward decl
-template <typename T, typename U>
-struct cross_product;
-template <typename... T>
-struct concat;
-
-template <typename... Ts, typename... Us>
-struct concat<TypeList<Ts...>, TypeList<Us...>> {
-  using type = TypeList<Ts..., Us...>;
-};
-
-// Partially specialise the empty cases.
-template <typename... Us>
-struct cross_product<TypeList<>, TypeList<Us...>> {
-  using type = TypeList<>;
-};
-
-template <typename... Us>
-struct cross_product<TypeList<Us...>, TypeList<>> {
-  using type = TypeList<>;
-};
-
-template <>
-struct cross_product<TypeList<>, TypeList<>> {
-  using type = TypeList<>;
-};
-
-// Generic Case
-template <typename T, typename... Ts, typename U, typename... Us>
-struct cross_product<TypeList<T, Ts...>, TypeList<U, Us...>> {
-  using type = typename concat<
-      typename concat<
-          TypeList<Set<T, U>>,
-          typename cross_product<TypeList<T>, TypeList<Us...>>::type>::type,
-      typename cross_product<TypeList<Ts...>, TypeList<U, Us...>>::type>::type;
-};
-
-/**
- * @brief Specialization where the first type list contains a Set and the second
- * type list contains a Type
- *
- */
-template <typename... T, typename... Ts, typename U, typename... Us>
-struct cross_product<TypeList<Set<T...>, Ts...>, TypeList<U, Us...>> {
-  using type = typename concat<
-      typename concat<TypeList<Set<T..., U>>,
-                      typename cross_product<TypeList<Set<T...>>,
-                                             TypeList<Us...>>::type>::type,
-      typename cross_product<TypeList<Ts...>, TypeList<U, Us...>>::type>::type;
-};
-
-/**
- * @brief Specialization where the first type list contains a Type and the
- * second type list contains a Set
- *
- */
-template <typename T, typename... Ts, typename... U, typename... Us>
-struct cross_product<TypeList<T, Ts...>, TypeList<Set<U...>, Us...>> {
-  using type = typename concat<
-      typename concat<
-          TypeList<Set<T, U...>>,
-          typename cross_product<TypeList<T>, TypeList<Us...>>::type>::type,
-      typename cross_product<TypeList<Ts...>,
-                             TypeList<Set<U...>, Us...>>::type>::type;
-};
-
-/**
- * @brief Specialization where the both type lists contains a Set as a first
- * element
- *
- */
-template <typename... T, typename... Ts, typename... U, typename... Us>
-struct cross_product<TypeList<Set<T...>, Ts...>, TypeList<Set<U...>, Us...>> {
-  using type = typename concat<
-      typename concat<TypeList<Set<T..., U...>>,
-                      typename cross_product<TypeList<Set<T...>>,
-                                             TypeList<Us...>>::type>::type,
-      typename cross_product<TypeList<Ts...>,
-                             TypeList<Set<U...>, Us...>>::type>::type;
-};
-}  // namespace Impl
-/*! \endcond */
 
 /**
  * @brief Compile-time type list
