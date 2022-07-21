@@ -228,51 +228,58 @@ struct to_gtest_types<Morpheus::TypeList<Ts...>> {
   using type = ::testing::Types<Ts...>;
 };
 
-template <typename... Ts>
-using vec = Morpheus::DenseVector<Ts...>;
+template <typename T, typename... Ts>
+struct Container1 {};
+template <typename T, typename... Ts>
+struct Container2 {};
 
 TEST(ContainerFactoryTest, GenerateUnaryTypeList) {
-  using D  = Morpheus::Default;
-  using d  = double;
-  using f  = float;
-  using i  = int;
-  using ll = long long;
-  using l  = Kokkos::LayoutLeft;
-  using r  = Kokkos::LayoutRight;
-  using s  = TEST_EXECSPACE;
+  using DD = Morpheus::Default;
+  struct A {};
+  struct B {};
+  struct C {};
+  struct D {};
+  struct E {};
+  struct F {};
+  struct G {};
+  struct H {};
 
-  using value_tlist  = Morpheus::TypeList<d, f, i>;
-  using index_tlist  = Morpheus::TypeList<i, ll, D>;
-  using layout_tlist = Morpheus::TypeList<r, l, D>;
-  using space_tlist  = Morpheus::TypeList<s, D>;
+  using value_tlist  = Morpheus::TypeList<A, B, C>;
+  using index_tlist  = Morpheus::TypeList<D, E, DD>;
+  using layout_tlist = Morpheus::TypeList<F, G, DD>;
+  using space_tlist  = Morpheus::TypeList<H, DD>;
 
   using types_set = typename Morpheus::cross_product<
       value_tlist,
       typename Morpheus::cross_product<
           index_tlist, typename Morpheus::cross_product<
                            layout_tlist, space_tlist>::type>::type>::type;
-  //  Convert types set into container set
+
   using unary_types =
-      typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
+      typename Morpheus::generate_unary_typelist<Container1<double>,
                                                  types_set>::type;
 
   using res_t = Morpheus::TypeList<
-      vec<d, i, r, s>, vec<d, i, r>, vec<d, i, l, s>, vec<d, i, l>,
-      vec<d, i, s>, vec<d, i>, vec<d, ll, r, s>, vec<d, ll, r>,
-      vec<d, ll, l, s>, vec<d, ll, l>, vec<d, ll, s>, vec<d, ll>, vec<d, r, s>,
-      vec<d, r>, vec<d, l, s>, vec<d, l>, vec<d, s>, vec<d>, vec<f, i, r, s>,
-      vec<f, i, r>, vec<f, i, l, s>, vec<f, i, l>, vec<f, i, s>, vec<f, i>,
-      vec<f, ll, r, s>, vec<f, ll, r>, vec<f, ll, l, s>, vec<f, ll, l>,
-      vec<f, ll, s>, vec<f, ll>, vec<f, r, s>, vec<f, r>, vec<f, l, s>,
-      vec<f, l>, vec<f, s>, vec<f>, vec<i, i, r, s>, vec<i, i, r>,
-      vec<i, i, l, s>, vec<i, i, l>, vec<i, i, s>, vec<i, i>, vec<i, ll, r, s>,
-      vec<i, ll, r>, vec<i, ll, l, s>, vec<i, ll, l>, vec<i, ll, s>, vec<i, ll>,
-      vec<i, r, s>, vec<i, r>, vec<i, l, s>, vec<i, l>, vec<i, s>, vec<i>>;
+      Container1<A, D, F, H>, Container1<A, D, F>, Container1<A, D, G, H>,
+      Container1<A, D, G>, Container1<A, D, H>, Container1<A, D>,
+      Container1<A, E, F, H>, Container1<A, E, F>, Container1<A, E, G, H>,
+      Container1<A, E, G>, Container1<A, E, H>, Container1<A, E>,
+      Container1<A, F, H>, Container1<A, F>, Container1<A, G, H>,
+      Container1<A, G>, Container1<A, H>, Container1<A>, Container1<B, D, F, H>,
+      Container1<B, D, F>, Container1<B, D, G, H>, Container1<B, D, G>,
+      Container1<B, D, H>, Container1<B, D>, Container1<B, E, F, H>,
+      Container1<B, E, F>, Container1<B, E, G, H>, Container1<B, E, G>,
+      Container1<B, E, H>, Container1<B, E>, Container1<B, F, H>,
+      Container1<B, F>, Container1<B, G, H>, Container1<B, G>, Container1<B, H>,
+      Container1<B>, Container1<C, D, F, H>, Container1<C, D, F>,
+      Container1<C, D, G, H>, Container1<C, D, G>, Container1<C, D, H>,
+      Container1<C, D>, Container1<C, E, F, H>, Container1<C, E, F>,
+      Container1<C, E, G, H>, Container1<C, E, G>, Container1<C, E, H>,
+      Container1<C, E>, Container1<C, F, H>, Container1<C, F>,
+      Container1<C, G, H>, Container1<C, G>, Container1<C, H>, Container1<C>>;
 
   bool res = std::is_same<unary_types, res_t>::value;
   EXPECT_EQ(res, 1);
-  //  Convert to Types
-  using DenseVectorTypes = typename to_gtest_types<unary_types>::type;
 }
 
 }  // namespace Test
