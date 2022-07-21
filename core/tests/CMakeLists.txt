@@ -21,6 +21,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       Dot
       TypeTraits
       Metaprogramming
+      ContainerFactory
       FormatTags
       GenericSpace)
       set(file ${testdir}/Test_${Tag}_${Name}.cpp)

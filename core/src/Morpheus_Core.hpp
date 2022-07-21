@@ -56,6 +56,11 @@
 // I/O
 #include <Morpheus_MatrixMarket.hpp>
 
+// Other
+#include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_Metaprogramming.hpp>
+#include <Morpheus_ContainerFactory.hpp>
+
 namespace Morpheus {
 
 struct InitArguments : public Kokkos::InitArguments {
