@@ -92,17 +92,12 @@ inline constexpr bool is_default_v = is_default<T>::value;
 
 /**
  * @brief A wrapper that constructs a new container type from \p ContainerType
- using as type arguments the types in \p TypeSet.
+ using as arguments the types in \p TypeSet.
  *
  * \par Overview
  * A wrapper that constructs a container type from a set of Type parameters.
  In the case where a template argument is passed as a \p Default this is
- ignored and not passed in the definition of the type. Note that the \p
- Container argument needs to specify a complete container type out of which
- we will be extracting which container that is and define a new type with
- the rest of the template arguments.
- * @brief Generates a \p UnaryContainer from the arguments of the \p Set
- passed.
+ ignored and not passed in the definition of the type.
  *
  * @tparam ContainerType The container type from which the new type will be
  * generated from.
@@ -119,8 +114,7 @@ inline constexpr bool is_default_v = is_default<T>::value;
  *  using Container = Morpheus::UnaryContainer<ref, params>;
  *
  *  using res = Morpheus::DenseVector<float, Kokkos::Serial>;
- *  std::cout << std::is_same<Container, res>::value << std::endl; // prints
- 1
+ *  std::cout << std::is_same<Container, res>::value << std::endl; // prints 1
  *
  * }
  * \endcode
@@ -128,6 +122,39 @@ inline constexpr bool is_default_v = is_default<T>::value;
 template <typename ContainerType, typename TypeSet>
 struct UnaryContainer {
   using type = typename Impl::UnaryContainerProxy<ContainerType, TypeSet>::type;
+};
+
+/**
+ * @brief A wrapper that constructs a new container type that holds two
+ container types.
+ *
+ * \par Overview
+ * The purpose of this container is to place under the same type two containers
+ - possibly different.
+ *
+ * @tparam ContainerType1 The first container type.
+ * @tparam ContainerType2 The second container type.
+ *
+ * \par Example
+ * \code
+ * #include <Morpheus_Core.hpp>
+ *
+ * int main(){
+ *  using c1 = Morpheus::CooMatrix<double>;
+ *  using c2 = Morpheus::DenseVector<double>;
+ *  using bin = Morpheus::BinaryContainer<c1, c2>;
+ *
+ *  // both print 1
+ *  std::cout << std::is_same<typename bin::type1, c1>::value << std::endl;
+ *  std::cout << std::is_same<typename bin::type2, c2>::value << std::endl;
+ *
+ * }
+ * \endcode
+ */
+template <typename ContainerType1, typename ContainerType2>
+struct BinaryContainer {
+  using type1 = ContainerType1;
+  using type2 = ContainerType2;
 };
 /*! \} // end of generic_containers group
  */
@@ -140,10 +167,8 @@ struct UnaryContainer {
  */
 
 /**
- * @brief Generates a \p TypeList of \p UnaryContainer where each container
- is a
- * specific Morpheus Container type with a variadic number of template
- * arguments.
+ * @brief Generates a \p TypeList of \p UnaryContainer where each container type
+ * is generated from each combination of types in the \p U type list.
  *
  * @tparam Container One of Morpheus supported \p Containers
  * @tparam U A type list of all the combination.
@@ -151,6 +176,20 @@ struct UnaryContainer {
 template <typename Container, typename U>
 struct generate_unary_typelist {
   using type = typename Impl::generate_unary_typelist<Container, U>::type;
+};
+
+// Returns a TypeList<Binary1<>, Binary2<>....>
+/**
+ * @brief Generates a \p TypeList of all combinations of \p BinaryContainer from
+ * two TypeLists of containers.
+ *
+ * @tparam List1 The first type list of containers.
+ * @tparam List2 The second type list of containers.
+ */
+template <typename List1, typename List2>
+struct generate_binary_typelist {
+  using type =
+      typename Impl::generate_binary_typelist_proxy<List1, List2>::type;
 };
 /*! \} // end of metaprogramming group
  */

@@ -27,197 +27,123 @@
 #include <Morpheus_Core.hpp>
 
 namespace Test {
-#define VALIDATE_UNARY_CONTAINER(r, NewType, RefType, RefValueType,            \
-                                 RefIndexType, RefLayout, RefSpace)            \
-  {                                                                            \
-    r = std::is_same<typename NewType::type, RefType>::value;                  \
-    EXPECT_EQ(r, 1);                                                           \
-    r = std::is_same<typename NewType::type::value_type, RefValueType>::value; \
-    EXPECT_EQ(r, 1);                                                           \
-    r = std::is_same<typename NewType::type::index_type, RefIndexType>::value; \
-    EXPECT_EQ(r, 1);                                                           \
-    r = std::is_same<typename NewType::type::array_layout, RefLayout>::value;  \
-    EXPECT_EQ(r, 1);                                                           \
-    r = std::is_same<typename NewType::type::execution_space,                  \
-                     RefSpace>::value;                                         \
-    EXPECT_EQ(r, 1);                                                           \
+
+template <typename T, typename... Ts>
+struct Container1 {};
+template <typename T, typename... Ts>
+struct Container2 {};
+
+/**
+ * @brief Checks if a type is a \p Default.
+ *
+ */
+TEST(ContainerFactoryTest, IsDefault) {
+  bool res = Morpheus::is_default<Morpheus::Default>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_default<double>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_default<int>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_default<Morpheus::Impl::SparseMatrixTag>::value;
+  EXPECT_EQ(res, 0);
+
+  /* Testing Alias */
+  res = Morpheus::is_default_v<Morpheus::Default>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_default_v<double>;
+  EXPECT_EQ(res, 0);
+}
+
+/**
+ * @brief Checks the compile-time type generation of a \p UnaryContainer from a
+ * sample container and a set of type arguments. In other word, we expect the
+ * unary container to adopt the provided container type with the new set of
+ * parameters.
+ *
+ */
+TEST(ContainerFactoryTest, UnaryContainer) {
+  using DD = Morpheus::Default;
+  struct t {};
+  struct A {};
+  struct B {};
+  struct C {};
+  struct D {};
+
+  {
+    using set       = Morpheus::Set<A, DD, DD, DD>;
+    using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
+    using reference = Container1<A>;
+
+    bool res = std::is_same<typename unary::type, reference>::value;
+    EXPECT_EQ(res, 1);
   }
 
-/**
- * @brief Checks the compile-time type generation of a \p DenseVector container
- * from a set of template arguments.
- *
- */
-TEST(ContainerFactoryTest, UnaryContainer_DenseVector_FromSet) {
-  using D   = Morpheus::Default;
-  using f   = float;
-  using i   = long long;
-  using l   = Kokkos::LayoutLeft;
-  using s   = Kokkos::Serial;
-  using con = Morpheus::DenseVector<double>;
+  {
+    using set       = Morpheus::Set<A, B, DD, DD>;
+    using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
+    using reference = Container1<A, B>;
 
-  using def_space  = Kokkos::DefaultExecutionSpace;
-  using def_layout = Kokkos::LayoutRight;
-  bool res;
+    bool res = std::is_same<typename unary::type, reference>::value;
+    EXPECT_EQ(res, 1);
+  }
 
-  using v       = Morpheus::Set<f, D, D, D>;
-  using U_v     = Morpheus::UnaryContainer<con, v>;
-  using ref_U_v = Morpheus::DenseVector<f>;
-  VALIDATE_UNARY_CONTAINER(res, U_v, ref_U_v, f, int, def_layout, def_space);
+  {
+    using set       = Morpheus::Set<A, DD, B, DD>;
+    using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
+    using reference = Container1<A, B>;
 
-  using vi       = Morpheus::Set<f, i, D, D>;
-  using U_vi     = Morpheus::UnaryContainer<con, vi>;
-  using ref_U_vi = Morpheus::DenseVector<f, i>;
-  VALIDATE_UNARY_CONTAINER(res, U_vi, ref_U_vi, f, i, def_layout, def_space);
+    bool res = std::is_same<typename unary::type, reference>::value;
+    EXPECT_EQ(res, 1);
+  }
 
-  using vl       = Morpheus::Set<f, D, l, D>;
-  using U_vl     = Morpheus::UnaryContainer<con, vl>;
-  using ref_U_vl = Morpheus::DenseVector<f, l>;
-  VALIDATE_UNARY_CONTAINER(res, U_vl, ref_U_vl, f, int, l, def_space);
+  {
+    using set       = Morpheus::Set<A, DD, DD, B>;
+    using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
+    using reference = Container1<A, B>;
 
-  using vs       = Morpheus::Set<f, D, D, s>;
-  using U_vs     = Morpheus::UnaryContainer<con, vs>;
-  using ref_U_vs = Morpheus::DenseVector<f, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vs, ref_U_vs, f, int,
-                           typename s::array_layout, s);
+    bool res = std::is_same<typename unary::type, reference>::value;
+    EXPECT_EQ(res, 1);
+  }
 
-  using vil       = Morpheus::Set<f, i, l, D>;
-  using U_vil     = Morpheus::UnaryContainer<con, vil>;
-  using ref_U_vil = Morpheus::DenseVector<f, i, l>;
-  VALIDATE_UNARY_CONTAINER(res, U_vil, ref_U_vil, f, i, l, def_space);
+  {
+    using set       = Morpheus::Set<A, B, C, DD>;
+    using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
+    using reference = Container1<A, B, C>;
 
-  using vis       = Morpheus::Set<f, i, D, s>;
-  using U_vis     = Morpheus::UnaryContainer<con, vis>;
-  using ref_U_vis = Morpheus::DenseVector<f, i, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vis, ref_U_vis, f, i, def_layout, s);
+    bool res = std::is_same<typename unary::type, reference>::value;
+    EXPECT_EQ(res, 1);
+  }
 
-  using vls       = Morpheus::Set<f, D, l, s>;
-  using U_vls     = Morpheus::UnaryContainer<con, vls>;
-  using ref_U_vls = Morpheus::DenseVector<f, l, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vls, ref_U_vls, f, int, l, s);
+  {
+    using set       = Morpheus::Set<A, B, DD, C>;
+    using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
+    using reference = Container1<A, B, C>;
 
-  using vils       = Morpheus::Set<f, i, l, s>;
-  using U_vils     = Morpheus::UnaryContainer<con, vils>;
-  using ref_U_vils = Morpheus::DenseVector<f, i, l, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vils, ref_U_vils, f, i, l, s);
-}
+    bool res = std::is_same<typename unary::type, reference>::value;
+    EXPECT_EQ(res, 1);
+  }
 
-/**
- * @brief Checks the compile-time type generation of a \p CooMatrix container
- * from a set of template arguments.
- *
- */
-TEST(ContainerFactoryTest, UnaryContainer_CooMatrix_FromSet) {
-  using D   = Morpheus::Default;
-  using f   = float;
-  using i   = long long;
-  using l   = Kokkos::LayoutLeft;
-  using s   = Kokkos::Serial;
-  using con = Morpheus::CooMatrix<double>;
+  {
+    using set       = Morpheus::Set<A, DD, B, C>;
+    using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
+    using reference = Container1<A, B, C>;
 
-  using def_space  = Kokkos::DefaultExecutionSpace;
-  using def_layout = Kokkos::LayoutRight;
-  bool res;
+    bool res = std::is_same<typename unary::type, reference>::value;
+    EXPECT_EQ(res, 1);
+  }
 
-  using v       = Morpheus::Set<f, D, D, D>;
-  using U_v     = Morpheus::UnaryContainer<con, v>;
-  using ref_U_v = Morpheus::CooMatrix<f>;
-  VALIDATE_UNARY_CONTAINER(res, U_v, ref_U_v, f, int, def_layout, def_space);
+  {
+    using set       = Morpheus::Set<A, B, C, D>;
+    using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
+    using reference = Container1<A, B, C, D>;
 
-  using vi       = Morpheus::Set<f, i, D, D>;
-  using U_vi     = Morpheus::UnaryContainer<con, vi>;
-  using ref_U_vi = Morpheus::CooMatrix<f, i>;
-  VALIDATE_UNARY_CONTAINER(res, U_vi, ref_U_vi, f, i, def_layout, def_space);
-
-  using vl       = Morpheus::Set<f, D, l, D>;
-  using U_vl     = Morpheus::UnaryContainer<con, vl>;
-  using ref_U_vl = Morpheus::CooMatrix<f, l>;
-  VALIDATE_UNARY_CONTAINER(res, U_vl, ref_U_vl, f, int, l, def_space);
-
-  using vs       = Morpheus::Set<f, D, D, s>;
-  using U_vs     = Morpheus::UnaryContainer<con, vs>;
-  using ref_U_vs = Morpheus::CooMatrix<f, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vs, ref_U_vs, f, int,
-                           typename s::array_layout, s);
-
-  using vil       = Morpheus::Set<f, i, l, D>;
-  using U_vil     = Morpheus::UnaryContainer<con, vil>;
-  using ref_U_vil = Morpheus::CooMatrix<f, i, l>;
-  VALIDATE_UNARY_CONTAINER(res, U_vil, ref_U_vil, f, i, l, def_space);
-
-  using vis       = Morpheus::Set<f, i, D, s>;
-  using U_vis     = Morpheus::UnaryContainer<con, vis>;
-  using ref_U_vis = Morpheus::CooMatrix<f, i, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vis, ref_U_vis, f, i, def_layout, s);
-
-  using vls       = Morpheus::Set<f, D, l, s>;
-  using U_vls     = Morpheus::UnaryContainer<con, vls>;
-  using ref_U_vls = Morpheus::CooMatrix<f, l, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vls, ref_U_vls, f, int, l, s);
-
-  using vils       = Morpheus::Set<f, i, l, s>;
-  using U_vils     = Morpheus::UnaryContainer<con, vils>;
-  using ref_U_vils = Morpheus::CooMatrix<f, i, l, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vils, ref_U_vils, f, i, l, s);
-}
-
-/**
- * @brief Checks the compile-time type generation of a \p DynamicVector
- * container from a set of template arguments.
- *
- */
-TEST(ContainerFactoryTest, UnaryContainer_DynamicMatrix_FromSet) {
-  using D   = Morpheus::Default;
-  using f   = float;
-  using i   = long long;
-  using l   = Kokkos::LayoutLeft;
-  using s   = Kokkos::Serial;
-  using con = Morpheus::DynamicMatrix<double>;
-
-  using def_space  = Kokkos::DefaultExecutionSpace;
-  using def_layout = Kokkos::LayoutRight;
-  bool res;
-
-  using v       = Morpheus::Set<f, D, D, D>;
-  using U_v     = Morpheus::UnaryContainer<con, v>;
-  using ref_U_v = Morpheus::DynamicMatrix<f>;
-  VALIDATE_UNARY_CONTAINER(res, U_v, ref_U_v, f, int, def_layout, def_space);
-
-  using vi       = Morpheus::Set<f, i, D, D>;
-  using U_vi     = Morpheus::UnaryContainer<con, vi>;
-  using ref_U_vi = Morpheus::DynamicMatrix<f, i>;
-  VALIDATE_UNARY_CONTAINER(res, U_vi, ref_U_vi, f, i, def_layout, def_space);
-
-  using vl       = Morpheus::Set<f, D, l, D>;
-  using U_vl     = Morpheus::UnaryContainer<con, vl>;
-  using ref_U_vl = Morpheus::DynamicMatrix<f, l>;
-  VALIDATE_UNARY_CONTAINER(res, U_vl, ref_U_vl, f, int, l, def_space);
-
-  using vs       = Morpheus::Set<f, D, D, s>;
-  using U_vs     = Morpheus::UnaryContainer<con, vs>;
-  using ref_U_vs = Morpheus::DynamicMatrix<f, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vs, ref_U_vs, f, int,
-                           typename s::array_layout, s);
-
-  using vil       = Morpheus::Set<f, i, l, D>;
-  using U_vil     = Morpheus::UnaryContainer<con, vil>;
-  using ref_U_vil = Morpheus::DynamicMatrix<f, i, l>;
-  VALIDATE_UNARY_CONTAINER(res, U_vil, ref_U_vil, f, i, l, def_space);
-
-  using vis       = Morpheus::Set<f, i, D, s>;
-  using U_vis     = Morpheus::UnaryContainer<con, vis>;
-  using ref_U_vis = Morpheus::DynamicMatrix<f, i, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vis, ref_U_vis, f, i, def_layout, s);
-
-  using vls       = Morpheus::Set<f, D, l, s>;
-  using U_vls     = Morpheus::UnaryContainer<con, vls>;
-  using ref_U_vls = Morpheus::DynamicMatrix<f, l, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vls, ref_U_vls, f, int, l, s);
-
-  using vils       = Morpheus::Set<f, i, l, s>;
-  using U_vils     = Morpheus::UnaryContainer<con, vils>;
-  using ref_U_vils = Morpheus::DynamicMatrix<f, i, l, s>;
-  VALIDATE_UNARY_CONTAINER(res, U_vils, ref_U_vils, f, i, l, s);
+    bool res = std::is_same<typename unary::type, reference>::value;
+    EXPECT_EQ(res, 1);
+  }
 }
 
 template <typename... Ts>
@@ -228,11 +154,11 @@ struct to_gtest_types<Morpheus::TypeList<Ts...>> {
   using type = ::testing::Types<Ts...>;
 };
 
-template <typename T, typename... Ts>
-struct Container1 {};
-template <typename T, typename... Ts>
-struct Container2 {};
-
+/**
+ * @brief Generate a list of unary types that emerge from all the possible
+ * combinations of type sets generated.
+ *
+ */
 TEST(ContainerFactoryTest, GenerateUnaryTypeList) {
   using DD = Morpheus::Default;
   struct A {};
@@ -279,6 +205,234 @@ TEST(ContainerFactoryTest, GenerateUnaryTypeList) {
       Container1<C, G, H>, Container1<C, G>, Container1<C, H>, Container1<C>>;
 
   bool res = std::is_same<unary_types, res_t>::value;
+  EXPECT_EQ(res, 1);
+}
+
+/**
+ * @brief Generate a list of unary types that emerge from all the possible
+ * combinations of type sets generated - each type list holds only one type so
+ * we expect only one set to be generated and passed as a type set.
+ *
+ */
+TEST(ContainerFactoryTest, GenerateUnaryTypeListSingleEntry) {
+  struct A {};
+  struct B {};
+  struct C {};
+  struct D {};
+  struct E {};
+  struct F {};
+  struct G {};
+  struct H {};
+
+  using value_tlist  = Morpheus::TypeList<A>;
+  using index_tlist  = Morpheus::TypeList<D>;
+  using layout_tlist = Morpheus::TypeList<F>;
+  using space_tlist  = Morpheus::TypeList<H>;
+
+  using types_set = typename Morpheus::cross_product<
+      value_tlist,
+      typename Morpheus::cross_product<
+          index_tlist, typename Morpheus::cross_product<
+                           layout_tlist, space_tlist>::type>::type>::type;
+
+  using unary_types =
+      typename Morpheus::generate_unary_typelist<Container1<double>,
+                                                 types_set>::type;
+
+  using res_t = Morpheus::TypeList<Container1<A, D, F, H>>;
+
+  bool res = std::is_same<unary_types, res_t>::value;
+  EXPECT_EQ(res, 1);
+}
+
+/**
+ * @brief Generate a list of unary types that emerge from all the possible
+ * combinations of type sets generated - an empty type set is passed to generate
+ * the unary type list so we expect the result to be an empty type list.
+ *
+ */
+TEST(ContainerFactoryTest, GenerateUnaryTypeListNoEntry) {
+  using empty_list = Morpheus::TypeList<>;
+
+  using unary_types =
+      typename Morpheus::generate_unary_typelist<Container1<double>,
+                                                 empty_list>::type;
+
+  using res_t = empty_list;
+
+  bool res = std::is_same<unary_types, res_t>::value;
+  EXPECT_EQ(res, 1);
+}
+
+/**
+ * @brief Checks the compile-time type generation of a \p BinaryContainer from
+ * two sample containers. We expect the binary container to have \p type1 and \p
+ * type2 same to the types of the containers passed each time.
+ *
+ */
+TEST(ContainerFactoryTest, BinaryContainer) {
+  struct A {};
+  struct B {};
+  struct C {};
+  struct D {};
+
+  {
+    using c1  = Container1<A, B>;
+    using c2  = Container2<C, D>;
+    using bin = Morpheus::BinaryContainer<c1, c2>;
+
+    bool res = std::is_same<typename bin::type1, c1>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename bin::type2, c2>::value;
+    EXPECT_EQ(res, 1);
+  }
+
+  {
+    using c1  = Container1<A, B>;
+    using c2  = Container2<C, D>;
+    using bin = Morpheus::BinaryContainer<c2, c1>;
+
+    bool res = std::is_same<typename bin::type1, c2>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename bin::type2, c1>::value;
+    EXPECT_EQ(res, 1);
+  }
+
+  {
+    using c1  = Container1<A, B>;
+    using bin = Morpheus::BinaryContainer<c1, c1>;
+
+    bool res = std::is_same<typename bin::type1, c1>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename bin::type2, c1>::value;
+    EXPECT_EQ(res, 1);
+  }
+}
+
+/**
+ * @brief Generate a list of binary types that emerge from all the possible
+ * combinations of two unary type lists.
+ *
+ */
+TEST(ContainerFactoryTest, GenerateBinaryTypeList) {
+  using DD = Morpheus::Default;
+  struct A {};
+  struct B {};
+  struct C {};
+  struct D {};
+  struct E {};
+  struct F {};
+  struct G {};
+  struct H {};
+
+  using value_tlist  = Morpheus::TypeList<A>;
+  using index_tlist  = Morpheus::TypeList<D, DD>;
+  using layout_tlist = Morpheus::TypeList<F, DD>;
+  using space_tlist  = Morpheus::TypeList<H, DD>;
+
+  using types_set = typename Morpheus::cross_product<
+      value_tlist,
+      typename Morpheus::cross_product<
+          index_tlist, typename Morpheus::cross_product<
+                           layout_tlist, space_tlist>::type>::type>::type;
+
+  using container1_types =
+      typename Morpheus::generate_unary_typelist<Container1<double>,
+                                                 types_set>::type;
+
+  using res_container1_t =
+      Morpheus::TypeList<Container1<A, D, F, H>, Container1<A, D, F>,
+                         Container1<A, D, H>, Container1<A, D>,
+                         Container1<A, F, H>, Container1<A, F>,
+                         Container1<A, H>, Container1<A>>;
+
+  bool res = std::is_same<container1_types, res_container1_t>::value;
+  EXPECT_EQ(res, 1);
+
+  using container2_types =
+      typename Morpheus::generate_unary_typelist<Container2<double>,
+                                                 types_set>::type;
+
+  using res_container2_t =
+      Morpheus::TypeList<Container2<A, D, F, H>, Container2<A, D, F>,
+                         Container2<A, D, H>, Container2<A, D>,
+                         Container2<A, F, H>, Container2<A, F>,
+                         Container2<A, H>, Container2<A>>;
+
+  res = std::is_same<container2_types, res_container2_t>::value;
+  EXPECT_EQ(res, 1);
+  std::cout << Morpheus::is_container<Container1<A, D, F, H>>::value
+            << std::endl;
+  using binary_containers =
+      typename Morpheus::generate_binary_typelist<container1_types,
+                                                  container2_types>::type;
+  using res_t = Morpheus::TypeList<
+      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, D, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, D, F>>,
+      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, D, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, D>>,
+      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, F>>,
+      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A>>,
+      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, D, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, D, F>>,
+      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, D, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, D>>,
+      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, F>>,
+      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A>>,
+      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, D, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, D, F>>,
+      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, D, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, D>>,
+      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, F>>,
+      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, H>>,
+      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A>>,
+      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, D, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, D, F>>,
+      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, D, H>>,
+      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, D>>,
+      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, F>>,
+      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, H>>,
+      Morpheus::BinaryContainer<Container1<A, D>, Container2<A>>,
+      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, D, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, D, F>>,
+      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, D, H>>,
+      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, D>>,
+      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, F>>,
+      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, H>>,
+      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A>>,
+      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, D, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, D, F>>,
+      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, D, H>>,
+      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, D>>,
+      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, F>>,
+      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, H>>,
+      Morpheus::BinaryContainer<Container1<A, F>, Container2<A>>,
+      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, D, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, D, F>>,
+      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, D, H>>,
+      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, D>>,
+      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, F, H>>,
+      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, F>>,
+      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, H>>,
+      Morpheus::BinaryContainer<Container1<A, H>, Container2<A>>,
+      Morpheus::BinaryContainer<Container1<A>, Container2<A, D, F, H>>,
+      Morpheus::BinaryContainer<Container1<A>, Container2<A, D, F>>,
+      Morpheus::BinaryContainer<Container1<A>, Container2<A, D, H>>,
+      Morpheus::BinaryContainer<Container1<A>, Container2<A, D>>,
+      Morpheus::BinaryContainer<Container1<A>, Container2<A, F, H>>,
+      Morpheus::BinaryContainer<Container1<A>, Container2<A, F>>,
+      Morpheus::BinaryContainer<Container1<A>, Container2<A, H>>,
+      Morpheus::BinaryContainer<Container1<A>, Container2<A>>>;
+
+  res = std::is_same<binary_containers, res_t>::value;
   EXPECT_EQ(res, 1);
 }
 
