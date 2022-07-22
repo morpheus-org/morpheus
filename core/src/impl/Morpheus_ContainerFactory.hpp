@@ -33,6 +33,8 @@ namespace Morpheus {
 struct Default;
 template <typename T1, typename T2>
 struct BinaryContainer;
+template <typename ContainerType, typename TypeSet>
+struct UnaryContainer;
 
 namespace Impl {
 // Forward Decl
@@ -41,76 +43,130 @@ struct UnaryContainerProxy;
 
 template <typename Container, typename T1, typename T2, typename T3,
           typename T4>
-struct UnaryContainer;
+struct UnaryContainerProxy_Impl;
 
 // A unary container specialization that is build by selecting the ValueType.
 // The rest of the parameters are set to default.
 template <template <class...> class Container, typename T, typename ValueType>
-struct UnaryContainer<Container<T>, ValueType, Default, Default, Default> {
+struct UnaryContainerProxy_Impl<Container<T>, ValueType, Default, Default,
+                                Default> {
   using type = Container<ValueType>;
+
+  using value_type      = ValueType;
+  using index_type      = Default;
+  using array_layout    = Default;
+  using execution_space = Default;
 };
 
 // A unary container specialization that is build by selecting the ValueType and
 // IndexType. The rest of the parameters are set to default.
 template <template <class...> class Container, typename T, typename ValueType,
           typename IndexType>
-struct UnaryContainer<Container<T>, ValueType, IndexType, Default, Default> {
+struct UnaryContainerProxy_Impl<Container<T>, ValueType, IndexType, Default,
+                                Default> {
   using type = Container<ValueType, IndexType>;
+
+  using value_type      = ValueType;
+  using index_type      = IndexType;
+  using array_layout    = Default;
+  using execution_space = Default;
 };
 
 // A unary container specialization that is build by selecting the ValueType and
 // Layout. The rest of the parameters are set to default.
 template <template <class...> class Container, typename T, typename ValueType,
           typename Layout>
-struct UnaryContainer<Container<T>, ValueType, Default, Layout, Default> {
+struct UnaryContainerProxy_Impl<Container<T>, ValueType, Default, Layout,
+                                Default> {
   using type = Container<ValueType, Layout>;
+
+  using value_type      = ValueType;
+  using index_type      = Default;
+  using array_layout    = Layout;
+  using execution_space = Default;
 };
 
 // A unary container specialization that is build by selecting the ValueType and
 // Space. The rest of the parameters are set to default.
 template <template <class...> class Container, typename T, typename ValueType,
           typename Space>
-struct UnaryContainer<Container<T>, ValueType, Default, Default, Space> {
+struct UnaryContainerProxy_Impl<Container<T>, ValueType, Default, Default,
+                                Space> {
   using type = Container<ValueType, Space>;
+
+  using value_type      = ValueType;
+  using index_type      = Default;
+  using array_layout    = Default;
+  using execution_space = Space;
 };
 
 // A unary container specialization that is build by selecting the ValueType,
 // IndexType and Layout. The rest of the parameters are set to default.
 template <template <class...> class Container, typename T, typename ValueType,
           typename IndexType, typename Layout>
-struct UnaryContainer<Container<T>, ValueType, IndexType, Layout, Default> {
+struct UnaryContainerProxy_Impl<Container<T>, ValueType, IndexType, Layout,
+                                Default> {
   using type = Container<ValueType, IndexType, Layout>;
+
+  using value_type      = ValueType;
+  using index_type      = IndexType;
+  using array_layout    = Layout;
+  using execution_space = Default;
 };
 
 // A unary container specialization that is build by selecting the ValueType,
 // IndexType and Space. The rest of the parameters are set to default.
 template <template <class...> class Container, typename T, typename ValueType,
           typename IndexType, typename Space>
-struct UnaryContainer<Container<T>, ValueType, IndexType, Default, Space> {
+struct UnaryContainerProxy_Impl<Container<T>, ValueType, IndexType, Default,
+                                Space> {
   using type = Container<ValueType, IndexType, Space>;
+
+  using value_type      = ValueType;
+  using index_type      = IndexType;
+  using array_layout    = Default;
+  using execution_space = Space;
 };
 
 // A unary container specialization that is build by selecting the ValueType,
 // Layout and Space. The rest of the parameters are set to default.
 template <template <class...> class Container, typename T, typename ValueType,
           typename Layout, typename Space>
-struct UnaryContainer<Container<T>, ValueType, Default, Layout, Space> {
+struct UnaryContainerProxy_Impl<Container<T>, ValueType, Default, Layout,
+                                Space> {
   using type = Container<ValueType, Layout, Space>;
+
+  using value_type      = ValueType;
+  using index_type      = Default;
+  using array_layout    = Layout;
+  using execution_space = Space;
 };
 
 // A unary container specialization that is build by selecting the ValueType,
 // IndexType, Layout and Space. The rest of the parameters are set to default.
 template <template <class...> class Container, typename T, typename ValueType,
           typename IndexType, typename Layout, typename Space>
-struct UnaryContainer<Container<T>, ValueType, IndexType, Layout, Space> {
+struct UnaryContainerProxy_Impl<Container<T>, ValueType, IndexType, Layout,
+                                Space> {
   using type = Container<ValueType, IndexType, Layout, Space>;
+
+  using value_type      = ValueType;
+  using index_type      = IndexType;
+  using array_layout    = Layout;
+  using execution_space = Space;
 };
 
 // Takes in types as a set and forwards it to the UnaryContainer.
 template <template <class...> class Container, typename T, typename T1,
           typename T2, typename T3, typename T4>
 struct UnaryContainerProxy<Container<T>, Set<T1, T2, T3, T4>> {
-  using type = typename UnaryContainer<Container<T>, T1, T2, T3, T4>::type;
+  using unary = UnaryContainerProxy_Impl<Container<T>, T1, T2, T3, T4>;
+  using type  = typename unary::type;
+
+  using value_type      = typename unary::value_type;
+  using index_type      = typename unary::index_type;
+  using array_layout    = typename unary::array_layout;
+  using execution_space = typename unary::execution_space;
 };
 
 template <typename... Ts>
@@ -130,7 +186,7 @@ struct generate_unary_typelist<T, TypeList<>> {
 // Generate unary container from a Set of parameter types
 template <template <typename...> class Container, typename T, typename... U>
 struct generate_unary_typelist<Container<T>, Set<U...>> {
-  using type = typename UnaryContainer<Container<T>, U...>::type;
+  using type = UnaryContainer<Container<T>, Set<U...>>;
 };
 
 // Generate unary container

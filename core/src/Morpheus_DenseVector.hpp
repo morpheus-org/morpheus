@@ -40,20 +40,20 @@ namespace Morpheus {
  *
  */
 
-namespace Impl{
-// TODO: Merge this and set_functor from DenseMatrix in a single definition and place in Impl directory
-template<typename View, typename ValueType>
+namespace Impl {
+// TODO: Merge this and set_functor from DenseMatrix in a single definition and
+// place in Impl directory
+template <typename View, typename ValueType>
 struct set_functor {
-    View _data;
-    ValueType _val;
+  View _data;
+  ValueType _val;
 
-    set_functor(View data, ValueType val)
-        : _data(data), _val(val) {}
+  set_functor(View data, ValueType val) : _data(data), _val(val) {}
 
-    KOKKOS_INLINE_FUNCTION
-    void operator()(const size_t& i) const { _data(i) = _val; }
-  };
-}
+  KOKKOS_INLINE_FUNCTION
+  void operator()(const size_t& i) const { _data(i) = _val; }
+};
+}  // namespace Impl
 /**
  * \addtogroup containers_1d 1D Containers
  * \brief One-dimensional Containers
@@ -61,7 +61,7 @@ struct set_functor {
  * \{
  *
  */
- 
+
 /**
  * @brief The DenseVector container is a one-dimensional container that contains
  * contiguous elements. It is a polymorphic container in the sense that it can
@@ -195,8 +195,8 @@ class DenseVector
    * @tparam Generator random number generator type
    * @param n Size of DenseVector
    * @param rand_pool Random number generator
-   * @param range_low Low bound value to assign
-   * @param range_high Upper bound value to assign
+   * @param range_low Low bound value to assign - included
+   * @param range_high Upper bound value to assign - excluded
    */
   template <typename Generator>
   inline DenseVector(const size_t n, Generator rand_pool,
@@ -209,16 +209,13 @@ class DenseVector
   template <class VR, class... PR>
   inline DenseVector(
       const DenseVector<VR, PR...>& src,
-      typename std::enable_if<is_format_compatible<
-          DenseVector, typename DenseVector<VR, PR...>::type>::value>::type* =
-          nullptr)
+      typename std::enable_if_t<
+          is_compatible<DenseVector, DenseVector<VR, PR...>>::value>* = nullptr)
       : _size(src.size()), _values(src.const_view()) {}
 
   template <class VR, class... PR>
-  typename std::enable_if<
-      is_format_compatible<DenseVector,
-                           typename DenseVector<VR, PR...>::type>::value,
-      DenseVector&>::type
+  typename std::enable_if_t<
+      is_compatible<DenseVector, DenseVector<VR, PR...>>::value, DenseVector&>
   operator=(const DenseVector<VR, PR...>& src) {
     _size   = src.size();
     _values = src.const_view();

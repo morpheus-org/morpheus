@@ -25,53 +25,107 @@
 #define TEST_CORE_TEST_DENSEVECTOR_HPP
 
 #include <Morpheus_Core.hpp>
+#include <setup/UnaryTypes.hpp>
 
-#include <setup/DenseVectorDefinition_Utils.hpp>
+using DenseVectorUnary = to_gtest_types<unary::DenseVector>::type;
 
 // Used for testing unary operations for same type container
 template <typename UnaryContainer>
 class DenseVectorUnaryTest : public ::testing::Test {
  public:
-  using DenseVector = UnaryContainer;
-  using HostMirror  = typename UnaryContainer::HostMirror;
-  // No need for setup and tear-down in this case, mainly care about types
-  // any setup and tear-down will be made by each individual test
-};
-
-// Used for testing behaviour between many types of the same container
-template <typename DenseVectorTypes>
-class DenseVectorTypesTest : public ::testing::Test {
- public:
-  using DenseVector_v    = typename DenseVectorTypes::v;
-  using DenseVector_vl   = typename DenseVectorTypes::vl;
-  using DenseVector_vis  = typename DenseVectorTypes::vis;
-  using DenseVector_vil  = typename DenseVectorTypes::vil;
-  using DenseVector_vils = typename DenseVectorTypes::vils;
-  using DenseVector_vls  = typename DenseVectorTypes::vls;
+  using type   = UnaryContainer;
+  using device = typename UnaryContainer::type;
+  using host   = typename UnaryContainer::type::HostMirror;
 };
 
 namespace Test {
 
 TYPED_TEST_CASE(DenseVectorUnaryTest, DenseVectorUnary);
 
-// TYPED_TEST(DenseVectorUnaryTest, Traits) {
-//   // Check DenseVector Specific Traits:
-//   // Tag, value_array_type, value_array_pointer, value_array_reference
-//   // Repeat that for the HostMirror too
-//   // Check value_array_type traits too
-//   // Ensure size is of type size_t and not index_type
-//   // Add size_type trait
-//   static_assert(std::is_same<typename TestFixture::DenseVector::tag,
-//                              Morpheus::DenseVectorTag>::value);
-// }
+TYPED_TEST(DenseVectorUnaryTest, Traits) {
+  // Check DenseVector Specific Traits:
+  // Tag, value_array_type, value_array_pointer, value_array_reference
+  // Repeat that for the HostMirror too
+  // Check value_array_type traits too
+  // Ensure size is of type size_t and not index_type
+  // Add size_type trait
+  using unary  = typename TestFixture::type;
+  using Vector = typename TestFixture::device;
+
+  bool res = Morpheus::is_dense_vector_format_container<Vector>::value;
+  EXPECT_EQ(res, 1);
+
+  // value_type
+  res = Morpheus::has_same_value_type<Vector, unary>::value;
+  EXPECT_EQ(res, 1);
+
+  // non_const_value_type
+  res = std::is_same<
+      typename Vector::non_const_value_type,
+      typename std::remove_cv<typename Vector::value_type>::type>::value;
+  EXPECT_EQ(res, 1);
+
+  // index_type
+  if (Morpheus::is_default<typename unary::index_type>::value) {
+    res = Morpheus::is_same_index_type<typename Vector::index_type, int>::value;
+    EXPECT_EQ(res, 1);
+  } else {
+    res = Morpheus::has_same_index_type<Vector, unary>::value;
+    EXPECT_EQ(res, 1);
+  }
+
+  // non_const_index_type
+  res = std::is_same<
+      typename Vector::non_const_index_type,
+      typename std::remove_cv<typename Vector::index_type>::type>::value;
+  EXPECT_EQ(res, 1);
+
+  // array_layout
+  if (Morpheus::is_default<typename unary::array_layout>::value) {
+    res = Morpheus::is_same_layout<typename Vector::array_layout,
+                                   Kokkos::LayoutRight>::value;
+    EXPECT_EQ(res, 1);
+  } else {
+    res = Morpheus::has_same_layout<Vector, unary>::value;
+    EXPECT_EQ(res, 1);
+  }
+
+  // execution_space & memory_space
+  if (Morpheus::is_default<typename unary::execution_space>::value) {
+    res = std::is_same<typename Vector::execution_space,
+                       Kokkos::DefaultExecutionSpace>::value;
+    res = Morpheus::has_same_memory_space<
+        Vector, typename Kokkos::DefaultExecutionSpace::execution_space>::value;
+    EXPECT_EQ(res, 1);
+    EXPECT_EQ(res, 1);
+  } else {
+    res =
+        Morpheus::has_same_memory_space<Vector,
+                                        typename unary::execution_space>::value;
+    EXPECT_EQ(res, 1);
+
+    res = std::is_same<typename Vector::execution_space,
+                       typename unary::execution_space>::value;
+    EXPECT_EQ(res, 1);
+  }
+
+  // type
+  res =
+      std::is_same<typename Vector::type,
+                   typename Morpheus::DenseVector<
+                       typename Vector::value_type, typename Vector::index_type,
+                       typename Vector::array_layout,
+                       typename Vector::execution_space>::type>::value;
+  EXPECT_EQ(res, 1);
+}
 
 /**
  * @brief Testing default construction of DenseVector container
  *
  */
 TYPED_TEST(DenseVectorUnaryTest, DefaultConstruction) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
 
   Vector x;
   EXPECT_EQ(x.size(), 0);
@@ -94,8 +148,8 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultConstruction) {
  *
  */
 TYPED_TEST(DenseVectorUnaryTest, DefaultCopyAssignment) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
   using value_type = typename Vector::value_type;
 
   auto size = 10;
@@ -124,8 +178,8 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyAssignment) {
  *
  */
 TYPED_TEST(DenseVectorUnaryTest, DefaultCopyConstructor) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
   using value_type = typename Vector::value_type;
 
   auto size = 10;
@@ -155,8 +209,8 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyConstructor) {
  *
  */
 TYPED_TEST(DenseVectorUnaryTest, DefaultMoveAssignment) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
   using value_type = typename Vector::value_type;
 
   auto size = 10;
@@ -185,8 +239,8 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveAssignment) {
  *
  */
 TYPED_TEST(DenseVectorUnaryTest, DefaultMoveConstructor) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
   using value_type = typename Vector::value_type;
 
   auto size = 10;
@@ -215,8 +269,8 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveConstructor) {
  *
  */
 TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
   using value_type = typename Vector::value_type;
 
   auto size      = 100;
@@ -242,8 +296,8 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
  *
  */
 TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
   using value_type = typename Vector::value_type;
 
   auto size      = 100;
@@ -268,8 +322,8 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
 //  */
 // TYPED_TEST(DenseVectorUnaryTest, PointerConstruction) {
 //   // DenseVector(index_type n, value_type val)
-//   using Vector     = typename TestFixture::DenseVector;
-//   using HostVector = typename TestFixture::HostMirror;
+//   using Vector     = typename TestFixture::device;
+//   using HostVector = typename TestFixture::host;
 //   using index_type = typename Vector::index_type;
 //   using value_type = typename Vector::value_type;
 
@@ -302,8 +356,8 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
 // }
 
 TYPED_TEST(DenseVectorUnaryTest, RandomConstruction) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
   using value_type = typename Vector::value_type;
 
   auto size            = 10000;
@@ -319,30 +373,24 @@ TYPED_TEST(DenseVectorUnaryTest, RandomConstruction) {
 
   Morpheus::copy(x, xh);
 
+  // Check if empty
+  int nzeros = 0;
   for (size_t i = 0; i < xh.size(); i++) {
-    EXPECT_NE(xh[i], 0.0);
-    EXPECT_GT(xh[i], low_bound);
+    if (xh[i] == 0.0) {
+      nzeros++;
+    }
+  }
+  EXPECT_LT(nzeros, xh.size());
+
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_GE(xh[i], low_bound);
     EXPECT_LT(xh[i], high_bound);
   }
 }
 
-// // Changed that to DenseVectorBinaryTests
-// TYPED_TEST(DenseVectorUnaryTest, ShallowCopySemantics) {
-//   // DenseVector(const DenseVector<VR, PR...>& src, ...)
-//   // operator=(const DenseVector<VR, PR...>& src)
-//   // DenseVector(const DenseVector&) = default;
-//   // DenseVector& operator=(const DenseVector&) = default;
-// }
-
-// // Changed that to DenseVectorBinaryTests
-// TYPED_TEST(DenseVectorUnaryTest, Allocate) {
-//   // DenseVector& allocate(const std::string name,
-//   //                       const DenseVector<VR, PR...>& src)
-// }
-
 TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
   using value_type = typename Vector::value_type;
 
   auto size = 10000;
@@ -400,8 +448,8 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
 }
 
 TYPED_TEST(DenseVectorUnaryTest, AssignResize) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
   using value_type = typename Vector::value_type;
 
   auto size = 10000;
@@ -421,8 +469,8 @@ TYPED_TEST(DenseVectorUnaryTest, AssignResize) {
 }
 
 TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
 
   auto size               = 10000;
   unsigned long long seed = 5374857;
@@ -440,7 +488,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   Morpheus::copy(x, xh);
 
   for (size_t i = 0; i < 100; i++) {
-    EXPECT_GT(xh[i], 10);
+    EXPECT_GE(xh[i], 10);
     EXPECT_LT(xh[i], 30);
   }
   for (size_t i = 100; i < xh.size(); i++) {
@@ -453,7 +501,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   Morpheus::copy(x, xh);
 
   for (size_t i = 0; i < 1000; i++) {
-    EXPECT_GT(xh[i], 40);
+    EXPECT_GE(xh[i], 40);
     EXPECT_LT(xh[i], 50);
   }
   for (size_t i = 1000; i < xh.size(); i++) {
@@ -465,11 +513,11 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   Morpheus::copy(x, xh);
 
   for (size_t i = 0; i < 80; i++) {
-    EXPECT_GT(xh[i], -4);
+    EXPECT_GE(xh[i], -4);
     EXPECT_LT(xh[i], 5);
   }
   for (size_t i = 80; i < 1000; i++) {
-    EXPECT_GT(xh[i], 40);
+    EXPECT_GE(xh[i], 40);
     EXPECT_LT(xh[i], 50);
   }
   for (size_t i = 1000; i < xh.size(); i++) {
@@ -481,14 +529,14 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   Morpheus::copy(x, xh);
 
   for (size_t i = 0; i < xh.size(); i++) {
-    EXPECT_GT(xh[i], 60);
+    EXPECT_GE(xh[i], 60);
     EXPECT_LT(xh[i], 70);
   }
 }
 
 TYPED_TEST(DenseVectorUnaryTest, AssignRandomResize) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
 
   auto size = 10000, seed = 5374857;
   Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
@@ -503,14 +551,14 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomResize) {
   Morpheus::copy(x, xh);
 
   for (size_t i = 0; i < xh.size(); i++) {
-    EXPECT_GT(xh[i], 30);
+    EXPECT_GE(xh[i], 30);
     EXPECT_LT(xh[i], 40);
   }
 }
 
 TYPED_TEST(DenseVectorUnaryTest, Resize) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
   using value_type = typename Vector::value_type;
 
   auto original_size            = 1000;
@@ -552,8 +600,8 @@ TYPED_TEST(DenseVectorUnaryTest, Resize) {
 }
 
 TYPED_TEST(DenseVectorUnaryTest, ResizeVal) {
-  using Vector     = typename TestFixture::DenseVector;
-  using HostVector = typename TestFixture::HostMirror;
+  using Vector     = typename TestFixture::device;
+  using HostVector = typename TestFixture::host;
   using value_type = typename Vector::value_type;
 
   auto original_size            = 1000;
@@ -595,8 +643,8 @@ TYPED_TEST(DenseVectorUnaryTest, ResizeVal) {
 }
 
 TYPED_TEST(DenseVectorUnaryTest, ElementAccess) {
-  using Vector              = typename TestFixture::DenseVector;
-  using HostVector          = typename TestFixture::HostMirror;
+  using Vector              = typename TestFixture::device;
+  using HostVector          = typename TestFixture::host;
   using value_type          = typename Vector::value_type;
   using value_array_pointer = typename Vector::value_array_pointer;
 
@@ -630,6 +678,23 @@ TYPED_TEST(DenseVectorUnaryTest, ElementAccess) {
 //   // view()
 //   // const_view()
 //   // name()
+// }
+
+// // Check vector from vector
+// TYPED_TEST_CASE(DenseVectorBinaryTest, DenseVectorBinary);
+
+// // Changed that to DenseVectorBinaryTests
+// TYPED_TEST(DenseVectorUnaryTest, ShallowCopySemantics) {
+//   // DenseVector(const DenseVector<VR, PR...>& src, ...)
+//   // operator=(const DenseVector<VR, PR...>& src)
+//   // DenseVector(const DenseVector&) = default;
+//   // DenseVector& operator=(const DenseVector&) = default;
+// }
+
+// // Changed that to DenseVectorBinaryTests
+// TYPED_TEST(DenseVectorUnaryTest, Allocate) {
+//   // DenseVector& allocate(const std::string name,
+//   //                       const DenseVector<VR, PR...>& src)
 // }
 
 }  // namespace Test

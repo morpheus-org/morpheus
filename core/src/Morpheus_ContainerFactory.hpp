@@ -89,7 +89,8 @@ inline constexpr bool is_default_v = is_default<T>::value;
  * \{
  *
  */
-
+// template <typename ContainerType, typename... Types>
+// struct UnaryContainer {};
 /**
  * @brief A wrapper that constructs a new container type from \p ContainerType
  using as arguments the types in \p TypeSet.
@@ -121,7 +122,13 @@ inline constexpr bool is_default_v = is_default<T>::value;
  */
 template <typename ContainerType, typename TypeSet>
 struct UnaryContainer {
-  using type = typename Impl::UnaryContainerProxy<ContainerType, TypeSet>::type;
+  using proxy = typename Impl::UnaryContainerProxy<ContainerType, TypeSet>;
+  using type  = typename proxy::type;
+
+  using value_type      = typename proxy::value_type;
+  using index_type      = typename proxy::index_type;
+  using array_layout    = typename proxy::array_layout;
+  using execution_space = typename proxy::execution_space;
 };
 
 /**

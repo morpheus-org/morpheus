@@ -80,6 +80,14 @@ TEST(ContainerFactoryTest, UnaryContainer) {
 
     bool res = std::is_same<typename unary::type, reference>::value;
     EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::value_type, A>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::index_type, DD>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::array_layout, DD>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::execution_space, DD>::value;
+    EXPECT_EQ(res, 1);
   }
 
   {
@@ -88,6 +96,14 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     using reference = Container1<A, B>;
 
     bool res = std::is_same<typename unary::type, reference>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::value_type, A>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::index_type, B>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::array_layout, DD>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::execution_space, DD>::value;
     EXPECT_EQ(res, 1);
   }
 
@@ -98,6 +114,14 @@ TEST(ContainerFactoryTest, UnaryContainer) {
 
     bool res = std::is_same<typename unary::type, reference>::value;
     EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::value_type, A>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::index_type, DD>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::array_layout, B>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::execution_space, DD>::value;
+    EXPECT_EQ(res, 1);
   }
 
   {
@@ -106,6 +130,14 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     using reference = Container1<A, B>;
 
     bool res = std::is_same<typename unary::type, reference>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::value_type, A>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::index_type, DD>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::array_layout, DD>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::execution_space, B>::value;
     EXPECT_EQ(res, 1);
   }
 
@@ -116,6 +148,14 @@ TEST(ContainerFactoryTest, UnaryContainer) {
 
     bool res = std::is_same<typename unary::type, reference>::value;
     EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::value_type, A>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::index_type, B>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::array_layout, C>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::execution_space, DD>::value;
+    EXPECT_EQ(res, 1);
   }
 
   {
@@ -124,6 +164,14 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     using reference = Container1<A, B, C>;
 
     bool res = std::is_same<typename unary::type, reference>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::value_type, A>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::index_type, B>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::array_layout, DD>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::execution_space, C>::value;
     EXPECT_EQ(res, 1);
   }
 
@@ -134,6 +182,14 @@ TEST(ContainerFactoryTest, UnaryContainer) {
 
     bool res = std::is_same<typename unary::type, reference>::value;
     EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::value_type, A>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::index_type, DD>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::array_layout, B>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::execution_space, C>::value;
+    EXPECT_EQ(res, 1);
   }
 
   {
@@ -143,16 +199,16 @@ TEST(ContainerFactoryTest, UnaryContainer) {
 
     bool res = std::is_same<typename unary::type, reference>::value;
     EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::value_type, A>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::index_type, B>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::array_layout, C>::value;
+    EXPECT_EQ(res, 1);
+    res = std::is_same<typename unary::execution_space, D>::value;
+    EXPECT_EQ(res, 1);
   }
 }
-
-template <typename... Ts>
-struct to_gtest_types {};
-
-template <typename... Ts>
-struct to_gtest_types<Morpheus::TypeList<Ts...>> {
-  using type = ::testing::Types<Ts...>;
-};
 
 /**
  * @brief Generate a list of unary types that emerge from all the possible
@@ -186,23 +242,63 @@ TEST(ContainerFactoryTest, GenerateUnaryTypeList) {
                                                  types_set>::type;
 
   using res_t = Morpheus::TypeList<
-      Container1<A, D, F, H>, Container1<A, D, F>, Container1<A, D, G, H>,
-      Container1<A, D, G>, Container1<A, D, H>, Container1<A, D>,
-      Container1<A, E, F, H>, Container1<A, E, F>, Container1<A, E, G, H>,
-      Container1<A, E, G>, Container1<A, E, H>, Container1<A, E>,
-      Container1<A, F, H>, Container1<A, F>, Container1<A, G, H>,
-      Container1<A, G>, Container1<A, H>, Container1<A>, Container1<B, D, F, H>,
-      Container1<B, D, F>, Container1<B, D, G, H>, Container1<B, D, G>,
-      Container1<B, D, H>, Container1<B, D>, Container1<B, E, F, H>,
-      Container1<B, E, F>, Container1<B, E, G, H>, Container1<B, E, G>,
-      Container1<B, E, H>, Container1<B, E>, Container1<B, F, H>,
-      Container1<B, F>, Container1<B, G, H>, Container1<B, G>, Container1<B, H>,
-      Container1<B>, Container1<C, D, F, H>, Container1<C, D, F>,
-      Container1<C, D, G, H>, Container1<C, D, G>, Container1<C, D, H>,
-      Container1<C, D>, Container1<C, E, F, H>, Container1<C, E, F>,
-      Container1<C, E, G, H>, Container1<C, E, G>, Container1<C, E, H>,
-      Container1<C, E>, Container1<C, F, H>, Container1<C, F>,
-      Container1<C, G, H>, Container1<C, G>, Container1<C, H>, Container1<C>>;
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, F, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, F, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, G, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, G, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, DD, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, DD, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, E, F, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, E, F, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, E, G, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, E, G, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, E, DD, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, E, DD, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, DD, F, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, DD, F, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, DD, G, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, DD, G, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, DD, DD, H>>,
+      Morpheus::UnaryContainer<Container1<double>,
+                               Morpheus::Set<A, DD, DD, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, D, F, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, D, F, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, D, G, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, D, G, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, D, DD, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, D, DD, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, E, F, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, E, F, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, E, G, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, E, G, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, E, DD, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, E, DD, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, DD, F, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, DD, F, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, DD, G, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, DD, G, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<B, DD, DD, H>>,
+      Morpheus::UnaryContainer<Container1<double>,
+                               Morpheus::Set<B, DD, DD, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, D, F, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, D, F, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, D, G, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, D, G, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, D, DD, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, D, DD, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, E, F, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, E, F, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, E, G, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, E, G, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, E, DD, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, E, DD, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, DD, F, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, DD, F, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, DD, G, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, DD, G, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<C, DD, DD, H>>,
+      Morpheus::UnaryContainer<Container1<double>,
+                               Morpheus::Set<C, DD, DD, DD>>>;
 
   bool res = std::is_same<unary_types, res_t>::value;
   EXPECT_EQ(res, 1);
@@ -239,7 +335,8 @@ TEST(ContainerFactoryTest, GenerateUnaryTypeListSingleEntry) {
       typename Morpheus::generate_unary_typelist<Container1<double>,
                                                  types_set>::type;
 
-  using res_t = Morpheus::TypeList<Container1<A, D, F, H>>;
+  using res_t = Morpheus::TypeList<
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, F, H>>>;
 
   bool res = std::is_same<unary_types, res_t>::value;
   EXPECT_EQ(res, 1);
@@ -336,101 +433,370 @@ TEST(ContainerFactoryTest, GenerateBinaryTypeList) {
           index_tlist, typename Morpheus::cross_product<
                            layout_tlist, space_tlist>::type>::type>::type;
 
+  // Generate unary containers for List1
   using container1_types =
       typename Morpheus::generate_unary_typelist<Container1<double>,
                                                  types_set>::type;
 
-  using res_container1_t =
-      Morpheus::TypeList<Container1<A, D, F, H>, Container1<A, D, F>,
-                         Container1<A, D, H>, Container1<A, D>,
-                         Container1<A, F, H>, Container1<A, F>,
-                         Container1<A, H>, Container1<A>>;
+  using res_container1_t = Morpheus::TypeList<
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, F, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, F, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, DD, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, DD, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, DD, F, H>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, DD, F, DD>>,
+      Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, DD, DD, H>>,
+      Morpheus::UnaryContainer<Container1<double>,
+                               Morpheus::Set<A, DD, DD, DD>>>;
 
   bool res = std::is_same<container1_types, res_container1_t>::value;
   EXPECT_EQ(res, 1);
 
+  // Generate unary containers for List2
   using container2_types =
       typename Morpheus::generate_unary_typelist<Container2<double>,
                                                  types_set>::type;
 
-  using res_container2_t =
-      Morpheus::TypeList<Container2<A, D, F, H>, Container2<A, D, F>,
-                         Container2<A, D, H>, Container2<A, D>,
-                         Container2<A, F, H>, Container2<A, F>,
-                         Container2<A, H>, Container2<A>>;
+  using res_container2_t = Morpheus::TypeList<
+      Morpheus::UnaryContainer<Container2<double>, Morpheus::Set<A, D, F, H>>,
+      Morpheus::UnaryContainer<Container2<double>, Morpheus::Set<A, D, F, DD>>,
+      Morpheus::UnaryContainer<Container2<double>, Morpheus::Set<A, D, DD, H>>,
+      Morpheus::UnaryContainer<Container2<double>, Morpheus::Set<A, D, DD, DD>>,
+      Morpheus::UnaryContainer<Container2<double>, Morpheus::Set<A, DD, F, H>>,
+      Morpheus::UnaryContainer<Container2<double>, Morpheus::Set<A, DD, F, DD>>,
+      Morpheus::UnaryContainer<Container2<double>, Morpheus::Set<A, DD, DD, H>>,
+      Morpheus::UnaryContainer<Container2<double>,
+                               Morpheus::Set<A, DD, DD, DD>>>;
 
   res = std::is_same<container2_types, res_container2_t>::value;
   EXPECT_EQ(res, 1);
-  std::cout << Morpheus::is_container<Container1<A, D, F, H>>::value
-            << std::endl;
+
   using binary_containers =
       typename Morpheus::generate_binary_typelist<container1_types,
                                                   container2_types>::type;
+
+  // Reference result with all the pairs
   using res_t = Morpheus::TypeList<
-      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, D, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, D, F>>,
-      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, D, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, D>>,
-      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, F>>,
-      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, F, H>, Container2<A>>,
-      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, D, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, D, F>>,
-      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, D, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, D>>,
-      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, F>>,
-      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, F>, Container2<A>>,
-      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, D, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, D, F>>,
-      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, D, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, D>>,
-      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, F>>,
-      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A, H>>,
-      Morpheus::BinaryContainer<Container1<A, D, H>, Container2<A>>,
-      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, D, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, D, F>>,
-      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, D, H>>,
-      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, D>>,
-      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, F>>,
-      Morpheus::BinaryContainer<Container1<A, D>, Container2<A, H>>,
-      Morpheus::BinaryContainer<Container1<A, D>, Container2<A>>,
-      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, D, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, D, F>>,
-      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, D, H>>,
-      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, D>>,
-      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, F>>,
-      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A, H>>,
-      Morpheus::BinaryContainer<Container1<A, F, H>, Container2<A>>,
-      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, D, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, D, F>>,
-      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, D, H>>,
-      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, D>>,
-      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, F>>,
-      Morpheus::BinaryContainer<Container1<A, F>, Container2<A, H>>,
-      Morpheus::BinaryContainer<Container1<A, F>, Container2<A>>,
-      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, D, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, D, F>>,
-      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, D, H>>,
-      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, D>>,
-      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, F, H>>,
-      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, F>>,
-      Morpheus::BinaryContainer<Container1<A, H>, Container2<A, H>>,
-      Morpheus::BinaryContainer<Container1<A, H>, Container2<A>>,
-      Morpheus::BinaryContainer<Container1<A>, Container2<A, D, F, H>>,
-      Morpheus::BinaryContainer<Container1<A>, Container2<A, D, F>>,
-      Morpheus::BinaryContainer<Container1<A>, Container2<A, D, H>>,
-      Morpheus::BinaryContainer<Container1<A>, Container2<A, D>>,
-      Morpheus::BinaryContainer<Container1<A>, Container2<A, F, H>>,
-      Morpheus::BinaryContainer<Container1<A>, Container2<A, F>>,
-      Morpheus::BinaryContainer<Container1<A>, Container2<A, H>>,
-      Morpheus::BinaryContainer<Container1<A>, Container2<A>>>;
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, D, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, F, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, H>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, D, DD, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, F, DD>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, H>>>,
+      Morpheus::BinaryContainer<
+          Morpheus::UnaryContainer<Container1<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>,
+          Morpheus::UnaryContainer<Container2<double>,
+                                   Morpheus::Set<A, DD, DD, DD>>>>;
 
   res = std::is_same<binary_containers, res_t>::value;
   EXPECT_EQ(res, 1);

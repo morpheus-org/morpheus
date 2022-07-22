@@ -47,7 +47,9 @@ struct MirrorContainerType {
   using value_type   = typename src_container_type::non_const_value_type;
   using index_type   = typename src_container_type::index_type;
   using array_layout = typename src_container_type::array_layout;
-  // The destination container type if it is not the same memory space
+  // The destination container type if it is not the same memory space - note
+  // that the new container will always be managed even when the source is
+  // unmanaged
   using dest_container_type =
       Container<value_type, index_type, array_layout, Space>;
   // If it is the same memory_space return the existsing container_type
@@ -73,7 +75,9 @@ struct MirrorType {
   using value_type   = typename src_container_type::non_const_value_type;
   using index_type   = typename src_container_type::non_const_index_type;
   using array_layout = typename src_container_type::array_layout;
-  // The destination container type if it is not the same memory space
+  // The destination container type if it is not the same memory space - note
+  // that the new container will always be managed even when the source is
+  // unmanaged
   using container_type = Container<value_type, index_type, array_layout, Space>;
 };
 }  // namespace Impl
@@ -83,9 +87,7 @@ struct MirrorType {
 template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror(
     const Container<T, P...>& src,
-    typename std::enable_if<
-        is_container<typename Container<T, P...>::tag>::value>::type* =
-        nullptr) {
+    typename std::enable_if_t<is_container_v<Container<T, P...>>>* = nullptr) {
   using src_type = Container<T, P...>;
   using dst_type = typename src_type::HostMirror;
 
@@ -96,9 +98,9 @@ typename Container<T, P...>::HostMirror create_mirror(
 template <class Space, template <class, class...> class Container, class T,
           class... P>
 typename Impl::MirrorType<Space, Container, T, P...>::container_type
-create_mirror(const Container<T, P...>& src,
-              typename std::enable_if<is_container<
-                  typename Container<T, P...>::tag>::value>::type* = nullptr) {
+create_mirror(
+    const Container<T, P...>& src,
+    typename std::enable_if_t<is_container_v<Container<T, P...>>>* = nullptr) {
   using container_type =
       typename Impl::MirrorType<Space, Container, T, P...>::container_type;
   return container_type().allocate(src);
@@ -107,32 +109,18 @@ create_mirror(const Container<T, P...>& src,
 template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror_container(
     const Container<T, P...>& src,
-    typename std::enable_if<
-        (std::is_same<
-             typename Container<T, P...>::memory_space,
-             typename Container<T, P...>::HostMirror::memory_space>::value &&
-         std::is_same<
-             typename Container<T, P...>::value_type,
-             typename Container<T, P...>::HostMirror::value_type>::value &&
-         std::is_same<typename Container<T, P...>::index_type,
-                      typename Container<T, P...>::HostMirror::index_type>::
-             value)>::type* = nullptr) {
+    typename std::enable_if_t<is_compatible_v<
+        Container<T, P...>, typename Container<T, P...>::HostMirror>>* =
+        nullptr) {
   return src;
 }
 
 template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror_container(
     const Container<T, P...>& src,
-    typename std::enable_if<
-        !(std::is_same<
-              typename Container<T, P...>::memory_space,
-              typename Container<T, P...>::HostMirror::memory_space>::value &&
-          std::is_same<
-              typename Container<T, P...>::value_type,
-              typename Container<T, P...>::HostMirror::value_type>::value &&
-          std::is_same<typename Container<T, P...>::index_type,
-                       typename Container<T, P...>::HostMirror::index_type>::
-              value)>::type* = nullptr) {
+    typename std::enable_if_t<!is_compatible_v<
+        Container<T, P...>, typename Container<T, P...>::HostMirror>>* =
+        nullptr) {
   return Morpheus::create_mirror(src);
 }
 
@@ -153,10 +141,9 @@ template <class Space, template <class, class...> class Container, class T,
 typename Impl::MirrorContainerType<Space, Container, T, P...>::container_type
 create_mirror_container(
     const Container<T, P...>& src,
-    typename std::enable_if<
-        !Impl::MirrorContainerType<Space, Container, T,
-                                   P...>::is_same_memspace &&
-        is_container<typename Container<T, P...>::tag>::value>::type* =
+    typename std::enable_if<!Impl::MirrorContainerType<
+                                Space, Container, T, P...>::is_same_memspace &&
+                            is_container<Container<T, P...>>::value>::type* =
         nullptr) {
   using container_type =
       typename Impl::MirrorContainerType<Space, Container, T,
