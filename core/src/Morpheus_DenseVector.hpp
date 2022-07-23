@@ -205,7 +205,15 @@ class DenseVector
     Kokkos::fill_random(_values, rand_pool, range_low, range_high);
   }
 
-  // Need to make sure two containers are of compatible type for shallow copy
+  /**
+   * @brief Shallow Copy contrustor from another DenseVector container with
+   * different properties. Note that this is only possible when the \p
+   * is_compatible check is satisfied.
+   *
+   * @tparam VR Value Type of the container we are constructing from.
+   * @tparam PR Optional properties of the container we are constructing from.
+   * @param src The \p DenseVector container we are constructing from.
+   */
   template <class VR, class... PR>
   inline DenseVector(
       const DenseVector<VR, PR...>& src,
@@ -213,6 +221,15 @@ class DenseVector
           is_compatible<DenseVector, DenseVector<VR, PR...>>::value>* = nullptr)
       : _size(src.size()), _values(src.const_view()) {}
 
+  /**
+   * @brief Shallow Copy Assignemnt from another DenseVector container with
+   * different properties. Note that this is only possible when the \p
+   * is_compatible check is satisfied.
+   *
+   * @tparam VR Value Type of the container we are copying from.
+   * @tparam PR Optional properties of the container we are copying from.
+   * @param src The \p DenseVector container we are copying from.
+   */
   template <class VR, class... PR>
   typename std::enable_if_t<
       is_compatible<DenseVector, DenseVector<VR, PR...>>::value, DenseVector&>
@@ -222,8 +239,14 @@ class DenseVector
     return *this;
   }
 
-  // Allocates a vector based on the shape of the source vector
-  // Needed for Mirror operations
+  /**
+   * @brief Allocates memory from another DenseVector container with
+   * different properties.
+   *
+   * @tparam VR Value Type of the container we are allocating from.
+   * @tparam PR Optional properties of the container we are allocating from.
+   * @param src The \p DenseVector container we are allocating from.
+   */
   template <class VR, class... PR>
   inline DenseVector& allocate(const DenseVector<VR, PR...>& src) {
     _size = src.size();

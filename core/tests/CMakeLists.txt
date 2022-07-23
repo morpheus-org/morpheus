@@ -16,6 +16,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
 
     foreach(
       Name
+      Utils
       DenseVector
       DenseMatrix
       Dot

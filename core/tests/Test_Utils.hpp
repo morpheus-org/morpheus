@@ -1,5 +1,5 @@
 /**
- * TestUtils.hpp
+ * Test_Utils.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,18 +21,11 @@
  * limitations under the License.
  */
 
-#ifndef TEST_CORE_TESTUTILS_HPP
-#define TEST_CORE_TESTUTILS_HPP
+#ifndef TEST_CORE_TEST_UTILS_HPP
+#define TEST_CORE_TEST_UTILS_HPP
 
-#include <Morpheus_Core.hpp>
+#include <Utils.hpp>
 
-template <typename... Ts>
-struct to_gtest_types {};
+TEST(UtilsTest, ToGestTypes) { EXPECT_EQ(0, 1); }
 
-// Convert a Morpheus TypeList to Gtest Types
-template <typename... Ts>
-struct to_gtest_types<Morpheus::TypeList<Ts...>> {
-  using type = ::testing::Types<Ts...>;
-};
-
-#endif  // TEST_CORE_TESTUTILS_HPP
+#endif  // TEST_CORE_TEST_TESTUTILS_HPP

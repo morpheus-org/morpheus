@@ -25,9 +25,23 @@
 #define TEST_CORE_TEST_DENSEVECTOR_HPP
 
 #include <Morpheus_Core.hpp>
-#include <setup/UnaryTypes.hpp>
+#include <Utils.hpp>
 
-using DenseVectorUnary = to_gtest_types<unary::DenseVector>::type;
+using DenseVectorTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
+                                               types::types_set>::type;
+using DenseVectorUnary = to_gtest_types<DenseVectorTypes>::type;
+
+using DenseVectorBinary =
+    to_gtest_types<typename Morpheus::generate_binary_typelist<
+        DenseVectorTypes, DenseVectorTypes>::type>::type;
+
+using DenseVectorCompatibleTypes = typename Morpheus::generate_unary_typelist<
+    Morpheus::DenseVector<double>, types::compatible_types_set>::type;
+
+using CompatibleDenseVectorBinary =
+    to_gtest_types<typename Morpheus::generate_binary_typelist<
+        DenseVectorCompatibleTypes, DenseVectorCompatibleTypes>::type>::type;
 
 // Used for testing unary operations for same type container
 template <typename UnaryContainer>
@@ -38,8 +52,42 @@ class DenseVectorUnaryTest : public ::testing::Test {
   using host   = typename UnaryContainer::type::HostMirror;
 };
 
+// Used for testing compatible binary operations
+template <typename BinaryContainer>
+class CompatibleDenseVectorBinaryTest : public ::testing::Test {
+ public:
+  using type  = BinaryContainer;
+  using type1 = typename BinaryContainer::type1;  // Unary
+  using type2 = typename BinaryContainer::type2;  // Unary
+
+  using device1 = typename type1::type;  // DenseVector
+  using host1   = typename type1::type::HostMirror;
+
+  using device2 = typename type2::type;  // DenseVector
+  using host2   = typename type2::type::HostMirror;
+};
+
+// Used for testing binary operations
+template <typename BinaryContainer>
+class DenseVectorBinaryTest : public ::testing::Test {
+ public:
+  using type  = BinaryContainer;
+  using type1 = typename BinaryContainer::type1;  // Unary
+  using type2 = typename BinaryContainer::type2;  // Unary
+
+  using device1 = typename type1::type;  // DenseVector
+  using host1   = typename type1::type::HostMirror;
+
+  using device2 = typename type2::type;  // DenseVector
+  using host2   = typename type2::type::HostMirror;
+};
+
 namespace Test {
 
+/**
+ * @brief Test Suite using the Unary DenseVectors
+ *
+ */
 TYPED_TEST_CASE(DenseVectorUnaryTest, DenseVectorUnary);
 
 TYPED_TEST(DenseVectorUnaryTest, Traits) {
@@ -141,10 +189,9 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultConstruction) {
 }
 
 /**
- * @brief Testing default copy assignment of DenseVector container from
- another
- * DenseVector container with the same parameters. Resulting container
- * should be a shallow copy of the original.
+ * @brief Testing default copy assignment of DenseVector container from another
+ * DenseVector container with the same parameters. Resulting container should be
+ * a shallow copy of the original.
  *
  */
 TYPED_TEST(DenseVectorUnaryTest, DefaultCopyAssignment) {
@@ -168,12 +215,20 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyAssignment) {
   for (size_t i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], yh[i]);
   }
+
+  // Now check device vector
+  Vector y = x;
+  EXPECT_EQ(y.size(), x.size());
+  Morpheus::copy(xh, x);
+
+  for (size_t i = 0; i < x.size(); i++) {
+    EXPECT_EQ(x[i], y[i]);
+  }
 }
 
 /**
  * @brief Testing default copy construction of DenseVector container from
- * another DenseVector container with the same parameters. Resulting
- container
+ * another DenseVector container with the same parameters. Resulting container
  * should be a shallow copy of the original.
  *
  */
@@ -198,13 +253,20 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyConstructor) {
   for (size_t i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], yh[i]);
   }
+
+  // Now check device vector
+  Vector y(x);
+  EXPECT_EQ(y.size(), x.size());
+  Morpheus::copy(xh, x);
+
+  for (size_t i = 0; i < x.size(); i++) {
+    EXPECT_EQ(x[i], y[i]);
+  }
 }
 
 /**
- * @brief Testing default move assignment of DenseVector container from
- another
- * DenseVector container with the same parameters. Resulting container should
- be
+ * @brief Testing default move assignment of DenseVector container from another
+ * DenseVector container with the same parameters. Resulting container should be
  * a shallow copy of the original.
  *
  */
@@ -233,8 +295,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveAssignment) {
 
 /**
  * @brief Testing default move construction of DenseVector container from
- * another DenseVector container with the same parameters. Resulting
- container
+ * another DenseVector container with the same parameters. Resulting container
  * should be a shallow copy of the original.
  *
  */
@@ -263,8 +324,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveConstructor) {
 }
 
 /**
- * @brief Testing construction of DenseVector container with size `n` and
- values
+ * @brief Testing construction of DenseVector container with size `n` and values
  * set at 0 by default
  *
  */
@@ -290,8 +350,7 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
 }
 
 /**
- * @brief Testing construction of DenseVector container with size `n` and
- values
+ * @brief Testing construction of DenseVector container with size `n` and values
  * set at 0 by default
  *
  */
@@ -674,28 +733,150 @@ TYPED_TEST(DenseVectorUnaryTest, ElementAccess) {
   }
 }
 
-// TYPED_TEST(DenseVectorUnaryTest, UtilRoutines) {
-//   // view()
-//   // const_view()
-//   // name()
-// }
+/**
+ * @brief Test Suite using the Compatible Binary DenseVectors
+ *
+ */
+TYPED_TEST_CASE(CompatibleDenseVectorBinaryTest, CompatibleDenseVectorBinary);
 
-// // Check vector from vector
-// TYPED_TEST_CASE(DenseVectorBinaryTest, DenseVectorBinary);
+/**
+ * @brief Testing shallow copy construction of DenseVector container from
+ * another DenseVector container with the different parameters. Resulting
+ * container should be a shallow copy of the original.
+ *
+ */
+TYPED_TEST(CompatibleDenseVectorBinaryTest, ShallowCopyConstructor) {
+  using Vector1     = typename TestFixture::device1;
+  using HostVector1 = typename TestFixture::host1;
+  using Vector2     = typename TestFixture::device2;
+  using HostVector2 = typename TestFixture::host2;
+  using value_type  = typename Vector1::value_type;
 
-// // Changed that to DenseVectorBinaryTests
-// TYPED_TEST(DenseVectorUnaryTest, ShallowCopySemantics) {
-//   // DenseVector(const DenseVector<VR, PR...>& src, ...)
-//   // operator=(const DenseVector<VR, PR...>& src)
-//   // DenseVector(const DenseVector&) = default;
-//   // DenseVector& operator=(const DenseVector&) = default;
-// }
+  auto size = 10;
+  Vector1 x(size, (value_type)5.22);
+  EXPECT_EQ(x.size(), size);
 
-// // Changed that to DenseVectorBinaryTests
-// TYPED_TEST(DenseVectorUnaryTest, Allocate) {
-//   // DenseVector& allocate(const std::string name,
-//   //                       const DenseVector<VR, PR...>& src)
-// }
+  HostVector1 xh(x.size(), (value_type)0);
+  Morpheus::copy(x, xh);
+
+  HostVector2 yh(xh);
+  EXPECT_EQ(yh.size(), xh.size());
+
+  xh[4] = (value_type)-4.33;
+  xh[9] = (value_type)-9.44;
+
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_EQ(xh[i], yh[i]);
+  }
+
+  // Now check device vector
+  Vector2 y(x);
+  EXPECT_EQ(y.size(), x.size());
+  Morpheus::copy(xh, x);
+
+  for (size_t i = 0; i < x.size(); i++) {
+    EXPECT_EQ(x[i], y[i]);
+  }
+}
+
+/**
+ * @brief Testing shallow copy assignment of DenseVector container from
+ * another DenseVector container with the different parameters. Resulting
+ * copy should be a shallow copy from the original.
+ *
+ */
+TYPED_TEST(CompatibleDenseVectorBinaryTest, ShallowCopyAssignment) {
+  using Vector1     = typename TestFixture::device1;
+  using HostVector1 = typename TestFixture::host1;
+  using Vector2     = typename TestFixture::device2;
+  using HostVector2 = typename TestFixture::host2;
+  using value_type  = typename Vector1::value_type;
+
+  auto size = 10;
+  Vector1 x(size, (value_type)5.22);
+  EXPECT_EQ(x.size(), size);
+
+  HostVector1 xh(x.size(), 0);
+  Morpheus::copy(x, xh);
+
+  HostVector2 yh = xh;
+  EXPECT_EQ(yh.size(), xh.size());
+
+  xh[4] = (value_type)-4.33;
+  xh[9] = (value_type)-9.44;
+
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_EQ(xh[i], yh[i]);
+  }
+
+  // Now check device vector
+  Vector2 y = x;
+  EXPECT_EQ(y.size(), x.size());
+  Morpheus::copy(xh, x);
+
+  for (size_t i = 0; i < x.size(); i++) {
+    EXPECT_EQ(x[i], y[i]);
+  }
+}
+
+/**
+ * @brief Test Suite using the Compatible Binary DenseVectors
+ *
+ */
+TYPED_TEST_CASE(DenseVectorBinaryTest, DenseVectorBinary);
+
+/**
+ * @brief Testing allocation of DenseVector container from another
+ DenseVector
+ * container with the different parameters. New allocation shouldn't alias
+ the
+ * original.
+ *
+ */
+TYPED_TEST(DenseVectorBinaryTest, Allocate) {
+  using Vector1     = typename TestFixture::device1;
+  using HostVector1 = typename TestFixture::host1;
+  using Vector2     = typename TestFixture::device2;
+  using HostVector2 = typename TestFixture::host2;
+  using value_type  = typename Vector1::value_type;
+
+  auto size = 10;
+  Vector1 x(size, (value_type)5.22);
+  EXPECT_EQ(x.size(), size);
+
+  HostVector1 xh(x.size(), 0);
+  Morpheus::copy(x, xh);
+
+  HostVector2 yh;
+  EXPECT_EQ(yh.size(), 0);
+  EXPECT_EQ(yh.view().size(), 0);
+
+  yh.allocate(xh);
+  xh[4] = (value_type)-4.33;
+  xh[9] = (value_type)-9.44;
+
+  EXPECT_EQ(yh.size(), xh.size());
+  EXPECT_EQ(yh.view().size(), xh.view().size());
+  for (size_t i = 0; i < xh.size(); i++) {
+    EXPECT_EQ(yh[i], (value_type)0);
+  }
+
+  // Now check device vector
+  Vector2 y;
+  EXPECT_EQ(y.size(), 0);
+  EXPECT_EQ(y.view().size(), 0);
+
+  yh[4] = (value_type)-4.33;
+  yh[9] = (value_type)-9.44;
+  y.allocate(x);
+  Morpheus::copy(y, yh);
+
+  EXPECT_EQ(y.size(), yh.size());
+  EXPECT_EQ(y.view().size(), yh.view().size());
+  for (size_t i = 0; i < yh.size(); i++) {
+    EXPECT_EQ(yh[i], (value_type)0);
+  }
+}
 
 }  // namespace Test
 
