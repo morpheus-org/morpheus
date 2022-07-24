@@ -19,6 +19,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       Utils
       DenseVector
       DenseMatrix
+      CooMatrix
       Dot
       TypeTraits
       Metaprogramming

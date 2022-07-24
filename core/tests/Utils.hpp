@@ -40,6 +40,7 @@ using types_set = typename Morpheus::cross_product<
         index_tlist, typename Morpheus::cross_product<
                          layout_tlist, space_tlist>::type>::type>::type;
 
+// Generate compatible unary combinations
 using compatible_value_tlist = Morpheus::TypeList<double>;
 using compatible_index_tlist = Morpheus::TypeList<int, Morpheus::Default>;
 using compatible_layout_tlist =
@@ -52,6 +53,19 @@ using compatible_types_set = typename Morpheus::cross_product<
     typename Morpheus::cross_product<
         compatible_index_tlist,
         typename Morpheus::cross_product<compatible_layout_tlist,
+                                         space_tlist>::type>::type>::type;
+
+using test_value_tlist = Morpheus::TypeList<double>;
+using test_index_tlist = Morpheus::TypeList<int>;
+using test_layout_tlist =
+    Morpheus::TypeList<typename TEST_EXECSPACE::array_layout>;
+
+// Generate all compatible unary combinations
+using test_types_set = typename Morpheus::cross_product<
+    test_value_tlist,
+    typename Morpheus::cross_product<
+        test_index_tlist,
+        typename Morpheus::cross_product<test_layout_tlist,
                                          space_tlist>::type>::type>::type;
 }  // namespace types
 
