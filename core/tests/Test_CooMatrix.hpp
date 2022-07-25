@@ -912,19 +912,157 @@ TYPED_TEST(CooMatrixUnaryTest, IsSorted) {
   }
 }
 
-// /**
-//  * @brief Test Suite using the Compatible Binary CooMatrix pairs
-//  *
-//  */
-// TYPED_TEST_CASE(CompatibleCooMatrixBinaryTest, CompatibleCooMatrixBinary);
+/**
+ * @brief Test Suite using the Compatible Binary CooMatrix pairs
+ *
+ */
+TYPED_TEST_CASE(CompatibleCooMatrixBinaryTest, CompatibleCooMatrixBinary);
 
-// TYPED_TEST(CompatibleCooMatrixBinaryTest, ConstructionFromCooMatrix) {
-//   EXPECT_EQ(1, 0);
-// }
+TYPED_TEST(CompatibleCooMatrixBinaryTest, ConstructionFromCooMatrix) {
+  using Matrix1     = typename TestFixture::device1;
+  using HostMatrix1 = typename TestFixture::host1;
+  using Matrix2     = typename TestFixture::device2;
+  using HostMatrix2 = typename TestFixture::host2;
+  using index_type  = typename Matrix1::index_type;
 
-// TYPED_TEST(CompatibleCooMatrixBinaryTest, CopyAssignmentFromCooMatrix) {
-//   EXPECT_EQ(1, 0);
-// }
+  // Matrix to Build
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
+  index_type nrows = 3, ncols = 3, nnnz = 4;
+  Matrix1 Aref(nrows, ncols, nnnz);
+  CHECK_COO_SIZES(Aref, nrows, ncols, nnnz);
+
+  HostMatrix1 Ahref(nrows, ncols, nnnz);
+  CHECK_COO_SIZES(Ahref, nrows, ncols, nnnz);
+
+  // clang-format off
+  Ahref.row_indices(0) = 0; Ahref.column_indices(0) = 0; Ahref.values(0) = 1.11;
+  Ahref.row_indices(1) = 0; Ahref.column_indices(1) = 2; Ahref.values(1) = 2.22;
+  Ahref.row_indices(2) = 1; Ahref.column_indices(2) = 2; Ahref.values(2) = 3.33;
+  Ahref.row_indices(3) = 2; Ahref.column_indices(3) = 1; Ahref.values(3) = 4.44;
+  // clang-format on
+
+  // Send to device
+  Morpheus::copy(Ahref, Aref);
+
+  // Build Matrix from the compatible Matrix
+  Matrix2 A(Aref);
+  CHECK_COO_CONTAINERS(A, Aref);
+
+  HostMatrix2 Ah(nrows, ncols, nnnz);
+  CHECK_COO_SIZES(Ah, nrows, ncols, nnnz)
+  Morpheus::copy(A, Ah);
+
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Ah.row_indices(n), Ahref.row_indices(n));
+    EXPECT_EQ(Ah.column_indices(n), Ahref.column_indices(n));
+    EXPECT_EQ(Ah.values(n), Ahref.values(n));
+  }
+
+  // Default copy construction
+  HostMatrix1 Bh(Ah);
+  CHECK_COO_CONTAINERS(Bh, Ah);
+
+  // Change values in one container
+  Ah.row_indices(2)    = 2;
+  Ah.column_indices(1) = 1;
+  Ah.values(3)         = -3.33;
+
+  // Other container should reflect the same changes
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Bh.row_indices(n), Ah.row_indices(n));
+    EXPECT_EQ(Bh.column_indices(n), Ah.column_indices(n));
+    EXPECT_EQ(Bh.values(n), Ah.values(n));
+  }
+
+  // Now check device Matrix
+  Matrix1 B(A);
+  CHECK_COO_CONTAINERS(B, A);
+  Morpheus::copy(Ah, A);
+
+  // Send other vector back to host for check
+  HostMatrix1 Bt(nrows, ncols, nnnz);
+  Morpheus::copy(B, Bt);
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Bt.row_indices(n), Ah.row_indices(n));
+    EXPECT_EQ(Bt.column_indices(n), Ah.column_indices(n));
+    EXPECT_EQ(Bt.values(n), Ah.values(n));
+  }
+}
+
+TYPED_TEST(CompatibleCooMatrixBinaryTest, CopyAssignmentFromCooMatrix) {
+  using Matrix1     = typename TestFixture::device1;
+  using HostMatrix1 = typename TestFixture::host1;
+  using Matrix2     = typename TestFixture::device2;
+  using HostMatrix2 = typename TestFixture::host2;
+  using index_type  = typename Matrix1::index_type;
+
+  // Matrix to Build
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
+  index_type nrows = 3, ncols = 3, nnnz = 4;
+  Matrix1 Aref(nrows, ncols, nnnz);
+  CHECK_COO_SIZES(Aref, nrows, ncols, nnnz);
+
+  HostMatrix1 Ahref(nrows, ncols, nnnz);
+  CHECK_COO_SIZES(Ahref, nrows, ncols, nnnz);
+
+  // clang-format off
+  Ahref.row_indices(0) = 0; Ahref.column_indices(0) = 0; Ahref.values(0) = 1.11;
+  Ahref.row_indices(1) = 0; Ahref.column_indices(1) = 2; Ahref.values(1) = 2.22;
+  Ahref.row_indices(2) = 1; Ahref.column_indices(2) = 2; Ahref.values(2) = 3.33;
+  Ahref.row_indices(3) = 2; Ahref.column_indices(3) = 1; Ahref.values(3) = 4.44;
+  // clang-format on
+
+  // Send to device
+  Morpheus::copy(Ahref, Aref);
+
+  // Build Matrix from the compatible Matrix
+  Matrix2 A = Aref;
+  CHECK_COO_CONTAINERS(A, Aref);
+
+  HostMatrix2 Ah(nrows, ncols, nnnz);
+  CHECK_COO_SIZES(Ah, nrows, ncols, nnnz)
+  Morpheus::copy(A, Ah);
+
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Ah.row_indices(n), Ahref.row_indices(n));
+    EXPECT_EQ(Ah.column_indices(n), Ahref.column_indices(n));
+    EXPECT_EQ(Ah.values(n), Ahref.values(n));
+  }
+
+  // Default copy asssignment
+  HostMatrix1 Bh = Ah;
+  CHECK_COO_CONTAINERS(Bh, Ah);
+
+  // Change values in one container
+  Ah.row_indices(2)    = 2;
+  Ah.column_indices(1) = 1;
+  Ah.values(3)         = -3.33;
+
+  // Other container should reflect the same changes
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Bh.row_indices(n), Ah.row_indices(n));
+    EXPECT_EQ(Bh.column_indices(n), Ah.column_indices(n));
+    EXPECT_EQ(Bh.values(n), Ah.values(n));
+  }
+
+  // Now check device Matrix
+  Matrix1 B = A;
+  CHECK_COO_CONTAINERS(B, A);
+  Morpheus::copy(Ah, A);
+
+  // Send other vector back to host for check
+  HostMatrix1 Bt(nrows, ncols, nnnz);
+  Morpheus::copy(B, Bt);
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Bt.row_indices(n), Ah.row_indices(n));
+    EXPECT_EQ(Bt.column_indices(n), Ah.column_indices(n));
+    EXPECT_EQ(Bt.values(n), Ah.values(n));
+  }
+}
 
 // /**
 //  * @brief Test Suite using the Binary CooMatrix pairs

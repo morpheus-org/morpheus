@@ -211,9 +211,9 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
    * @param num_rows  Number of rows of the matrix.
    * @param num_cols Number of columns of the matrix.
    * @param num_entries Number of non-zero values in the matrix.
-   * @param rind DenseVector containing the row indices of the matrix.
-   * @param cind DenseVector containing the column indices of the matrix.
-   * @param vals DenseVector containing the values of the matrix.
+   * @param rind \p DenseVector containing the row indices of the matrix.
+   * @param cind \p DenseVector containing the column indices of the matrix.
+   * @param vals \p DenseVector containing the values of the matrix.
    */
   template <typename ValueArray, typename IndexArray>
   explicit inline CooMatrix(
