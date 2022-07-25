@@ -221,8 +221,11 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyAssignment) {
   EXPECT_EQ(y.size(), x.size());
   Morpheus::copy(xh, x);
 
-  for (size_t i = 0; i < x.size(); i++) {
-    EXPECT_EQ(x[i], y[i]);
+  // Send other vector back to host for check
+  HostVector yt(y.size(), 0);
+  Morpheus::copy(y, yt);
+  for (size_t i = 0; i < y.size(); i++) {
+    EXPECT_EQ(yt[i], xh[i]);
   }
 }
 
@@ -259,8 +262,11 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyConstructor) {
   EXPECT_EQ(y.size(), x.size());
   Morpheus::copy(xh, x);
 
-  for (size_t i = 0; i < x.size(); i++) {
-    EXPECT_EQ(x[i], y[i]);
+  // Send other vector back to host for check
+  HostVector yt(y.size(), 0);
+  Morpheus::copy(y, yt);
+  for (size_t i = 0; i < y.size(); i++) {
+    EXPECT_EQ(yt[i], xh[i]);
   }
 }
 
@@ -291,6 +297,18 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveAssignment) {
   for (size_t i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], yh[i]);
   }
+
+  // Now check device vector
+  Vector y = std::move(x);
+  EXPECT_EQ(y.size(), x.size());
+  Morpheus::copy(xh, x);
+
+  // Send other vector back to host for check
+  HostVector yt(y.size(), 0);
+  Morpheus::copy(y, yt);
+  for (size_t i = 0; i < y.size(); i++) {
+    EXPECT_EQ(yt[i], xh[i]);
+  }
 }
 
 /**
@@ -320,6 +338,18 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveConstructor) {
   yh[0] = 0;
   for (size_t i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], yh[i]);
+  }
+
+  // Now check device vector
+  Vector y(std::move(x));
+  EXPECT_EQ(y.size(), x.size());
+  Morpheus::copy(xh, x);
+
+  // Send other vector back to host for check
+  HostVector yt(y.size(), 0);
+  Morpheus::copy(y, yt);
+  for (size_t i = 0; i < y.size(); i++) {
+    EXPECT_EQ(yt[i], xh[i]);
   }
 }
 
@@ -774,8 +804,11 @@ TYPED_TEST(CompatibleDenseVectorBinaryTest, ShallowCopyConstructor) {
   EXPECT_EQ(y.size(), x.size());
   Morpheus::copy(xh, x);
 
-  for (size_t i = 0; i < x.size(); i++) {
-    EXPECT_EQ(x[i], y[i]);
+  // Send other vector back to host for check
+  HostVector2 yt(y.size(), 0);
+  Morpheus::copy(y, yt);
+  for (size_t i = 0; i < y.size(); i++) {
+    EXPECT_EQ(yt[i], xh[i]);
   }
 }
 
@@ -814,8 +847,11 @@ TYPED_TEST(CompatibleDenseVectorBinaryTest, ShallowCopyAssignment) {
   EXPECT_EQ(y.size(), x.size());
   Morpheus::copy(xh, x);
 
-  for (size_t i = 0; i < x.size(); i++) {
-    EXPECT_EQ(x[i], y[i]);
+  // Send other vector back to host for check
+  HostVector2 yt(y.size(), 0);
+  Morpheus::copy(y, yt);
+  for (size_t i = 0; i < y.size(); i++) {
+    EXPECT_EQ(yt[i], xh[i]);
   }
 }
 

@@ -34,18 +34,79 @@
 
 namespace Morpheus {
 
+/**
+ * \addtogroup containers_2d 2D Containers
+ * \brief Two-dimensional Containers
+ * \ingroup containers
+ * \{
+ *
+ */
+
+/**
+ * @brief Implementation of the Coordinate (COO) Sparse Matrix Format
+ * Representation.
+ *
+ * @tparam ValueType type of values to store
+ * @tparam Properties optional properties to modify the behaviour of the
+ * container. Sensible defaults are selected based on the configuration. Please
+ * refer to \ref impl/Morpheus_ContainerTraits.hpp to find out more about the
+ * valid properties.
+ *
+ * \par Overview
+ * The CooMatrix container is a two-dimensional container that represents
+ * a sparse matrix. This container is the implementation of the Coordinate
+ * Format (COO), that is also known as the "triplet" format because it stores
+ * pairs of "ijv" of the matrix. In general, it is a fast and convenient format
+ * for constructing sparse matrices. It is a polymorphic container in the sense
+ * that it can store scalar or integer type values, on host or device depending
+ * how the template parameters are selected.
+ *
+ * \par Example
+ * \code
+ * #include <Morpheus_Core.hpp>
+ * // Matrix to Build
+ * // [1 * 2]
+ * // [* * 3]
+ * // [* 4 *]
+ * int main(){
+ *  using Matrix = Morpheus::CooMatrix<double, Kokkos::HostSpace>;
+ *  using index_array_type = typename Matrix::index_array_type;
+ *  using value_array_type = typename Matrix::value_array_type;
+ *
+ *  index_array_type i(4, 0), j(4, 0);
+ *  value_array_type v(4,0);
+ *
+ *  i[0] = 0; j[0] = 0; v[0] = 1;
+ *  i[1] = 0; j[1] = 2; v[1] = 2;
+ *  i[2] = 1; j[2] = 2; v[2] = 3;
+ *  i[3] = 2; j[3] = 1; v[3] = 4;
+ *
+ *  // Construct the matrix from i,j,v
+ *  Morpheus::CooMatrix<double, Kokkos::HostSpace> A(3, 3, 4, i, j, v);
+ *
+ *  Morpheus::print(A); // prints A
+ * }
+ * \endcode
+ */
 template <class ValueType, class... Properties>
 class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
  public:
+  /*! The traits associated with the particular container */
   using traits = Impl::ContainerTraits<CooMatrix, ValueType, Properties...>;
-  using type   = typename traits::type;
-  using base   = Impl::MatrixBase<CooMatrix, ValueType, Properties...>;
-  using tag    = typename MatrixFormatTag<Morpheus::CooFormatTag>::tag;
+  /*! The complete type of the container */
+  using type = typename traits::type;
+  using base = Impl::MatrixBase<CooMatrix, ValueType, Properties...>;
+  /*! The tag associated specificaly to the particular container*/
+  using tag = typename MatrixFormatTag<Morpheus::CooFormatTag>::tag;
 
-  using value_type           = typename traits::value_type;
+  /*! The type of the values held by the container - can be const */
+  using value_type = typename traits::value_type;
+  /*! The non-constant type of the values held by the container */
   using non_const_value_type = typename traits::non_const_value_type;
   using size_type            = typename traits::index_type;
-  using index_type           = typename traits::index_type;
+  /*! The type of the indices held by the container - can be const */
+  using index_type = typename traits::index_type;
+  /*! The non-constant type of the indices held by the container */
   using non_const_index_type = typename traits::non_const_index_type;
 
   using array_layout    = typename traits::array_layout;
@@ -60,35 +121,60 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
+  /*! The type of \p DenseVector that holds the index_type data */
   using index_array_type =
       Morpheus::DenseVector<index_type, index_type, array_layout,
                             execution_space, memory_traits>;
-  using const_index_array_type = const index_array_type;
-  using index_array_pointer    = typename index_array_type::value_array_pointer;
+  using index_array_pointer = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
-  using const_index_array_reference = const index_array_reference;
 
+  /*! The type of \p DenseVector that holds the value_type data */
   using value_array_type =
       Morpheus::DenseVector<value_type, index_type, array_layout,
                             execution_space, memory_traits>;
-  using const_value_array_type = const value_array_type;
-  using value_array_pointer    = typename value_array_type::value_array_pointer;
+  using value_array_pointer = typename value_array_type::value_array_pointer;
   using value_array_reference =
       typename value_array_type::value_array_reference;
-  using const_value_array_reference = const value_array_reference;
 
-  ~CooMatrix()                 = default;
+  /**
+   * @brief Default destructor.
+   */
+  ~CooMatrix() = default;
+  /**
+   * @brief Default copy contructor (shallow copy) of a CooMatrix container
+   * from another CooMatrix container with the same properties.
+   */
   CooMatrix(const CooMatrix &) = default;
-  CooMatrix(CooMatrix &&)      = default;
+  /**
+   * @brief Default move contructor (shallow copy) of a CooMatrix container
+   * from another CooMatrix container with the same properties.
+   */
+  CooMatrix(CooMatrix &&) = default;
+  /**
+   * @brief Default copy assignment (shallow copy) of a CooMatrix container
+   * from another CooMatrix container with the same properties.
+   */
   CooMatrix &operator=(const CooMatrix &) = default;
+  /**
+   * @brief Default move assignment (shallow copy) of a CooMatrix container
+   * from another CooMatrix container with the same properties.
+   */
   CooMatrix &operator=(CooMatrix &&) = default;
 
-  // Construct an empty CooMatrix
-  inline CooMatrix()
-      : base(), _row_indices(0), _column_indices(0), _values(0) {}
+  /**
+   * @brief Construct an empty CooMatrix object
+   */
+  inline CooMatrix() : base(), _row_indices(), _column_indices(), _values() {}
 
-  // Construct a CooMatrix with a specific shape and number of non-zero entries
+  /**
+   * @brief Construct a CooMatrix object with shape (num_rows, num_cols) and
+   * number of non-zeros equal to num_entries.
+   *
+   * @param num_rows  Number of rows of the matrix.
+   * @param num_cols Number of columns of the matrix.
+   * @param num_entries Number of non-zero values in the matrix.
+   */
   inline CooMatrix(const index_type num_rows, const index_type num_cols,
                    const index_type num_entries)
       : base(num_rows, num_cols, num_entries),
@@ -96,18 +182,35 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
         _column_indices(num_entries),
         _values(num_entries) {}
 
+  // Construct from raw pointers
   template <typename ValuePtr, typename IndexPtr>
   explicit inline CooMatrix(
       const index_type num_rows, const index_type num_cols,
       const index_type num_entries, IndexPtr rind_ptr, IndexPtr cind_ptr,
       ValuePtr vals_ptr,
-      typename std::enable_if<std::is_pointer<ValuePtr>::value &&
-                              std::is_pointer<IndexPtr>::value>::type * =
+      typename std::enable_if<(std::is_pointer<ValuePtr>::value &&
+                               ValuePtr::memory_traits::is_unmanaged) &&
+                              (std::is_pointer<IndexPtr>::value &&
+                               IndexPtr::memory_traits::is_unmanaged)>::type * =
           nullptr)
       : base(num_rows, num_cols, num_entries),
         _row_indices(size_t(num_entries), rind_ptr),
         _column_indices(size_t(num_entries), cind_ptr),
         _values(size_t(num_entries), vals_ptr) {}
+
+  // Construct from DenseVector arrays
+  template <typename ValueArray, typename IndexArray>
+  explicit inline CooMatrix(
+      const index_type num_rows, const index_type num_cols,
+      const index_type num_entries, IndexArray rind, IndexArray cind,
+      ValueArray vals,
+      typename std::enable_if<(!ValueArray::memory_traits::is_unmanaged) &&
+                              (!IndexArray::memory_traits::is_unmanaged)>::type
+          * = nullptr)
+      : base(num_rows, num_cols, num_entries),
+        _row_indices(rind),
+        _column_indices(cind),
+        _values(vals) {}
 
   // Construct from another matrix type (Shallow)
   // Needs to be a compatible type
@@ -217,59 +320,139 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   // Determine whether matrix elements are sorted by row and column index
   bool is_sorted(void) { return Morpheus::is_sorted(*this); }
 
+  /**
+   * @brief Returns the format enum assigned to the CooMatrix container.
+   *
+   * @return formats_e The format enum
+   */
   formats_e format_enum() const { return _id; }
 
+  /**
+   * @brief Returns the equivalent index to the format enum assigned to the
+   * CooMatrix container.
+   *
+   * @return int The equivalent index to \p format_e
+   */
   int format_index() const { return static_cast<int>(_id); }
 
+  /**
+   * @brief Returns a reference to the row index of the matrix with index \p n
+   *
+   * @param n Index of the value to extract
+   * @return Row index at index \p n
+   */
   MORPHEUS_FORCEINLINE_FUNCTION index_array_reference
   row_indices(index_type n) {
     return _row_indices(n);
   }
 
+  /**
+   * @brief Returns a reference to the column index of the matrix with index \p
+   * n
+   *
+   * @param n Index of the value to extract
+   * @return Column index at index \p n
+   */
   MORPHEUS_FORCEINLINE_FUNCTION index_array_reference
   column_indices(index_type n) {
     return _column_indices(n);
   }
 
+  /**
+   * @brief Returns a reference to the value of the matrix with index \p n
+   *
+   * @param n Index of the value to extract
+   * @return Value of the element at index \p n
+   */
   MORPHEUS_FORCEINLINE_FUNCTION value_array_reference values(index_type n) {
     return _values(n);
   }
 
-  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_reference
+  /**
+   * @brief Returns a const-reference to the row index of the matrix with index
+   * \p n
+   *
+   * @param n Index of the value to extract
+   * @return Row index at index \p n
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION const index_array_reference
   crow_indices(index_type n) const {
     return _row_indices(n);
   }
 
-  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_reference
+  /**
+   * @brief Returns a const-reference to the column index of the matrix with
+   * index \p n
+   *
+   * @param n Index of the value to extract
+   * @return Column index at index \p n
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION const index_array_reference
   ccolumn_indices(index_type n) const {
     return _column_indices(n);
   }
 
-  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_reference
+  /**
+   * @brief Returns a const-reference to the value of the matrix with index \p n
+   *
+   * @param n Index of the value to extract
+   * @return Value of the element at index \p n
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION const value_array_reference
   cvalues(index_type n) const {
     return _values(n);
   }
 
+  /**
+   * @brief Returns a reference to the row indices of the matrix.
+   *
+   * @return index_array_type&  A reference to the row indices.
+   */
   MORPHEUS_FORCEINLINE_FUNCTION index_array_type &row_indices() {
     return _row_indices;
   }
 
+  /**
+   * @brief Returns a reference to the column indices of the matrix.
+   *
+   * @return index_array_type&  A reference to the column indices.
+   */
   MORPHEUS_FORCEINLINE_FUNCTION index_array_type &column_indices() {
     return _column_indices;
   }
 
+  /**
+   * @brief Returns a reference to the values of the matrix.
+   *
+   * @return value_array_type&  A reference to the values.
+   */
   MORPHEUS_FORCEINLINE_FUNCTION value_array_type &values() { return _values; }
 
-  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_type &crow_indices() const {
+  /**
+   * @brief Returns a const-reference to the row indices of the matrix.
+   *
+   * @return const index_array_type&  A const reference to the row indices.
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION const index_array_type &crow_indices() const {
     return _row_indices;
   }
 
-  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_type &ccolumn_indices()
+  /**
+   * @brief Returns a const-reference to the column indices of the matrix.
+   *
+   * @return index_array_type&  A const-reference to the column indices.
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION const index_array_type &ccolumn_indices()
       const {
     return _column_indices;
   }
 
-  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_type &cvalues() const {
+  /**
+   * @brief Returns a reference to the values of the matrix.
+   *
+   * @return values_array_type&  A reference to the values.
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION const value_array_type &cvalues() const {
     return _values;
   }
 
@@ -278,6 +461,8 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
   value_array_type _values;
   static constexpr formats_e _id = Morpheus::COO_FORMAT;
 };
+/*! \}  // end of containers_2d group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_COOMATRIX_HPP
