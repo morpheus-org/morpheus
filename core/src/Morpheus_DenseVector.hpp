@@ -27,6 +27,7 @@
 #include <Morpheus_FormatTags.hpp>
 
 #include <impl/Morpheus_ContainerTraits.hpp>
+#include <impl/Morpheus_Functors.hpp>
 
 #include <Kokkos_Core.hpp>
 #include <Kokkos_Random.hpp>
@@ -40,20 +41,6 @@ namespace Morpheus {
  *
  */
 
-namespace Impl {
-// TODO: Merge this and set_functor from DenseMatrix in a single definition and
-// place in Impl directory
-template <typename View, typename ValueType>
-struct set_functor {
-  View _data;
-  ValueType _val;
-
-  set_functor(View data, ValueType val) : _data(data), _val(val) {}
-
-  KOKKOS_INLINE_FUNCTION
-  void operator()(const size_t& i) const { _data(i) = _val; }
-};
-}  // namespace Impl
 /**
  * \addtogroup containers_1d 1D Containers
  * \brief One-dimensional Containers
@@ -129,7 +116,9 @@ class DenseVector
   using value_array_pointer   = typename value_array_type::pointer_type;
   using value_array_reference = typename value_array_type::reference_type;
 
-  //   Member functions
+  /**
+   * @brief Default destructor.
+   */
   ~DenseVector() = default;
   /**
    * @brief Default copy contructor (shallow copy) of a DenseVector container
@@ -271,7 +260,7 @@ class DenseVector
     }
 
     range_policy policy(0, n);
-    Impl::set_functor f(_values, val);
+    Impl::set_functor<value_array_type, value_type> f(_values, val);
     Kokkos::parallel_for("Morpheus::DenseVector::assign", policy, f);
   }
 

@@ -28,6 +28,7 @@
 #include <Morpheus_FormatTags.hpp>
 
 #include <impl/Morpheus_MatrixBase.hpp>
+#include <impl/Morpheus_Functors.hpp>
 
 #include <Kokkos_Core.hpp>
 
@@ -133,7 +134,8 @@ class DenseMatrix
     this->resize(num_rows, num_cols);
 
     range_policy policy(0, num_rows);
-    set_functor f(_values, val, num_cols);
+    Impl::set_functor<value_array_type, value_type, index_type> f(_values, val,
+                                                                  num_cols);
     Kokkos::parallel_for("Morpheus::DenseMatrix::assign", policy, f);
   }
 
@@ -161,23 +163,6 @@ class DenseMatrix
 
  private:
   value_array_type _values;
-
- public:
-  struct set_functor {
-    value_array_type _data;
-    value_type _val;
-    index_type _ncols;
-
-    set_functor(value_array_type data, value_type val, index_type ncols)
-        : _data(data), _val(val), _ncols(ncols) {}
-
-    KOKKOS_INLINE_FUNCTION
-    void operator()(const index_type &i) const {
-      for (index_type j = 0; j < _ncols; j++) {
-        _data(i, j) = _val;
-      }
-    }
-  };
 };
 }  // namespace Morpheus
 
