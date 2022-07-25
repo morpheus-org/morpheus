@@ -170,7 +170,8 @@ class DenseVector
   explicit DenseVector(
       const size_t n, ValuePtr ptr,
       typename std::enable_if<std::is_pointer<ValuePtr>::value &&
-                              (memory_traits::is_unmanaged)>::type* = nullptr)
+                              is_same_value_type<value_type, ValuePtr>::value &&
+                              memory_traits::is_unmanaged>::type* = nullptr)
       : _size(n), _values(ptr, n) {
     static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
                   "Constructing DenseVector to wrap user memory must supply "

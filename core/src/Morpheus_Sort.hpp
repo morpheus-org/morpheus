@@ -28,18 +28,19 @@
 
 namespace Morpheus {
 
-template <typename Matrix>
+template <typename ExecSpace, typename Matrix>
 void sort_by_row_and_column(Matrix& mat,
                             typename Matrix::index_type min_row = 0,
                             typename Matrix::index_type max_row = 0,
                             typename Matrix::index_type min_col = 0,
                             typename Matrix::index_type max_col = 0) {
-  Impl::sort_by_row_and_column(mat, min_row, max_row, min_col, max_col);
+  Impl::sort_by_row_and_column<ExecSpace>(mat, min_row, max_row, min_col,
+                                          max_col);
 }
 
-template <typename Matrix>
+template <typename ExecSpace, typename Matrix>
 bool is_sorted(Matrix& mat) {
-  return Impl::is_sorted(mat);
+  return Impl::is_sorted<ExecSpace>(mat);
 }
 
 }  // namespace Morpheus

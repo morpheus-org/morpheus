@@ -188,25 +188,43 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
       const index_type num_rows, const index_type num_cols,
       const index_type num_entries, IndexPtr rind_ptr, IndexPtr cind_ptr,
       ValuePtr vals_ptr,
-      typename std::enable_if<(std::is_pointer<ValuePtr>::value &&
-                               ValuePtr::memory_traits::is_unmanaged) &&
-                              (std::is_pointer<IndexPtr>::value &&
-                               IndexPtr::memory_traits::is_unmanaged)>::type * =
-          nullptr)
+      typename std::enable_if<
+          (std::is_pointer<ValuePtr>::value &&
+           is_same_value_type<value_type, ValuePtr>::value &&
+           memory_traits::is_unmanaged) &&
+          (std::is_pointer<IndexPtr>::value &&
+           is_same_index_type<index_type, IndexPtr>::value &&
+           memory_traits::is_unmanaged)>::type * = nullptr)
       : base(num_rows, num_cols, num_entries),
         _row_indices(size_t(num_entries), rind_ptr),
         _column_indices(size_t(num_entries), cind_ptr),
         _values(size_t(num_entries), vals_ptr) {}
 
-  // Construct from DenseVector arrays
+  /**
+   * @brief Construct a CooMatrix object with shape (num_rows, num_cols) and
+   * number of non-zeros equal to num_entries and assign the indices and values
+   * from \p DenseVector arrays.
+   *
+   * @tparam ValueArray Value type DenseVector type.
+   * @tparam IndexArray Index type DenseVector type.
+   *
+   * @param num_rows  Number of rows of the matrix.
+   * @param num_cols Number of columns of the matrix.
+   * @param num_entries Number of non-zero values in the matrix.
+   * @param rind DenseVector containing the row indices of the matrix.
+   * @param cind DenseVector containing the column indices of the matrix.
+   * @param vals DenseVector containing the values of the matrix.
+   */
   template <typename ValueArray, typename IndexArray>
   explicit inline CooMatrix(
       const index_type num_rows, const index_type num_cols,
       const index_type num_entries, IndexArray rind, IndexArray cind,
       ValueArray vals,
-      typename std::enable_if<(!ValueArray::memory_traits::is_unmanaged) &&
-                              (!IndexArray::memory_traits::is_unmanaged)>::type
-          * = nullptr)
+      typename std::enable_if<
+          is_dense_vector_format_container<ValueArray>::value &&
+          is_dense_vector_format_container<IndexArray>::value &&
+          !ValueArray::memory_traits::is_unmanaged &&
+          !IndexArray::memory_traits::is_unmanaged>::type * = nullptr)
       : base(num_rows, num_cols, num_entries),
         _row_indices(rind),
         _column_indices(cind),
@@ -273,15 +291,36 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
     return *this;
   }
 
-  // Construct from another matrix type
+  /**
+   * @brief Construct a CooMatrix object from another storage format. This
+   * functionality is disabled to avoid implicit copies and conversion
+   * operations.
+   *
+   * @tparam MatrixType Any of the supported storage formats.
+   * @param src The source container.
+   */
   template <typename MatrixType>
   CooMatrix(const MatrixType &src) = delete;
 
-  // Assignment from another matrix type
+  /**
+   * @brief Assign to CooMatrix object from another storage format. This
+   * functionality is disabled to avoid implicit copies and conversion
+   * operations.
+   *
+   * @tparam MatrixType Any of the supported storage formats.
+   * @param src The source container.
+   */
   template <typename MatrixType>
   reference operator=(const MatrixType &src) = delete;
 
-  // Resize matrix dimensions and underlying storage
+  /**
+   * @brief Resizes CooMatrix with shape of (num_rows, num_cols) and sets number
+   * of non-zero entries to num_entries.
+   *
+   * @param num_rows Number of rows of resized matrix.
+   * @param num_cols Number of columns of resized matrix.
+   * @param num_entries Number of non-zero entries in resized matrix.
+   */
   inline void resize(const index_type num_rows, const index_type num_cols,
                      const index_type num_entries) {
     base::resize(num_rows, num_cols, num_entries);
@@ -301,24 +340,35 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
     return *this;
   }
 
-  // Sort matrix elements by row index
+  /**
+   * @brief Sorts matrix elements by row index
+   *
+   */
   void sort_by_row(void) {
-    // TODO: CooMatrix.sort_by_row
     throw Morpheus::NotImplementedException("CooMatrix.sort_by_row()");
   }
 
-  // Sort matrix elements by row and column index
-  void sort_by_row_and_column(void) { Morpheus::sort_by_row_and_column(*this); }
+  /**
+   * @brief Sorts matrix elements by row index first and then by column index.
+   *
+   */
+  void sort(void) { Morpheus::sort_by_row_and_column<execution_space>(*this); }
 
-  // Determine whether matrix elements are sorted by row index
+  /**
+   * @brief Determines whether matrix elements are sorted by row index
+   *
+   */
   bool is_sorted_by_row(void) {
-    // TODO: CooMatrix.is_sorted_by_row
     throw Morpheus::NotImplementedException("CooMatrix.is_sorted_by_row()");
     return true;
   }
 
-  // Determine whether matrix elements are sorted by row and column index
-  bool is_sorted(void) { return Morpheus::is_sorted(*this); }
+  /**
+   * @brief Determines whether matrix elements are sorted by row and column
+   * index
+   *
+   */
+  bool is_sorted(void) { return Morpheus::is_sorted<execution_space>(*this); }
 
   /**
    * @brief Returns the format enum assigned to the CooMatrix container.

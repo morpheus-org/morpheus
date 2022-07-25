@@ -164,9 +164,9 @@ TYPED_TEST(CooMatrixUnaryTest, ReferenceByIndex) {
   using host_value_array_type = typename value_array_type::HostMirror;
 
   // Matrix to Build
-  // [1 * 2]
-  // [* * 3]
-  // [* 4 *]
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
   index_type nrows = 3, ncols = 3, nnnz = 4;
   index_array_type i(nnnz, 0), j(nnnz, 0);
   value_array_type v(nnnz, 0);
@@ -214,9 +214,9 @@ TYPED_TEST(CooMatrixUnaryTest, Reference) {
   using host_value_array_type = typename value_array_type::HostMirror;
 
   // Matrix to Build
-  // [1 * 2]
-  // [* * 3]
-  // [* 4 *]
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
   index_type nrows = 3, ncols = 3, nnnz = 4;
   index_array_type i(nnnz, 0), j(nnnz, 0);
   value_array_type v(nnnz, 0);
@@ -271,9 +271,9 @@ TYPED_TEST(CooMatrixUnaryTest, ConstReference) {
   using host_value_array_type = typename value_array_type::HostMirror;
 
   // Matrix to Build
-  // [1 * 2]
-  // [* * 3]
-  // [* 4 *]
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
   index_type nrows = 3, ncols = 3, nnnz = 4;
   index_array_type i(nnnz, 0), j(nnnz, 0);
   value_array_type v(nnnz, 0);
@@ -343,9 +343,9 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyAssignment) {
   using host_value_array_type = typename value_array_type::HostMirror;
 
   // Matrix to Build
-  // [1 * 2]
-  // [* * 3]
-  // [* 4 *]
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
   index_type nrows = 3, ncols = 3, nnnz = 4;
   index_array_type i(nnnz, 0), j(nnnz, 0);
   value_array_type v(nnnz, 0);
@@ -425,9 +425,9 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyConstructor) {
   using host_value_array_type = typename value_array_type::HostMirror;
 
   // Matrix to Build
-  // [1 * 2]
-  // [* * 3]
-  // [* 4 *]
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
   index_type nrows = 3, ncols = 3, nnnz = 4;
   index_array_type i(nnnz, 0), j(nnnz, 0);
   value_array_type v(nnnz, 0);
@@ -507,9 +507,9 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveAssignment) {
   using host_value_array_type = typename value_array_type::HostMirror;
 
   // Matrix to Build
-  // [1 * 2]
-  // [* * 3]
-  // [* 4 *]
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
   index_type nrows = 3, ncols = 3, nnnz = 4;
   index_array_type i(nnnz, 0), j(nnnz, 0);
   value_array_type v(nnnz, 0);
@@ -589,9 +589,9 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveConstructor) {
   using host_value_array_type = typename value_array_type::HostMirror;
 
   // Matrix to Build
-  // [1 * 2]
-  // [* * 3]
-  // [* 4 *]
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
   index_type nrows = 3, ncols = 3, nnnz = 4;
   index_array_type i(nnnz, 0), j(nnnz, 0);
   value_array_type v(nnnz, 0);
@@ -655,22 +655,262 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveConstructor) {
   }
 }
 
-// TYPED_TEST(CooMatrixUnaryTest, ConstructionFromShape) { EXPECT_EQ(1, 0); }
+TYPED_TEST(CooMatrixUnaryTest, ConstructionFromShape) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
+  index_type nrows = 3, ncols = 3, nnnz = 4;
+  HostMatrix Ah(nrows, ncols, nnnz);
+  CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
+
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Ah.row_indices(n), (index_type)0);
+    EXPECT_EQ(Ah.column_indices(n), (index_type)0);
+    EXPECT_EQ(Ah.values(n), (value_type)0);
+  }
+  // Matrix to Build
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
+
+  // clang-format off
+  Ah.row_indices(0) = 0; Ah.column_indices(0) = 0; Ah.values(0) = 1.11;
+  Ah.row_indices(1) = 0; Ah.column_indices(1) = 2; Ah.values(1) = 2.22;
+  Ah.row_indices(2) = 1; Ah.column_indices(2) = 2; Ah.values(2) = 3.33;
+  Ah.row_indices(3) = 2; Ah.column_indices(3) = 1; Ah.values(3) = 4.44;
+  // clang-format on
+
+  Matrix A(nrows, ncols, nnnz);
+  CHECK_COO_SIZES(A, nrows, ncols, nnnz)
+  // Send vectors to device
+  Morpheus::copy(Ah, A);
+
+  HostMatrix Ah_test(nrows, ncols, nnnz);
+  CHECK_COO_SIZES(Ah_test, nrows, ncols, nnnz)
+  Morpheus::copy(A, Ah_test);
+
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Ah_test.row_indices(n), Ah.row_indices(n));
+    EXPECT_EQ(Ah_test.column_indices(n), Ah.column_indices(n));
+    EXPECT_EQ(Ah_test.values(n), Ah.values(n));
+  }
+}
+
+// /**
+//  * @brief Testing construction of CooMatrix from a raw pointers
+//  *
+//  */
 // TYPED_TEST(CooMatrixUnaryTest, ConstructionFromPointers) { EXPECT_EQ(1, 0); }
 
-// TYPED_TEST(CooMatrixUnaryTest, ConstructionFromDenseVector) { EXPECT_EQ(1,
-// 0); }
+/**
+ * @brief Testing construction of CooMatrix from \p DenseVector arrays.
+ *
+ */
+TYPED_TEST(CooMatrixUnaryTest, ConstructionFromDenseVector) {
+  using Matrix                = typename TestFixture::device;
+  using HostMatrix            = typename TestFixture::host;
+  using index_type            = typename Matrix::index_type;
+  using index_array_type      = typename Matrix::index_array_type;
+  using value_array_type      = typename Matrix::value_array_type;
+  using host_index_array_type = typename index_array_type::HostMirror;
+  using host_value_array_type = typename value_array_type::HostMirror;
 
-// TYPED_TEST(CooMatrixUnaryTest, Resize) { EXPECT_EQ(1, 0); }
+  // Matrix to Build
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
+  index_type nrows = 3, ncols = 3, nnnz = 4;
+  index_array_type i(nnnz, 0), j(nnnz, 0);
+  value_array_type v(nnnz, 0);
+  // Construct vectors on host
+  host_index_array_type ih(nnnz, 0), jh(nnnz, 0);
+  host_value_array_type vh(nnnz, 0);
+  // clang-format off
+  ih[0] = 0; jh[0] = 0; vh[0] = 1.11;
+  ih[1] = 0; jh[1] = 2; vh[1] = 2.22;
+  ih[2] = 1; jh[2] = 2; vh[2] = 3.33;
+  ih[3] = 2; jh[3] = 1; vh[3] = 4.44;
+  // clang-format on
 
-// TYPED_TEST(CooMatrixUnaryTest, SortByRow) { EXPECT_EQ(1, 0); }
+  // Send vectors to device
+  Morpheus::copy(ih, i);
+  Morpheus::copy(jh, j);
+  Morpheus::copy(vh, v);
 
-// TYPED_TEST(CooMatrixUnaryTest, SortByRowAndColumn) { EXPECT_EQ(1, 0); }
+  // Build matrix from the device vectors
+  Matrix A(nrows, ncols, nnnz, i, j, v);
+  CHECK_COO_SIZES(A, nrows, ncols, nnnz);
 
-// TYPED_TEST(CooMatrixUnaryTest, IsSortedByRow) { EXPECT_EQ(1, 0); }
+  // Build matrix from the host vectors
+  HostMatrix Ah(nrows, ncols, nnnz, ih, jh, vh);
+  CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
 
-// TYPED_TEST(CooMatrixUnaryTest, IsSorted) { EXPECT_EQ(1, 0); }
+  HostMatrix Ah_test(nrows, ncols, nnnz);
+  Morpheus::copy(A, Ah_test);
+
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Ah.row_indices(n), Ah_test.row_indices(n));
+    EXPECT_EQ(Ah.column_indices(n), Ah_test.column_indices(n));
+    EXPECT_EQ(Ah.values(n), Ah_test.values(n));
+  }
+
+  Ah.row_indices(2) = 2;
+  EXPECT_NE(Ah.row_indices(2), Ah_test.row_indices(2));
+  Ah.column_indices(1) = 1;
+  EXPECT_NE(Ah.column_indices(1), Ah_test.column_indices(1));
+  Ah.values(0) = -1.11;
+  EXPECT_NE(Ah.values(0), Ah_test.values(0));
+}
+
+TYPED_TEST(CooMatrixUnaryTest, Resize) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using index_type = typename Matrix::index_type;
+
+  // Matrix to Build
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
+  index_type nrows = 3, ncols = 3, nnnz = 4;
+  index_type large_nrows = 500, large_ncols = 400, large_nnnz = 640;
+  index_type small_nrows = 2, small_ncols = 3, small_nnnz = 2;
+
+  HostMatrix Ahref(nrows, ncols, nnnz);
+  // clang-format off
+  Ahref.row_indices(0) = 0; Ahref.column_indices(0) = 0; Ahref.values(0) = 1.11;
+  Ahref.row_indices(1) = 0; Ahref.column_indices(1) = 2; Ahref.values(1) = 2.22;
+  Ahref.row_indices(2) = 1; Ahref.column_indices(2) = 2; Ahref.values(2) = 3.33;
+  Ahref.row_indices(3) = 2; Ahref.column_indices(3) = 1; Ahref.values(3) = 4.44;
+  // clang-format on
+
+  Matrix Aref(nrows, ncols, nnnz);
+  Morpheus::copy(Ahref, Aref);
+
+  Matrix A(nrows, ncols, nnnz);
+  Morpheus::copy(Ahref, A);
+
+  // Resize to larger shape and non-zeros
+  A.resize(large_nrows, large_ncols, large_nnnz);
+  CHECK_COO_SIZES(A, large_nrows, large_ncols, large_nnnz);
+
+  HostMatrix Ah(large_nrows, large_ncols, large_nnnz);
+  CHECK_COO_SIZES(Ah, large_nrows, large_ncols, large_nnnz);
+  Morpheus::copy(A, Ah);
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Ah.row_indices(n), Ahref.row_indices(n));
+    EXPECT_EQ(Ah.column_indices(n), Ahref.column_indices(n));
+    EXPECT_EQ(Ah.values(n), Ahref.values(n));
+  }
+
+  // Resizing to larger sizes should invoke a new allocation so changes in
+  // matrix should not be reflected in reference
+  Ah.row_indices(1)    = 1;
+  Ah.column_indices(2) = 10;
+  Ah.values(0)         = -1.11;
+  Morpheus::copy(Ah, A);
+
+  // Copy reference back to see if there are any changes
+  HostMatrix Ahref_test(nrows, ncols, nnnz);
+  Morpheus::copy(Ahref, Ahref_test);
+  EXPECT_NE(Ah.row_indices(1), Ahref_test.row_indices(1));
+  EXPECT_NE(Ah.column_indices(2), Ahref_test.column_indices(2));
+  EXPECT_NE(Ah.values(0), Ahref_test.values(0));
+
+  for (index_type n = nnnz; n < Ah.nnnz(); n++) {
+    EXPECT_EQ(Ah.row_indices(n), 0);
+    EXPECT_EQ(Ah.column_indices(n), 0);
+    EXPECT_EQ(Ah.values(n), 0);
+  }
+
+  // Resize to smaller shape and non-zeros
+  A.resize(small_nrows, small_ncols, small_nnnz);
+  CHECK_COO_SIZES(A, small_nrows, small_ncols, small_nnnz);
+  Ah.resize(small_nrows, small_ncols, small_nnnz);
+  CHECK_COO_SIZES(Ah, small_nrows, small_ncols, small_nnnz);
+
+  // Set back to normal
+  Ah.row_indices(1)    = 0;
+  Ah.column_indices(2) = 1;
+  Ah.values(0)         = 1.11;
+  Morpheus::copy(Ah, A);
+
+  for (index_type n = 0; n < Ah.nnnz(); n++) {
+    EXPECT_EQ(Ah.row_indices(n), Ahref_test.row_indices(n));
+    EXPECT_EQ(Ah.column_indices(n), Ahref_test.column_indices(n));
+    EXPECT_EQ(Ah.values(n), Ahref_test.values(n));
+  }
+}
+
+TYPED_TEST(CooMatrixUnaryTest, SortByRow) {
+  using Matrix = typename TestFixture::device;
+
+  Matrix A;
+  EXPECT_THROW(A.sort_by_row(), Morpheus::NotImplementedException);
+}
+
+TYPED_TEST(CooMatrixUnaryTest, Sort) {
+  using Matrix = typename TestFixture::device;
+  using space  = typename Matrix::execution_space;
+
+  Matrix A(5, 5, 7);
+
+  if (Morpheus::is_serial_execution_space<space>::value) {
+    // clang-format off
+    A.row_indices(0) = 3; A.column_indices(0) = 1; A.values(0) = 1;
+    A.row_indices(1) = 4; A.column_indices(1) = 2; A.values(1) = 2;
+    A.row_indices(2) = 1; A.column_indices(2) = 3; A.values(2) = 3;
+    A.row_indices(3) = 2; A.column_indices(3) = 2; A.values(3) = 4;
+    A.row_indices(4) = 1; A.column_indices(4) = 2; A.values(4) = 5;
+    A.row_indices(5) = 0; A.column_indices(5) = 3; A.values(5) = 6;
+    A.row_indices(6) = 2; A.column_indices(6) = 1; A.values(6) = 7;
+
+    A.sort();
+
+    EXPECT_EQ(A.row_indices(0), 0); EXPECT_EQ(A.column_indices(0), 3); EXPECT_EQ(A.values(0), 6);
+    EXPECT_EQ(A.row_indices(1), 1); EXPECT_EQ(A.column_indices(1), 2); EXPECT_EQ(A.values(1), 5);
+    EXPECT_EQ(A.row_indices(2), 1); EXPECT_EQ(A.column_indices(2), 3); EXPECT_EQ(A.values(2), 3);
+    EXPECT_EQ(A.row_indices(3), 2); EXPECT_EQ(A.column_indices(3), 1); EXPECT_EQ(A.values(3), 7);
+    EXPECT_EQ(A.row_indices(4), 2); EXPECT_EQ(A.column_indices(4), 2); EXPECT_EQ(A.values(4), 4);
+    EXPECT_EQ(A.row_indices(5), 3); EXPECT_EQ(A.column_indices(5), 1); EXPECT_EQ(A.values(5), 1);
+    EXPECT_EQ(A.row_indices(6), 4); EXPECT_EQ(A.column_indices(6), 2); EXPECT_EQ(A.values(6), 2);
+    // clang-format on
+  } else {
+    EXPECT_THROW(A.sort(), Morpheus::NotImplementedException);
+  }
+}
+
+TYPED_TEST(CooMatrixUnaryTest, IsSortedByRow) {
+  using Matrix = typename TestFixture::device;
+
+  Matrix A;
+  EXPECT_THROW(A.is_sorted_by_row(), Morpheus::NotImplementedException);
+}
+
+TYPED_TEST(CooMatrixUnaryTest, IsSorted) {
+  using Matrix = typename TestFixture::device;
+  using space  = typename Matrix::execution_space;
+
+  Matrix A(5, 5, 7);
+
+  if (Morpheus::is_serial_execution_space<space>::value) {
+    // clang-format off
+    A.row_indices(0) = 3; A.column_indices(0) = 1; A.values(0) = 1;
+    A.row_indices(1) = 4; A.column_indices(1) = 2; A.values(1) = 2;
+    A.row_indices(2) = 1; A.column_indices(2) = 3; A.values(2) = 3;
+    A.row_indices(3) = 2; A.column_indices(3) = 2; A.values(3) = 4;
+    A.row_indices(4) = 1; A.column_indices(4) = 2; A.values(4) = 5;
+    A.row_indices(5) = 0; A.column_indices(5) = 3; A.values(5) = 6;
+    A.row_indices(6) = 2; A.column_indices(6) = 1; A.values(6) = 7;
+    // clang-format on
+
+    EXPECT_FALSE(A.is_sorted());
+    A.sort();
+  } else {
+    EXPECT_THROW(A.is_sorted(), Morpheus::NotImplementedException);
+  }
+}
 
 // /**
 //  * @brief Test Suite using the Compatible Binary CooMatrix pairs
