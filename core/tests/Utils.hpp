@@ -55,6 +55,10 @@ using compatible_types_set = typename Morpheus::cross_product<
         typename Morpheus::cross_product<compatible_layout_tlist,
                                          space_tlist>::type>::type>::type;
 
+/**
+ * Single type list for rapid testing
+ *
+ */
 using test_value_tlist = Morpheus::TypeList<double>;
 using test_index_tlist = Morpheus::TypeList<int>;
 using test_layout_tlist =
@@ -77,5 +81,26 @@ template <typename... Ts>
 struct to_gtest_types<Morpheus::TypeList<Ts...>> {
   using type = ::testing::Types<Ts...>;
 };
+
+template <typename T1, typename T2>
+inline void morpheus_expect_eq(T1 val1, T2 val2) {
+  if (std::is_floating_point<T1>::value) {
+    if ((std::is_floating_point<T2>::value) && (sizeof(T1) > sizeof(T2))) {
+      EXPECT_PRED_FORMAT2(::testing::internal::CmpHelperFloatingPointEQ<T2>,
+                          val1, val2);
+    } else if ((std::is_floating_point<T2>::value) &&
+               (sizeof(T1) < sizeof(T2))) {
+      EXPECT_PRED_FORMAT2(::testing::internal::CmpHelperFloatingPointEQ<T1>,
+                          val1, val2);
+    } else {
+      EXPECT_EQ((T2)val1, (T2)val2);
+    }
+  } else {
+    EXPECT_EQ((T1)val1, (T1)val2);
+  }
+}
+
+#define MORPHEUS_EXPECT_EQ(val1, val2) \
+  { morpheus_expect_eq(val1, val2); }
 
 #endif  // TEST_CORE_UTILS_HPP

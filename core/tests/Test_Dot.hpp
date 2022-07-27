@@ -68,16 +68,6 @@ class DotTest : public ::testing::Test {
   }
 };
 
-template <typename T>
-inline void MORPHEUS_EXPECT_EQ(T val1, T val2) {
-  if (std::is_floating_point<T>::value) {
-    EXPECT_PRED_FORMAT2(::testing::internal::CmpHelperFloatingPointEQ<T>, val1,
-                        val2);
-  } else {
-    EXPECT_EQ(val1, val2);
-  }
-}
-
 namespace Test {
 
 TYPED_TEST_CASE(DotTest, ContainerImplementations);

@@ -230,23 +230,39 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
         _column_indices(cind),
         _values(vals) {}
 
-  // Construct from another matrix type (Shallow)
-  // Needs to be a compatible type
+  /**
+   * @brief Constructs a CooMatrix from another compatible CooMatrix
+   *
+   * @par Constructs a CooMatrix from another compatible CooMatrix i.e a
+   * matrix that satisfies the \p is_format_compatible check.
+   *
+   * @tparam VR Type of Values the Other Matrix holds.
+   * @tparam PR Properties of the Other Matrix.
+   * @param src The matrix we are constructing from.
+   */
   template <class VR, class... PR>
   CooMatrix(const CooMatrix<VR, PR...> &src,
             typename std::enable_if<is_format_compatible<
-                CooMatrix, typename CooMatrix<VR, PR...>::type>::value>::type
-                * = nullptr)
+                CooMatrix, CooMatrix<VR, PR...>>::value>::type * = nullptr)
       : base(src.nrows(), src.ncols(), src.nnnz()),
         _row_indices(src.crow_indices()),
         _column_indices(src.ccolumn_indices()),
         _values(src.cvalues()) {}
 
-  // Assignment from another matrix type (Shallow)
+  /**
+   * @brief Assigns a CooMatrix from another compatible CooMatrix
+   *
+   * @par Overview
+   * Assigns a CooMatrix from another compatible CooMatrix i.e a
+   * matrix that satisfies the \p is_format_compatible check.
+   *
+   * @tparam VR Type of Values the Other Matrix holds.
+   * @tparam PR Properties of the Other Matrix.
+   * @param src The matrix we are assigning from.
+   */
   template <class VR, class... PR>
   typename std::enable_if<
-      is_format_compatible<CooMatrix,
-                           typename CooMatrix<VR, PR...>::type>::value,
+      is_format_compatible<CooMatrix, CooMatrix<VR, PR...>>::value,
       CooMatrix &>::type
   operator=(const CooMatrix<VR, PR...> &src) {
     this->set_nrows(src.nrows());
@@ -260,14 +276,23 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
     return *this;
   }
 
-  // Construct from a compatible dynamic matrix type (Shallow)
-  // Throws when active type of dynamic matrix not same to concrete type
+  /**
+   * @brief Constructs a CooMatrix from a compatible DynamicMatrix
+   *
+   * @par Overview
+   * Constructs a CooMatrix from a compatible DynamicMatrix i.e a matrix that
+   * satisfies the \p is_dynamically_compatible check. Note that when the active
+   * type of the dynamic matrix is different from the concrete type, this will
+   * result in an exception thrown.
+   *
+   * @tparam VR Type of Values the Other Matrix holds.
+   * @tparam PR Properties of the Other Matrix.
+   * @param src The matrix we are constructing from.
+   */
   template <class VR, class... PR>
-  CooMatrix(
-      const DynamicMatrix<VR, PR...> &src,
-      typename std::enable_if<is_dynamically_compatible<
-          CooMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type * =
-          nullptr)
+  CooMatrix(const DynamicMatrix<VR, PR...> &src,
+            typename std::enable_if<is_dynamically_compatible<
+                CooMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr)
       : base(src.nrows(), src.ncols(), src.nnnz()) {
     auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
                        std::ref(*this));
@@ -275,12 +300,22 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
     std::visit(f, src.const_formats());
   }
 
-  // Assignment from a compatible dynamic matrix type (Shallow)
-  // Throws when active type of dynamic matrix not same to concrete type
+  /**
+   * @brief Assigns a CooMatrix from a compatible DynamicMatrix
+   *
+   * @par Overview
+   * Assigns a CooMatrix from a compatible DynamicMatrix i.e a matrix that
+   * satisfies the \p is_dynamically_compatible check. Note that when the active
+   * type of the dynamic matrix is different from the concrete type, this will
+   * result in an exception thrown.
+   *
+   * @tparam VR Type of Values the Other Matrix holds.
+   * @tparam PR Properties of the Other Matrix.
+   * @param src The matrix we are assigning from.
+   */
   template <class VR, class... PR>
   typename std::enable_if<
-      is_dynamically_compatible<CooMatrix,
-                                typename DynamicMatrix<VR, PR...>::type>::value,
+      is_dynamically_compatible<CooMatrix, DynamicMatrix<VR, PR...>>::value,
       CooMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
     auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,

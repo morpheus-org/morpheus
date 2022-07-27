@@ -16,11 +16,15 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
 
     foreach(
       Name
-      Utils
       DenseVector
+      DenseVector_Binary
+      DenseVector_CompatibleBinary
       DenseMatrix
       CooMatrix
-      Dot
+      CooMatrix_Binary
+      CooMatrix_CompatibleBinary
+      CooMatrix_CompatibleDynamicBinary
+      # Dot
       TypeTraits
       Metaprogramming
       ContainerFactory
