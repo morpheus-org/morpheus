@@ -28,8 +28,8 @@
 #include <Morpheus_Core.hpp>
 
 namespace types {
-using value_tlist  = Morpheus::TypeList<double, float, int>;
-using index_tlist  = Morpheus::TypeList<int, long long, Morpheus::Default>;
+using value_tlist  = Morpheus::TypeList<double, int>;
+using index_tlist  = Morpheus::TypeList<long long, Morpheus::Default>;
 using layout_tlist = Morpheus::TypeList<Kokkos::LayoutRight, Kokkos::LayoutLeft,
                                         Morpheus::Default>;
 using space_tlist  = Morpheus::TypeList<TEST_EXECSPACE>;
