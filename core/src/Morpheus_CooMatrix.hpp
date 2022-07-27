@@ -46,8 +46,8 @@ namespace Morpheus {
  * @brief Implementation of the Coordinate (COO) Sparse Matrix Format
  * Representation.
  *
- * @tparam ValueType type of values to store
- * @tparam Properties optional properties to modify the behaviour of the
+ * @tparam ValueType Type of values to store
+ * @tparam Properties Optional properties to modify the behaviour of the
  * container. Sensible defaults are selected based on the configuration. Please
  * refer to \ref impl/Morpheus_ContainerTraits.hpp to find out more about the
  * valid properties.
@@ -329,6 +329,14 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
     _values.resize(num_entries);
   }
 
+  /**
+   * @brief Resizes CooMatrix with the shape and number of non-zero entries of
+   * another CooMatrix with different parameters.
+   *
+   * @tparam VR Type of values the source matrix stores.
+   * @tparam PR Other properties of source matrix.
+   * @param src The source CooMatrix we are resizing from.
+   */
   template <class VR, class... PR>
   inline void resize(const CooMatrix<VR, PR...> &src) {
     resize(src.nrows(), src.ncols(), src.nnnz());
