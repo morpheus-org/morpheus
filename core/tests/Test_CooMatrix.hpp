@@ -880,7 +880,64 @@ TYPED_TEST(CooMatrixBinaryTest, ResizeFromCooMatrix) {
   VALIDATE_COO_CONTAINER(Ah, Ahref_test, Ah.nnnz(), index_type);
 }
 
-// TYPED_TEST(CooMatrixBinaryTest, AllocateFromCooMatrix) { EXPECT_EQ(1, 0); }
+/**
+ * @brief Testing allocation of CooMatrix container from another CooMatrix
+ * container with the different parameters. New allocation shouldn't alias the
+ * original.
+ *
+ */
+TYPED_TEST(CooMatrixBinaryTest, AllocateFromCooMatrix) {
+  using Matrix1     = typename TestFixture::device1;
+  using HostMatrix1 = typename TestFixture::host1;
+  using Matrix2     = typename TestFixture::device2;
+  using HostMatrix2 = typename TestFixture::host2;
+  using index_type  = typename Matrix1::index_type;
+
+  index_type nrows = 3, ncols = 3, nnnz = 4;
+
+  HostMatrix1 Ah(nrows, ncols, nnnz);
+  CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
+  build_coomatrix(Ah);
+
+  Matrix1 A(nrows, ncols, nnnz);
+  CHECK_COO_SIZES(A, nrows, ncols, nnnz);
+  Morpheus::copy(Ah, A);
+
+  HostMatrix2 Bh;
+  CHECK_COO_SIZES(Bh, 0, 0, 0);
+
+  Bh.allocate(Ah);
+  CHECK_COO_CONTAINERS(Ah, Bh);
+
+  // Change values in one container
+  Ah.row_indices(2)    = 2;
+  Ah.column_indices(1) = 1;
+  Ah.values(3)         = -3.33;
+
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Bh.row_indices(n), 0);
+    EXPECT_EQ(Bh.column_indices(n), 0);
+    EXPECT_EQ(Bh.values(n), 0);
+  }
+
+  // Now check device vector
+  Matrix2 B;
+  CHECK_COO_SIZES(B, 0, 0, 0);
+
+  Bh.row_indices(1)    = 1;
+  Bh.column_indices(2) = 2;
+  Bh.values(1)         = -1.11;
+
+  B.allocate(A);
+  CHECK_COO_CONTAINERS(A, B);
+  Morpheus::copy(B, Bh);
+
+  for (index_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Bh.row_indices(n), 0);
+    EXPECT_EQ(Bh.column_indices(n), 0);
+    EXPECT_EQ(Bh.values(n), 0);
+  }
+}
 
 // /**
 //  * @brief Test Suite using the Binary CooMatrix-DynamicMatrix Compatible

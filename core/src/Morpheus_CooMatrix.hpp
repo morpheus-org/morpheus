@@ -342,6 +342,14 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
     resize(src.nrows(), src.ncols(), src.nnnz());
   }
 
+  /**
+   * @brief Allocates memory from another CooMatrix container with
+   * different properties.
+   *
+   * @tparam VR Value Type of the container we are allocating from.
+   * @tparam PR Optional properties of the container we are allocating from.
+   * @param src The \p CooMatrix container we are allocating from.
+   */
   template <class VR, class... PR>
   inline CooMatrix &allocate(const CooMatrix<VR, PR...> &src) {
     resize(src.nrows(), src.ncols(), src.nnnz());

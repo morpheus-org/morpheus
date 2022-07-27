@@ -862,10 +862,8 @@ TYPED_TEST(CompatibleDenseVectorBinaryTest, ShallowCopyAssignment) {
 TYPED_TEST_CASE(DenseVectorBinaryTest, DenseVectorBinary);
 
 /**
- * @brief Testing allocation of DenseVector container from another
- DenseVector
- * container with the different parameters. New allocation shouldn't alias
- the
+ * @brief Testing allocation of DenseVector container from another DenseVector
+ * container with the different parameters. New allocation shouldn't alias the
  * original.
  *
  */
