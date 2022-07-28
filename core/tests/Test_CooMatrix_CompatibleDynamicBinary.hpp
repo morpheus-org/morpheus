@@ -71,13 +71,13 @@ using CooMatrixDynamicCompatibleBinary =
  * data.
  *
  */
-#define VALIDATE_COO_CONTAINER(A, Aref, nnnz, type)            \
-  {                                                            \
-    for (type n = 0; n < nnnz; n++) {                          \
-      EXPECT_EQ(Ah.row_indices(n), Aref.row_indices(n));       \
-      EXPECT_EQ(Ah.column_indices(n), Aref.column_indices(n)); \
-      EXPECT_EQ(Ah.values(n), Aref.values(n));                 \
-    }                                                          \
+#define VALIDATE_COO_CONTAINER(A, Aref, nnnz, type)           \
+  {                                                           \
+    for (type n = 0; n < nnnz; n++) {                         \
+      EXPECT_EQ(A.row_indices(n), Aref.row_indices(n));       \
+      EXPECT_EQ(A.column_indices(n), Aref.column_indices(n)); \
+      EXPECT_EQ(A.values(n), Aref.values(n));                 \
+    }                                                         \
   }
 
 /**
