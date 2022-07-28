@@ -35,7 +35,6 @@ namespace Morpheus {
 
 /**
  * \addtogroup containers_2d 2D Containers
- * \brief Two-dimensional Containers
  * \ingroup containers
  * \{
  *

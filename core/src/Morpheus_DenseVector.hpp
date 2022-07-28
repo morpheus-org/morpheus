@@ -212,7 +212,7 @@ class DenseVector
       : _size(src.size()), _values(src.const_view()) {}
 
   /**
-   * @brief Shallow Copy Assignemnt from another DenseVector container with
+   * @brief Shallow Copy Assignment from another DenseVector container with
    * different properties. Note that this is only possible when the \p
    * is_compatible check is satisfied.
    *

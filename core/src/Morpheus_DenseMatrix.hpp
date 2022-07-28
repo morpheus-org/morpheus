@@ -34,19 +34,62 @@
 
 namespace Morpheus {
 
+/**
+ * \addtogroup containers_2d 2D Containers
+ * \ingroup containers
+ * \{
+ *
+ */
+
+/**
+ * @brief The DenseMatrix container is a two-dimensional dense container that
+ * contains contiguous elements. It is a polymorphic container in the sense that
+ * it can store scalar or integer type values, on host or device depending how
+ * the template parameters are selected.
+ *
+ * @tparam ValueType type of values to store
+ * @tparam Properties optional properties to modify the behaviour of the
+ * container. Sensible defaults are selected based on the configuration. Please
+ * refer to \ref impl/Morpheus_ContainerTraits.hpp to find out more about the
+ * valid properties.
+ *
+ * \par Overview
+ * TODO
+ *
+ * \par Example
+ * \code
+ * #include <Morpheus_Core.hpp>
+ *
+ * int main(){
+ *  // Construct a vector on host, of size 10 and with values set to 5.0
+ *  Morpheus::DenseMatrix<double, Kokkos::HostSpace> A(10, 10, 5.0);
+ *
+ *  // Set some values
+ *  A(2,4) = 5.0;
+ *  A(5,4) = -2.0;
+ * }
+ * \endcode
+ */
 template <class ValueType, class... Properties>
 class DenseMatrix
     : public Impl::MatrixBase<DenseMatrix, ValueType, Properties...> {
  public:
+  /*! The traits associated with the particular container */
   using traits = Impl::ContainerTraits<DenseMatrix, ValueType, Properties...>;
-  using type   = typename traits::type;
-  using base   = Impl::MatrixBase<DenseMatrix, ValueType, Properties...>;
-  using tag    = typename MatrixFormatTag<Morpheus::DenseMatrixFormatTag>::tag;
+  /*! The complete type of the container */
+  using type = typename traits::type;
+  using base = Impl::MatrixBase<DenseMatrix, ValueType, Properties...>;
+  /*! The tag associated specificaly to the particular container*/
+  using tag = typename MatrixFormatTag<Morpheus::DenseMatrixFormatTag>::tag;
 
-  using value_type           = typename traits::value_type;
+  /*! The type of the values held by the container - can be const */
+  using value_type = typename traits::value_type;
+  /*! The non-constant type of the values held by the container */
   using non_const_value_type = typename traits::non_const_value_type;
   using size_type            = typename traits::index_type;
-  using index_type           = typename traits::index_type;
+  /*! The type of the indices held by the container - can be const */
+  using index_type = typename traits::index_type;
+  /*! The non-constant type of the indices held by the container */
   using non_const_index_type = typename traits::non_const_index_type;
 
   using array_layout    = typename traits::array_layout;
@@ -61,21 +104,50 @@ class DenseMatrix
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
+  /*! The type of view that holds the value_type data */
   using value_array_type =
       Kokkos::View<value_type **, array_layout, execution_space, memory_traits>;
   using value_array_pointer   = typename value_array_type::pointer_type;
   using value_array_reference = typename value_array_type::reference_type;
 
-  ~DenseMatrix()                   = default;
+  /**
+   * @brief Default destructor.
+   */
+  ~DenseMatrix() = default;
+  /**
+   * @brief Default copy contructor (shallow copy) of a DenseMatrix container
+   * from another DenseMatrix container with the same properties.
+   */
   DenseMatrix(const DenseMatrix &) = default;
-  DenseMatrix(DenseMatrix &&)      = default;
+  /**
+   * @brief Default move contructor (shallow copy) of a DenseMatrix container
+   * from another DenseMatrix container with the same properties.
+   */
+  DenseMatrix(DenseMatrix &&) = default;
+  /**
+   * @brief Default copy assignment (shallow copy) of a DenseMatrix container
+   * from another DenseMatrix container with the same properties.
+   */
   DenseMatrix &operator=(const DenseMatrix &) = default;
+  /**
+   * @brief Default move assignment (shallow copy) of a DenseMatrix container
+   * from another DenseMatrix container with the same properties.
+   */
   DenseMatrix &operator=(DenseMatrix &&) = default;
 
-  // Construct an empty DenseMatrix
+  /**
+   * @brief Construct an empty DenseVector object
+   */
   inline DenseMatrix() : base(), _values() {}
 
-  // Construct a DenseMatrix with a specific shape
+  /**
+   * @brief Construct a DenseMatrix object with shape (num_rows, num_cols) and
+   * values set to \p val
+   *
+   * @param num_rows Number of rows
+   * @param num_cols Number of columns
+   * @param val Value at which the elements of the DenseMatrix will be set to
+   */
   inline DenseMatrix(const index_type num_rows, const index_type num_cols,
                      const value_type val = 0)
       : base(num_rows, num_cols, num_rows * num_cols),
@@ -83,11 +155,21 @@ class DenseMatrix
     assign(num_rows, num_cols, val);
   }
 
+  /**
+   * @brief Construct a DenseMatrix object from a raw pointer. This is only
+   * enabled if the DenseMatrix is an unmanaged container.
+   *
+   * @tparam ValuePtr Pointer type
+   * @param num_rows Number of rows
+   * @param num_cols Number of columns
+   * @param ptr Pointer value
+   */
   template <typename ValuePtr>
   explicit DenseMatrix(
       const index_type num_rows, const index_type num_cols, ValuePtr ptr,
-      typename std::enable_if<std::is_pointer<ValuePtr>::value>::type * =
-          nullptr)
+      typename std::enable_if<std::is_pointer<ValuePtr>::value &&
+                              is_same_value_type<value_type, ValuePtr>::value &&
+                              memory_traits::is_unmanaged>::type * = nullptr)
       : base(num_rows, num_cols, num_rows * num_cols),
         _values(ptr, size_t(num_rows), size_t(num_cols)) {
     static_assert(std::is_same<value_array_pointer, ValuePtr>::value,
@@ -95,21 +177,35 @@ class DenseMatrix
                   "matching pointer type");
   }
 
-  // Construct from another dense matrix type (Shallow)
+  /**
+   * @brief Shallow Copy contrustor from another DenseMatrix container with
+   * different properties. Note that this is only possible when the \p
+   * is_compatible check is satisfied.
+   *
+   * @tparam VR Value Type of the container we are constructing from.
+   * @tparam PR Optional properties of the container we are constructing from.
+   * @param src The \p DenseMatrix container we are constructing from.
+   */
   template <class VR, class... PR>
   inline DenseMatrix(
       const DenseMatrix<VR, PR...> &src,
       typename std::enable_if<is_format_compatible<
-          DenseMatrix, typename DenseMatrix<VR, PR...>::type>::value>::type * =
-          nullptr)
+          DenseMatrix, DenseMatrix<VR, PR...>>::value>::type * = nullptr)
       : base(src.nrows(), src.ncols(), src.nrows() * src.ncols()),
         _values(src.const_view()) {}
 
-  // Assignment from another dense matrix type (Shallow)
+  /**
+   * @brief Shallow Copy Assignment from another DenseMatrix container with
+   * different properties. Note that this is only possible when the \p
+   * is_compatible check is satisfied.
+   *
+   * @tparam VR Value Type of the container we are copying from.
+   * @tparam PR Optional properties of the container we are copying from.
+   * @param src The \p DenseMatrix container we are copying from.
+   */
   template <class VR, class... PR>
   typename std::enable_if<
-      is_format_compatible<DenseMatrix,
-                           typename DenseMatrix<VR, PR...>::type>::value,
+      is_format_compatible<DenseMatrix, DenseMatrix<VR, PR...>>::value,
       DenseMatrix &>::type
   operator=(const DenseMatrix<VR, PR...> &src) {
     this->set_nrows(src.nrows());
@@ -119,18 +215,39 @@ class DenseMatrix
     return *this;
   }
 
-  // Construct from another matrix type
+  /**
+   * @brief Construct a DenserMatrix object from another storage format. This
+   * functionality is disabled to avoid implicit copies and conversion
+   * operations.
+   *
+   * @tparam MatrixType Any of the supported storage formats.
+   * @param src The source container.
+   */
   template <class MatrixType>
   DenseMatrix(const MatrixType &src) = delete;
 
-  // Assignment from another matrix type
+  /**
+   * @brief Assign to DenseMatrix object from another storage format. This
+   * functionality is disabled to avoid implicit copies and conversion
+   * operations.
+   *
+   * @tparam MatrixType Any of the supported storage formats.
+   * @param src The source container.
+   */
   template <class MatrixType>
   reference operator=(const MatrixType &src) = delete;
 
+  /**
+   * @brief Assigns (num_rows * num_cols) elements of value \p val to the
+   * DenseMatrix.
+   *
+   * @param num_rows Number of rows
+   * @param num_cols Number of columns
+   * @param val Value to assign
+   */
   inline void assign(index_type num_rows, index_type num_cols,
                      const value_type val) {
     using range_policy = Kokkos::RangePolicy<index_type, execution_space>;
-    /* Resize if necessary */
     this->resize(num_rows, num_cols);
 
     range_policy policy(0, num_rows);
@@ -139,31 +256,72 @@ class DenseMatrix
     Kokkos::parallel_for("Morpheus::DenseMatrix::assign", policy, f);
   }
 
-  // Modifiers
+  /**
+   * @brief Resizes DenseMatrix with shape (num_rows * num_cols). Overlapping
+   * subextents will preserve their contents.
+   *
+   * @param num_rows Number of new rows
+   * @param num_cols Number of new columns
+   */
   inline void resize(index_type num_rows, index_type num_cols) {
     base::resize(num_rows, num_cols, num_rows * num_cols);
     Kokkos::resize(_values, size_t(num_rows), size_t(num_cols));
   }
 
+  /**
+   * @brief Allocates memory from another DenseMatrix container with
+   * different properties.
+   *
+   * @tparam VR Value Type of the container we are allocating from.
+   * @tparam PR Optional properties of the container we are allocating from.
+   * @param src The \p DenseMatrix container we are allocating from.
+   */
   template <class VR, class... PR>
-  inline DenseMatrix &allocate(const std::string name,
-                               const DenseMatrix<VR, PR...> &src) {
+  inline DenseMatrix &allocate(const DenseMatrix<VR, PR...> &src) {
     resize(src.nrows(), src.ncols());
     return *this;
   }
 
-  // Element access
-  inline value_array_reference operator()(index_type i, index_type j) const {
+  /**
+   * @brief Returns a reference to the element with index (i,j)
+   *
+   * @param i First index of the value to extract
+   * @param j Second index of the value to extract
+   * @return Element at index (i,j)
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_reference
+  operator()(index_type i, index_type j) const {
     return _values(i, j);
   }
 
+  /**
+   * @brief Returns a pointer to the data at the beginning of the container
+   *
+   * @return Pointer type of the value_type data
+   */
   inline value_array_pointer data() const { return _values.data(); }
+
+  /**
+   * @brief Returns a reference to the beginning of the view that holds the data
+   *
+   * @return Type of view that holds the data
+   */
   inline value_array_type &view() { return _values; }
+
+  /**
+   * @brief Returns a constant reference to the beginning of the view that holds
+   * the data
+   *
+   * @return Constant type of view that holds the data
+   */
   inline const value_array_type &const_view() const { return _values; }
 
  private:
   value_array_type _values;
 };
+
+/*! \}  // end of containers_2d group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_DENSEMATRIX_HPP
