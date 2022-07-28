@@ -425,7 +425,6 @@ TYPED_TEST(DenseMatrixUnaryTest, Assign) {
 TYPED_TEST(DenseMatrixUnaryTest, Resize) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using value_type = typename Matrix::value_type;
   using index_type = typename Matrix::index_type;
 
   index_type nrows = 1000, ncols = 1500;

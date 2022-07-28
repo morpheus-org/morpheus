@@ -52,7 +52,7 @@ class DenseVectorBinaryTest : public ::testing::Test {
 
 namespace Test {
 /**
- * @brief Test Suite using the Compatible Binary DenseVectors
+ * @brief Test Suite using the Binary DenseVectors
  *
  */
 TYPED_TEST_CASE(DenseVectorBinaryTest, DenseVectorBinary);
