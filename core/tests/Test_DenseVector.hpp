@@ -339,7 +339,7 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
 
 /**
  * @brief Testing construction of DenseVector container with size `n` and values
- * set at 0 by default
+ * set to val
  *
  */
 TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {

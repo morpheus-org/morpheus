@@ -239,7 +239,7 @@ class DenseMatrix
 
   /**
    * @brief Assigns (num_rows * num_cols) elements of value \p val to the
-   * DenseMatrix.
+   * DenseMatrix. The container will always resize to match the new shape.
    *
    * @param num_rows Number of rows
    * @param num_cols Number of columns
@@ -248,6 +248,7 @@ class DenseMatrix
   inline void assign(index_type num_rows, index_type num_cols,
                      const value_type val) {
     using range_policy = Kokkos::RangePolicy<index_type, execution_space>;
+
     this->resize(num_rows, num_cols);
 
     range_policy policy(0, num_rows);
