@@ -24,6 +24,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       CooMatrix_Binary
       CooMatrix_CompatibleBinary
       CooMatrix_CompatibleDynamicBinary
+      CsrMatrix
       # Dot
       TypeTraits
       Metaprogramming
