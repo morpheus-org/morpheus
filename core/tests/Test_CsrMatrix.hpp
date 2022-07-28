@@ -71,23 +71,13 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultConstruction) {
   using HostMatrix = typename TestFixture::host;
 
   Matrix A;
-  EXPECT_EQ(A.nrows(), 0);
-  EXPECT_EQ(A.ncols(), 0);
-  EXPECT_EQ(A.nnnz(), 0);
-  EXPECT_EQ(A.row_offsets().size(), 0);
-  EXPECT_EQ(A.column_indices().size(), 0);
-  EXPECT_EQ(A.values().size(), 0);
+  CHECK_CSR_EMPTY(A);
   EXPECT_EQ(A.row_offsets().data(), nullptr);
   EXPECT_EQ(A.column_indices().data(), nullptr);
   EXPECT_EQ(A.values().data(), nullptr);
 
   HostMatrix Ah;
-  EXPECT_EQ(Ah.nrows(), 0);
-  EXPECT_EQ(Ah.ncols(), 0);
-  EXPECT_EQ(Ah.nnnz(), 0);
-  EXPECT_EQ(Ah.row_offsets().size(), 0);
-  EXPECT_EQ(Ah.column_indices().size(), 0);
-  EXPECT_EQ(Ah.values().size(), 0);
+  CHECK_CSR_EMPTY(Ah);
   EXPECT_EQ(Ah.row_offsets().data(), nullptr);
   EXPECT_EQ(Ah.column_indices().data(), nullptr);
   EXPECT_EQ(Ah.values().data(), nullptr);

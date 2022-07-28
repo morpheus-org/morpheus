@@ -106,6 +106,20 @@ void build_coomatrix(Matrix& A) {
   }
 
 /**
+ * @brief Checks the sizes of an empty CsrMatrix container
+ *
+ */
+#define CHECK_CSR_EMPTY(A)                   \
+  {                                          \
+    EXPECT_EQ(A.nrows(), 0);                 \
+    EXPECT_EQ(A.ncols(), 0);                 \
+    EXPECT_EQ(A.nnnz(), 0);                  \
+    EXPECT_EQ(A.row_offsets().size(), 0);    \
+    EXPECT_EQ(A.column_indices().size(), 0); \
+    EXPECT_EQ(A.values().size(), 0);         \
+  }
+
+/**
  * @brief Checks the sizes of two CsrMatrix containers if they match
  *
  */

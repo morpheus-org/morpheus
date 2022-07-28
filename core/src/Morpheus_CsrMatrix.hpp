@@ -82,8 +82,8 @@ namespace Morpheus {
  *  j[2] = 2; v[2] = 3;
  *  j[3] = 1; v[3] = 4;
  *
- *  // Construct the matrix from i,j,v
- *  Matrix A(3, 3, 4, i, j, v);
+ *  // Construct the matrix from off,j,v
+ *  Matrix A(3, 3, 4, off, j, v);
  *
  *  Morpheus::print(A); // prints A
  * }
