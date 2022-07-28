@@ -82,7 +82,7 @@ namespace Morpheus {
  *  i[3] = 2; j[3] = 1; v[3] = 4;
  *
  *  // Construct the matrix from i,j,v
- *  Morpheus::CooMatrix<double, Kokkos::HostSpace> A(3, 3, 4, i, j, v);
+ *  Matrix A(3, 3, 4, i, j, v);
  *
  *  Morpheus::print(A); // prints A
  * }

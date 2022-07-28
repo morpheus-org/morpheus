@@ -45,12 +45,9 @@ void copy(const SourceType& src, DestinationType& dst,
                   "Destination matrix must have equal number of non-zeros to "
                   "the source matrix");
 
-  Morpheus::Impl::copy(src.crow_offsets(), dst.row_offsets(), DenseVectorTag(),
-                       DenseVectorTag());
-  Morpheus::Impl::copy(src.ccolumn_indices(), dst.column_indices(),
-                       DenseVectorTag(), DenseVectorTag());
-  Morpheus::Impl::copy(src.cvalues(), dst.values(), DenseVectorTag(),
-                       DenseVectorTag());
+  Morpheus::Impl::copy(src.crow_offsets(), dst.row_offsets());
+  Morpheus::Impl::copy(src.ccolumn_indices(), dst.column_indices());
+  Morpheus::Impl::copy(src.cvalues(), dst.values());
 }
 
 }  // namespace Impl
