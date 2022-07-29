@@ -37,12 +37,6 @@ void print_matrix_header(const Printable& p, Stream& s) {
     << " entries\n";
 }
 
-// Calculates padding to align the data based on the current length
-template <typename T>
-MORPHEUS_INLINE_FUNCTION const T get_pad_size(T len, T alignment) {
-  return alignment * ((len + alignment - 1) / alignment);
-}
-
 template <typename Size1, typename Size2>
 MORPHEUS_INLINE_FUNCTION Size1 DIVIDE_INTO(Size1 N, Size2 granularity) {
   return (N + (granularity - 1)) / granularity;
