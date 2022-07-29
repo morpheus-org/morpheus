@@ -31,6 +31,10 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       CsrMatrix_CompatibleBinary
       CsrMatrix_CompatibleDynamicBinary
       DiaMatrix
+      DiaMatrix_Binary
+      DiaMatrix_CompatibleBinary
+      DiaMatrix_CompatibleDynamicBinary
+      # Dot
       TypeTraits
       Metaprogramming
       ContainerFactory

@@ -518,8 +518,10 @@ TYPED_TEST(DiaMatrixUnaryTest, ResizeDefault) {
   for (index_type n = this->ndiag; n < Ah.ndiags(); n++) {
     EXPECT_EQ(Ah.diagonal_offsets(n), 0);
   }
-  for (index_type i = this->nrows; i < Ah.values().nrows(); i++) {
-    for (index_type j = this->ncols; j < Ah.values().ncols(); j++) {
+  for (index_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
+       i++) {
+    for (index_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
+         j++) {
       EXPECT_EQ(Ah.values(i, j), 0);
     }
   }
@@ -539,8 +541,10 @@ TYPED_TEST(DiaMatrixUnaryTest, ResizeDefault) {
   for (index_type n = this->ndiag; n < Ah.ndiags(); n++) {
     EXPECT_EQ(Ah.diagonal_offsets(n), 0);
   }
-  for (index_type i = this->nrows; i < Ah.values().nrows(); i++) {
-    for (index_type j = this->ncols; j < Ah.values().ncols(); j++) {
+  for (index_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
+       i++) {
+    for (index_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
+         j++) {
       EXPECT_EQ(Ah.values(i, j), 0);
     }
   }
