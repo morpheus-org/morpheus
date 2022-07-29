@@ -227,6 +227,10 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
       typename std::enable_if<
           is_dense_vector_format_container<ValueArray>::value &&
           is_dense_vector_format_container<IndexArray>::value &&
+          is_compatible<typename CsrMatrix::value_array_type,
+                        ValueArray>::value &&
+          is_compatible<typename CsrMatrix::index_array_type,
+                        IndexArray>::value &&
           !ValueArray::memory_traits::is_unmanaged &&
           !IndexArray::memory_traits::is_unmanaged>::type * = nullptr)
       : base(num_rows, num_cols, num_entries),
@@ -342,7 +346,7 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   CsrMatrix(const MatrixType &src) = delete;
 
   /**
-   * @brief Assign to CsrMatrix object from another storage format. This
+   * @brief Assigns to CsrMatrix object from another storage format. This
    * functionality is disabled to avoid implicit copies and conversion
    * operations.
    *

@@ -223,6 +223,10 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
       typename std::enable_if<
           is_dense_vector_format_container<ValueArray>::value &&
           is_dense_vector_format_container<IndexArray>::value &&
+          is_compatible<typename CooMatrix::value_array_type,
+                        ValueArray>::value &&
+          is_compatible<typename CooMatrix::index_array_type,
+                        IndexArray>::value &&
           !ValueArray::memory_traits::is_unmanaged &&
           !IndexArray::memory_traits::is_unmanaged>::type * = nullptr)
       : base(num_rows, num_cols, num_entries),
