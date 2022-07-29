@@ -155,7 +155,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, CopyAssignmentFromCsrMatrix) {
 }
 
 /**
- * @brief Testing construction of CooMatrix from \p DenseVector arrays.
+ * @brief Testing construction of CsrMatrix from \p DenseVector arrays.
  *
  */
 TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromDenseVector) {

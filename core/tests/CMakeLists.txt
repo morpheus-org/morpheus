@@ -20,8 +20,8 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       DenseVector_Binary
       DenseVector_CompatibleBinary
       DenseMatrix
-      DenseVector_Binary
-      DenseVector_CompatibleBinary
+      DenseMatrix_Binary
+      DenseMatrix_CompatibleBinary
       CooMatrix
       CooMatrix_Binary
       CooMatrix_CompatibleBinary

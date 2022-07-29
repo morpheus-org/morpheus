@@ -30,7 +30,7 @@
 using DenseMatrixCompatibleTypes = typename Morpheus::generate_unary_typelist<
     Morpheus::DenseMatrix<double>, types::compatible_types_set>::type;
 
-using Compatible DenseMatrixBinary =
+using CompatibleDenseMatrixBinary =
     to_gtest_types<typename Morpheus::generate_binary_typelist<
         DenseMatrixCompatibleTypes, DenseMatrixCompatibleTypes>::type>::type;
 
@@ -76,7 +76,7 @@ TYPED_TEST(CompatibleDenseMatrixBinaryTest, ShallowCopyConstructor) {
   EXPECT_EQ(A.ncols(), N1);
   EXPECT_EQ(A.nnnz(), N0 * N1);
 
-  HostMatrix1 Ah(A.nrows(), A.cols(), (value_type)0);
+  HostMatrix1 Ah(A.nrows(), A.ncols(), (value_type)0);
   Morpheus::copy(A, Ah);
 
   HostMatrix2 Bh(Ah);
@@ -130,7 +130,7 @@ TYPED_TEST(CompatibleDenseMatrixBinaryTest, ShallowCopyAssignment) {
   EXPECT_EQ(A.ncols(), N1);
   EXPECT_EQ(A.nnnz(), N0 * N1);
 
-  HostMatrix1 Ah(A.nrows(), A.cols(), (value_type)0);
+  HostMatrix1 Ah(A.nrows(), A.ncols(), (value_type)0);
   Morpheus::copy(A, Ah);
 
   HostMatrix2 Bh = Ah;

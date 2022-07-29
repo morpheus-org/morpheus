@@ -225,8 +225,8 @@ TYPED_TEST(CsrMatrixUnaryTest, ConstReference) {
 }
 
 /**
- * @brief Testing default copy assignment of CooMatrix container from another
- * CooMatrix container with the same parameters. Resulting container should be
+ * @brief Testing default copy assignment of CsrMatrix container from another
+ * CsrMatrix container with the same parameters. Resulting container should be
  * a shallow copy of the original.
  *
  */
@@ -271,8 +271,8 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultCopyAssignment) {
 }
 
 /**
- * @brief Testing default copy constructor of CooMatrix container from another
- * CooMatrix container with the same parameters. Resulting container should be
+ * @brief Testing default copy constructor of CsrMatrix container from another
+ * CsrMatrix container with the same parameters. Resulting container should be
  * a shallow copy of the original.
  *
  */
@@ -317,8 +317,8 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultCopyConstructor) {
 }
 
 /**
- * @brief Testing default move assignment of CooMatrix container from another
- * CooMatrix container with the same parameters. Resulting container should be
+ * @brief Testing default move assignment of CsrMatrix container from another
+ * CsrMatrix container with the same parameters. Resulting container should be
  * a shallow copy of the original.
  *
  */
@@ -363,8 +363,8 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultMoveAssignment) {
 }
 
 /**
- * @brief Testing default move construction of CooMatrix container from
- * another CooMatrix container with the same parameters. Resulting container
+ * @brief Testing default move construction of CsrMatrix container from
+ * another CsrMatrix container with the same parameters. Resulting container
  * should be a shallow copy of the original.
  *
  */
@@ -441,7 +441,7 @@ TYPED_TEST(CsrMatrixUnaryTest, ConstructionFromShape) {
 }
 
 // /**
-//  * @brief Testing construction of CooMatrix from a raw pointers
+//  * @brief Testing construction of CsrMatrix from a raw pointers
 //  *
 //  */
 // TYPED_TEST(CsrMatrixUnaryTest, ConstructionFromPointers) { EXPECT_EQ(1, 0); }

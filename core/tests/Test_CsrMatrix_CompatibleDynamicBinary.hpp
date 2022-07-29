@@ -38,7 +38,7 @@ using CsrMatrixDynamicCompatibleBinary =
     to_gtest_types<typename Morpheus::generate_binary_typelist<
         CsrMatrixCompatibleTypes, DynamicMatrixCompatibleTypes>::type>::type;
 
-// Used for testing compatible binary operations between Dynamic and CooMatrix
+// Used for testing compatible binary operations between Dynamic and CsrMatrix
 // containers
 template <typename BinaryContainer>
 class CompatibleCsrMatrixDynamicTest : public ::testing::Test {
@@ -91,11 +91,11 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   using index_type        = typename Matrix::index_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
-  // Build matrix from the reference CooMatrix
+  // Build matrix from the reference CsrMatrix
   DynamicMatrix A(this->Aref);
   DynamicHostMatrix Ah(this->Ahref);
 
-  // Active type is CooMatrix
+  // Active type is CsrMatrix
   EXPECT_EQ(A.active_index(), this->Aref.format_index());
 
   // Copy construction from dynamic
@@ -178,11 +178,11 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   using index_type        = typename Matrix::index_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
-  // Build matrix from the reference CooMatrix
+  // Build matrix from the reference CsrMatrix
   DynamicMatrix A(this->Aref);
   DynamicHostMatrix Ah(this->Ahref);
 
-  // Active type is CooMatrix
+  // Active type is CsrMatrix
   EXPECT_EQ(A.active_index(), this->Aref.format_index());
 
   // Copy assignemnt from dynamic
