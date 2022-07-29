@@ -492,7 +492,7 @@ TYPED_TEST(DiaMatrixUnaryTest, ConstructionFromShape) {
 //  */
 // TYPED_TEST(DiaMatrixUnaryTest, ConstructionFromPointers) { EXPECT_EQ(1, 0); }
 
-TYPED_TEST(DiaMatrixUnaryTest, Resize) {
+TYPED_TEST(DiaMatrixUnaryTest, ResizeDefault) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
@@ -559,6 +559,68 @@ TYPED_TEST(DiaMatrixUnaryTest, Resize) {
   Morpheus::copy(Ah, A);
 
   VALIDATE_DIA_CONTAINER(Ah, Ahref_test, index_type);
+}
+
+TYPED_TEST(DiaMatrixUnaryTest, Resize) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using index_type = typename Matrix::index_type;
+
+  index_type _nalign = 127;
+  HostMatrix Ah;
+  CHECK_DIA_EMPTY(Ah);
+  Ah.resize(this->nrows, this->ncols, this->nnnz, this->ndiag, _nalign);
+  CHECK_DIA_SIZES(Ah, this->nrows, this->ncols, this->nnnz, this->ndiag,
+                  _nalign);
+
+  Matrix A;
+  CHECK_DIA_EMPTY(A);
+  A.resize(this->nrows, this->ncols, this->nnnz, this->ndiag, _nalign);
+  CHECK_DIA_SIZES(A, this->nrows, this->ncols, this->nnnz, this->ndiag,
+                  _nalign);
+
+  index_type large_nrows = 500, large_ncols = 500, large_nnnz = 640,
+             large_ndiag = 110, _nalign1 = 512;
+
+  HostMatrix Ah1(large_nrows, large_ncols, large_nnnz, large_ndiag, _nalign1);
+  CHECK_DIA_SIZES(Ah1, large_nrows, large_ncols, large_nnnz, large_ndiag,
+                  _nalign1);
+
+  Matrix A1(large_nrows, large_ncols, large_nnnz, large_ndiag, _nalign1);
+  CHECK_DIA_SIZES(A1, large_nrows, large_ncols, large_nnnz, large_ndiag,
+                  _nalign1);
+
+  index_type small_nrows = 2, small_ncols = 2, small_nnnz = 2, small_ndiag = 2,
+             _nalign2 = 333;
+
+  HostMatrix Ah2(small_nrows, small_ncols, small_nnnz, small_ndiag, _nalign2);
+  CHECK_DIA_SIZES(Ah2, small_nrows, small_ncols, small_nnnz, small_ndiag,
+                  _nalign2);
+
+  Matrix A2(small_nrows, small_ncols, small_nnnz, small_ndiag, _nalign2);
+  CHECK_DIA_SIZES(A2, small_nrows, small_ncols, small_nnnz, small_ndiag,
+                  _nalign2)
+}
+
+TYPED_TEST(DiaMatrixUnaryTest, ResizeTolerance) {
+  using Matrix = typename TestFixture::device;
+
+  Matrix A;
+  CHECK_DIA_EMPTY(A);
+
+  // Size above 100M entries
+  A.resize(10e6, this->ncols, 60e6, 15);
+  CHECK_DIA_SIZES(A, 1e9, this->ncols, 60e6, 15, this->nalign);
+
+  // Fill ratio above 10
+  A.resize(10, 10, 0, 5);
+  CHECK_DIA_SIZES(A, 10, 10, 0, 5, this->nalign);
+  A.resize(100, 100, 10, 50);
+  CHECK_DIA_SIZES(A, 100, 100, 10, 50, this->nalign);
+
+  // Both Size and Fill ratio above 100M and 10 respectively
+  EXPECT_THROW(A.resize(10e6, this->ncols, 1000, 15),
+               Morpheus::FormatConversionException);
 }
 
 }  // namespace Test

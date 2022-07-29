@@ -39,21 +39,21 @@ MORPHEUS_INLINE_FUNCTION const T get_pad_size(T len, T alignment) {
  * @brief Checks if the current matrix exceeds a tolerance level reflecting
  * the performance of the DIA format.
  *
- * @param num_rows Number of
- * @param num_entries
- * @param num_diagonals
+ * @param num_rows Number of rows
+ * @param num_entries Number of non-zeros
+ * @param num_diagonals Number of diagonals
  * @return bool
  */
 template <typename T>
 bool exceeds_tolerance(const T num_rows, const T num_entries,
                        const T num_diagonals) {
   const float max_fill   = 10.0;
-  const float threshold  = 10e9;  // 100M entries
+  const float threshold  = 100e6;  // 10M entries
   const float size       = float(num_diagonals) * float(num_rows);
   const float fill_ratio = size / std::max(1.0f, float(num_entries));
 
   bool res = false;
-  if (max_fill < fill_ratio && size > threshold) {
+  if (fill_ratio > max_fill && size > threshold) {
     res = true;
   }
 
