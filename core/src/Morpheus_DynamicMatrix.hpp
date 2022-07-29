@@ -28,7 +28,7 @@
 
 #include <impl/Morpheus_Variant.hpp>
 #include <impl/Morpheus_MatrixBase.hpp>
-#include <impl/Morpheus_DynamicMatrix_Impl.hpp>
+#include <impl/Dynamic/Morpheus_DynamicMatrix_Impl.hpp>
 
 #include <iostream>
 #include <string>
