@@ -138,26 +138,26 @@ class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
       typename value_array_type::value_array_reference;
 
   /**
-   * @brief Default destructor.
+   * @brief The default destructor.
    */
   ~CooMatrix() = default;
   /**
-   * @brief Default copy contructor (shallow copy) of a CooMatrix container
+   * @brief The default copy contructor (shallow copy) of a CooMatrix container
    * from another CooMatrix container with the same properties.
    */
   CooMatrix(const CooMatrix &) = default;
   /**
-   * @brief Default move contructor (shallow copy) of a CooMatrix container
+   * @brief The default move contructor (shallow copy) of a CooMatrix container
    * from another CooMatrix container with the same properties.
    */
   CooMatrix(CooMatrix &&) = default;
   /**
-   * @brief Default copy assignment (shallow copy) of a CooMatrix container
+   * @brief The default copy assignment (shallow copy) of a CooMatrix container
    * from another CooMatrix container with the same properties.
    */
   CooMatrix &operator=(const CooMatrix &) = default;
   /**
-   * @brief Default move assignment (shallow copy) of a CooMatrix container
+   * @brief The default move assignment (shallow copy) of a CooMatrix container
    * from another CooMatrix container with the same properties.
    */
   CooMatrix &operator=(CooMatrix &&) = default;

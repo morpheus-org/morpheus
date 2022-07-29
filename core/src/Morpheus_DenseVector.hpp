@@ -117,27 +117,27 @@ class DenseVector
   using value_array_reference = typename value_array_type::reference_type;
 
   /**
-   * @brief Default destructor.
+   * @brief The default destructor.
    */
   ~DenseVector() = default;
   /**
-   * @brief Default copy contructor (shallow copy) of a DenseVector container
-   * from another DenseVector container with the same properties.
+   * @brief The default copy contructor (shallow copy) of a DenseVector
+   * container from another DenseVector container with the same properties.
    */
   DenseVector(const DenseVector&) = default;
   /**
-   * @brief Default move contructor (shallow copy) of a DenseVector container
-   * from another DenseVector container with the same properties.
+   * @brief The default move contructor (shallow copy) of a DenseVector
+   * container from another DenseVector container with the same properties.
    */
   DenseVector(DenseVector&&) = default;
   /**
-   * @brief Default copy assignment (shallow copy) of a DenseVector container
-   * from another DenseVector container with the same properties.
+   * @brief The default copy assignment (shallow copy) of a DenseVector
+   * container from another DenseVector container with the same properties.
    */
   DenseVector& operator=(const DenseVector&) = default;
   /**
-   * @brief Default move assignment (shallow copy) of a DenseVector container
-   * from another DenseVector container with the same properties.
+   * @brief The default move assignment (shallow copy) of a DenseVector
+   * container from another DenseVector container with the same properties.
    */
   DenseVector& operator=(DenseVector&&) = default;
 

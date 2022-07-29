@@ -571,6 +571,8 @@ class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
   static constexpr formats_e _id = Morpheus::DIA_FORMAT;
 };
 
+/*! \}  // end of containers_2d group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_DIAMATRIX_HPP

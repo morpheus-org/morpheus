@@ -142,26 +142,26 @@ class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
   using const_value_array_reference = const value_array_reference;
 
   /**
-   * @brief Default destructor.
+   * @brief The default destructor.
    */
   ~CsrMatrix() = default;
   /**
-   * @brief Default copy contructor (shallow copy) of a CsrMatrix container
+   * @brief The default copy contructor (shallow copy) of a CsrMatrix container
    * from another CsrMatrix container with the same properties.
    */
   CsrMatrix(const CsrMatrix &) = default;
   /**
-   * @brief Default move contructor (shallow copy) of a CsrMatrix container
+   * @brief The default move contructor (shallow copy) of a CsrMatrix container
    * from another CsrMatrix container with the same properties.
    */
   CsrMatrix(CsrMatrix &&) = default;
   /**
-   * @brief Default copy assignment (shallow copy) of a CsrMatrix container
+   * @brief The default copy assignment (shallow copy) of a CsrMatrix container
    * from another CsrMatrix container with the same properties.
    */
   CsrMatrix &operator=(const CsrMatrix &) = default;
   /**
-   * @brief Default move assignment (shallow copy) of a CsrMatrix container
+   * @brief The default move assignment (shallow copy) of a CsrMatrix container
    * from another CsrMatrix container with the same properties.
    */
   CsrMatrix &operator=(CsrMatrix &&) = default;

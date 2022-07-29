@@ -115,23 +115,23 @@ class DenseMatrix
    */
   ~DenseMatrix() = default;
   /**
-   * @brief Default copy contructor (shallow copy) of a DenseMatrix container
-   * from another DenseMatrix container with the same properties.
+   * @brief The default copy contructor (shallow copy) of a DenseMatrix
+   * container from another DenseMatrix container with the same properties.
    */
   DenseMatrix(const DenseMatrix &) = default;
   /**
-   * @brief Default move contructor (shallow copy) of a DenseMatrix container
-   * from another DenseMatrix container with the same properties.
+   * @brief The default move contructor (shallow copy) of a DenseMatrix
+   * container from another DenseMatrix container with the same properties.
    */
   DenseMatrix(DenseMatrix &&) = default;
   /**
-   * @brief Default copy assignment (shallow copy) of a DenseMatrix container
-   * from another DenseMatrix container with the same properties.
+   * @brief The default copy assignment (shallow copy) of a DenseMatrix
+   * container from another DenseMatrix container with the same properties.
    */
   DenseMatrix &operator=(const DenseMatrix &) = default;
   /**
-   * @brief Default move assignment (shallow copy) of a DenseMatrix container
-   * from another DenseMatrix container with the same properties.
+   * @brief The default move assignment (shallow copy) of a DenseMatrix
+   * container from another DenseMatrix container with the same properties.
    */
   DenseMatrix &operator=(DenseMatrix &&) = default;
 

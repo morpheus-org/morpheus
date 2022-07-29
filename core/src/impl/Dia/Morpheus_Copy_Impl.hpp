@@ -50,10 +50,8 @@ void copy(const SourceType& src, DestinationType& dst,
       "Destination matrix must have equal number of diagonals to the source "
       "matrix");
 
-  Morpheus::Impl::copy(src.cdiagonal_offsets(), dst.diagonal_offsets(),
-                       DenseVectorTag(), DenseVectorTag());
-  Morpheus::Impl::copy(src.cvalues(), dst.values(), DenseMatrixTag(),
-                       DenseMatrixTag());
+  Morpheus::Impl::copy(src.cdiagonal_offsets(), dst.diagonal_offsets());
+  Morpheus::Impl::copy(src.cvalues(), dst.values());
 }
 
 }  // namespace Impl

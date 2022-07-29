@@ -29,15 +29,19 @@
  * columns and non-zeros
  *
  */
-#define CHECK_DIA_SIZES(A, num_rows, num_cols, num_nnz, num_diag, alignment) \
-  {                                                                          \
-    EXPECT_EQ(A.nrows(), num_rows);                                          \
-    EXPECT_EQ(A.ncols(), num_cols);                                          \
-    EXPECT_EQ(A.nnnz(), num_nnz);                                            \
-    EXPECT_EQ(A.ndiags(), num_diag);                                         \
-    EXPECT_EQ(A.alignment(), alignment);                                     \
-    EXPECT_EQ(A.diagonal_offsets().size(), num_diag);                        \
-    EXPECT_EQ(A.values().size(), num_nnz);                                   \
+#define CHECK_DIA_SIZES(A, num_rows, num_cols, num_nnz, num_diag, align) \
+  {                                                                      \
+    EXPECT_EQ(A.nrows(), num_rows);                                      \
+    EXPECT_EQ(A.ncols(), num_cols);                                      \
+    EXPECT_EQ(A.nnnz(), num_nnz);                                        \
+    EXPECT_EQ(A.ndiags(), num_diag);                                     \
+    EXPECT_EQ(A.alignment(), align);                                     \
+    EXPECT_EQ(A.diagonal_offsets().size(), num_diag);                    \
+    EXPECT_EQ(A.diagonal_offsets().view().size(), num_diag);             \
+    EXPECT_EQ(A.values().nrows() * A.values().ncols(),                   \
+              num_diag * align * ((num_rows + align - 1) / align));      \
+    EXPECT_EQ(A.values().view().size(),                                  \
+              A.values().nrows() * A.values().ncols());                  \
   }
 
 /**
@@ -52,7 +56,10 @@
     EXPECT_EQ(A.ndiags(), 0);                  \
     EXPECT_EQ(A.alignment(), 0);               \
     EXPECT_EQ(A.diagonal_offsets().size(), 0); \
-    EXPECT_EQ(A.values().size(), 0);           \
+    EXPECT_EQ(A.values().nrows(), 0);          \
+    EXPECT_EQ(A.values().ncols(), 0);          \
+    EXPECT_EQ(A.values().nnnz(), 0);           \
+    EXPECT_EQ(A.values().view().size(), 0);    \
   }
 
 /**
@@ -67,7 +74,10 @@
     EXPECT_EQ(A.ndiags(), B.ndiags());                                   \
     EXPECT_EQ(A.alignment(), B.alignment());                             \
     EXPECT_EQ(A.diagonal_offsets().size(), B.diagonal_offsets().size()); \
-    EXPECT_EQ(A.values().size(), B.values().size());                     \
+    EXPECT_EQ(A.values().nrows(), B.values().nrows());                   \
+    EXPECT_EQ(A.values().ncols(), B.values().ncols());                   \
+    EXPECT_EQ(A.values().nnnz(), B.values().nnnz());                     \
+    EXPECT_EQ(A.values().view().size(), B.values().view().size());       \
   }
 
 /**
@@ -80,8 +90,8 @@
     for (type n = 0; n < A.ndiags(); n++) {                       \
       EXPECT_EQ(A.diagonal_offsets(n), Aref.diagonal_offsets(n)); \
     }                                                             \
-    for (type i = 0; i < A.values.nrows(); i++) {                 \
-      for (type j = 0; j < A.values.ncols(); j++) {               \
+    for (type i = 0; i < A.values().nrows(); i++) {               \
+      for (type j = 0; j < A.values().ncols(); j++) {             \
         EXPECT_EQ(A.values(i, j), Aref.values(i, j));             \
       }                                                           \
     }                                                             \
