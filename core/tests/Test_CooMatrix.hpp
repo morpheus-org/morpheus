@@ -434,40 +434,6 @@ TYPED_TEST(CooMatrixUnaryTest, ConstructionFromShape) {
 //  */
 // TYPED_TEST(CooMatrixUnaryTest, ConstructionFromPointers) { EXPECT_EQ(1, 0); }
 
-/**
- * @brief Testing construction of CooMatrix from \p DenseVector arrays.
- *
- */
-TYPED_TEST(CooMatrixUnaryTest, ConstructionFromDenseVector) {
-  using Matrix     = typename TestFixture::device;
-  using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
-
-  index_type nrows = 3, ncols = 3, nnnz = 4;
-  // Build matrix from the device vectors
-  Matrix A(nrows, ncols, nnnz, this->Aref.row_indices(),
-           this->Aref.column_indices(), this->Aref.values());
-  CHECK_COO_CONTAINERS(A, this->Aref);
-
-  HostMatrix Ah(nrows, ncols, nnnz);
-  CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
-
-  Morpheus::copy(A, Ah);
-  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz, index_type);
-
-  HostMatrix Ah_test(nrows, ncols, nnnz);
-  Morpheus::copy(A, Ah_test);
-
-  VALIDATE_COO_CONTAINER(Ah, Ah_test, nnnz, index_type);
-
-  Ah.row_indices(2) = 2;
-  EXPECT_NE(Ah.row_indices(2), Ah_test.row_indices(2));
-  Ah.column_indices(1) = 1;
-  EXPECT_NE(Ah.column_indices(1), Ah_test.column_indices(1));
-  Ah.values(0) = -1.11;
-  EXPECT_NE(Ah.values(0), Ah_test.values(0));
-}
-
 TYPED_TEST(CooMatrixUnaryTest, Resize) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
