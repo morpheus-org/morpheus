@@ -603,14 +603,16 @@ TYPED_TEST(DiaMatrixUnaryTest, Resize) {
 }
 
 TYPED_TEST(DiaMatrixUnaryTest, ResizeTolerance) {
-  using Matrix = typename TestFixture::device;
+  using Matrix     = typename TestFixture::device;
+  using index_type = typename Matrix::index_type;
 
   Matrix A;
   CHECK_DIA_EMPTY(A);
 
   // Size above 100M entries
   A.resize(10e6, this->ncols, 60e6, 15);
-  CHECK_DIA_SIZES(A, 1e9, this->ncols, 60e6, 15, this->nalign);
+  CHECK_DIA_SIZES(A, index_type(10e6), this->ncols, index_type(60e6), 15,
+                  this->nalign);
 
   // Fill ratio above 10
   A.resize(10, 10, 0, 5);
