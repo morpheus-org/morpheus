@@ -25,7 +25,7 @@
 #define TEST_CORE_TEST_DENSEVECTOR_COMPATIBLEBINARY_HPP
 
 #include <Morpheus_Core.hpp>
-#include <Utils.hpp>
+#include <utils/Utils.hpp>
 
 using DenseVectorCompatibleTypes = typename Morpheus::generate_unary_typelist<
     Morpheus::DenseVector<double>, types::compatible_types_set>::type;

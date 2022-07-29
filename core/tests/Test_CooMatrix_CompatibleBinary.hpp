@@ -25,8 +25,8 @@
 #define TEST_CORE_TEST_COOMATRIX_COMPATIBLEBINARY_HPP
 
 #include <Morpheus_Core.hpp>
-#include <Utils.hpp>
-#include <Macros.hpp>
+#include <utils/Utils.hpp>
+#include <utils/Macros_CooMatrix.hpp>
 
 using CooMatrixCompatibleTypes = typename Morpheus::generate_unary_typelist<
     Morpheus::CooMatrix<double>, types::compatible_types_set>::type;

@@ -25,8 +25,8 @@
 #define TEST_CORE_TEST_CSRMATRIX_COMPATIBLEBINARY_HPP
 
 #include <Morpheus_Core.hpp>
-#include <Utils.hpp>
-#include <Macros.hpp>
+#include <utils/Utils.hpp>
+#include <utils/Macros_CsrMatrix.hpp>
 
 using CsrMatrixCompatibleTypes = typename Morpheus::generate_unary_typelist<
     Morpheus::CsrMatrix<double>, types::compatible_types_set>::type;

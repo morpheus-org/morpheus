@@ -25,7 +25,7 @@
 #define TEST_CORE_TEST_DENSEVECTOR_BINARY_HPP
 
 #include <Morpheus_Core.hpp>
-#include <Utils.hpp>
+#include <utils/Utils.hpp>
 
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,

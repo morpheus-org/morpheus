@@ -25,8 +25,8 @@
 #define TEST_CORE_TEST_CSRMATRIX_HPP
 
 #include <Morpheus_Core.hpp>
-#include <Utils.hpp>
-#include <Macros.hpp>
+#include <utils/Utils.hpp>
+#include <utils/Macros_CsrMatrix.hpp>
 
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,

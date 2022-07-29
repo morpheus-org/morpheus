@@ -1,5 +1,5 @@
 /**
- * Macros.hpp
+ * Macros_CsrMatrix.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,74 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef TEST_CORE_MACROS_HPP
-#define TEST_CORE_MACROS_HPP
-
-/**
- * @brief Checks the sizes of a CooMatrix container against a number of rows,
- * columns and non-zeros
- *
- */
-#define CHECK_COO_SIZES(A, num_rows, num_cols, num_nnz) \
-  {                                                     \
-    EXPECT_EQ(A.nrows(), num_rows);                     \
-    EXPECT_EQ(A.ncols(), num_cols);                     \
-    EXPECT_EQ(A.nnnz(), num_nnz);                       \
-    EXPECT_EQ(A.row_indices().size(), num_nnz);         \
-    EXPECT_EQ(A.column_indices().size(), num_nnz);      \
-    EXPECT_EQ(A.values().size(), num_nnz);              \
-  }
-
-/**
- * @brief Checks the sizes of two CooMatrix containers if they match
- *
- */
-#define CHECK_COO_CONTAINERS(A, B)                                   \
-  {                                                                  \
-    EXPECT_EQ(A.nrows(), B.nrows());                                 \
-    EXPECT_EQ(A.ncols(), B.ncols());                                 \
-    EXPECT_EQ(A.nnnz(), B.nnnz());                                   \
-    EXPECT_EQ(A.row_indices().size(), B.row_indices().size());       \
-    EXPECT_EQ(A.column_indices().size(), B.column_indices().size()); \
-    EXPECT_EQ(A.values().size(), B.values().size());                 \
-  }
-
-/**
- * @brief Checks if the data arrays of two CooMatrix containers contain the same
- * data.
- *
- */
-#define VALIDATE_COO_CONTAINER(A, Aref, nnnz, type)           \
-  {                                                           \
-    for (type n = 0; n < nnnz; n++) {                         \
-      EXPECT_EQ(A.row_indices(n), Aref.row_indices(n));       \
-      EXPECT_EQ(A.column_indices(n), Aref.column_indices(n)); \
-      EXPECT_EQ(A.values(n), Aref.values(n));                 \
-    }                                                         \
-  }
-
-/**
- * @brief Builds a sample CooMatrix container. Assumes we have already
- * constructed the matrix and we are only adding data.
- *
- * @tparam Matrix A CooMatrix type
- * @param A The CooMatrix we will be initializing.
- */
-template <typename Matrix>
-void build_coomatrix(Matrix& A) {
-  // Matrix to Build
-  // [1.11 *    2.22]
-  // [*    *    3.33]
-  // [*    4.44 *   ]
-  CHECK_COO_SIZES(A, 3, 3, 4);
-
-  // clang-format off
-  A.row_indices(0) = 0; A.column_indices(0) = 0; A.values(0) = 1.11;
-  A.row_indices(1) = 0; A.column_indices(1) = 2; A.values(1) = 2.22;
-  A.row_indices(2) = 1; A.column_indices(2) = 2; A.values(2) = 3.33;
-  A.row_indices(3) = 2; A.column_indices(3) = 1; A.values(3) = 4.44;
-  // clang-format on
-}
+#ifndef TEST_CORE_UTILS_MACROS_CSRMATRIX_HPP
+#define TEST_CORE_UTILS_MACROS_CSRMATRIX_HPP
 
 /**
  * @brief Checks the sizes of a CsrMatrix container against a number of rows,
@@ -150,11 +84,11 @@ void build_coomatrix(Matrix& A) {
   }
 
 /**
- * @brief Builds a sample CooMatrix container. Assumes we have already
+ * @brief Builds a sample CsrMatrix container. Assumes we have already
  * constructed the matrix and we are only adding data.
  *
- * @tparam Matrix A CooMatrix type
- * @param A The CooMatrix we will be initializing.
+ * @tparam Matrix A CsrMatrix type
+ * @param A The CsrMatrix we will be initializing.
  */
 template <typename Matrix>
 void build_csrmatrix(Matrix& A) {
@@ -177,4 +111,4 @@ void build_csrmatrix(Matrix& A) {
   // clang-format on
 }
 
-#endif  // TEST_CORE_MACROS_HPP
+#endif  // TEST_CORE_UTILS_MACROS_CSRMATRIX_HPP

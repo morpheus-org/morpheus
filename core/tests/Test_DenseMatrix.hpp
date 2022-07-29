@@ -25,7 +25,7 @@
 #define TEST_CORE_TEST_DENSEMATRIX_HPP
 
 #include <Morpheus_Core.hpp>
-#include <Utils.hpp>
+#include <utils/Utils.hpp>
 
 using DenseMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseMatrix<double>,
