@@ -36,19 +36,89 @@
 
 namespace Morpheus {
 
+/**
+ * \addtogroup containers_2d 2D Containers
+ * \ingroup containers
+ * \{
+ *
+ */
+
+/**
+ * @brief Implementation of the Dynamic Sparse Matrix Format
+ * Representation.
+ *
+ * @tparam ValueType Type of values to store
+ * @tparam Properties Optional properties to modify the behaviour of the
+ * container. Sensible defaults are selected based on the configuration. Please
+ * refer to \ref impl/Morpheus_ContainerTraits.hpp to find out more about the
+ * valid properties.
+ *
+ * \par Overview
+ * The DynamicMatrix container is a two-dimensional container that acts as a
+ * superset of all the available matrix storage formats supported in Morpheus.
+ * The purpose of such a container is to enable run-time switching across the
+ * different formats under a single unified interface such that we can take
+ * advantage of the format that is best suited for the given computation and
+ * target hardware. It is a polymorphic container in the sense that it can store
+ * scalar or integer type values, on host or device depending how the template
+ * parameters are selected.
+ *
+ * \par Example
+ * \code
+ * #include <Morpheus_Core.hpp>
+ * // Matrix to Build
+ * // [1 * 2]
+ * // [* * 3]
+ * // [* 4 *]
+ * int main(){
+ *  using DynamicMatrix = Morpheus::DynamicMatrix<double, Kokkos::HostSpace>;
+ *  using Matrix = Morpheus::CsrMatrix<double, Kokkos::HostSpace>;
+ *  using index_array_type = typename Matrix::index_array_type;
+ *  using value_array_type = typename Matrix::value_array_type;
+ *
+ *  DynamicMatrix A;  // A acts as COO format by default
+ *
+ *  A.activate(Morpheus::DIA_FORMAT); // Now acts as a DIA format
+ *
+ *  index_array_type off(4, 0), j(4, 0);
+ *  value_array_type v(4,0);
+ *
+ *  off[0] = 0; off[1] = 2; off[2] = 3; off[3] = 4;
+ *
+ *  j[0] = 0; v[0] = 1;
+ *  j[1] = 2; v[1] = 2;
+ *  j[2] = 2; v[2] = 3;
+ *  j[3] = 1; v[3] = 4;
+ *
+ *  // Construct the matrix from off,j,v
+ *  Matrix Acsr(3, 3, 4, off, j, v);
+ *
+ *  A = Acsr; // Now acts as CSR and holds the same data
+ *
+ *  Morpheus::print(A); // prints A
+ * }
+ * \endcode
+ */
 template <class ValueType, class... Properties>
 class DynamicMatrix
     : public Impl::MatrixBase<DynamicMatrix, ValueType, Properties...> {
  public:
+  /*! The traits associated with the particular container */
   using traits = Impl::ContainerTraits<DynamicMatrix, ValueType, Properties...>;
-  using type   = typename traits::type;
-  using base   = Impl::MatrixBase<DynamicMatrix, ValueType, Properties...>;
+  /*! The complete type of the container */
+  using type = typename traits::type;
+  using base = Impl::MatrixBase<DynamicMatrix, ValueType, Properties...>;
+  /*! The tag associated specificaly to the particular container*/
   using tag = typename MatrixFormatTag<Morpheus::DynamicMatrixFormatTag>::tag;
 
-  using value_type           = typename traits::value_type;
+  /*! The type of the values held by the container - can be const */
+  using value_type = typename traits::value_type;
+  /*! The non-constant type of the values held by the container */
   using non_const_value_type = typename traits::non_const_value_type;
   using size_type            = typename traits::index_type;
-  using index_type           = typename traits::index_type;
+  /*! The type of the indices held by the container - can be const */
+  using index_type = typename traits::index_type;
+  /*! The non-constant type of the indices held by the container */
   using non_const_index_type = typename traits::non_const_index_type;
 
   using array_layout    = typename traits::array_layout;
@@ -63,25 +133,59 @@ class DynamicMatrix
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
+  /*! The variant container that holds the various supported containers */
   using variant_type =
       typename MatrixFormats<ValueType, Properties...>::variant;
 
-  ~DynamicMatrix()                     = default;
+  /**
+   * @brief The default destructor.
+   */
+  ~DynamicMatrix() = default;
+  /**
+   * @brief The default copy contructor (shallow copy) of a DynamicMatrix
+   * container from another DynamicMatrix container with the same properties.
+   */
   DynamicMatrix(const DynamicMatrix &) = default;
-  DynamicMatrix(DynamicMatrix &&)      = default;
+  /**
+   * @brief The default move contructor (shallow copy) of a DynamicMatrix
+   * container from another DynamicMatrix container with the same properties.
+   */
+  DynamicMatrix(DynamicMatrix &&) = default;
+  /**
+   * @brief The default copy assignment (shallow copy) of a DynamicMatrix
+   * container from another DynamicMatrix container with the same properties.
+   */
   DynamicMatrix &operator=(const DynamicMatrix &) = default;
+  /**
+   * @brief The default move assignment (shallow copy) of a DynamicMatrix
+   * container from another DynamicMatrix container with the same properties.
+   */
   DynamicMatrix &operator=(DynamicMatrix &&) = default;
 
-  // Default Constructor
+  /**
+   * @brief Constructs an empty DynamicMatrix object
+   */
   inline DynamicMatrix() : _formats() {}
 
-  // Construct dynamic matrix from another concrete matrix format
+  /**
+   * @brief Constructs a DynamicMatrix from another concrete format.
+   *
+   * @par Overview
+   * Constructs a DynamicMatrix from another concrete format supported in
+   * Morpheus. For the construction to be valid the \p is_variant_member check
+   * needs to be satisfied. In other words, we can only construct from one of
+   * the member types in the variant held by the \p DynamicMatrix. Note that the
+   * \p DynamicMatrix will change it's active type to the format type of the
+   * source Matrix.
+   *
+   * @tparam Matrix The type of the concrete matrix format.
+   * @param src The source container we are constructing from.
+   */
   template <typename Matrix>
   inline DynamicMatrix(
       const Matrix &src,
-      typename std::enable_if<
-          is_variant_member_v<typename Matrix::type, variant_type>>::type * =
-          nullptr)
+      typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
+          * = nullptr)
       : base(src.nrows(), src.ncols(), src.nnnz()) {
     this->activate(src.format_enum());
     auto f = std::bind(Impl::any_type_assign(), std::cref(src),
@@ -89,11 +193,23 @@ class DynamicMatrix
     Morpheus::Impl::Variant::visit(f, _formats);
   }
 
-  // Assignment from another matrix type
+  /**
+   * @brief Assigns a DynamicMatrix from another concrete format.
+   *
+   * @par Overview
+   * Assigns a DynamicMatrix from another concrete format supported in
+   * Morpheus. For the assignment to be valid the \p is_variant_member check
+   * needs to be satisfied. In other words, we can only assign from one of
+   * the member types in the variant held by the \p DynamicMatrix. Note that the
+   * \p DynamicMatrix will change it's active type to the format type of the
+   * source Matrix.
+   *
+   * @tparam Matrix The type of the concrete matrix format.
+   * @param src The source container we are assigning from.
+   */
   template <typename Matrix>
-  typename std::enable_if<
-      is_variant_member_v<typename Matrix::type, variant_type>,
-      DynamicMatrix &>::type
+  typename std::enable_if<is_variant_member_v<Matrix, variant_type>,
+                          DynamicMatrix &>::type
   operator=(const Matrix &matrix) {
     base::resize(matrix.nrows(), matrix.ncols(), matrix.nnnz());
     this->activate(matrix.format_enum());
@@ -104,24 +220,46 @@ class DynamicMatrix
     return *this;
   }
 
-  // Construct from another compatible dynamic matrix type
+  /**
+   * @brief Constructs a DynamicMatrix from another compatible DynamicMatrix
+   *
+   * @par Overview
+   * Constructs a DynamicMatrix from another compatible DynamicMatrix i.e a
+   * matrix that satisfies the \p is_format_compatible check. Note that upon
+   * construction the new DynamicMatrix will set to have the same active type as
+   * the source Matrix.
+   *
+   * @tparam VR Type of Values the Other Matrix holds.
+   * @tparam PR Properties of the Other Matrix.
+   * @param src The matrix we are constructing from.
+   */
   template <class VR, class... PR>
   DynamicMatrix(
       const DynamicMatrix<VR, PR...> &src,
       typename std::enable_if<is_format_compatible<
-          DynamicMatrix, typename DynamicMatrix<VR, PR...>::type>::value>::type
-          * = nullptr)
+          DynamicMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr)
       : base(src.nrows(), src.ncols(), src.nnnz()) {
     this->activate(src.active_index());  // switch to src format
     Morpheus::Impl::Variant::visit(Impl::any_type_assign(), src.const_formats(),
                                    _formats);
   }
 
-  // Assignment from another compatible dynamic matrix type
+  /**
+   * @brief Assigns a DynamicMatrix from another compatible DynamicMatrix
+   *
+   * @par Overview
+   * Assigns a DynamicMatrix from another compatible DynamicMatrix i.e a
+   * matrix that satisfies the \p is_format_compatible check. Note that upon
+   * assignment the new DynamicMatrix will set to have the same active type as
+   * the source Matrix.
+   *
+   * @tparam VR Type of Values the Other Matrix holds.
+   * @tparam PR Properties of the Other Matrix.
+   * @param src The matrix we are assigning from.
+   */
   template <class VR, class... PR>
   typename std::enable_if<
-      is_format_compatible<DynamicMatrix,
-                           typename DynamicMatrix<VR, PR...>::type>::value,
+      is_format_compatible<DynamicMatrix, DynamicMatrix<VR, PR...>>::value,
       DynamicMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
     base::resize(src.nrows(), src.ncols(), src.nnnz());
@@ -133,30 +271,45 @@ class DynamicMatrix
     return *this;
   }
 
-  template <typename... Args>
-  inline void resize(const index_type m, const index_type n,
-                     const index_type nnz, Args &&... args) {
-    base::resize(m, n, nnz);
-    auto f = std::bind(Impl::any_type_resize<ValueType, Properties...>(),
-                       std::placeholders::_1, m, n, nnz,
-                       std::forward<Args>(args)...);
-    return Morpheus::Impl::Variant::visit(f, _formats);
-  }
+  // template <typename... Args>
+  // inline void resize(const index_type m, const index_type n,
+  //                    const index_type nnz, Args &&... args) {
+  //   base::resize(m, n, nnz);
+  //   auto f = std::bind(Impl::any_type_resize<ValueType, Properties...>(),
+  //                      std::placeholders::_1, m, n, nnz,
+  //                      std::forward<Args>(args)...);
+  //   return Morpheus::Impl::Variant::visit(f, _formats);
+  // }
 
-  // Resize from a compatible dynamic matrix
+  /**
+   * @brief Resizes DynamicMatrix with the shape and number of non-zero entries
+   * of the active type of another DynamicMatrix with different parameters.
+   *
+   * @tparam VR Type of values the source matrix stores.
+   * @tparam PR Other properties of source matrix.
+   * @param src The source DynamicMatrix we are resizing from.
+   */
   template <class VR, class... PR>
   inline void resize(const DynamicMatrix<VR, PR...> &src) {
     Morpheus::Impl::Variant::visit(Impl::any_type_resize_from_mat(),
                                    src.const_formats(), _formats);
   }
 
-  // Resize from a member matrix format
+  /**
+   * @brief Resizes DynamicMatrix with the shape and number of non-zero entries
+   * of another Matrix with possibly a different storage format. Note that upon
+   * resizing the new DynamicMatrix will set to have the same active type as
+   * the source Matrix.
+   *
+   * @tparam VR Type of values the source matrix stores.
+   * @tparam PR Other properties of source matrix.
+   * @param src The source Matrix we are resizing from.
+   */
   template <typename Matrix>
   inline void resize(
       const Matrix &src,
-      typename std::enable_if<
-          is_variant_member_v<typename Matrix::type, variant_type>>::type * =
-          nullptr) {
+      typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
+          * = nullptr) {
     base::resize(src.nrows(), src.ncols(), src.nnnz());
     this->activate(src.format_enum());
 
@@ -165,6 +318,16 @@ class DynamicMatrix
     Morpheus::Impl::Variant::visit(f, _formats);
   }
 
+  /**
+   * @brief Allocates DynamicMatrix with the shape and number of non-zero
+   * entries of the active type of another DynamicMatrix with different
+   * parameters. Note that upon allocation the new DynamicMatrix will set to
+   * have the same active type as the source Matrix.
+   *
+   * @tparam VR Type of values the source matrix stores.
+   * @tparam PR Other properties of source matrix.
+   * @param src The source DynamicMatrix we are resizing from.
+   */
   template <class VR, class... PR>
   inline DynamicMatrix &allocate(const DynamicMatrix<VR, PR...> &src) {
     base::resize(src.nrows(), src.ncols(), src.nnnz());
@@ -174,16 +337,46 @@ class DynamicMatrix
     return *this;
   }
 
+  /**
+   * @brief Returns the format index assigned to the active type of the
+   * DynamicMatrix container.
+   *
+   * @return formats_e The format enum
+   */
   inline int active_index() const { return _formats.index(); }
 
+  /**
+   * @brief Returns the format index assigned to the active type of the
+   * DynamicMatrix container.
+   *
+   * @return formats_e The format enum
+   */
   int format_index() const { return this->active_index(); }
 
+  /**
+   * @brief Returns the format enum assigned to the active type of the
+   * DynamicMatrix container.
+   *
+   * @return formats_e The format enum
+   */
   inline formats_e active_enum() const {
     return static_cast<formats_e>(_formats.index());
   }
 
+  /**
+   * @brief Returns the format enum assigned to the active type of the
+   * DynamicMatrix container.
+   *
+   * @return formats_e The format enum
+   */
   inline formats_e format_enum() const { return this->active_enum(); }
 
+  /**
+   * @brief Changes the active type of the DynamicMatrix container to the one
+   * given by the enum \p index parameter.
+   *
+   * @param index The enum state representing the active type to change to.
+   */
   inline void activate(const formats_e index) {
     constexpr int size = Morpheus::Impl::Variant::variant_size_v<
         typename MatrixFormats<ValueType, Properties...>::variant>;
@@ -199,17 +392,37 @@ class DynamicMatrix
                                                                   idx);
   }
 
-  // Enable switching through direct integer indexing
+  /**
+   * @brief Changes the active type of the DynamicMatrix container to the one
+   * given by the \p index parameter.
+   *
+   * @param index The index representing the active type to change to.
+   */
   inline void activate(const int index) {
     activate(static_cast<formats_e>(index));
   }
 
+  /**
+   * @brief Returns a const-reference to the variant container that holds the
+   * supported formats in the \p DynamicMatrix.
+   *
+   * @return const variant_type&  A const-reference to the variant container.
+   */
   inline const variant_type &const_formats() const { return _formats; }
+
+  /**
+   * @brief Returns a reference to the variant container that holds the
+   * supported formats in the \p DynamicMatrix.
+   *
+   * @return variant_type&  A reference to the variant container.
+   */
   inline variant_type &formats() { return _formats; }
 
  private:
   variant_type _formats;
 };
+/*! \}  // end of containers_2d group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_DYNAMICMATRIX_HPP
