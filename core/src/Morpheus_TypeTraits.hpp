@@ -112,13 +112,43 @@ struct ValueType {
  *
  */
 template <typename T, typename Variant>
+class is_variant_member {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <typename U, typename UV>
+  static yes& test(typename U::type*, UV*,
+                   typename std::enable_if<Impl::is_variant_member<
+                       typename U::type, UV>::value>::type* = nullptr);
+
+  template <typename U, typename UV>
+  static yes& test(
+      U*, UV*,
+      typename std::enable_if<Impl::is_variant_member<U, UV>::value>::type* =
+          nullptr);
+
+  template <typename U, typename UV>
+  static no& test(...);
+
+ public:
+  static const bool value =
+      sizeof(test<T, Variant>(nullptr, nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand for \p is_variant_member.
+ *
+ * @tparam T Type passed for check
+ */
+template <typename T, typename Variant>
 inline constexpr bool is_variant_member_v =
-    Impl::is_variant_member<T, Variant>::value;
+    is_variant_member<T, Variant>::value;
 
 /**
  * @brief Checks if \p T has \p tag as a member trait.
  *
  * @tparam T Type passed for check
+ * @tparam Variant A variant container
  */
 template <class T>
 class has_tag_trait {

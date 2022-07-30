@@ -60,30 +60,59 @@ struct TestStruct {
 namespace Test {
 
 /**
- * @brief The \p is_variant_member_v checks if the passed type is a member of
+ * @brief The \p is_variant_member checks if the passed type is a member of
  * the variant container
  *
  */
 TEST(TypeTraitsTest, IsVariantMember) {
   using variant = Morpheus::Impl::Variant::variant<int, double, float>;
 
-  struct A {};
-  bool res = Morpheus::is_variant_member_v<double, variant>;
+  bool res = Morpheus::is_variant_member<double, variant>::value;
   EXPECT_EQ(res, 1);
 
-  res = Morpheus::is_variant_member_v<float, variant>;
+  res = Morpheus::is_variant_member<float, variant>::value;
   EXPECT_EQ(res, 1);
 
   res = Morpheus::is_variant_member_v<int, variant>;
   EXPECT_EQ(res, 1);
 
-  res = Morpheus::is_variant_member_v<long long, variant>;
+  res = Morpheus::is_variant_member<long long, variant>::value;
   EXPECT_EQ(res, 0);
 
   res = Morpheus::is_variant_member_v<char, variant>;
   EXPECT_EQ(res, 0);
+}
 
-  res = Morpheus::is_variant_member_v<A, variant>;
+/**
+ * @brief The \p is_variant_member checks if the passed type is a member of
+ * the variant container
+ *
+ */
+TEST(TypeTraitsTest, IsVariantMemberStruct) {
+  struct A {
+    using type = A;
+  };
+
+  struct B {
+    using type = B;
+  };
+
+  struct C {
+    using type = C;
+  };
+
+  using variant = Morpheus::Impl::Variant::variant<A, B>;
+
+  bool res = Morpheus::is_variant_member<A, variant>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_variant_member_v<B, variant>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_variant_member<C, variant>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_variant_member_v<C, variant>;
   EXPECT_EQ(res, 0);
 }
 
