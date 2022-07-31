@@ -185,9 +185,10 @@ class DynamicMatrix
   inline DynamicMatrix(
       const Matrix &src,
       typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
-          * = nullptr)
-      : base(src.nrows(), src.ncols(), src.nnnz()) {
+          * = nullptr) {
     this->activate(src.format_enum());
+    base::resize(src.nrows(), src.ncols(), src.nnnz());
+
     auto f = std::bind(Impl::any_type_assign(), std::cref(src),
                        std::placeholders::_1);
     Morpheus::Impl::Variant::visit(f, _formats);
@@ -211,8 +212,8 @@ class DynamicMatrix
   typename std::enable_if<is_variant_member_v<Matrix, variant_type>,
                           DynamicMatrix &>::type
   operator=(const Matrix &matrix) {
-    base::resize(matrix.nrows(), matrix.ncols(), matrix.nnnz());
     this->activate(matrix.format_enum());
+    base::resize(matrix.nrows(), matrix.ncols(), matrix.nnnz());
 
     auto f = std::bind(Impl::any_type_assign(), std::cref(matrix),
                        std::placeholders::_1);
@@ -237,9 +238,10 @@ class DynamicMatrix
   DynamicMatrix(
       const DynamicMatrix<VR, PR...> &src,
       typename std::enable_if<is_format_compatible<
-          DynamicMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr)
-      : base(src.nrows(), src.ncols(), src.nnnz()) {
+          DynamicMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr) {
     this->activate(src.active_index());  // switch to src format
+    base::resize(src.nrows(), src.ncols(), src.nnnz());
+
     Morpheus::Impl::Variant::visit(Impl::any_type_assign(), src.const_formats(),
                                    _formats);
   }
@@ -262,9 +264,9 @@ class DynamicMatrix
       is_format_compatible<DynamicMatrix, DynamicMatrix<VR, PR...>>::value,
       DynamicMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
+    this->activate(src.active_index());  // switch to src format
     base::resize(src.nrows(), src.ncols(), src.nnnz());
 
-    this->activate(src.active_index());  // switch to src format
     Morpheus::Impl::Variant::visit(Impl::any_type_assign(), src.const_formats(),
                                    _formats);
 
@@ -332,6 +334,7 @@ class DynamicMatrix
   inline DynamicMatrix &allocate(const DynamicMatrix<VR, PR...> &src) {
     base::resize(src.nrows(), src.ncols(), src.nnnz());
     this->activate(src.active_index());  // switch to src format
+
     Morpheus::Impl::Variant::visit(Impl::any_type_allocate(),
                                    src.const_formats(), _formats);
     return *this;
@@ -382,12 +385,19 @@ class DynamicMatrix
         typename MatrixFormats<ValueType, Properties...>::variant>;
     const int idx = static_cast<int>(index);
 
-    if (idx > size) {
+    if(idx == active_index()){
+      return;
+    }else if (idx > size) {
       std::cout << "Warning: There are " << size
                 << " available formats to switch to. "
                 << "Selecting to switch to format with index " << idx
-                << " will default to the format with index 0." << std::endl;
+                << " will default to no change." << std::endl;
+
+      return;
     }
+
+    // Set metadata to 0
+    base::resize(0, 0, 0);
     Impl::activate_impl<size, ValueType, Properties...>::activate(_formats,
                                                                   idx);
   }

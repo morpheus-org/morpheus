@@ -44,7 +44,6 @@ struct copy_fn {
           is_format_compatible<SourceType, DestinationType>::value ||
           is_format_compatible_different_space<
               SourceType, DestinationType>::value>* = nullptr) {
-    dst.resize(src);
     Impl::copy(src, dst);
   }
 
@@ -91,9 +90,6 @@ void copy(
         Morpheus::is_sparse_matrix_container<SourceType>::value &&
         Morpheus::is_dynamic_matrix_format_container<DestinationType>::value>* =
         nullptr) {
-  dst.activate(src.format_enum());
-  dst.resize(src);
-
   auto f = std::bind(Impl::copy_fn(), std::cref(src), std::placeholders::_1);
   Impl::Variant::visit(f, dst.formats());
 }
@@ -105,9 +101,6 @@ void copy(
         Morpheus::is_dynamic_matrix_format_container<SourceType>::value &&
         Morpheus::is_dynamic_matrix_format_container<DestinationType>::value>* =
         nullptr) {
-  dst.activate(src.active_index());
-  dst.resize(src);
-
   Impl::Variant::visit(Impl::copy_fn(), src.const_formats(), dst.formats());
 }
 

@@ -129,16 +129,14 @@ struct any_type_allocate {
   template <typename T1, typename T2>
   result_type operator()(
       const T1 &src, T2 &dst,
-      typename std::enable_if <
-          std::is_same<has_same_format<T1, T2>::value>::type * = nullptr) {
+      typename std::enable_if <has_same_format<T1, T2>::value>::type * = nullptr) {
     dst = T2().allocate(src);
   }
 
   template <typename T1, typename T2>
   result_type operator()(
       const T1 &src, T2 &dst,
-      typename std::enable_if <
-          !std::is_same<!has_same_format<T1, T2>::value>::type * = nullptr) {
+      typename std::enable_if <!has_same_format<T1, T2>::value>::type * = nullptr) {
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic allocate interface. Src and std tags must "
         "be the same (" +
@@ -153,18 +151,14 @@ struct any_type_assign {
   template <typename T1, typename T2>
   result_type operator()(
       const T1 &src, T2 &dst,
-      typename std::enable_if<
-          std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
-          nullptr) {
+      typename std::enable_if<has_same_format<T1, T2>::value>::type* = nullptr) {
     dst = src;
   }
 
   template <typename T1, typename T2>
   result_type operator()(
       const T1 &src, T2 &dst,
-      typename std::enable_if<
-          !std::is_same<typename T1::tag, typename T2::tag>::value>::type * =
-          nullptr) {
+      typename std::enable_if<!has_same_format<T1, T2>::value>::type* = nullptr) {
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic assign interface. Src and dst tags must be "
         "the same (" +
