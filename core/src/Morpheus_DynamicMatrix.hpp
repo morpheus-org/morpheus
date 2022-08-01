@@ -238,8 +238,7 @@ class DynamicMatrix
   DynamicMatrix(
       const DynamicMatrix<VR, PR...> &src,
       typename std::enable_if<is_format_compatible<
-              DynamicMatrix, DynamicMatrix<VR, PR...>>::value>::value >
-          ::type * = nullptr) {
+          DynamicMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr) {
     this->activate(src.active_index());  // switch to src format
     base::resize(src.nrows(), src.ncols(), src.nnnz());
 

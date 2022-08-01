@@ -35,6 +35,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       DiaMatrix_CompatibleBinary
       DiaMatrix_CompatibleDynamicBinary
       DynamicMatrix
+      DynamicMatrix_CompatibleBinary
       # Dot
       TypeTraits
       Metaprogramming
