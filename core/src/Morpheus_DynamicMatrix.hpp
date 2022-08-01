@@ -238,7 +238,8 @@ class DynamicMatrix
   DynamicMatrix(
       const DynamicMatrix<VR, PR...> &src,
       typename std::enable_if<is_format_compatible<
-          DynamicMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr) {
+              DynamicMatrix, DynamicMatrix<VR, PR...>>::value>::value >
+          ::type * = nullptr) {
     this->activate(src.active_index());  // switch to src format
     base::resize(src.nrows(), src.ncols(), src.nnnz());
 
@@ -293,6 +294,9 @@ class DynamicMatrix
    */
   template <class VR, class... PR>
   inline void resize(const DynamicMatrix<VR, PR...> &src) {
+    this->activate(src.format_enum());
+    base::resize(src.nrows(), src.ncols(), src.nnnz());
+
     Morpheus::Impl::Variant::visit(Impl::any_type_resize_from_mat(),
                                    src.const_formats(), _formats);
   }
@@ -312,8 +316,8 @@ class DynamicMatrix
       const Matrix &src,
       typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
           * = nullptr) {
-    base::resize(src.nrows(), src.ncols(), src.nnnz());
     this->activate(src.format_enum());
+    base::resize(src.nrows(), src.ncols(), src.nnnz());
 
     auto f = std::bind(Impl::any_type_resize_from_mat(), std::cref(src),
                        std::placeholders::_1);
@@ -332,8 +336,8 @@ class DynamicMatrix
    */
   template <class VR, class... PR>
   inline DynamicMatrix &allocate(const DynamicMatrix<VR, PR...> &src) {
-    base::resize(src.nrows(), src.ncols(), src.nnnz());
     this->activate(src.active_index());  // switch to src format
+    base::resize(src.nrows(), src.ncols(), src.nnnz());
 
     Morpheus::Impl::Variant::visit(Impl::any_type_allocate(),
                                    src.const_formats(), _formats);
@@ -385,9 +389,9 @@ class DynamicMatrix
         typename MatrixFormats<ValueType, Properties...>::variant>;
     const int idx = static_cast<int>(index);
 
-    if(idx == active_index()){
+    if (idx == active_index()) {
       return;
-    }else if (idx > size) {
+    } else if (idx > size) {
       std::cout << "Warning: There are " << size
                 << " available formats to switch to. "
                 << "Selecting to switch to format with index " << idx
