@@ -29,16 +29,14 @@
 
 namespace Morpheus {
 
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
-inline void multiply(const Matrix& A, const Vector1& x, Vector2& y,
+template <typename ExecSpace, typename Matrix, typename Vector>
+inline void multiply(const Matrix& A, const Vector& x, Vector& y,
                      const bool init) {
   Impl::multiply<ExecSpace>(A, x, y, init);
 }
 
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
-inline void multiply(const Matrix& A, const Vector1& x, Vector2& y) {
+template <typename ExecSpace, typename Matrix, typename Vector>
+inline void multiply(const Matrix& A, const Vector& x, Vector& y) {
   multiply<ExecSpace>(A, x, y, true);
 }
 

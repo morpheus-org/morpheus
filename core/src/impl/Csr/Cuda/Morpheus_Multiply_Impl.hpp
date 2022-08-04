@@ -38,34 +38,32 @@ namespace Morpheus {
 namespace Impl {
 
 // forward decl
-template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y,
+template <typename Matrix, typename Vector>
+void __spmv_csr_vector(const Matrix& A, const Vector& x, Vector& y,
                        const bool init);
 
-template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_csr_scalar(const Matrix& A, const Vector1& x, Vector2& y,
+template <typename Matrix, typename Vector>
+void __spmv_csr_scalar(const Matrix& A, const Vector& x, Vector& y,
                        const bool init);
 
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const Matrix& A, const Vector1& x, Vector2& y, const bool init,
+    const Matrix& A, const Vector& x, Vector& y, const bool init,
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Matrix> &&
-        Morpheus::is_dense_vector_format_container_v<Vector1> &&
-        Morpheus::is_dense_vector_format_container_v<Vector2> &&
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
         Morpheus::is_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector1, Vector2>>* = nullptr) {
+                               Vector>>* = nullptr) {
   switch (A.options()) {
     case MATOPT_SHORT_ROWS: __spmv_csr_scalar(A, x, y, init); break;
     default: __spmv_csr_vector(A, x, y, init);
   }
 }
 
-template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_csr_scalar(const Matrix& A, const Vector1& x, Vector2& y,
+template <typename Matrix, typename Vector>
+void __spmv_csr_scalar(const Matrix& A, const Vector& x, Vector& y,
                        const bool init) {
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
@@ -87,9 +85,8 @@ void __spmv_csr_scalar(const Matrix& A, const Vector1& x, Vector2& y,
 #endif
 }
 
-template <size_t THREADS_PER_VECTOR, typename Matrix, typename Vector1,
-          typename Vector2>
-void __spmv_csr_vector_dispatch(const Matrix& A, const Vector1& x, Vector2& y,
+template <size_t THREADS_PER_VECTOR, typename Matrix, typename Vector>
+void __spmv_csr_vector_dispatch(const Matrix& A, const Vector& x, Vector& y,
                                 const bool init) {
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
@@ -125,8 +122,8 @@ void __spmv_csr_vector_dispatch(const Matrix& A, const Vector1& x, Vector2& y,
 #endif
 }
 
-template <typename Matrix, typename Vector1, typename Vector2>
-void __spmv_csr_vector(const Matrix& A, const Vector1& x, Vector2& y,
+template <typename Matrix, typename Vector>
+void __spmv_csr_vector(const Matrix& A, const Vector& x, Vector& y,
                        const bool init) {
   using index_type = typename Matrix::index_type;
 

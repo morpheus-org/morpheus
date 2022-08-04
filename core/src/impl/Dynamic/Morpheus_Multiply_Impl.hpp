@@ -32,14 +32,12 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Matrix, typename Vector1,
-          typename Vector2>
+template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const Matrix& A, const Vector1& x, Vector2& y, const bool init,
+    const Matrix& A, const Vector& x, Vector& y, const bool init,
     typename std::enable_if<
         Morpheus::is_dynamic_matrix_format_container<Matrix>::value &&
-        Morpheus::is_dense_vector_format_container<Vector1>::value &&
-        Morpheus::is_dense_vector_format_container<Vector2>::value>::type* =
+        Morpheus::is_dense_vector_format_container<Vector>::value>::type* =
         nullptr) {
   std::visit([&](auto&& arg) { Impl::multiply<ExecSpace>(arg, x, y, init); },
              A.const_formats());
