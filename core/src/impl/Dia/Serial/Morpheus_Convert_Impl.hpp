@@ -101,7 +101,7 @@ void convert(
   }
 
   if (!dst.is_sorted()) {
-    dst.sort_by_row_and_column();
+    dst.sort();
   }
 }
 
@@ -133,7 +133,7 @@ void convert(
   std::set<index_type> diag_set(diag_map.begin(), diag_map.end());
   index_type ndiags = index_type(diag_set.size());
 
-  if (dst.exceeds_tolerance(src.nrows(), src.nnnz(), ndiags)) {
+  if (Impl::exceeds_tolerance(src.nrows(), src.nnnz(), ndiags)) {
     throw Morpheus::FormatConversionException(
         "DiaMatrix fill-in would exceed maximum tolerance");
   }
