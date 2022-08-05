@@ -82,4 +82,32 @@ struct to_gtest_types<Morpheus::TypeList<Ts...>> {
   using type = ::testing::Types<Ts...>;
 };
 
+// TODO: Move in Morpheus Core
+template <typename... T>
+struct generate_pair;
+// Partially specialise the empty cases.
+template <typename... Us>
+struct generate_pair<Morpheus::TypeList<>, Morpheus::TypeList<Us...>> {
+  using type = Morpheus::TypeList<>;
+};
+
+template <typename... Us>
+struct generate_pair<Morpheus::TypeList<Us...>, Morpheus::TypeList<>> {
+  using type = Morpheus::TypeList<>;
+};
+
+template <>
+struct generate_pair<Morpheus::TypeList<>, Morpheus::TypeList<>> {
+  using type = Morpheus::TypeList<>;
+};
+
+template <typename T, typename... Ts, typename U, typename... Us>
+struct generate_pair<Morpheus::TypeList<T, Ts...>,
+                     Morpheus::TypeList<U, Us...>> {
+  using type = typename Morpheus::concat<
+      Morpheus::TypeList<std::pair<T, U>>,
+      typename generate_pair<Morpheus::TypeList<Ts...>,
+                             Morpheus::TypeList<Us...>>::type>::type;
+};
+
 #endif  // TEST_CORE_UTILS_HPP

@@ -43,44 +43,14 @@ using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
                                                types::types_set>::type;
 
-template <typename... T>
-struct generate_pair;
-// Partially specialise the empty cases.
-template <typename... Us>
-struct generate_pair<Morpheus::TypeList<>, Morpheus::TypeList<Us...>> {
-  using type = Morpheus::TypeList<>;
-};
-
-template <typename... Us>
-struct generate_pair<Morpheus::TypeList<Us...>, Morpheus::TypeList<>> {
-  using type = Morpheus::TypeList<>;
-};
-
-template <>
-struct generate_pair<Morpheus::TypeList<>, Morpheus::TypeList<>> {
-  using type = Morpheus::TypeList<>;
-};
-
-template <typename T, typename... Ts, typename U, typename... Us>
-struct generate_pair<Morpheus::TypeList<T, Ts...>,
-                     Morpheus::TypeList<U, Us...>> {
-  using type = typename Morpheus::concat<
-      Morpheus::TypeList<std::pair<T, U>>,
-      typename generate_pair<Morpheus::TypeList<Ts...>,
-                             Morpheus::TypeList<Us...>>::type>::type;
-};
-
 using DenseMatrixCooMatrixPairs =
     generate_pair<DenseMatrixTypes, CooMatrixTypes>::type;
-// using DenseCooConvertTypes = to_gtest_types<DenseMatrixCooMatrixPairs>::type;
 
 using DenseMatrixCsrMatrixPairs =
     generate_pair<DenseMatrixTypes, CsrMatrixTypes>::type;
-// using DenseCsrConvertTypes = to_gtest_types<DenseMatrixCsrMatrixPairs>::type;
 
 using DenseMatrixDiaMatrixPairs =
     generate_pair<DenseMatrixTypes, DiaMatrixTypes>::type;
-// using DenseDiaConvertTypes = to_gtest_types<DenseMatrixDiaMatrixPairs>::type;
 
 using pairs = typename Morpheus::concat<
     DenseMatrixCooMatrixPairs,
@@ -101,10 +71,7 @@ class ConvertTest : public ::testing::Test {
   using IndexType     = typename source_device::index_type;
   using ValueType     = typename source_device::value_type;
 
-  // ConvertTest(IndexType _nrows, IndexType _ncols) : nrows(_nrows)
-
   void SetUp() override {
-    // construct reference DenseMatrix
     source_host Aref_h(1000, 1000, 0.0);
     nnnz = 0;
     for (IndexType i = 0; i < Aref_h.nrows(); i++) {
@@ -133,74 +100,52 @@ namespace Test {
 
 TYPED_TEST_CASE(ConvertTest, ConvertTypes);
 
-TYPED_TEST(ConvertTest, ForwardThenBackward1) {
+TYPED_TEST(ConvertTest, ForwardThenBackward) {
   using src_t      = typename TestFixture::source_host;
   using dst_t      = typename TestFixture::dest_host;
   using index_type = typename src_t::index_type;
   using value_type = typename src_t::value_type;
 
-  typename dst_t::HostMirror Acoo_h;
-  Morpheus::convert<TEST_EXECSPACE>(this->ref_h, Acoo_h);
+  dst_t A;
+  src_t Adense;
+  bool validate = false;
+#if defined(MORPHEUS_ENABLE_CUDA)
+  if (Morpheus::is_cuda_execution_space<TEST_EXECSPACE>::value) {
+    EXPECT_THROW(Morpheus::convert<TEST_EXECSPACE>(this->ref, A),
+                 Morpheus::NotImplementedException);
+  }
+#endif
 
-  typename src_t::HostMirror Adense_h;
-  Morpheus::convert<TEST_EXECSPACE>(Acoo_h, Adense_h);
+#if defined(MORPHEUS_ENABLE_OPENMP)
+  if (Morpheus::is_openmp_execution_space<TEST_EXECSPACE>::value) {
+    EXPECT_THROW(Morpheus::convert<TEST_EXECSPACE>(this->ref, A),
+                 Morpheus::NotImplementedException);
+  }
+#endif
 
-  for (index_type i = 0; i < this->ref_h.nrows(); i++) {
-    for (index_type j = 0; j < this->ref_h.ncols(); j++) {
-      if (std::is_floating_point<value_type>::value) {
-        EXPECT_PRED_FORMAT2(
-            ::testing::internal::CmpHelperFloatingPointEQ<value_type>,
-            this->ref_h(i, j), Adense_h(i, j));
-      } else {
-        EXPECT_EQ(this->ref_h(i, j), Adense_h(i, j));
+  if (Morpheus::is_serial_execution_space<TEST_EXECSPACE>::value) {
+    Morpheus::convert<TEST_EXECSPACE>(this->ref, A);
+    Morpheus::convert<TEST_EXECSPACE>(A, Adense);
+    validate = true;
+  }
+
+  if (validate) {
+    typename src_t::HostMirror Adense_h(Adense.nrows(), Adense.ncols());
+    Morpheus::copy(Adense, Adense_h);
+
+    for (index_type i = 0; i < this->ref_h.nrows(); i++) {
+      for (index_type j = 0; j < this->ref_h.ncols(); j++) {
+        if (std::is_floating_point<value_type>::value) {
+          EXPECT_PRED_FORMAT2(
+              ::testing::internal::CmpHelperFloatingPointEQ<value_type>,
+              this->ref_h(i, j), Adense_h(i, j));
+        } else {
+          EXPECT_EQ(this->ref_h(i, j), Adense_h(i, j));
+        }
       }
     }
   }
 }
-
-// TYPED_TEST(DotTest, MediumTest) {
-//   using value_type = typename TestFixture::DenseVector::value_type;
-//   using index_type = typename TestFixture::DenseVector::index_type;
-
-//   index_type sz  = this->m_size;
-//   value_type res = this->m_res;
-//   auto x = this->m_x, y = this->m_y;
-
-//   auto result = Morpheus::dot<TEST_EXECSPACE>(sz, x, y);
-
-//   // Make sure the correct type is returned by dot
-//   EXPECT_EQ((std::is_same<decltype(result), decltype(res)>::value), 1);
-
-//   if (std::is_floating_point<value_type>::value) {
-//     EXPECT_PRED_FORMAT2(
-//         ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res,
-//         result);
-//   } else {
-//     EXPECT_EQ(res, result);
-//   }
-// }
-
-// TYPED_TEST(DotTest, LargeTest) {
-//   using value_type = typename TestFixture::DenseVector::value_type;
-//   using index_type = typename TestFixture::DenseVector::index_type;
-
-//   index_type sz  = this->l_size;
-//   value_type res = this->l_res;
-//   auto x = this->l_x, y = this->l_y;
-
-//   auto result = Morpheus::dot<TEST_EXECSPACE>(sz, x, y);
-
-//   // Make sure the correct type is returned by dot
-//   EXPECT_EQ((std::is_same<decltype(result), decltype(res)>::value), 1);
-
-//   if (std::is_floating_point<value_type>::value) {
-//     EXPECT_PRED_FORMAT2(
-//         ::testing::internal::CmpHelperFloatingPointEQ<value_type>, res,
-//         result);
-//   } else {
-//     EXPECT_EQ(res, result);
-//   }
-// }
 
 }  // namespace Test
 
