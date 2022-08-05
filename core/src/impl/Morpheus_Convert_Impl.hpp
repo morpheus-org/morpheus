@@ -71,7 +71,8 @@ void convert(
   using ArrayLayout = typename SourceType::array_layout;
   using MemorySpace = typename SourceType::memory_space;
 
-  using Coo = CooMatrix<ValueType, IndexType, ArrayLayout, MemorySpace>;
+  using Coo = CooMatrix<ValueType, IndexType, ArrayLayout,
+                        Kokkos::Device<ExecSpace, MemorySpace>>;
   Coo tmp;
 
   Impl::convert<ExecSpace>(src, tmp);
