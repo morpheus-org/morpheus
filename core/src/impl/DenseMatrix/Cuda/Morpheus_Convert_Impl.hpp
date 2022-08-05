@@ -37,7 +37,7 @@ namespace Impl {
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
-    const SourceType& src, DestinationType& dst,
+    const SourceType&, DestinationType&,
     typename std::enable_if<
         Morpheus::is_dense_matrix_format_container_v<SourceType> &&
         Morpheus::is_dense_matrix_format_container_v<DestinationType> &&
@@ -50,7 +50,7 @@ void convert(
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
-    const SourceType& src, DestinationType& dst,
+    const SourceType&, DestinationType&,
     typename std::enable_if<
         Morpheus::is_dense_matrix_format_container_v<SourceType> &&
         Morpheus::is_dense_vector_format_container_v<DestinationType> &&
@@ -63,7 +63,7 @@ void convert(
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
-    const SourceType& src, DestinationType& dst,
+    const SourceType&, DestinationType&,
     typename std::enable_if<
         Morpheus::is_dense_matrix_format_container_v<SourceType> &&
         Morpheus::is_coo_matrix_format_container_v<DestinationType> &&
@@ -76,7 +76,7 @@ void convert(
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(
-    const SourceType& src, DestinationType& dst,
+    const SourceType&, DestinationType&,
     typename std::enable_if<
         Morpheus::is_coo_matrix_format_container_v<SourceType> &&
         Morpheus::is_dense_matrix_format_container_v<DestinationType> &&

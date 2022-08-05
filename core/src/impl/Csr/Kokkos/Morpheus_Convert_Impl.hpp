@@ -33,7 +33,7 @@ namespace Impl {
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 inline void convert(
-    const SourceType& src, DestinationType& dst,
+    const SourceType&, DestinationType&,
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<SourceType> &&
         Morpheus::is_csr_matrix_format_container_v<DestinationType> &&
@@ -45,7 +45,7 @@ inline void convert(
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 inline void convert(
-    const SourceType& src, DestinationType& dst,
+    const SourceType&, DestinationType&,
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<SourceType> &&
         Morpheus::is_coo_matrix_format_container_v<DestinationType> &&
@@ -57,7 +57,7 @@ inline void convert(
 
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 inline void convert(
-    const SourceType& src, DestinationType& dst,
+    const SourceType&, DestinationType&,
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<SourceType> &&
         Morpheus::is_csr_matrix_format_container_v<DestinationType> &&
