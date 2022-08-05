@@ -81,7 +81,13 @@ size_t max_active_blocks(KernelFunction kernel, const size_t CTA_SIZE,
   int MAX_BLOCKS;
   cudaOccupancyMaxActiveBlocksPerMultiprocessor(
       &MAX_BLOCKS, kernel, (int)CTA_SIZE, dynamic_smem_bytes);
-  return (size_t)MAX_BLOCKS;
+
+  cudaDeviceProp prop;
+  int device;
+  checkCudaErrors(cudaGetDevice(&device));
+  checkCudaErrors(cudaGetDeviceProperties(&prop, device));
+
+  return (size_t)MAX_BLOCKS * prop.multiProcessorCount;
 }
 
 // Compute the number of threads and blocks to use for the given reduction
