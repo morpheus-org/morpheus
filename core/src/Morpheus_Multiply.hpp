@@ -37,7 +37,7 @@ inline void multiply(const Matrix& A, const Vector& x, Vector& y,
 
 template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(const Matrix& A, const Vector& x, Vector& y) {
-  multiply<ExecSpace>(A, x, y, true);
+  Impl::multiply<ExecSpace>(A, x, y, true);
 }
 
 }  // namespace Morpheus

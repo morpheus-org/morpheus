@@ -49,7 +49,7 @@ void convert(SourceType& src, const formats_e index) {
 
 template <typename ExecSpace, typename SourceType>
 void convert(SourceType& src, const int index) {
-  convert<ExecSpace>(src, static_cast<formats_e>(index));
+  Morpheus::convert<ExecSpace>(src, static_cast<formats_e>(index));
 }
 }  // namespace Morpheus
 

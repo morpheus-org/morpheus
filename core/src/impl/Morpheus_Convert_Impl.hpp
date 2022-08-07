@@ -65,7 +65,8 @@ void convert(
         !is_dynamic_matrix_format_container_v<SourceType> &&
         !is_dynamic_matrix_format_container_v<DestinationType> &&
         !is_coo_matrix_format_container_v<SourceType> &&
-        !is_coo_matrix_format_container_v<DestinationType>>* = nullptr) {
+        !is_coo_matrix_format_container_v<DestinationType> &&
+        !has_same_format_v<SourceType, DestinationType>>* = nullptr) {
   using ValueType   = typename SourceType::value_type;
   using IndexType   = typename SourceType::index_type;
   using ArrayLayout = typename SourceType::array_layout;

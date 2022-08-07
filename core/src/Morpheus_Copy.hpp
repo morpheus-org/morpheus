@@ -24,8 +24,6 @@
 #ifndef MORPHEUS_COPY_HPP
 #define MORPHEUS_COPY_HPP
 
-#include <Morpheus_MatrixTags.hpp>
-
 #include <impl/Morpheus_Utils.hpp>
 #include <impl/Morpheus_Copy_Impl.hpp>
 #include <impl/Dynamic/Morpheus_Copy_Impl.hpp>
