@@ -78,6 +78,10 @@ void __spmv_csr_scalar(const Matrix& A, const Vector& x, Vector& y,
   const value_type* x_ptr = x.data();
   value_type* y_ptr       = y.data();
 
+  if (init) {
+    y.assign(y.size(), 0);
+  }
+
   Morpheus::Impl::Kernels::spmv_csr_scalar_kernel<index_type, value_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), I, J, V, x_ptr, y_ptr);
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
