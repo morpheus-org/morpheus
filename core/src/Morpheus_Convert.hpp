@@ -39,8 +39,7 @@ template <typename ExecSpace, typename SourceType>
 void convert(SourceType& src, const formats_e index) {
   Morpheus::CooMatrix<
       typename SourceType::value_type, typename SourceType::index_type,
-      typename SourceType::array_layout, typename SourceType::execution_space,
-      typename SourceType::memory_traits>
+      typename SourceType::array_layout, typename SourceType::execution_space>
       temp;
   Impl::convert<ExecSpace>(src, temp);
   src.activate(index);

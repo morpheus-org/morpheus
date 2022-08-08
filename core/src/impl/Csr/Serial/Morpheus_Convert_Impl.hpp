@@ -105,6 +105,8 @@ void convert(
   using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
+  // Make sure we zero offsets for correct cumsum
+  dst.row_offsets().assign(src.nrows() + 1, 0);
 
   // compute number of non-zero entries per row of coo src
   for (index_type n = 0; n < src.nnnz(); n++) {
@@ -117,6 +119,7 @@ void convert(
     dst.row_offsets(i) = cumsum;
     cumsum += temp;
   }
+
   dst.row_offsets(src.nrows()) = src.nnnz();
 
   // write coo column indices and values into csr
