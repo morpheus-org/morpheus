@@ -243,20 +243,13 @@ class DenseVector
   }
 
   /**
-   * @brief Assigns \p n elements of value \p val to the DenseVector. In the
-   * case where \p n is larger than the actual size of the container, the
-   * container will resize before assignment.
+   * @brief Assigns \p n elements of value \p val to the DenseVector.
    *
    * @param n Number of elements to assign
    * @param val Value to assign
    */
   inline void assign(const size_t n, const value_type val) {
     using range_policy = Kokkos::RangePolicy<size_t, execution_space>;
-
-    /* Resize if necessary (behavior of std:vector) */
-    if (n > _size) {
-      this->resize(n);
-    }
 
     range_policy policy(0, n);
     Impl::set_functor<value_array_type, value_type> f(_values, val);
@@ -265,8 +258,7 @@ class DenseVector
 
   /**
    * @brief Assigns \p n elements of values between \p range_low  and
-   * \p range_high to the DenseVector. In the case where \p n is larger than the
-   * actual size of the container, the container will resize before assignment.
+   * \p range_high to the DenseVector.
    *
    * @tparam Generator random number generator type
    * @param n Number of elements to assign
@@ -277,10 +269,6 @@ class DenseVector
   template <typename Generator>
   inline void assign(const size_t n, Generator rand_pool,
                      const value_type range_low, const value_type range_high) {
-    /* Resize if necessary (behavior of std:vector) */
-    if (n > _size) {
-      this->resize(n);
-    }
     auto vals = Kokkos::subview(_values, std::make_pair((size_t)0, n));
     Kokkos::fill_random(vals, rand_pool, range_low, range_high);
   }

@@ -494,26 +494,26 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   }
 }
 
-TYPED_TEST(DenseVectorUnaryTest, AssignResize) {
-  using Vector     = typename TestFixture::device;
-  using HostVector = typename TestFixture::host;
-  using value_type = typename Vector::value_type;
+// TYPED_TEST(DenseVectorUnaryTest, AssignResize) {
+//   using Vector     = typename TestFixture::device;
+//   using HostVector = typename TestFixture::host;
+//   using value_type = typename Vector::value_type;
 
-  auto size = 10000;
-  Vector x(size, 0);
+//   auto size = 10000;
+//   Vector x(size, 0);
 
-  // x should resize now that the size we are assigning is larger that `size`
-  x.assign(size + 2000, (value_type)10.111);
-  EXPECT_EQ(x.size(), size + 2000);
+//   // x should resize now that the size we are assigning is larger that `size`
+//   x.assign(size + 2000, (value_type)10.111);
+//   EXPECT_EQ(x.size(), size + 2000);
 
-  HostVector xh(x.size(), 0);
-  EXPECT_EQ(xh.size(), x.size());
-  Morpheus::copy(x, xh);
+//   HostVector xh(x.size(), 0);
+//   EXPECT_EQ(xh.size(), x.size());
+//   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < xh.size(); i++) {
-    EXPECT_EQ(xh[i], (value_type)10.111);
-  }
-}
+//   for (size_t i = 0; i < xh.size(); i++) {
+//     EXPECT_EQ(xh[i], (value_type)10.111);
+//   }
+// }
 
 TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   using Vector     = typename TestFixture::device;
@@ -581,27 +581,27 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   }
 }
 
-TYPED_TEST(DenseVectorUnaryTest, AssignRandomResize) {
-  using Vector     = typename TestFixture::device;
-  using HostVector = typename TestFixture::host;
+// TYPED_TEST(DenseVectorUnaryTest, AssignRandomResize) {
+//   using Vector     = typename TestFixture::device;
+//   using HostVector = typename TestFixture::host;
 
-  auto size = 10000, seed = 5374857;
-  Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
-  Vector x(size, 0);
+//   auto size = 10000, seed = 5374857;
+//   Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
+//   Vector x(size, 0);
 
-  // x should resize now that the size we are assigning is larger that `size`
-  x.assign(size + 2000, rand_pool, 30, 40);
-  EXPECT_EQ(x.size(), size + 2000);
+//   // x should resize now that the size we are assigning is larger that `size`
+//   x.assign(size + 2000, rand_pool, 30, 40);
+//   EXPECT_EQ(x.size(), size + 2000);
 
-  HostVector xh(x.size(), 0);
-  EXPECT_EQ(xh.size(), x.size());
-  Morpheus::copy(x, xh);
+//   HostVector xh(x.size(), 0);
+//   EXPECT_EQ(xh.size(), x.size());
+//   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < xh.size(); i++) {
-    EXPECT_GE(xh[i], 30);
-    EXPECT_LT(xh[i], 40);
-  }
-}
+//   for (size_t i = 0; i < xh.size(); i++) {
+//     EXPECT_GE(xh[i], 30);
+//     EXPECT_LT(xh[i], 40);
+//   }
+// }
 
 TYPED_TEST(DenseVectorUnaryTest, Resize) {
   using Vector     = typename TestFixture::device;

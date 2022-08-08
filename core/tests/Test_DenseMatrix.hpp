@@ -403,15 +403,15 @@ TYPED_TEST(DenseMatrixUnaryTest, Assign) {
     }
   }
 
-  A.assign(nrows + 2000, ncols + 1500, (value_type)10.111);
-  EXPECT_EQ(A.nrows(), nrows + 2000);
-  EXPECT_EQ(A.ncols(), ncols + 1500);
-  EXPECT_EQ(A.nnnz(), (nrows + 2000) * (ncols + 1500));
+  // A.assign(nrows + 2000, ncols + 1500, (value_type)10.111);
+  // EXPECT_EQ(A.nrows(), nrows + 2000);
+  // EXPECT_EQ(A.ncols(), ncols + 1500);
+  // EXPECT_EQ(A.nnnz(), (nrows + 2000) * (ncols + 1500));
 
-  Ah.assign(nrows + 2000, ncols + 1500, 0);
-  EXPECT_EQ(Ah.nrows(), A.nrows());
-  EXPECT_EQ(Ah.ncols(), A.ncols());
-  EXPECT_EQ(Ah.nnnz(), A.nnnz());
+  // Ah.assign(nrows + 2000, ncols + 1500, 0);
+  // EXPECT_EQ(Ah.nrows(), A.nrows());
+  // EXPECT_EQ(Ah.ncols(), A.ncols());
+  // EXPECT_EQ(Ah.nnnz(), A.nnnz());
 
   Morpheus::copy(A, Ah);
 
