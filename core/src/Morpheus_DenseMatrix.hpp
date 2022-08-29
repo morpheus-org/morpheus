@@ -249,8 +249,6 @@ class DenseMatrix
                      const value_type val) {
     using range_policy = Kokkos::RangePolicy<index_type, execution_space>;
 
-    this->resize(num_rows, num_cols);
-
     range_policy policy(0, num_rows);
     Impl::set_functor<value_array_type, value_type, index_type> f(_values, val,
                                                                   num_cols);
