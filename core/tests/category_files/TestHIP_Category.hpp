@@ -1,5 +1,5 @@
 /**
- * TestCuda_Category.hpp
+ * TestHIP_Category.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,14 +21,14 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_CORE_TEST_CUDA_HPP
-#define MORPHEUS_CORE_TEST_CUDA_HPP
+#ifndef MORPHEUS_CORE_TEST_HIP_HPP
+#define MORPHEUS_CORE_TEST_HIP_HPP
 
 #include <gtest/gtest.h>
 
-#define TEST_CATEGORY cuda
-#define TEST_CATEGORY_NUMBER 5
-#define TEST_EXECSPACE Kokkos::Cuda
-#define TEST_CATEGORY_FIXTURE(name) cuda_##name
+#define TEST_CATEGORY hip
+#define TEST_CATEGORY_NUMBER 7
+#define TEST_EXECSPACE Kokkos::Experimental::HIP
+#define TEST_CATEGORY_FIXTURE(name) hip_##name
 
-#endif  // MORPHEUS_CORE_TEST_CUDA_HPP
+#endif  // MORPHEUS_CORE_TEST_HIP_HPP

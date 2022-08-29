@@ -78,13 +78,14 @@ namespace Test {
  * @brief Test Suite using the Binary DiaMatrix pairs
  *
  */
-TYPED_TEST_CASE(DiaMatrixBinaryTest, DiaMatrixBinary);
+TYPED_TEST_SUITE(DiaMatrixBinaryTest, DiaMatrixBinary);
 
 TYPED_TEST(DiaMatrixBinaryTest, ResizeFromDiaMatrix) {
   using Matrix1     = typename TestFixture::device1;
   using HostMatrix1 = typename TestFixture::host1;
   using Matrix2     = typename TestFixture::device2;
   using index_type  = typename Matrix1::index_type;
+  using value_type  = typename Matrix1::value_type;
 
   Matrix1 A(this->nrows, this->ncols, this->nnnz, this->ndiag);
   CHECK_DIA_SIZES(A, this->nrows, this->ncols, this->nnnz, this->ndiag,
@@ -126,7 +127,7 @@ TYPED_TEST(DiaMatrixBinaryTest, ResizeFromDiaMatrix) {
   // Resizing to larger sizes should invoke a new allocation so changes in
   // matrix should not be reflected in reference
   Ah.diagonal_offsets(1) = 1;
-  Ah.values(0, 1)        = -1.11;
+  Ah.values(0, 1)        = (value_type)-1.11;
   Morpheus::copy(Ah, A);
 
   // Copy reference back to see if there are any changes
@@ -156,7 +157,7 @@ TYPED_TEST(DiaMatrixBinaryTest, ResizeFromDiaMatrix) {
 
   // Set back to normal
   Ah.diagonal_offsets(1) = 0;
-  Ah.values(0, 1)        = 1.11;
+  Ah.values(0, 1)        = (value_type)1.11;
   Morpheus::copy(Ah, A);
 
   VALIDATE_DIA_CONTAINER(Ah, Ahref_test, index_type);
@@ -174,6 +175,8 @@ TYPED_TEST(DiaMatrixBinaryTest, AllocateFromDiaMatrix) {
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
   using index_type  = typename Matrix1::index_type;
+  using value_type1 = typename Matrix1::value_type;
+  using value_type2 = typename Matrix2::value_type;
 
   HostMatrix1 Ah(this->nrows, this->ncols, this->nnnz, this->ndiag);
   CHECK_DIA_SIZES(Ah, this->nrows, this->ncols, this->nnnz, this->ndiag,
@@ -193,7 +196,7 @@ TYPED_TEST(DiaMatrixBinaryTest, AllocateFromDiaMatrix) {
 
   // Change values in one container
   Ah.diagonal_offsets(1) = 1;
-  Ah.values(0, 1)        = -1.11;
+  Ah.values(0, 1)        = (value_type1)-1.11;
 
   for (index_type n = 0; n < Bh.ndiags(); n++) {
     EXPECT_EQ(Bh.diagonal_offsets(n), 0);
@@ -209,7 +212,7 @@ TYPED_TEST(DiaMatrixBinaryTest, AllocateFromDiaMatrix) {
   CHECK_DIA_EMPTY(B);
 
   Bh.diagonal_offsets(1) = 1;
-  Bh.values(0, 1)        = -1.11;
+  Bh.values(0, 1)        = (value_type2)-1.11;
 
   B.allocate(A);
   CHECK_DIA_CONTAINERS(A, B);

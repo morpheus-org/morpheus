@@ -98,7 +98,7 @@ class ConvertTest : public ::testing::Test {
 
 namespace Test {
 
-TYPED_TEST_CASE(ConvertTest, ConvertTypes);
+TYPED_TEST_SUITE(ConvertTest, ConvertTypes);
 
 TYPED_TEST(ConvertTest, ForwardThenBackward) {
   using src_t      = typename TestFixture::source_host;

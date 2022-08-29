@@ -60,7 +60,7 @@ namespace Test {
  * @brief Test Suite using the Unary CsrMatrix
  *
  */
-TYPED_TEST_CASE(CsrMatrixUnaryTest, CsrMatrixUnary);
+TYPED_TEST_SUITE(CsrMatrixUnaryTest, CsrMatrixUnary);
 
 /**
  * @brief Testing default construction of CsrMatrix container
@@ -234,6 +234,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultCopyAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -254,7 +255,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultCopyAssignment) {
   // Change values in one container
   Ah.row_offsets(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_CSR_CONTAINER(Bh, Ah, nrows, nnnz, index_type);
@@ -280,6 +281,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultCopyConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -300,7 +302,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultCopyConstructor) {
   // Change values in one container
   Ah.row_offsets(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_CSR_CONTAINER(Bh, Ah, nrows, nnnz, index_type);
@@ -326,6 +328,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultMoveAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -346,7 +349,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultMoveAssignment) {
   // Change values in one container
   Ah.row_offsets(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_CSR_CONTAINER(Bh, Ah, nrows, nnnz, index_type);
@@ -372,6 +375,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultMoveConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -392,7 +396,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultMoveConstructor) {
   // Change values in one container
   Ah.row_offsets(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_CSR_CONTAINER(Bh, Ah, nrows, nnnz, index_type);
@@ -450,6 +454,7 @@ TYPED_TEST(CsrMatrixUnaryTest, Resize) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   index_type large_nrows = 500, large_ncols = 400, large_nnnz = 640;
@@ -472,14 +477,14 @@ TYPED_TEST(CsrMatrixUnaryTest, Resize) {
   }
   for (index_type n = nnnz; n < Ah.nnnz(); n++) {
     EXPECT_EQ(Ah.column_indices(n), 0);
-    EXPECT_EQ(Ah.values(n), 0);
+    EXPECT_EQ(Ah.values(n), (value_type)0);
   }
 
   // Resizing to larger sizes should invoke a new allocation so changes in
   // matrix should not be reflected in reference
   Ah.row_offsets(1)    = 1;
   Ah.column_indices(2) = 10;
-  Ah.values(0)         = -1.11;
+  Ah.values(0)         = (value_type)-1.11;
   Morpheus::copy(Ah, A);
 
   // Copy reference back to see if there are any changes
@@ -494,7 +499,7 @@ TYPED_TEST(CsrMatrixUnaryTest, Resize) {
   }
   for (index_type n = nnnz; n < Ah.nnnz(); n++) {
     EXPECT_EQ(Ah.column_indices(n), 0);
-    EXPECT_EQ(Ah.values(n), 0);
+    EXPECT_EQ(Ah.values(n), (value_type)0);
   }
 
   // Resize to smaller shape and non-zeros
@@ -506,7 +511,7 @@ TYPED_TEST(CsrMatrixUnaryTest, Resize) {
   // Set back to normal
   Ah.row_offsets(1)    = 2;
   Ah.column_indices(2) = 1;
-  Ah.values(0)         = 1.11;
+  Ah.values(0)         = (value_type)1.11;
   Morpheus::copy(Ah, A);
 
   VALIDATE_CSR_CONTAINER(Ah, Ahref_test, Ah.nrows(), Ah.nnnz(), index_type);

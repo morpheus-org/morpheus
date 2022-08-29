@@ -105,7 +105,7 @@ namespace Test {
  * @brief Test Suite using the Unary DynamicMatrix
  *
  */
-TYPED_TEST_CASE(DynamicMatrixUnaryTest, DynamicMatrixUnary);
+TYPED_TEST_SUITE(DynamicMatrixUnaryTest, DynamicMatrixUnary);
 
 /**
  * @brief Testing default construction of DynamicMatrix container
@@ -227,6 +227,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, ActiveIndex) {
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentHost) {
   using HostMatrix = typename TestFixture::host;
   using index_type = typename HostMatrix::index_type;
+  using value_type = typename HostMatrix::value_type;
 
   HostMatrix A1_h = this->Aref_dyn_h;
   CHECK_DYNAMIC_SIZES(A1_h, this->nrows, this->ncols, this->nnnz, 0);
@@ -236,7 +237,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentHost) {
   // Change values in one container
   this->Aref_coo_h.row_indices(2)    = 2;
   this->Aref_coo_h.column_indices(1) = 1;
-  this->Aref_coo_h.values(3)         = -3.33;
+  this->Aref_coo_h.values(3)         = (value_type)-3.33;
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CooHost Bt_h = A1_h;
@@ -254,7 +255,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentHost) {
   // Change values in one container
   this->Aref_csr_h.row_offsets(2)    = 2;
   this->Aref_csr_h.column_indices(1) = 1;
-  this->Aref_csr_h.values(3)         = -3.33;
+  this->Aref_csr_h.values(3)         = (value_type)-3.33;
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CsrHost Dt_h = A1_h;
@@ -274,6 +275,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentHost) {
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentDevice) {
   using Matrix     = typename TestFixture::device;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   Matrix A1 = this->Aref_dyn;
   CHECK_DYNAMIC_SIZES(A1, this->nrows, this->ncols, this->nnnz, 0);
@@ -283,7 +285,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentDevice) {
   // Change values in one container
   this->Aref_coo_h.row_indices(2)    = 2;
   this->Aref_coo_h.column_indices(1) = 1;
-  this->Aref_coo_h.values(3)         = -3.33;
+  this->Aref_coo_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_coo_h, this->Aref_coo);
 
   // Extract active state of both Dynamic containers to check
@@ -307,7 +309,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentDevice) {
   // Change values in one container
   this->Aref_csr_h.row_offsets(2)    = 2;
   this->Aref_csr_h.column_indices(1) = 1;
-  this->Aref_csr_h.values(3)         = -3.33;
+  this->Aref_csr_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);
 
   // Extract active state of both Dynamic containers to check
@@ -333,6 +335,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentDevice) {
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorHost) {
   using HostMatrix = typename TestFixture::host;
   using index_type = typename HostMatrix::index_type;
+  using value_type = typename HostMatrix::value_type;
 
   HostMatrix A1_h(this->Aref_dyn_h);
   CHECK_DYNAMIC_SIZES(A1_h, this->nrows, this->ncols, this->nnnz, 0);
@@ -342,7 +345,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorHost) {
   // Change values in one container
   this->Aref_coo_h.row_indices(2)    = 2;
   this->Aref_coo_h.column_indices(1) = 1;
-  this->Aref_coo_h.values(3)         = -3.33;
+  this->Aref_coo_h.values(3)         = (value_type)-3.33;
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CooHost Bt_h = A1_h;
@@ -360,7 +363,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorHost) {
   // Change values in one container
   this->Aref_csr_h.row_offsets(2)    = 2;
   this->Aref_csr_h.column_indices(1) = 1;
-  this->Aref_csr_h.values(3)         = -3.33;
+  this->Aref_csr_h.values(3)         = (value_type)-3.33;
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CsrHost B1t_h = B1_h;
@@ -380,6 +383,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorHost) {
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorDevice) {
   using Matrix     = typename TestFixture::device;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   Matrix A1(this->Aref_dyn);
   CHECK_DYNAMIC_SIZES(A1, this->nrows, this->ncols, this->nnnz, 0);
@@ -389,7 +393,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorDevice) {
   // Change values in one container
   this->Aref_coo_h.row_indices(2)    = 2;
   this->Aref_coo_h.column_indices(1) = 1;
-  this->Aref_coo_h.values(3)         = -3.33;
+  this->Aref_coo_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_coo_h, this->Aref_coo);
 
   // Extract active state of both Dynamic containers to check
@@ -413,7 +417,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorDevice) {
   // Change values in one container
   this->Aref_csr_h.row_offsets(2)    = 2;
   this->Aref_csr_h.column_indices(1) = 1;
-  this->Aref_csr_h.values(3)         = -3.33;
+  this->Aref_csr_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);
 
   // Extract active state of both Dynamic containers to check
@@ -439,6 +443,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorDevice) {
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentHost) {
   using HostMatrix = typename TestFixture::host;
   using index_type = typename HostMatrix::index_type;
+  using value_type = typename HostMatrix::value_type;
 
   HostMatrix A1_h = std::move(this->Aref_dyn_h);
   CHECK_DYNAMIC_SIZES(A1_h, this->nrows, this->ncols, this->nnnz, 0);
@@ -448,7 +453,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentHost) {
   // Change values in one container
   this->Aref_coo_h.row_indices(2)    = 2;
   this->Aref_coo_h.column_indices(1) = 1;
-  this->Aref_coo_h.values(3)         = -3.33;
+  this->Aref_coo_h.values(3)         = (value_type)-3.33;
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CooHost Bt_h = A1_h;
@@ -466,7 +471,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentHost) {
   // Change values in one container
   this->Aref_csr_h.row_offsets(2)    = 2;
   this->Aref_csr_h.column_indices(1) = 1;
-  this->Aref_csr_h.values(3)         = -3.33;
+  this->Aref_csr_h.values(3)         = (value_type)-3.33;
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CsrHost Dt_h = A1_h;
@@ -486,6 +491,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentHost) {
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentDevice) {
   using Matrix     = typename TestFixture::device;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   Matrix A1 = std::move(this->Aref_dyn);
   CHECK_DYNAMIC_SIZES(A1, this->nrows, this->ncols, this->nnnz, 0);
@@ -495,7 +501,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentDevice) {
   // Change values in one container
   this->Aref_coo_h.row_indices(2)    = 2;
   this->Aref_coo_h.column_indices(1) = 1;
-  this->Aref_coo_h.values(3)         = -3.33;
+  this->Aref_coo_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_coo_h, this->Aref_coo);
 
   // Extract active state of both Dynamic containers to check
@@ -519,7 +525,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentDevice) {
   // Change values in one container
   this->Aref_csr_h.row_offsets(2)    = 2;
   this->Aref_csr_h.column_indices(1) = 1;
-  this->Aref_csr_h.values(3)         = -3.33;
+  this->Aref_csr_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);
 
   // Extract active state of both Dynamic containers to check
@@ -545,6 +551,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentDevice) {
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorHost) {
   using HostMatrix = typename TestFixture::host;
   using index_type = typename HostMatrix::index_type;
+  using value_type = typename HostMatrix::value_type;
 
   HostMatrix A1_h(std::move(this->Aref_dyn_h));
   CHECK_DYNAMIC_SIZES(A1_h, this->nrows, this->ncols, this->nnnz, 0);
@@ -554,7 +561,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorHost) {
   // Change values in one container
   this->Aref_coo_h.row_indices(2)    = 2;
   this->Aref_coo_h.column_indices(1) = 1;
-  this->Aref_coo_h.values(3)         = -3.33;
+  this->Aref_coo_h.values(3)         = (value_type)-3.33;
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CooHost Bt_h = A1_h;
@@ -572,7 +579,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorHost) {
   // Change values in one container
   this->Aref_csr_h.row_offsets(2)    = 2;
   this->Aref_csr_h.column_indices(1) = 1;
-  this->Aref_csr_h.values(3)         = -3.33;
+  this->Aref_csr_h.values(3)         = (value_type)-3.33;
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CsrHost B1t_h = B1_h;
@@ -592,6 +599,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorHost) {
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorDevice) {
   using Matrix     = typename TestFixture::device;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   Matrix A1(std::move(this->Aref_dyn));
   CHECK_DYNAMIC_SIZES(A1, this->nrows, this->ncols, this->nnnz, 0);
@@ -601,7 +609,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorDevice) {
   // Change values in one container
   this->Aref_coo_h.row_indices(2)    = 2;
   this->Aref_coo_h.column_indices(1) = 1;
-  this->Aref_coo_h.values(3)         = -3.33;
+  this->Aref_coo_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_coo_h, this->Aref_coo);
 
   // Extract active state of both Dynamic containers to check
@@ -625,7 +633,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorDevice) {
   // Change values in one container
   this->Aref_csr_h.row_offsets(2)    = 2;
   this->Aref_csr_h.column_indices(1) = 1;
-  this->Aref_csr_h.values(3)         = -3.33;
+  this->Aref_csr_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);
 
   // Extract active state of both Dynamic containers to check

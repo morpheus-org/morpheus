@@ -68,7 +68,7 @@ namespace Test {
  * @brief Test Suite using the Compatible Binary CooMatrix pairs
  *
  */
-TYPED_TEST_CASE(CompatibleCooMatrixBinaryTest, CompatibleCooMatrixBinary);
+TYPED_TEST_SUITE(CompatibleCooMatrixBinaryTest, CompatibleCooMatrixBinary);
 
 TYPED_TEST(CompatibleCooMatrixBinaryTest, ConstructionFromCooMatrix) {
   using Matrix1     = typename TestFixture::device1;
@@ -76,6 +76,7 @@ TYPED_TEST(CompatibleCooMatrixBinaryTest, ConstructionFromCooMatrix) {
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
   using index_type  = typename Matrix1::index_type;
+  using value_type2 = typename Matrix2::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -96,7 +97,7 @@ TYPED_TEST(CompatibleCooMatrixBinaryTest, ConstructionFromCooMatrix) {
   // Change values in one container
   Ah.row_indices(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type2)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_COO_CONTAINER(Bh, Ah, nnnz, index_type);
@@ -118,6 +119,7 @@ TYPED_TEST(CompatibleCooMatrixBinaryTest, CopyAssignmentFromCooMatrix) {
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
   using index_type  = typename Matrix1::index_type;
+  using value_type2 = typename Matrix2::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -138,7 +140,7 @@ TYPED_TEST(CompatibleCooMatrixBinaryTest, CopyAssignmentFromCooMatrix) {
   // Change values in one container
   Ah.row_indices(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type2)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_COO_CONTAINER(Bh, Ah, nnnz, index_type);

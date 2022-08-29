@@ -83,8 +83,8 @@ namespace Test {
  pairs
  *
  */
-TYPED_TEST_CASE(CompatibleDiaMatrixDynamicTest,
-                DiaMatrixDynamicCompatibleBinary);
+TYPED_TEST_SUITE(CompatibleDiaMatrixDynamicTest,
+                 DiaMatrixDynamicCompatibleBinary);
 
 /**
  * @brief Testing construction of DiaMatrix container from another DynamicMatrix
@@ -99,6 +99,7 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
   using DynamicMatrix     = typename TestFixture::dynamic_device;
   using DynamicHostMatrix = typename TestFixture::dynamic_host;
   using index_type        = typename Matrix::index_type;
+  using value_type        = typename Matrix::value_type;
 
   // Build matrix from the reference DiaMatrix
   DynamicMatrix A(this->Aref);
@@ -116,7 +117,7 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
 
   // Change values in one container
   Bh.diagonal_offsets(2) = 2;
-  Bh.values(1, 2)        = -3.33;
+  Bh.values(1, 2)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   for (index_type n = 0; n < Bh.ndiags(); n++) {
@@ -186,6 +187,7 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
   using DynamicMatrix     = typename TestFixture::dynamic_device;
   using DynamicHostMatrix = typename TestFixture::dynamic_host;
   using index_type        = typename Matrix::index_type;
+  using value_type        = typename Matrix::value_type;
 
   // Build matrix from the reference DiaMatrix
   DynamicMatrix A(this->Aref);
@@ -203,7 +205,7 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
 
   // Change values in one container
   Bh.diagonal_offsets(2) = 2;
-  Bh.values(1, 2)        = -3.33;
+  Bh.values(1, 2)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   for (index_type n = 0; n < Bh.ndiags(); n++) {

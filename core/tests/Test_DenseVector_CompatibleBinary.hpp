@@ -54,7 +54,7 @@ namespace Test {
  * @brief Test Suite using the Compatible Binary DenseVectors
  *
  */
-TYPED_TEST_CASE(CompatibleDenseVectorBinaryTest, CompatibleDenseVectorBinary);
+TYPED_TEST_SUITE(CompatibleDenseVectorBinaryTest, CompatibleDenseVectorBinary);
 
 /**
  * @brief Testing shallow copy construction of DenseVector container from

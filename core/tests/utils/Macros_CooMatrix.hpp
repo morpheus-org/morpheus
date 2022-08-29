@@ -76,6 +76,7 @@
  */
 template <typename Matrix>
 void build_coomatrix(Matrix& A) {
+  using value_type = typename Matrix::value_type;
   // Matrix to Build
   // [1.11 *    2.22]
   // [*    *    3.33]
@@ -83,10 +84,10 @@ void build_coomatrix(Matrix& A) {
   CHECK_COO_SIZES(A, 3, 3, 4);
 
   // clang-format off
-  A.row_indices(0) = 0; A.column_indices(0) = 0; A.values(0) = 1.11;
-  A.row_indices(1) = 0; A.column_indices(1) = 2; A.values(1) = 2.22;
-  A.row_indices(2) = 1; A.column_indices(2) = 2; A.values(2) = 3.33;
-  A.row_indices(3) = 2; A.column_indices(3) = 1; A.values(3) = 4.44;
+  A.row_indices(0) = 0; A.column_indices(0) = 0; A.values(0) = (value_type)1.11;
+  A.row_indices(1) = 0; A.column_indices(1) = 2; A.values(1) = (value_type)2.22;
+  A.row_indices(2) = 1; A.column_indices(2) = 2; A.values(2) = (value_type)3.33;
+  A.row_indices(3) = 2; A.column_indices(3) = 1; A.values(3) = (value_type)4.44;
   // clang-format on
 }
 

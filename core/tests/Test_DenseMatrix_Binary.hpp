@@ -55,7 +55,7 @@ namespace Test {
  * @brief Test Suite using the Binary DenseMatrix
  *
  */
-TYPED_TEST_CASE(DenseMatrixBinaryTest, DenseMatrixBinary);
+TYPED_TEST_SUITE(DenseMatrixBinaryTest, DenseMatrixBinary);
 
 /**
  * @brief Testing allocation of DenseMatrix container from another DenseMatrix

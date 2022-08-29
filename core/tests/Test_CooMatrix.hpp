@@ -60,7 +60,7 @@ namespace Test {
  * @brief Test Suite using the Unary CooMatrix
  *
  */
-TYPED_TEST_CASE(CooMatrixUnaryTest, CooMatrixUnary);
+TYPED_TEST_SUITE(CooMatrixUnaryTest, CooMatrixUnary);
 
 /**
  * @brief Testing default construction of CooMatrix container
@@ -224,6 +224,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -244,7 +245,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyAssignment) {
   // Change values in one container
   Ah.row_indices(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_COO_CONTAINER(Bh, Ah, nnnz, index_type);
@@ -270,6 +271,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -290,7 +292,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyConstructor) {
   // Change values in one container
   Ah.row_indices(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_COO_CONTAINER(Bh, Ah, nnnz, index_type);
@@ -316,6 +318,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -336,7 +339,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveAssignment) {
   // Change values in one container
   Ah.row_indices(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_COO_CONTAINER(Bh, Ah, nnnz, index_type);
@@ -362,6 +365,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -382,7 +386,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveConstructor) {
   // Change values in one container
   Ah.row_indices(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_COO_CONTAINER(Bh, Ah, nnnz, index_type);
@@ -438,6 +442,7 @@ TYPED_TEST(CooMatrixUnaryTest, Resize) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   index_type large_nrows = 500, large_ncols = 400, large_nnnz = 640;
@@ -465,7 +470,7 @@ TYPED_TEST(CooMatrixUnaryTest, Resize) {
   // matrix should not be reflected in reference
   Ah.row_indices(1)    = 1;
   Ah.column_indices(2) = 10;
-  Ah.values(0)         = -1.11;
+  Ah.values(0)         = (value_type)-1.11;
   Morpheus::copy(Ah, A);
 
   // Copy reference back to see if there are any changes
@@ -490,7 +495,7 @@ TYPED_TEST(CooMatrixUnaryTest, Resize) {
   // Set back to normal
   Ah.row_indices(1)    = 0;
   Ah.column_indices(2) = 1;
-  Ah.values(0)         = 1.11;
+  Ah.values(0)         = (value_type)1.11;
   Morpheus::copy(Ah, A);
 
   VALIDATE_COO_CONTAINER(Ah, Ahref_test, Ah.nnnz(), index_type);
@@ -504,30 +509,31 @@ TYPED_TEST(CooMatrixUnaryTest, SortByRow) {
 }
 
 TYPED_TEST(CooMatrixUnaryTest, Sort) {
-  using Matrix = typename TestFixture::device;
-  using space  = typename Matrix::execution_space;
+  using Matrix     = typename TestFixture::device;
+  using space      = typename Matrix::execution_space;
+  using value_type = typename Matrix::value_type;
 
   Matrix A(5, 5, 7);
 
   if (Morpheus::is_serial_execution_space<space>::value) {
     // clang-format off
-    A.row_indices(0) = 3; A.column_indices(0) = 1; A.values(0) = 1;
-    A.row_indices(1) = 4; A.column_indices(1) = 2; A.values(1) = 2;
-    A.row_indices(2) = 1; A.column_indices(2) = 3; A.values(2) = 3;
-    A.row_indices(3) = 2; A.column_indices(3) = 2; A.values(3) = 4;
-    A.row_indices(4) = 1; A.column_indices(4) = 2; A.values(4) = 5;
-    A.row_indices(5) = 0; A.column_indices(5) = 3; A.values(5) = 6;
-    A.row_indices(6) = 2; A.column_indices(6) = 1; A.values(6) = 7;
+    A.row_indices(0) = 3; A.column_indices(0) = 1; A.values(0) = (value_type)1;
+    A.row_indices(1) = 4; A.column_indices(1) = 2; A.values(1) = (value_type)2;
+    A.row_indices(2) = 1; A.column_indices(2) = 3; A.values(2) = (value_type)3;
+    A.row_indices(3) = 2; A.column_indices(3) = 2; A.values(3) = (value_type)4;
+    A.row_indices(4) = 1; A.column_indices(4) = 2; A.values(4) = (value_type)5;
+    A.row_indices(5) = 0; A.column_indices(5) = 3; A.values(5) = (value_type)6;
+    A.row_indices(6) = 2; A.column_indices(6) = 1; A.values(6) = (value_type)7;
 
     A.sort();
 
-    EXPECT_EQ(A.row_indices(0), 0); EXPECT_EQ(A.column_indices(0), 3); EXPECT_EQ(A.values(0), 6);
-    EXPECT_EQ(A.row_indices(1), 1); EXPECT_EQ(A.column_indices(1), 2); EXPECT_EQ(A.values(1), 5);
-    EXPECT_EQ(A.row_indices(2), 1); EXPECT_EQ(A.column_indices(2), 3); EXPECT_EQ(A.values(2), 3);
-    EXPECT_EQ(A.row_indices(3), 2); EXPECT_EQ(A.column_indices(3), 1); EXPECT_EQ(A.values(3), 7);
-    EXPECT_EQ(A.row_indices(4), 2); EXPECT_EQ(A.column_indices(4), 2); EXPECT_EQ(A.values(4), 4);
-    EXPECT_EQ(A.row_indices(5), 3); EXPECT_EQ(A.column_indices(5), 1); EXPECT_EQ(A.values(5), 1);
-    EXPECT_EQ(A.row_indices(6), 4); EXPECT_EQ(A.column_indices(6), 2); EXPECT_EQ(A.values(6), 2);
+    EXPECT_EQ(A.row_indices(0), 0); EXPECT_EQ(A.column_indices(0), 3); EXPECT_EQ(A.values(0), (value_type)6);
+    EXPECT_EQ(A.row_indices(1), 1); EXPECT_EQ(A.column_indices(1), 2); EXPECT_EQ(A.values(1), (value_type)5);
+    EXPECT_EQ(A.row_indices(2), 1); EXPECT_EQ(A.column_indices(2), 3); EXPECT_EQ(A.values(2), (value_type)3);
+    EXPECT_EQ(A.row_indices(3), 2); EXPECT_EQ(A.column_indices(3), 1); EXPECT_EQ(A.values(3), (value_type)7);
+    EXPECT_EQ(A.row_indices(4), 2); EXPECT_EQ(A.column_indices(4), 2); EXPECT_EQ(A.values(4), (value_type)4);
+    EXPECT_EQ(A.row_indices(5), 3); EXPECT_EQ(A.column_indices(5), 1); EXPECT_EQ(A.values(5), (value_type)1);
+    EXPECT_EQ(A.row_indices(6), 4); EXPECT_EQ(A.column_indices(6), 2); EXPECT_EQ(A.values(6), (value_type)2);
     // clang-format on
   } else {
     EXPECT_THROW(A.sort(), Morpheus::NotImplementedException);
@@ -542,20 +548,21 @@ TYPED_TEST(CooMatrixUnaryTest, IsSortedByRow) {
 }
 
 TYPED_TEST(CooMatrixUnaryTest, IsSorted) {
-  using Matrix = typename TestFixture::device;
-  using space  = typename Matrix::execution_space;
+  using Matrix     = typename TestFixture::device;
+  using space      = typename Matrix::execution_space;
+  using value_type = typename Matrix::value_type;
 
   Matrix A(5, 5, 7);
 
   if (Morpheus::is_serial_execution_space<space>::value) {
     // clang-format off
-    A.row_indices(0) = 3; A.column_indices(0) = 1; A.values(0) = 1;
-    A.row_indices(1) = 4; A.column_indices(1) = 2; A.values(1) = 2;
-    A.row_indices(2) = 1; A.column_indices(2) = 3; A.values(2) = 3;
-    A.row_indices(3) = 2; A.column_indices(3) = 2; A.values(3) = 4;
-    A.row_indices(4) = 1; A.column_indices(4) = 2; A.values(4) = 5;
-    A.row_indices(5) = 0; A.column_indices(5) = 3; A.values(5) = 6;
-    A.row_indices(6) = 2; A.column_indices(6) = 1; A.values(6) = 7;
+    A.row_indices(0) = 3; A.column_indices(0) = 1; A.values(0) = (value_type)1;
+    A.row_indices(1) = 4; A.column_indices(1) = 2; A.values(1) = (value_type)2;
+    A.row_indices(2) = 1; A.column_indices(2) = 3; A.values(2) = (value_type)3;
+    A.row_indices(3) = 2; A.column_indices(3) = 2; A.values(3) = (value_type)4;
+    A.row_indices(4) = 1; A.column_indices(4) = 2; A.values(4) = (value_type)5;
+    A.row_indices(5) = 0; A.column_indices(5) = 3; A.values(5) = (value_type)6;
+    A.row_indices(6) = 2; A.column_indices(6) = 1; A.values(6) = (value_type)7;
     // clang-format on
 
     EXPECT_FALSE(A.is_sorted());

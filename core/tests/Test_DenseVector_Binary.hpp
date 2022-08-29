@@ -55,7 +55,7 @@ namespace Test {
  * @brief Test Suite using the Binary DenseVectors
  *
  */
-TYPED_TEST_CASE(DenseVectorBinaryTest, DenseVectorBinary);
+TYPED_TEST_SUITE(DenseVectorBinaryTest, DenseVectorBinary);
 
 /**
  * @brief Testing allocation of DenseVector container from another DenseVector
