@@ -186,8 +186,8 @@ typename Vector::value_type reduce(
 
   value_type result           = 0;
   const int maxThreads        = 256;  // number of threads per block
-  const int maxBlocks         = min(size / maxThreads, CUDA_MAX_BLOCK_DIM_SIZE);
-  const int cpuFinalThreshold = CUDA_WARP_SIZE;
+  const int maxBlocks         = min(size / maxThreads, MAX_BLOCK_DIM_SIZE);
+  const int cpuFinalThreshold = WARP_SIZE;
   int numBlocks               = 0;
   int numThreads              = 0;
 

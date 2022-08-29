@@ -1,5 +1,5 @@
 /**
- * Morpheus_CudaUtils.hpp
+ * Morpheus_HIPUtils.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,55 +21,55 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_CUDA_UTILS_HPP
-#define MORPHEUS_CUDA_UTILS_HPP
+#ifndef MORPHEUS_HIP_UTILS_HPP
+#define MORPHEUS_HIP_UTILS_HPP
 
 #include <Morpheus_Macros.hpp>
-#if defined(MORPHEUS_ENABLE_CUDA)
+#if defined(MORPHEUS_ENABLE_HIP)
 
 #include <impl/Morpheus_Utils.hpp>
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <cuda.h>
+#include "hip/hip_runtime.h"
 
 namespace Morpheus {
 namespace Impl {
 
 // maximum number of co-resident threads
 const int MAX_BLOCK_DIM_SIZE = 65535;
-const int WARP_SIZE          = 32;
+const int WARP_SIZE          = 64;
 
 template <typename T>
-static const char *_cudaGetErrorEnum(T error) {
-  return cudaGetErrorName(error);
+static const char *_hipGetErrorEnum(T error) {
+  return hipGetErrorName(error);
 }
 
 template <typename T>
-void check(T result, char const *const func, const char *const file,
-           int const line) {
+void check_hip(T result, char const *const func, const char *const file,
+               int const line) {
   if (result) {
-    fprintf(stderr, "CUDA error at %s:%d code=%d(%s) \"%s\" \n", file, line,
-            static_cast<unsigned int>(result), _cudaGetErrorEnum(result), func);
+    fprintf(stderr, "HIP error at %s:%d code=%d(%s) \"%s\" \n", file, line,
+            static_cast<unsigned int>(result), _hipGetErrorEnum(result), func);
     exit(EXIT_FAILURE);
   }
 }
 
-#define checkCudaErrors(val) check((val), #val, __FILE__, __LINE__)
+#define checkHIPErrors(val) check_hip((val), #val, __FILE__, __LINE__)
 
-// This will output the proper error string when calling cudaGetLastError
-#define getLastCudaError(msg) __getLastCudaError(msg, __FILE__, __LINE__)
+// This will output the proper error string when calling hipGetLastError
+#define getLastHIPError(msg) __getLastHIPError(msg, __FILE__, __LINE__)
 
-inline void __getLastCudaError(const char *errorMessage, const char *file,
-                               const int line) {
-  cudaError_t err = cudaGetLastError();
+inline void __getLastHIPError(const char *errorMessage, const char *file,
+                              const int line) {
+  hipError_t err = hipGetLastError();
 
-  if (cudaSuccess != err) {
+  if (hipSuccess != err) {
     fprintf(stderr,
-            "%s(%i) : getLastCudaError() CUDA error :"
+            "%s(%i) : getLastHIPError() HIP error :"
             " %s : (%d) %s.\n",
             file, line, errorMessage, static_cast<int>(err),
-            cudaGetErrorString(err));
+            hipGetErrorString(err));
     exit(EXIT_FAILURE);
   }
 }
@@ -78,13 +78,13 @@ template <typename KernelFunction>
 size_t max_active_blocks(KernelFunction kernel, const size_t CTA_SIZE,
                          const size_t dynamic_smem_bytes) {
   int MAX_BLOCKS;
-  cudaOccupancyMaxActiveBlocksPerMultiprocessor(
+  hipOccupancyMaxActiveBlocksPerMultiprocessor(
       &MAX_BLOCKS, kernel, (int)CTA_SIZE, dynamic_smem_bytes);
 
-  cudaDeviceProp prop;
+  hipDeviceProp_t prop;
   int device;
-  checkCudaErrors(cudaGetDevice(&device));
-  checkCudaErrors(cudaGetDeviceProperties(&prop, device));
+  checkHIPErrors(hipGetDevice(&device));
+  checkHIPErrors(hipGetDeviceProperties(&prop, device));
 
   return (size_t)MAX_BLOCKS * prop.multiProcessorCount;
 }
@@ -100,10 +100,10 @@ void getNumBlocksAndThreads(
     typename std::enable_if<std::is_integral<IndexType>::value>::type * =
         nullptr) {
   // get device capability, to avoid block/grid size exceed the upper bound
-  cudaDeviceProp prop;
+  hipDeviceProp_t prop;
   int device;
-  checkCudaErrors(cudaGetDevice(&device));
-  checkCudaErrors(cudaGetDeviceProperties(&prop, device));
+  checkHIPErrors(hipGetDevice(&device));
+  checkHIPErrors(hipGetDeviceProperties(&prop, device));
 
   threads = (n < maxThreads * 2) ? nextPow2((n + 1) / 2) : maxThreads;
   blocks  = (n + (threads * 2 - 1)) / (threads * 2);
@@ -129,5 +129,5 @@ void getNumBlocksAndThreads(
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ENABLE_CUDA
-#endif  // MORPHEUS_CUDA_UTILS_HPP
+#endif  // MORPHEUS_ENABLE_HIP
+#endif  // MORPHEUS_HIP_UTILS_HPP

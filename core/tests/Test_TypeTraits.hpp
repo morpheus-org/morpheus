@@ -584,6 +584,11 @@ TEST(TypeTraitsTest, IsMemorySpace) {
   EXPECT_EQ(res, 1);
 #endif
 
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::is_memory_space<Kokkos::Experimental::HIPSpace>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
   // Kokkos Execution Space
   res = Morpheus::is_memory_space<TEST_EXECSPACE>::value;
   EXPECT_EQ(res, 0);
@@ -633,6 +638,17 @@ TEST(TypeTraitsTest, HasMemorySpace) {
   EXPECT_EQ(res, 1);
 #endif
 
+#if defined(MORPHEUS_ENABLE_HIP)
+  // HIPSpace has a memory_space trait that we support
+  res = Morpheus::has_memory_space<Kokkos::Experimental::HIPSpace>::value;
+  EXPECT_EQ(res, 1);
+
+  // HIPSpace is also itself a memory space
+  res = Morpheus::has_memory_space<
+      Impl::with_memspace<Kokkos::Experimental::HIPSpace>>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
   res = Morpheus::has_memory_space<TEST_EXECSPACE>::value;
   EXPECT_EQ(res, 1);
 
@@ -671,6 +687,12 @@ TEST(TypeTraitsTest, IsSameMemorySpace) {
 #if defined(MORPHEUS_ENABLE_CUDA)
   res = Morpheus::is_same_memory_space<Kokkos::CudaSpace,
                                        Kokkos::CudaSpace>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::is_same_memory_space<Kokkos::Experimental::HIPSpace,
+                                       Kokkos::Experimental::HIPSpace>::value;
   EXPECT_EQ(res, 1);
 #endif
 
@@ -718,6 +740,12 @@ TEST(TypeTraitsTest, HasSameMemorySpace) {
 #if defined(MORPHEUS_ENABLE_CUDA)
   res = Morpheus::has_same_memory_space<Kokkos::CudaSpace,
                                         Kokkos::CudaSpace>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::has_same_memory_space<Kokkos::Experimental::HIPSpace,
+                                        Kokkos::Experimental::HIPSpace>::value;
   EXPECT_EQ(res, 1);
 #endif
 
@@ -1294,6 +1322,15 @@ TEST(TypeTraitsTest, IsCompatible) {
   EXPECT_EQ(res, 0);
 #endif
 
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::is_compatible<
+      Impl::TestStruct<double, int, Kokkos::Experimental::HIPSpace,
+                       Kokkos::LayoutRight>,
+      Impl::TestStruct<double, int, Kokkos::HostSpace,
+                       Kokkos::LayoutRight>>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
   /* Testing Alias */
   res = Morpheus::is_compatible_v<
       Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutRight>,
@@ -1370,6 +1407,15 @@ TEST(TypeTraitsTest, IsDynamicallyCompatible) {
   res = Morpheus::is_dynamically_compatible<
       Impl::TestStruct<double, int, Kokkos::CudaSpace, Kokkos::LayoutRight,
                        Morpheus::DynamicMatrixFormatTag>,
+      Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutRight,
+                       Morpheus::DynamicMatrixFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::is_dynamically_compatible<
+      Impl::TestStruct<double, int, Kokkos::Experimental::HIPSpace,
+                       Kokkos::LayoutRight, Morpheus::DynamicMatrixFormatTag>,
       Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutRight,
                        Morpheus::DynamicMatrixFormatTag>>::value;
   EXPECT_EQ(res, 0);
@@ -1486,6 +1532,15 @@ TEST(TypeTraitsTest, IsFormatCompatible) {
   EXPECT_EQ(res, 0);
 #endif
 
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::is_format_compatible<
+      Impl::TestStruct<double, int, Kokkos::Experimental::HIPSpace,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutRight,
+                       Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
   /* Testing Alias */
   // Compatible and first container is dynamic
   res = Morpheus::is_format_compatible_v<
@@ -1562,6 +1617,48 @@ TEST(TypeTraitsTest, IsFormatCompatibleDifferentSpace) {
   EXPECT_EQ(res, 0);
 #endif
 
+#if defined(MORPHEUS_ENABLE_HIP)
+  // Same format, layout, value and index types - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::Experimental::HIPSpace,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutRight,
+                       Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 1);
+
+  // Different format, same layout, value and index types - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::Experimental::HIPSpace,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutRight,
+                       Morpheus::CsrFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  // Different layout, same format, value and index types - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::Experimental::HIPSpace,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutLeft,
+                       Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  // Different value type, same format layout and index type - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::Experimental::HIPSpace,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>,
+      Impl::TestStruct<float, int, Kokkos::HostSpace, Kokkos::LayoutRight,
+                       Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+
+  // Different index type, same format layout and value type - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::Experimental::HIPSpace,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>,
+      Impl::TestStruct<double, long long, Kokkos::HostSpace,
+                       Kokkos::LayoutRight, Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
   // Different format, same layout, value and index types - Same Space
   res = Morpheus::is_format_compatible_different_space<
       Impl::TestStruct<double, int, typename TEST_EXECSPACE::memory_space,
@@ -1608,6 +1705,16 @@ TEST(TypeTraitsTest, IsFormatCompatibleDifferentSpace) {
   res = Morpheus::is_format_compatible_different_space<
       Impl::TestStruct<double, int, Kokkos::CudaSpace, Kokkos::LayoutRight,
                        Morpheus::DynamicMatrixFormatTag>,
+      Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutRight,
+                       Morpheus::DynamicMatrixFormatTag>>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
+#if defined(MORPHEUS_ENABLE_HIP)
+  // Dynamic format, layout, value and index types - Different Space
+  res = Morpheus::is_format_compatible_different_space<
+      Impl::TestStruct<double, int, Kokkos::Experimental::HIPSpace,
+                       Kokkos::LayoutRight, Morpheus::DynamicMatrixFormatTag>,
       Impl::TestStruct<double, int, Kokkos::HostSpace, Kokkos::LayoutRight,
                        Morpheus::DynamicMatrixFormatTag>>::value;
   EXPECT_EQ(res, 1);
@@ -1699,6 +1806,11 @@ TEST(TypeTraitsTest, IsExecutionSpace) {
   EXPECT_EQ(res, 1);
 #endif
 
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::is_execution_space<Kokkos::Experimental::HIP>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
   /* Testing Alias */
   res = Morpheus::is_execution_space_v<A>;
   EXPECT_EQ(res, 0);
@@ -1734,6 +1846,11 @@ TEST(TypeTraitsTest, IsHostMemorySpace) {
 
 #if defined(MORPHEUS_ENABLE_CUDA)
   res = Morpheus::is_host_memory_space<Kokkos::CudaSpace>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::is_host_memory_space<Kokkos::Experimental::HIPSpace>::value;
   EXPECT_EQ(res, 0);
 #endif
 
@@ -1777,6 +1894,11 @@ TEST(TypeTraitsTest, IsHostExecutionSpace) {
 
 #if defined(MORPHEUS_ENABLE_CUDA)
   res = Morpheus::is_host_execution_space<Kokkos::Cuda>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::is_host_execution_space<Kokkos::Experimental::HIP>::value;
   EXPECT_EQ(res, 0);
 #endif
 
@@ -1833,6 +1955,11 @@ TEST(TypeTraitsTest, IsSerialExecutionSpace) {
   EXPECT_EQ(res, 0);
 #endif
 
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::is_serial_execution_space<Kokkos::Experimental::HIP>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
   /* Testing Alias */
   res = Morpheus::is_serial_execution_space_v<A>;
   EXPECT_EQ(res, 0);
@@ -1886,6 +2013,11 @@ TEST(TypeTraitsTest, IsOpenMPExecutionSpace) {
 
 #if defined(MORPHEUS_ENABLE_CUDA)
   res = Morpheus::is_openmp_execution_space<Kokkos::Cuda>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::is_openmp_execution_space<Kokkos::Experimental::HIP>::value;
   EXPECT_EQ(res, 0);
 #endif
 
@@ -1946,6 +2078,47 @@ TEST(TypeTraitsTest, IsCudaExecutionSpace) {
 }
 #endif  // MORPHEUS_ENABLE_CUDA
 
+#if defined(MORPHEUS_ENABLE_HIP)
+/**
+ * @brief The \p is_hip_execution_space checks if the passed type is a valid
+ * HIP executions space. For the check to be valid, the type must be a HIP
+ * execution space.
+ *
+ */
+TEST(TypeTraitsTest, IsHIPExecutionSpace) {
+  struct A {};
+  bool res = Morpheus::is_hip_execution_space<int>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_hip_execution_space<A>::value;
+  EXPECT_EQ(res, 0);
+
+#if defined(MORPHEUS_ENABLE_SERIAL)
+  res = Morpheus::is_hip_execution_space<Kokkos::Serial>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+  res = Morpheus::is_hip_execution_space<Kokkos::OpenMP>::value;
+  EXPECT_EQ(res, 0);
+#endif
+
+  res = Morpheus::is_hip_execution_space<
+      Kokkos::DefaultHostExecutionSpace>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_hip_execution_space<Kokkos::Experimental::HIP>::value;
+  EXPECT_EQ(res, 1);
+
+  /* Testing Alias */
+  res = Morpheus::is_hip_execution_space_v<A>;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_hip_execution_space_v<Kokkos::DefaultHostExecutionSpace>;
+  EXPECT_EQ(res, 0);
+}
+#endif  // MORPHEUS_ENABLE_HIP
+
 /**
  * @brief The \p has_access checks if first type (ExecutionSpace) has access
  * to the arbitrary number of types passed. For the check to be valid, the
@@ -1993,6 +2166,40 @@ TEST(TypeTraitsTest, HasAccess) {
                            Impl::with_memspace<Kokkos::CudaSpace>,
                            Impl::with_memspace<Kokkos::CudaSpace>,
                            Impl::with_memspace<Kokkos::CudaSpace>>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::has_access<Kokkos::Experimental::HIP,
+                             Impl::with_memspace<Kokkos::HostSpace>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::has_access<Kokkos::Experimental::HIP,
+                             Impl::with_memspace<Kokkos::HostSpace>,
+                             Impl::with_memspace<Kokkos::HostSpace>,
+                             Impl::with_memspace<Kokkos::HostSpace>,
+                             Impl::with_memspace<Kokkos::HostSpace>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::has_access<
+      Kokkos::Experimental::HIP,
+      Impl::with_memspace<Kokkos::Experimental::HIPSpace>>::value;
+  EXPECT_EQ(res, 1);
+
+  res =
+      Morpheus::has_access<Kokkos::Experimental::HIP,
+                           Impl::with_memspace<Kokkos::HostSpace>,
+                           Impl::with_memspace<Kokkos::Experimental::HIPSpace>,
+                           Impl::with_memspace<Kokkos::HostSpace>,
+                           Impl::with_memspace<Kokkos::HostSpace>>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::has_access<
+      Kokkos::Experimental::HIP,
+      Impl::with_memspace<Kokkos::Experimental::HIPSpace>,
+      Impl::with_memspace<Kokkos::Experimental::HIPSpace>,
+      Impl::with_memspace<Kokkos::Experimental::HIPSpace>,
+      Impl::with_memspace<Kokkos::Experimental::HIPSpace>>::value;
   EXPECT_EQ(res, 1);
 #endif
   EXPECT_EQ(res, 1);

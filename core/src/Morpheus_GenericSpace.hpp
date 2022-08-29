@@ -123,6 +123,15 @@ using OpenMP = Morpheus::GenericSpace<Kokkos::OpenMP>;
  */
 using Cuda = Morpheus::GenericSpace<Kokkos::Cuda>;
 #endif
+
+#if defined(MORPHEUS_ENABLE_HIP)
+/**
+ * @brief A Generic Space that launches kernels in parallel from the performance
+ * portable backend (Kokkos) using HIP.
+ *
+ */
+using HIP = Morpheus::GenericSpace<Kokkos::Experimental::HIP>;
+#endif
 }  // namespace Generic
 
 /*! \} // end of wrappers group
