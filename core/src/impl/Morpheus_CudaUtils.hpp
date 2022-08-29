@@ -46,8 +46,8 @@ static const char *_cudaGetErrorEnum(T error) {
 }
 
 template <typename T>
-void check(T result, char const *const func, const char *const file,
-           int const line) {
+void check_cuda(T result, char const *const func, const char *const file,
+                int const line) {
   if (result) {
     fprintf(stderr, "CUDA error at %s:%d code=%d(%s) \"%s\" \n", file, line,
             static_cast<unsigned int>(result), _cudaGetErrorEnum(result), func);
@@ -55,7 +55,7 @@ void check(T result, char const *const func, const char *const file,
   }
 }
 
-#define checkCudaErrors(val) check((val), #val, __FILE__, __LINE__)
+#define checkCudaErrors(val) check_cuda((val), #val, __FILE__, __LINE__)
 
 // This will output the proper error string when calling cudaGetLastError
 #define getLastCudaError(msg) __getLastCudaError(msg, __FILE__, __LINE__)

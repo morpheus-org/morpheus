@@ -1353,7 +1353,7 @@ template <typename ExecSpace, typename... Ts>
 struct has_access;
 
 template <class T1, class T2>
-class has_access<T1, T2> {
+struct has_access<T1, T2> {
   typedef char yes[1];
   typedef char no[2];
 

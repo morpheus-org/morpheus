@@ -65,7 +65,7 @@ void update_diagonal(
 
 template <typename ExecSpace, typename Matrix, typename Vector>
 void get_diagonal(
-    Matrix& A, const Vector& diagonal,
+    Matrix&, const Vector&,
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
@@ -79,7 +79,7 @@ void get_diagonal(
 template <typename ExecSpace, typename Matrix, typename IndexType,
           typename ValueType>
 void set_value(
-    Matrix& A, IndexType row, IndexType col, ValueType value,
+    Matrix&, IndexType, IndexType, ValueType,
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
@@ -92,9 +92,8 @@ void set_value(
 template <typename ExecSpace, typename Matrix, typename IndexVector,
           typename ValueVector>
 void set_values(
-    Matrix& A, typename IndexVector::value_type m, const IndexVector idxm,
-    typename IndexVector::value_type n, const IndexVector idxn,
-    const ValueVector values,
+    Matrix&, typename IndexVector::value_type, const IndexVector,
+    typename IndexVector::value_type, const IndexVector, const ValueVector,
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<IndexVector> &&
@@ -108,7 +107,7 @@ void set_values(
 
 template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
 void transpose(
-    const Matrix& A, TransposeMatrix& At,
+    const Matrix&, TransposeMatrix&,
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
         Morpheus::is_dia_matrix_format_container_v<TransposeMatrix> &&

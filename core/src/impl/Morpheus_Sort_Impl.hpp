@@ -27,5 +27,6 @@
 #include <impl/Coo/Serial/Morpheus_Sort_Impl.hpp>
 #include <impl/Coo/OpenMP/Morpheus_Sort_Impl.hpp>
 #include <impl/Coo/Cuda/Morpheus_Sort_Impl.hpp>
+#include <impl/Coo/HIP/Morpheus_Sort_Impl.hpp>
 
 #endif  // MORPHEUS_SORT_IMPL_HPP

@@ -33,7 +33,7 @@ namespace Impl {
 
 template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y,
+    const Matrix&, const Vector&, Vector&,
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
