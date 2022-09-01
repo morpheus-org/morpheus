@@ -469,13 +469,23 @@ morpheus_add_option(
 set(CUBLAS_DEFAULT ${Morpheus_ENABLE_CUDA})
 if(Morpheus_NO_DEFAULT_CUDA_TPLS)
   set(CUBLAS_DEFAULT OFF)
-  set(CUSPARSE_DEFAULT OFF)
 endif()
 morpheus_add_tpl_option(
   CUBLAS ${CUBLAS_DEFAULT} "Whether to enable CUBLAS" DEFAULT_DOCSTRING
   "ON if CUDA-enabled Kokkos, otherwise OFF")
 
-morpheus_import_tpl(CUBLAS)
+# morpheus_add_option(
+#   NO_DEFAULT_HIP_TPLS OFF BOOL
+#   "Whether HIP TPLs should be enabled by default. Default: OFF")
+# set(HIPBLAS_DEFAULT ${Morpheus_ENABLE_HIP})
+# if(Morpheus_NO_DEFAULT_HIP_TPLS)
+#   set(HIPBLAS_DEFAULT OFF)
+# endif()
+# morpheus_add_tpl_option(
+#   HIPBLAS ${HIPBLAS_DEFAULT} "Whether to enable HIPBLAS" DEFAULT_DOCSTRING
+#   "ON if HIP-enabled Kokkos, otherwise OFF")
+
+# morpheus_import_tpl(HIPBLAS)
 
 morpheus_add_tpl_option(MPARK_VARIANT OFF
                         "Whether to enable Mpark Variant implementation")

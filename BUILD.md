@@ -154,6 +154,52 @@ $ make install
 
 **Warning** The installed Kokkos configuration does not support CXX extensions when build with `CUDA` enabled. Add the `-DCMAKE_CXX_EXTENSIONS=Off` to surpress warning.
 
+## P3 - MI100
+
+### Setup environment
+```sh
+$ module use /lustre/projects/bristol/modules/modulefiles
+$ module load cmake/3.23.2
+$ module load amd/4.5.1
+$ CXX_COMPILER=$(which hipcc)
+$ KOKKOS_INSTALL_DIR="/lustre/home/ri-cstylianou/morpheus-benchmarks/tpl/kokkos/installs/release-mi100-off-hip-4.5-off-hip"
+$ MORPHEUS_INSTALL_DIR="/lustre/home/ri-cstylianou/morpheus-benchmarks/tpl/morpheus/installs/release-mi100-off-hip-4.5-off-hip"
+```
+
+### Installing Kokkos
+```sh
+$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${KOKKOS_INSTALL_DIR} \
+           -DCMAKE_BUILD_TYPE=Release -DKokkos_ENABLE_HIP=On -DKokkos_ENABLE_CUDA=Off -DKokkos_ENABLE_OPENMP=Off  -DKokkos_ENABLE_SERIAL=ON \
+           -DKokkos_CXX_STANDARD=17 -DKokkos_ENABLE_COMPILER_WARNINGS=On -DKokkos_ARCH_ZEN3=On -DKokkos_ARCH_VEGA908=On \
+           -DKokkos_ENABLE_AGGRESSIVE_VECTORIZATION=On 
+           
+$ make
+$ make install
+```
+
+## Installing Morpheus
+```sh
+$ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${MORPHEUS_INSTALL_DIR} \
+           -DKokkos_ROOT=${KOKKOS_INSTALL_DIR} -DCMAKE_BUILD_TYPE=Release \
+           -DMorpheus_ENABLE_EXAMPLES=Off -DMorpheus_ENABLE_TESTS=On -DMorpheus_ENABLE_INDIVIDUAL_TESTS=On
+$ make
+$ make install
+```
+
+```sh
+module use /lustre/projects/bristol/modules/modulefiles
+module load cmake
+module load amd/4.5.1
+CXX_COMPILER=$(which hipcc)
+KOKKOS_INSTALL_DIR="/lustre/home/ri-cstylianou/morpheus-benchmarks/tpl/kokkos/installs/release-mi100-off-hip-4.5-off-hip"
+MORPHEUS_INSTALL_DIR="/lustre/home/ri-cstylianou/morpheus-benchmarks/tpl/morpheus/installs/release-mi100-off-hip-4.5-off-hip"
+
+cmake ../.. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${MORPHEUS_INSTALL_DIR} \
+           -DKokkos_ROOT=${KOKKOS_INSTALL_DIR} -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_EXTENSIONS=Off \
+           -DMorpheus_ENABLE_EXAMPLES=Off -DMorpheus_ENABLE_TESTS=On -DMorpheus_ENABLE_INDIVIDUAL_TESTS=On \
+           -DGTest_ROOT=/lustre/home/ri-cstylianou/googletest/install
+```
+
 ## Valgrind Memcheck
 ```sh
 $  valgrind -s --tool=memcheck --leak-check=full --track-origins=yes /path/to/exe
@@ -205,6 +251,9 @@ The following options control enabling TPLs:
 * Morpheus_ENABLE_TPL_CUBLAS: BOOL
     * Whether to enable CUBLAS
     * Default: ON if CUDA-enabled Kokkos, otherwise OFF
+* Morpheus_ENABLE_TPL_HIPBLAS: BOOL
+    * Whether to enable HIPBLAS
+    * Default: ON if HIP-enabled Kokkos, otherwise OFF
 * Morpheus_ENABLE_TPL_MPARK_VARIANT
     * Whether to enable the Mpark Variant library
     * BOOL Default: OFF
