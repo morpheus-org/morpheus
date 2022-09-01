@@ -28,7 +28,7 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_CUDA) || defined(MORPHEUS_ENABLE_HIP)
 
-#include <impl/Morpheus_CudaUtils.hpp>
+#include <impl/Morpheus_Utils.hpp>
 
 namespace Morpheus {
 namespace Impl {
