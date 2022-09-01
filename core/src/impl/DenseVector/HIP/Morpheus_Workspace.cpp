@@ -1,5 +1,5 @@
 /**
- * Morpheus_WAXPBY_Impl.hpp
+ * Morpheus_Convert_Impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,30 +21,21 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_DENSEVECTOR_KERNELS_WAXPBY_IMPL_HPP
-#define MORPHEUS_DENSEVECTOR_KERNELS_WAXPBY_IMPL_HPP
+#include <impl/DenseVector/HIP/Morpheus_Workspace.hpp>
+
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_HIP)
 
 namespace Morpheus {
 namespace Impl {
-namespace Kernels {
 
-template <typename ValueType, typename IndexType>
-__global__ void waxpby_kernel(IndexType n, ValueType alpha, const ValueType* x,
-                              ValueType beta, const ValueType* y,
-                              ValueType* w) {
-  const IndexType tid = blockDim.x * blockIdx.x + threadIdx.x;
-  if (tid > n) return;
+HIPWorkspace hipdotspace;
 
-  if (alpha == 1.0) {
-    w[tid] = x[tid] + beta * y[tid];
-  } else if (beta == 1.0) {
-    w[tid] = alpha * x[tid] + y[tid];
-  } else {
-    w[tid] = alpha * x[tid] + beta * y[tid];
-  }
-}
-}  // namespace Kernels
+#ifdef MORPHEUS_ENABLE_TPL_HIPBLAS
+HIPblasWorkspace hipblasdotspace;
+#endif  // MORPHEUS_ENABLE_TPL_HIPBLAS
+
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_DENSEVECTOR_KERNELS_WAXPBY_IMPL_HPP
+#endif  // MORPHEUS_ENABLE_HIP
