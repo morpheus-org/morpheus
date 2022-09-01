@@ -28,16 +28,19 @@
 #include <impl/Coo/Serial/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Coo/OpenMP/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Coo/Cuda/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Coo/HIP/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Coo/Kokkos/Morpheus_MatrixOperations_Impl.hpp>
 
 #include <impl/Csr/Serial/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Csr/OpenMP/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Csr/Cuda/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Csr/HIP/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Csr/Kokkos/Morpheus_MatrixOperations_Impl.hpp>
 
 #include <impl/Dia/Serial/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Dia/OpenMP/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Dia/Cuda/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Dia/HIP/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Dia/Kokkos/Morpheus_MatrixOperations_Impl.hpp>
 
 #endif  // MORPHEUS_IMPL_MATRIXOPERATIONS_IMPL_HPP

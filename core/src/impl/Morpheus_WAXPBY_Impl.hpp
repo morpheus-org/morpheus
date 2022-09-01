@@ -27,6 +27,7 @@
 #include <impl/DenseVector/Serial/Morpheus_WAXPBY_Impl.hpp>
 #include <impl/DenseVector/OpenMP/Morpheus_WAXPBY_Impl.hpp>
 #include <impl/DenseVector/Cuda/Morpheus_WAXPBY_Impl.hpp>
+#include <impl/DenseVector/HIP/Morpheus_WAXPBY_Impl.hpp>
 #include <impl/DenseVector/Kokkos/Morpheus_WAXPBY_Impl.hpp>
 
 #endif  // MORPHEUS_IMPL_WAXPBY_IMPL_HPP
