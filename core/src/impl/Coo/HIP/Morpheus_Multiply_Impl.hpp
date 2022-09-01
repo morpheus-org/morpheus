@@ -21,17 +21,17 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_COO_CUDA_MULTIPLY_IMPL_HPP
-#define MORPHEUS_COO_CUDA_MULTIPLY_IMPL_HPP
+#ifndef MORPHEUS_COO_HIP_MULTIPLY_IMPL_HPP
+#define MORPHEUS_COO_HIP_MULTIPLY_IMPL_HPP
 
 #include <Morpheus_Macros.hpp>
-#if defined(MORPHEUS_ENABLE_CUDA)
+#if defined(MORPHEUS_ENABLE_HIP)
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_GenericSpace.hpp>
 
-#include <impl/Morpheus_CudaUtils.hpp>
+#include <impl/Morpheus_HIPUtils.hpp>
 #include <impl/Coo/Kernels/Morpheus_Multiply_Impl.hpp>
 
 namespace Morpheus {
@@ -53,7 +53,7 @@ inline void multiply(
         Morpheus::is_coo_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
         !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_cuda_execution_space_v<ExecSpace> &&
+        Morpheus::is_hip_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
                                Vector>>* = nullptr) {
   switch (A.options()) {
@@ -82,7 +82,7 @@ void __spmv_coo_serial(const Matrix& A, const Vector& x, Vector& y,
       <<<1, 1>>>(A.nnnz(), I, J, V, x_ptr, y_ptr);
 
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
-  getLastCudaError("spmv_coo_serial_kernel: Kernel execution failed");
+  getLastHIPError("spmv_coo_serial_kernel: Kernel execution failed");
 #endif
 }
 
@@ -119,7 +119,7 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
         A.nnnz(), A.crow_indices().data(), A.ccolumn_indices().data(),
         A.cvalues().data(), x.data(), y.data());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
-    getLastCudaError("spmv_coo_serial_kernel: Kernel execution failed");
+    getLastHIPError("spmv_coo_serial_kernel: Kernel execution failed");
 #endif
     return;
   }
@@ -153,14 +153,14 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
           A.ccolumn_indices().data(), A.cvalues().data(), x.data(), y.data(),
           temp_rows.data(), temp_vals.data());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
-  getLastCudaError("spmv_coo_flat_kernel: Kernel execution failed");
+  getLastHIPError("spmv_coo_flat_kernel: Kernel execution failed");
 #endif
 
   Kernels::spmv_coo_reduce_update_kernel<index_type, value_type, BLOCK_SIZE>
       <<<1, BLOCK_SIZE, 0>>>(active_warps, temp_rows.data(), temp_vals.data(),
                              y.data());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
-  getLastCudaError("spmv_coo_reduce_kernel: Kernel execution failed");
+  getLastHIPError("spmv_coo_reduce_kernel: Kernel execution failed");
 #endif
 
   Kernels::spmv_coo_serial_kernel<index_type, value_type>
@@ -168,12 +168,12 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
                     A.ccolumn_indices().data() + tail,
                     A.cvalues().data() + tail, x.data(), y.data());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
-  getLastCudaError("spmv_coo_serial_kernel: Kernel execution failed");
+  getLastHIPError("spmv_coo_serial_kernel: Kernel execution failed");
 #endif
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ENABLE_CUDA
-#endif  // MORPHEUS_COO_CUDA_MULTIPLY_IMPL_HPP
+#endif  // MORPHEUS_ENABLE_HIP
+#endif  // MORPHEUS_COO_HIP_MULTIPLY_IMPL_HPP
