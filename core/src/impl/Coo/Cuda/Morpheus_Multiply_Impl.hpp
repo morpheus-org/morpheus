@@ -113,7 +113,7 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
   if (A.nnnz() == 0) {
     // empty matrix
     return;
-  } else if (A.nnnz() < static_cast<index_type>(CUDA_WARP_SIZE)) {
+  } else if (A.nnnz() < static_cast<index_type>(WARP_SIZE)) {
     // small matrix
     Kernels::spmv_coo_serial_kernel<index_type, value_type><<<1, 1, 0>>>(
         A.nnnz(), A.crow_indices().data(), A.ccolumn_indices().data(),
@@ -128,18 +128,18 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
   const size_t MAX_BLOCKS = max_active_blocks(
       Kernels::spmv_coo_flat_kernel<index_type, value_type, BLOCK_SIZE>,
       BLOCK_SIZE, (size_t)0);
-  const size_t WARPS_PER_BLOCK = BLOCK_SIZE / CUDA_WARP_SIZE;
+  const size_t WARPS_PER_BLOCK = BLOCK_SIZE / WARP_SIZE;
 
-  const size_t num_units  = A.nnnz() / CUDA_WARP_SIZE;
+  const size_t num_units  = A.nnnz() / WARP_SIZE;
   const size_t num_warps  = std::min(num_units, WARPS_PER_BLOCK * MAX_BLOCKS);
   const size_t num_blocks = DIVIDE_INTO(num_warps, WARPS_PER_BLOCK);
   const size_t num_iters  = DIVIDE_INTO(num_units, num_warps);
 
-  const index_type interval_size = CUDA_WARP_SIZE * num_iters;
+  const index_type interval_size = WARP_SIZE * num_iters;
 
   const index_type tail =
-      num_units * CUDA_WARP_SIZE;  // do the last few nonzeros separately (fewer
-                                   // than WARP_SIZE elements)
+      num_units * WARP_SIZE;  // do the last few nonzeros separately (fewer
+                              // than WARP_SIZE elements)
 
   const unsigned int active_warps =
       (interval_size == 0) ? 0 : DIVIDE_INTO(tail, interval_size);

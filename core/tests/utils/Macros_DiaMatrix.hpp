@@ -106,6 +106,7 @@
  */
 template <typename Matrix>
 void build_diamatrix(Matrix& A) {
+  using value_type = typename Matrix::value_type;
   // Matrix to Build
   // [1.11 *    2.22]
   // [*    *    3.33]
@@ -122,10 +123,10 @@ void build_diamatrix(Matrix& A) {
   // [0    0    3.33 *]
   // [4.44 0    *    *]
   // * -> -99
-  A.values(0,0) = -99; A.values(1,0) = 0; A.values(2,0) = 4.44;
-  A.values(0,1) = 1.11; A.values(1,1) = 0; A.values(2,1) = 0;
-  A.values(0,2) = 0; A.values(1,2) = 3.33; A.values(2,2) = -99;
-  A.values(0,3) = 2.22; A.values(1,3) = -99; A.values(2,3) = -99;
+  A.values(0,0) = (value_type)-99; A.values(1,0) = (value_type)0; A.values(2,0) = (value_type)4.44;
+  A.values(0,1) = (value_type)1.11; A.values(1,1) = (value_type)0; A.values(2,1) = (value_type)0;
+  A.values(0,2) = (value_type)0; A.values(1,2) = (value_type)3.33; A.values(2,2) = (value_type)-99;
+  A.values(0,3) = (value_type)2.22; A.values(1,3) = (value_type)-99; A.values(2,3) = (value_type)-99;
   // clang-format on
 }
 

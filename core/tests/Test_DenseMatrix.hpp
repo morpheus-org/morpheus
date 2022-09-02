@@ -46,7 +46,7 @@ namespace Test {
  * @brief Test Suite using the Unary DenseMatrix
  *
  */
-TYPED_TEST_CASE(DenseMatrixUnaryTest, DenseMatrixUnary);
+TYPED_TEST_SUITE(DenseMatrixUnaryTest, DenseMatrixUnary);
 
 /**
  * @brief Testing default construction of DenseMatrix container
@@ -293,7 +293,7 @@ TYPED_TEST(DenseMatrixUnaryTest, NormalConstructionDefaultVal) {
   using index_type = typename Matrix::index_type;
 
   index_type num_rows = 10, num_cols = 15;
-  value_type val = 0;
+  value_type val = (value_type)0;
 
   Matrix A(num_rows, num_cols);
   HostMatrix Ah(num_rows, num_cols);
@@ -326,7 +326,7 @@ TYPED_TEST(DenseMatrixUnaryTest, NormalConstruction) {
   using index_type = typename Matrix::index_type;
 
   index_type num_rows = 10, num_cols = 15;
-  value_type val = 15.22;
+  value_type val = (value_type)15.22;
 
   Matrix A(num_rows, num_cols, val);
   HostMatrix Ah(num_rows, num_cols);
@@ -372,52 +372,45 @@ TYPED_TEST(DenseMatrixUnaryTest, Assign) {
   EXPECT_EQ(Ah.nnnz(), nrows * ncols);
 
   A.assign(100, 150, (value_type)20.33);
-  EXPECT_EQ(A.nrows(), 100);
-  EXPECT_EQ(A.ncols(), 150);
-  EXPECT_EQ(A.nnnz(), 100 * 150);
-  Ah.assign(100, 150, (value_type)20.33);
-  EXPECT_EQ(Ah.nrows(), 100);
-  EXPECT_EQ(Ah.ncols(), 150);
-  EXPECT_EQ(Ah.nnnz(), 100 * 150);
+  // Ensure we are not resizing
+  EXPECT_EQ(A.nrows(), nrows);
+  EXPECT_EQ(A.ncols(), ncols);
+  EXPECT_EQ(A.nnnz(), nrows * ncols);
+  EXPECT_EQ(Ah.nrows(), nrows);
+  EXPECT_EQ(Ah.ncols(), ncols);
+  EXPECT_EQ(Ah.nnnz(), nrows * ncols);
   Morpheus::copy(A, Ah);
 
-  for (index_type i = 0; i < A.nrows(); i++) {
-    for (index_type j = 0; j < A.ncols(); j++) {
+  for (index_type i = 0; i < 100; i++) {
+    for (index_type j = 0; j < 150; j++) {
       EXPECT_EQ(Ah(i, j), (value_type)20.33);
     }
   }
 
+  for (index_type i = 100; i < A.nrows(); i++) {
+    for (index_type j = 150; j < A.ncols(); j++) {
+      EXPECT_EQ(Ah(i, j), (value_type)0);
+    }
+  }
+
   A.assign(70, 80, (value_type)-30.11);
-  EXPECT_EQ(A.nrows(), 70);
-  EXPECT_EQ(A.ncols(), 80);
-  EXPECT_EQ(A.nnnz(), 70 * 80);
-  Ah.assign(70, 80, (value_type)-30.11);
-  EXPECT_EQ(Ah.nrows(), 70);
-  EXPECT_EQ(Ah.ncols(), 80);
-  EXPECT_EQ(Ah.nnnz(), 70 * 80);
   Morpheus::copy(A, Ah);
 
-  for (index_type i = 0; i < A.nrows(); i++) {
-    for (index_type j = 0; j < A.ncols(); j++) {
+  for (index_type i = 0; i < 70; i++) {
+    for (index_type j = 0; j < 80; j++) {
       EXPECT_EQ(Ah(i, j), (value_type)-30.11);
     }
   }
 
-  // A.assign(nrows + 2000, ncols + 1500, (value_type)10.111);
-  // EXPECT_EQ(A.nrows(), nrows + 2000);
-  // EXPECT_EQ(A.ncols(), ncols + 1500);
-  // EXPECT_EQ(A.nnnz(), (nrows + 2000) * (ncols + 1500));
+  for (index_type i = 70; i < 100; i++) {
+    for (index_type j = 80; j < 150; j++) {
+      EXPECT_EQ(Ah(i, j), (value_type)20.33);
+    }
+  }
 
-  // Ah.assign(nrows + 2000, ncols + 1500, 0);
-  // EXPECT_EQ(Ah.nrows(), A.nrows());
-  // EXPECT_EQ(Ah.ncols(), A.ncols());
-  // EXPECT_EQ(Ah.nnnz(), A.nnnz());
-
-  Morpheus::copy(A, Ah);
-
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
-      EXPECT_EQ(Ah(i, j), (value_type)10.111);
+  for (index_type i = 100; i < A.nrows(); i++) {
+    for (index_type j = 150; j < A.ncols(); j++) {
+      EXPECT_EQ(Ah(i, j), (value_type)0);
     }
   }
 }

@@ -27,16 +27,19 @@
 #include <impl/Coo/Serial/Morpheus_Multiply_Impl.hpp>
 #include <impl/Coo/OpenMP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Coo/Cuda/Morpheus_Multiply_Impl.hpp>
+#include <impl/Coo/HIP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Coo/Kokkos/Morpheus_Multiply_Impl.hpp>
 
 #include <impl/Csr/Serial/Morpheus_Multiply_Impl.hpp>
 #include <impl/Csr/OpenMP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Csr/Cuda/Morpheus_Multiply_Impl.hpp>
+#include <impl/Csr/HIP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Csr/Kokkos/Morpheus_Multiply_Impl.hpp>
 
 #include <impl/Dia/Serial/Morpheus_Multiply_Impl.hpp>
 #include <impl/Dia/OpenMP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Dia/Cuda/Morpheus_Multiply_Impl.hpp>
+#include <impl/Dia/HIP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Dia/Kokkos/Morpheus_Multiply_Impl.hpp>
 
 #endif  // MORPHEUS_IMPL_MULTIPLY_IMPL_HPP

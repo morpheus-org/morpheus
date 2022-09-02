@@ -68,7 +68,7 @@ namespace Test {
  * @brief Test Suite using the Compatible Binary CsrMatrix pairs
  *
  */
-TYPED_TEST_CASE(CompatibleCsrMatrixBinaryTest, CompatibleCsrMatrixBinary);
+TYPED_TEST_SUITE(CompatibleCsrMatrixBinaryTest, CompatibleCsrMatrixBinary);
 
 TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromCsrMatrix) {
   using Matrix1     = typename TestFixture::device1;
@@ -76,6 +76,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromCsrMatrix) {
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
   using index_type  = typename Matrix1::index_type;
+  using value_type2 = typename Matrix2::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -96,7 +97,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromCsrMatrix) {
   // Change values in one container
   Ah.row_offsets(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type2)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_CSR_CONTAINER(Bh, Ah, nrows, nnnz, index_type);
@@ -118,6 +119,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, CopyAssignmentFromCsrMatrix) {
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
   using index_type  = typename Matrix1::index_type;
+  using value_type2 = typename Matrix2::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -138,7 +140,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, CopyAssignmentFromCsrMatrix) {
   // Change values in one container
   Ah.row_offsets(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type2)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_CSR_CONTAINER(Bh, Ah, nrows, nnnz, index_type);
@@ -162,6 +164,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromDenseVector) {
   using Matrix     = typename TestFixture::device2;
   using HostMatrix = typename TestFixture::host2;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
@@ -184,7 +187,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromDenseVector) {
   EXPECT_NE(Ah.row_offsets(2), Ah_test.row_offsets(2));
   Ah.column_indices(1) = 1;
   EXPECT_NE(Ah.column_indices(1), Ah_test.column_indices(1));
-  Ah.values(0) = -1.11;
+  Ah.values(0) = (value_type)-1.11;
   EXPECT_NE(Ah.values(0), Ah_test.values(0));
 }
 

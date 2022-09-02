@@ -105,7 +105,7 @@ inline void transpose(
         type* = nullptr) {
   Impl::Variant::visit(
       [&](auto&& arg1, auto&& arg2) { Impl::transpose<ExecSpace>(arg1, arg2); },
-      A.const_formats(), A.formats());
+      A.const_formats(), At.formats());
 }
 
 }  // namespace Impl

@@ -32,12 +32,19 @@
 #ifndef _REDUCE_KERNEL_H_
 #define _REDUCE_KERNEL_H_
 
-#define _CG_ABI_EXPERIMENTAL
-#include <cooperative_groups.h>
-#include <cooperative_groups/reduce.h>
-#include <stdio.h>
+#if defined(MORPHEUS_ENABLE_HIP)
+#include <impl/Morpheus_HIPUtils.hpp>
 
-namespace cg = cooperative_groups;
+#define SHFL_DOWN(mask, val, offset) __shfl_down(val, offset)
+#define BALLOT(mask, predicate) __ballot(predicate)
+#define BIT_MASK 0xffffffffffffffff
+#else
+#include <impl/Morpheus_CudaUtils.hpp>
+
+#define SHFL_DOWN(mask, val, offset) __shfl_down_sync(mask, val, offset)
+#define BALLOT(mask, predicate) __ballot(mask, predicate)
+#define BIT_MASK 0xffffffff
+#endif
 
 namespace Morpheus {
 namespace Impl {
@@ -75,8 +82,9 @@ struct SharedMemory<double> {
 
 template <class T>
 __device__ __forceinline__ T warpReduceSum(unsigned int mask, T mySum) {
-  for (int offset = warpSize / 2; offset > 0; offset /= 2) {
-    mySum += __shfl_down_sync(mask, mySum, offset);
+  for (int offset = WARP_SIZE / 2; offset > 0; offset /= 2) {
+    // mySum += __shfl_down_sync(mask, mySum, offset);
+    SHFL_DOWN(mask, mySum, offset);
   }
   return mySum;
 }
@@ -106,11 +114,14 @@ __global__ void reduce_kernel(const ValueType *__restrict__ g_idata,
 
   // perform first level of reduction,
   // reading from global memory, writing to shared memory
-  unsigned int tid        = threadIdx.x;
-  unsigned int gridSize   = blockSize * gridDim.x;
-  unsigned int maskLength = (blockSize & 31);  // 31 = warpSize-1
-  maskLength              = (maskLength > 0) ? (32 - maskLength) : maskLength;
-  const unsigned int mask = (0xffffffff) >> maskLength;
+  unsigned int tid      = threadIdx.x;
+  unsigned int gridSize = blockSize * gridDim.x;
+  // unsigned int maskLength = (blockSize & 31);  // 31 = WARP_SIZE-1
+  // maskLength              = (maskLength > 0) ? (32 - maskLength) :
+  // maskLength;
+  unsigned int maskLength = (blockSize & (WARP_SIZE - 1));  // 31 = WARP_SIZE-1
+  maskLength = (maskLength > 0) ? (WARP_SIZE - maskLength) : maskLength;
+  const unsigned int mask = (BIT_MASK) >> maskLength;
 
   ValueType mySum = 0;
 
@@ -143,15 +154,15 @@ __global__ void reduce_kernel(const ValueType *__restrict__ g_idata,
   mySum = warpReduceSum<ValueType>(mask, mySum);
 
   // each thread puts its local sum into shared memory
-  if ((tid % warpSize) == 0) {
-    sdata[tid / warpSize] = mySum;
+  if ((tid % WARP_SIZE) == 0) {
+    sdata[tid / WARP_SIZE] = mySum;
   }
 
   __syncthreads();
 
   const unsigned int shmem_extent =
-      (blockSize / warpSize) > 0 ? (blockSize / warpSize) : 1;
-  const unsigned int ballot_result = __ballot_sync(mask, tid < shmem_extent);
+      (blockSize / WARP_SIZE) > 0 ? (blockSize / WARP_SIZE) : 1;
+  const unsigned int ballot_result = BALLOT(mask, tid < shmem_extent);
   if (tid < shmem_extent) {
     mySum = sdata[tid];
     // Reduce final warp using shuffle or reduce_add if T==int & CUDA_ARCH ==

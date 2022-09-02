@@ -139,8 +139,8 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
   const IndexType thread_id =
       BLOCK_SIZE * blockIdx.x + threadIdx.x;  // global thread index
   const IndexType thread_lane =
-      threadIdx.x & (CUDA_WARP_SIZE - 1);  // thread index within the warp
-  const IndexType warp_id = thread_id / CUDA_WARP_SIZE;  // global warp index
+      threadIdx.x & (WARP_SIZE - 1);  // thread index within the warp
+  const IndexType warp_id = thread_id / WARP_SIZE;  // global warp index
 
   const IndexType interval_begin =
       warp_id * interval_size;  // warp's offset into I,J,V
@@ -162,7 +162,7 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
   }
 
   for (IndexType n = interval_begin + thread_lane; n < interval_end;
-       n += CUDA_WARP_SIZE) {
+       n += WARP_SIZE) {
     IndexType row = I[n];            // row index (i)
     ValueType val = V[n] * x[J[n]];  // A(i,j) * x(j)
 

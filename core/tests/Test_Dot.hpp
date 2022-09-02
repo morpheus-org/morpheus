@@ -70,7 +70,7 @@ class DotTest : public ::testing::Test {
 
 namespace Test {
 
-TYPED_TEST_CASE(DotTest, ContainerImplementations);
+TYPED_TEST_SUITE(DotTest, ContainerImplementations);
 
 TYPED_TEST(DotTest, SmallTest) {
   using value_type = typename TestFixture::DenseVector::value_type;

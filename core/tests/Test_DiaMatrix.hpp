@@ -69,7 +69,7 @@ namespace Test {
  * @brief Test Suite using the Unary DiaMatrix
  *
  */
-TYPED_TEST_CASE(DiaMatrixUnaryTest, DiaMatrixUnary);
+TYPED_TEST_SUITE(DiaMatrixUnaryTest, DiaMatrixUnary);
 
 /**
  * @brief Testing default construction of DiaMatrix container
@@ -241,6 +241,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   // Build matrix from the device vectors
   Matrix A(this->nrows, this->ncols, this->nnnz, this->Aref.diagonal_offsets(),
@@ -261,7 +262,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyAssignment) {
 
   // Change values in one container
   Ah.diagonal_offsets(2) = 2;
-  Ah.values(0, 1)        = -3.33;
+  Ah.values(0, 1)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
@@ -288,6 +289,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   // Build matrix from the device vectors
   Matrix A(this->nrows, this->ncols, this->nnnz, this->Aref.diagonal_offsets(),
@@ -308,7 +310,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyConstructor) {
 
   // Change values in one container
   Ah.diagonal_offsets(2) = 2;
-  Ah.values(0, 1)        = -3.33;
+  Ah.values(0, 1)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
@@ -335,6 +337,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   // Build matrix from the device vectors
   Matrix A(this->nrows, this->ncols, this->nnnz, this->Aref.diagonal_offsets(),
@@ -355,7 +358,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveAssignment) {
 
   // Change values in one container
   Ah.diagonal_offsets(2) = 2;
-  Ah.values(0, 1)        = -3.33;
+  Ah.values(0, 1)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
@@ -382,6 +385,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   // Build matrix from the device vectors
   Matrix A(this->nrows, this->ncols, this->nnnz, this->Aref.diagonal_offsets(),
@@ -402,7 +406,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveConstructor) {
 
   // Change values in one container
   Ah.diagonal_offsets(2) = 2;
-  Ah.values(0, 1)        = -3.33;
+  Ah.values(0, 1)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
@@ -496,6 +500,7 @@ TYPED_TEST(DiaMatrixUnaryTest, ResizeDefault) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   index_type large_nrows = 500, large_ncols = 500, large_nnnz = 640,
              large_ndiag = 110;
@@ -529,7 +534,7 @@ TYPED_TEST(DiaMatrixUnaryTest, ResizeDefault) {
   // Resizing to larger sizes should invoke a new allocation so changes in
   // matrix should not be reflected in reference
   Ah.diagonal_offsets(1) = 1;
-  Ah.values(0, 1)        = -1.11;
+  Ah.values(0, 1)        = (value_type)-1.11;
   Morpheus::copy(Ah, A);
 
   // Copy reference back to see if there are any changes
@@ -559,7 +564,7 @@ TYPED_TEST(DiaMatrixUnaryTest, ResizeDefault) {
 
   // Set back to normal
   Ah.diagonal_offsets(1) = 0;
-  Ah.values(0, 1)        = 1.11;
+  Ah.values(0, 1)        = (value_type)1.11;
   Morpheus::copy(Ah, A);
 
   VALIDATE_DIA_CONTAINER(Ah, Ahref_test, index_type);

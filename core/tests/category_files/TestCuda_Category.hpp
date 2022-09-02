@@ -1,5 +1,5 @@
 /**
- * TestOpenMP_Category.hpp
+ * TestCuda_Category.hpp
  *
  * EPCC, The University of Edinburgh
  *

@@ -114,8 +114,8 @@ namespace Test {
  * @brief Test Suite using the Compatible Binary DynamicMatrix pairs
  *
  */
-TYPED_TEST_CASE(CompatibleDynamicMatrixBinaryTest,
-                CompatibleDynamicMatrixBinary);
+TYPED_TEST_SUITE(CompatibleDynamicMatrixBinaryTest,
+                 CompatibleDynamicMatrixBinary);
 
 TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
            ConstructionFromDynamicMatrixHost) {

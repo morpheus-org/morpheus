@@ -24,8 +24,6 @@
 #ifndef MORPHEUS_DENSEVECTOR_KERNELS_WAXPBY_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_KERNELS_WAXPBY_IMPL_HPP
 
-#include <cuda.h>
-
 namespace Morpheus {
 namespace Impl {
 namespace Kernels {

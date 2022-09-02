@@ -78,7 +78,7 @@ namespace Test {
  * @brief Test Suite using the Compatible Binary DiaMatrix pairs
  *
  */
-TYPED_TEST_CASE(CompatibleDiaMatrixBinaryTest, CompatibleDiaMatrixBinary);
+TYPED_TEST_SUITE(CompatibleDiaMatrixBinaryTest, CompatibleDiaMatrixBinary);
 
 TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDiaMatrix) {
   using Matrix1     = typename TestFixture::device1;
@@ -86,6 +86,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDiaMatrix) {
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
   using index_type  = typename Matrix1::index_type;
+  using value_type  = typename Matrix2::index_type;
 
   // Build matrix from the device vectors
   Matrix2 A(this->nrows, this->ncols, this->nnnz, this->Aref.diagonal_offsets(),
@@ -106,7 +107,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDiaMatrix) {
 
   // Change values in one container
   Ah.diagonal_offsets(2) = 2;
-  Ah.values(1, 2)        = -3.33;
+  Ah.values(1, 2)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
@@ -129,6 +130,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, CopyAssignmentFromDiaMatrix) {
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
   using index_type  = typename Matrix1::index_type;
+  using value_type  = typename Matrix2::index_type;
 
   // Build matrix from the device vectors
   Matrix2 A(this->nrows, this->ncols, this->nnnz, this->Aref.diagonal_offsets(),
@@ -149,7 +151,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, CopyAssignmentFromDiaMatrix) {
 
   // Change values in one container
   Ah.diagonal_offsets(2) = 2;
-  Ah.values(1, 2)        = -3.33;
+  Ah.values(1, 2)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
@@ -175,6 +177,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDenseVector) {
   using Matrix     = typename TestFixture::device2;
   using HostMatrix = typename TestFixture::host2;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Matrix::value_type;
 
   // Build matrix from the device vectors
   Matrix A(this->nrows, this->ncols, this->nnnz, this->Aref.diagonal_offsets(),
@@ -197,7 +200,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDenseVector) {
 
   Ah.diagonal_offsets(2) = 2;
   EXPECT_NE(Ah.diagonal_offsets(2), Ah_test.diagonal_offsets(2));
-  Ah.values(0, 1) = -1.11;
+  Ah.values(0, 1) = (value_type)-1.11;
   EXPECT_NE(Ah.values(0, 1), Ah_test.values(0, 1));
 }
 

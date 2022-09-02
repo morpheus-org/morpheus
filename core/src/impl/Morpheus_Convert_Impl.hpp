@@ -31,26 +31,31 @@
 #include <impl/DenseVector/Serial/Morpheus_Convert_Impl.hpp>
 #include <impl/DenseVector/OpenMP/Morpheus_Convert_Impl.hpp>
 #include <impl/DenseVector/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/DenseVector/HIP/Morpheus_Convert_Impl.hpp>
 #include <impl/DenseVector/Kokkos/Morpheus_Convert_Impl.hpp>
 
 #include <impl/DenseMatrix/Serial/Morpheus_Convert_Impl.hpp>
 #include <impl/DenseMatrix/OpenMP/Morpheus_Convert_Impl.hpp>
 #include <impl/DenseMatrix/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/DenseMatrix/HIP/Morpheus_Convert_Impl.hpp>
 #include <impl/DenseMatrix/Kokkos/Morpheus_Convert_Impl.hpp>
 
 #include <impl/Coo/Serial/Morpheus_Convert_Impl.hpp>
 #include <impl/Coo/OpenMP/Morpheus_Convert_Impl.hpp>
 #include <impl/Coo/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/Coo/HIP/Morpheus_Convert_Impl.hpp>
 #include <impl/Coo/Kokkos/Morpheus_Convert_Impl.hpp>
 
 #include <impl/Csr/Serial/Morpheus_Convert_Impl.hpp>
 #include <impl/Csr/OpenMP/Morpheus_Convert_Impl.hpp>
 #include <impl/Csr/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/Csr/HIP/Morpheus_Convert_Impl.hpp>
 #include <impl/Csr/Kokkos/Morpheus_Convert_Impl.hpp>
 
 #include <impl/Dia/Serial/Morpheus_Convert_Impl.hpp>
 #include <impl/Dia/OpenMP/Morpheus_Convert_Impl.hpp>
 #include <impl/Dia/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/Dia/HIP/Morpheus_Convert_Impl.hpp>
 #include <impl/Dia/Kokkos/Morpheus_Convert_Impl.hpp>
 
 namespace Morpheus {

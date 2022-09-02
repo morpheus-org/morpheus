@@ -92,6 +92,7 @@
  */
 template <typename Matrix>
 void build_csrmatrix(Matrix& A) {
+  using value_type = typename Matrix::value_type;
   // Matrix to Build
   // [1.11 *    2.22]
   // [*    *    3.33]
@@ -104,10 +105,10 @@ void build_csrmatrix(Matrix& A) {
   A.row_offsets(2) = 3; 
   A.row_offsets(3) = 4; 
 
-  A.column_indices(0) = 0; A.values(0) = 1.11;
-  A.column_indices(1) = 2; A.values(1) = 2.22;
-  A.column_indices(2) = 2; A.values(2) = 3.33;
-  A.column_indices(3) = 1; A.values(3) = 4.44;
+  A.column_indices(0) = 0; A.values(0) = (value_type)1.11;
+  A.column_indices(1) = 2; A.values(1) = (value_type)2.22;
+  A.column_indices(2) = 2; A.values(2) = (value_type)3.33;
+  A.column_indices(3) = 1; A.values(3) = (value_type)4.44;
   // clang-format on
 }
 

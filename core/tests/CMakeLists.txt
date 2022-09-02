@@ -35,13 +35,14 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       DiaMatrix_CompatibleBinary
       DiaMatrix_CompatibleDynamicBinary
       DynamicMatrix
-      DynamicMatrix_CompatibleBinary
+      # DynamicMatrix_CompatibleBinary
       # Dot
       TypeTraits
       Metaprogramming
       ContainerFactory
       FormatTags
-      GenericSpace)
+      GenericSpace
+      )
       set(file ${testdir}/Test_${Tag}_${Name}.cpp)
       # Write to a temporary intermediate file and call configure_file to avoid
       # updating timestamps triggering unnecessary rebuilds on subsequent cmake

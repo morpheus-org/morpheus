@@ -54,7 +54,7 @@ namespace Test {
  * @brief Test Suite using the Compatible Binary DenseMatrix
  *
  */
-TYPED_TEST_CASE(CompatibleDenseMatrixBinaryTest, CompatibleDenseMatrixBinary);
+TYPED_TEST_SUITE(CompatibleDenseMatrixBinaryTest, CompatibleDenseMatrixBinary);
 
 /**
  * @brief Testing shallow copy construction of DenseMatrix container from

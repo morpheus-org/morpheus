@@ -73,8 +73,8 @@ namespace Test {
  pairs
  *
  */
-TYPED_TEST_CASE(CompatibleCsrMatrixDynamicTest,
-                CsrMatrixDynamicCompatibleBinary);
+TYPED_TEST_SUITE(CompatibleCsrMatrixDynamicTest,
+                 CsrMatrixDynamicCompatibleBinary);
 
 /**
  * @brief Testing construction of CsrMatrix container from another DynamicMatrix
@@ -89,6 +89,7 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   using DynamicMatrix     = typename TestFixture::dynamic_device;
   using DynamicHostMatrix = typename TestFixture::dynamic_host;
   using index_type        = typename Matrix::index_type;
+  using value_type        = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the reference CsrMatrix
@@ -108,7 +109,7 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   // Change values in one container
   Bh.row_offsets(2)    = 2;
   Bh.column_indices(1) = 1;
-  Bh.values(3)         = -3.33;
+  Bh.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
   for (index_type n = 0; n < nrows + 1; n++) {
@@ -176,6 +177,7 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   using DynamicMatrix     = typename TestFixture::dynamic_device;
   using DynamicHostMatrix = typename TestFixture::dynamic_host;
   using index_type        = typename Matrix::index_type;
+  using value_type        = typename Matrix::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the reference CsrMatrix
@@ -195,7 +197,7 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   // Change values in one container
   Bh.row_offsets(2)    = 2;
   Bh.column_indices(1) = 1;
-  Bh.values(3)         = -3.33;
+  Bh.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
   for (index_type n = 0; n < nrows + 1; n++) {

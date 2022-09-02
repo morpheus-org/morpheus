@@ -68,13 +68,14 @@ namespace Test {
  * @brief Test Suite using the Binary CsrMatrix pairs
  *
  */
-TYPED_TEST_CASE(CsrMatrixBinaryTest, CsrMatrixBinary);
+TYPED_TEST_SUITE(CsrMatrixBinaryTest, CsrMatrixBinary);
 
 TYPED_TEST(CsrMatrixBinaryTest, ResizeFromCsrMatrix) {
   using Matrix1     = typename TestFixture::device1;
   using HostMatrix1 = typename TestFixture::host1;
   using Matrix2     = typename TestFixture::device2;
   using index_type  = typename Matrix1::index_type;
+  using value_type  = typename Matrix1::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
   index_type large_nrows = 500, large_ncols = 400, large_nnnz = 640;
@@ -113,7 +114,7 @@ TYPED_TEST(CsrMatrixBinaryTest, ResizeFromCsrMatrix) {
   // matrix should not be reflected in reference
   Ah.row_offsets(1)    = 1;
   Ah.column_indices(2) = 10;
-  Ah.values(0)         = -1.11;
+  Ah.values(0)         = (value_type)-1.11;
   Morpheus::copy(Ah, A);
 
   // Copy reference back to see if there are any changes
@@ -128,7 +129,7 @@ TYPED_TEST(CsrMatrixBinaryTest, ResizeFromCsrMatrix) {
   }
   for (index_type n = nnnz; n < Ah.nnnz(); n++) {
     EXPECT_EQ(Ah.column_indices(n), 0);
-    EXPECT_EQ(Ah.values(n), 0);
+    EXPECT_EQ(Ah.values(n), (value_type)0);
   }
   Matrix2 Asmall(small_nrows, small_ncols, small_nnnz);
   // Resize to smaller shape and non-zeros
@@ -140,7 +141,7 @@ TYPED_TEST(CsrMatrixBinaryTest, ResizeFromCsrMatrix) {
   // Set back to normal
   Ah.row_offsets(1)    = 2;
   Ah.column_indices(2) = 1;
-  Ah.values(0)         = 1.11;
+  Ah.values(0)         = (value_type)1.11;
 
   Morpheus::copy(Ah, A);
   for (index_type n = 0; n < Ah.nrows() + 1; n++) {
@@ -164,6 +165,8 @@ TYPED_TEST(CsrMatrixBinaryTest, AllocateFromCsrMatrix) {
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
   using index_type  = typename Matrix1::index_type;
+  using value_type1 = typename Matrix1::value_type;
+  using value_type2 = typename Matrix2::value_type;
 
   index_type nrows = 3, ncols = 3, nnnz = 4;
 
@@ -184,14 +187,14 @@ TYPED_TEST(CsrMatrixBinaryTest, AllocateFromCsrMatrix) {
   // Change values in one container
   Ah.row_offsets(2)    = 2;
   Ah.column_indices(1) = 1;
-  Ah.values(3)         = -3.33;
+  Ah.values(3)         = (value_type1)-3.33;
 
   for (index_type n = 0; n < nrows + 1; n++) {
     EXPECT_EQ(Bh.row_offsets(n), 0);
   }
   for (index_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(Bh.column_indices(n), 0);
-    EXPECT_EQ(Bh.values(n), 0);
+    EXPECT_EQ(Bh.values(n), (value_type2)0);
   }
 
   // Now check device vector
@@ -200,7 +203,7 @@ TYPED_TEST(CsrMatrixBinaryTest, AllocateFromCsrMatrix) {
 
   Bh.row_offsets(1)    = 1;
   Bh.column_indices(2) = 2;
-  Bh.values(1)         = -1.11;
+  Bh.values(1)         = (value_type2)-1.11;
 
   B.allocate(A);
   CHECK_CSR_CONTAINERS(A, B);
@@ -211,7 +214,7 @@ TYPED_TEST(CsrMatrixBinaryTest, AllocateFromCsrMatrix) {
   }
   for (index_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(Bh.column_indices(n), 0);
-    EXPECT_EQ(Bh.values(n), 0);
+    EXPECT_EQ(Bh.values(n), (value_type2)0);
   }
 }
 

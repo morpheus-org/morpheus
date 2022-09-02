@@ -68,6 +68,14 @@ TEST(GenericSpaceTest, IsGenericSpace) {
   EXPECT_EQ(res, 1);
 #endif
 
+#if defined(MORPHEUS_ENABLE_HIP)
+  res = Morpheus::is_generic_space<Kokkos::Experimental::HIP>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_generic_space<Morpheus::Generic::HIP>::value;
+  EXPECT_EQ(res, 1);
+#endif
+
   /* Testing Alias */
   res = Morpheus::is_generic_space_v<Kokkos::DefaultHostExecutionSpace>;
   EXPECT_EQ(res, 0);

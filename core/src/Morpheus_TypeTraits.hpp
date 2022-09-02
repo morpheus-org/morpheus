@@ -422,6 +422,9 @@ class is_memory_space {
       U*, typename std::enable_if<std::is_same<U, Kokkos::HostSpace>::value ||
 #if defined(MORPHEUS_ENABLE_CUDA)
                                   std::is_same<U, Kokkos::CudaSpace>::value ||
+#elif defined(MORPHEUS_ENABLE_HIP)
+                                  std::is_same<U, Kokkos::Experimental::
+                                                      HIPSpace>::value ||
 #endif
                                   false>::type* = nullptr);
 
@@ -1103,6 +1106,9 @@ class is_execution_space {
 #endif
 #if defined(MORPHEUS_ENABLE_CUDA)
           std::is_same<typename U::execution_space, Kokkos::Cuda>::value ||
+#elif defined(MORPHEUS_ENABLE_HIP)
+          std::is_same<typename U::execution_space,
+                       Kokkos::Experimental::HIP>::value ||
 #endif
           false>::type* = nullptr);
 
@@ -1305,13 +1311,49 @@ inline constexpr bool is_cuda_execution_space_v =
     is_cuda_execution_space<T>::value;
 #endif  // MORPHEUS_ENABLE_CUDA
 
+#if defined(MORPHEUS_ENABLE_HIP)
+/**
+ * @brief Checks if the given type \p T is a HIP execution space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_hip_execution_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(U*, typename std::enable_if<
+#if defined(MORPHEUS_ENABLE_HIP)
+                           std::is_same<typename U::execution_space,
+                                        Kokkos::Experimental::HIP>::value ||
+#endif  // MORPHEUS_ENABLE_HIP
+                           false>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_hip_execution_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_hip_execution_space_v =
+    is_hip_execution_space<T>::value;
+#endif  // MORPHEUS_ENABLE_HIP
+
 /*! \cond */
 namespace Impl {
 template <typename ExecSpace, typename... Ts>
 struct has_access;
 
 template <class T1, class T2>
-class has_access<T1, T2> {
+struct has_access<T1, T2> {
   typedef char yes[1];
   typedef char no[2];
 

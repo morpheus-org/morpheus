@@ -37,6 +37,16 @@ if(Morpheus_ENABLE_CUDA)
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Cuda/*.cpp)
   append_glob(MORPHEUS_CORE_HEADERS
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Cuda/*.hpp)
+endif()
+
+if(Morpheus_ENABLE_HIP)
+  append_glob(MORPHEUS_CORE_SOURCES
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/HIP/*.cpp)
+  append_glob(MORPHEUS_CORE_HEADERS
+              ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/HIP/*.hpp)
+endif()
+
+if(Morpheus_ENABLE_CUDA OR MORPHEUS_ENABLE_HIP)
   append_glob(MORPHEUS_CORE_SOURCES
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Kernels/*.cpp)
   append_glob(MORPHEUS_CORE_HEADERS
