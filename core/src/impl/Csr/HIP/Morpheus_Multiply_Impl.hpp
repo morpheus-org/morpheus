@@ -150,7 +150,12 @@ void __spmv_csr_vector(const Matrix& A, const Vector& x, Vector& y,
     return;
   }
 
-  __spmv_csr_vector_dispatch<32>(A, x, y, init);
+  if (nnz_per_row <= 32) {
+    __spmv_csr_vector_dispatch<32>(A, x, y, init);
+    return;
+  }
+
+  __spmv_csr_vector_dispatch<64>(A, x, y, init);
 }
 
 }  // namespace Impl

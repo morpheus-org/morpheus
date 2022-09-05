@@ -109,7 +109,7 @@ __global__ void spmv_csr_vector_kernel(const IndexType nrows,
     // initialize local sum
     ValueType sum = ValueType(0);
 
-    if (THREADS_PER_VECTOR == 32 && row_end - row_start > 32) {
+    if (THREADS_PER_VECTOR == WARP_SIZE && row_end - row_start > WARP_SIZE) {
       // ensure aligned memory access to Aj and Ax
 
       IndexType jj =
@@ -132,6 +132,13 @@ __global__ void spmv_csr_vector_kernel(const IndexType nrows,
     sdata[threadIdx.x] = sum;
 
     ValueType temp;
+
+#if defined(MORPHEUS_ENABLE_HIP)
+    if (THREADS_PER_VECTOR > 32) {
+      temp               = sdata[threadIdx.x + 32];
+      sdata[threadIdx.x] = sum += temp;
+    }
+#endif  // MORPHEUS_ENABLE_HIP
 
     // reduce local sums to row sum
     if (THREADS_PER_VECTOR > 16) {
