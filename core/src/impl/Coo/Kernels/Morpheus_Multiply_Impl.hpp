@@ -37,10 +37,6 @@ namespace Kernels {
 template <typename IndexType, typename ValueType>
 __device__ void segreduce_block(const IndexType* idx, ValueType* val);
 
-template <typename IndexType, typename ValueType>
-__device__ ValueType segreduce_warp(const IndexType thread_lane, IndexType row,
-                                    ValueType val, IndexType* rows,
-                                    ValueType* vals);
 // COO format SpMV kernel that uses only one thread
 // This is incredibly slow, so it is only useful for testing purposes,
 // *extremely* small matrices, or a few elements at the end of a
@@ -133,7 +129,11 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
                               const IndexType* J, const ValueType* V,
                               const ValueType* x, ValueType* y,
                               IndexType* temp_rows, ValueType* temp_vals) {
-  __shared__ volatile IndexType rows[48 * (BLOCK_SIZE / 32)];
+  const IndexType MID_LANE  = WARP_SIZE / 2;
+  const IndexType LAST_LANE = WARP_SIZE - 1;
+
+  __shared__ volatile IndexType
+      rows[(WARP_SIZE + MID_LANE) * (BLOCK_SIZE / WARP_SIZE)];
   __shared__ volatile ValueType vals[BLOCK_SIZE];
 
   const IndexType thread_id =
@@ -147,15 +147,15 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
   const IndexType interval_end = Morpheus::Impl::min(
       interval_begin + interval_size, nnnz);  // end of warps's work
 
-  const IndexType idx = 16 * (threadIdx.x / 32 + 1) +
+  const IndexType idx = MID_LANE * (threadIdx.x / WARP_SIZE + 1) +
                         threadIdx.x;  // thread's index into padded rows array
 
-  rows[idx - 16] = -1;  // fill padding with invalid row index
+  rows[idx - MID_LANE] = -1;  // fill padding with invalid row index
 
   if (interval_begin >= interval_end)  // warp has no work to do
     return;
 
-  if (thread_lane == 31) {
+  if (thread_lane == WARP_SIZE - 1) {
     // initialize the carry in values
     rows[idx]         = I[interval_begin];
     vals[threadIdx.x] = ValueType(0);
@@ -167,11 +167,11 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
     ValueType val = V[n] * x[J[n]];  // A(i,j) * x(j)
 
     if (thread_lane == 0) {
-      if (row == rows[idx + 31])
-        val += ValueType(vals[threadIdx.x + 31]);  // row continues
+      if (row == rows[idx + LAST_LANE])
+        val += ValueType(vals[threadIdx.x + LAST_LANE]);  // row continues
       else
-        y[rows[idx + 31]] +=
-            ValueType(vals[threadIdx.x + 31]);  // row terminated
+        y[rows[idx + LAST_LANE]] +=
+            ValueType(vals[threadIdx.x + LAST_LANE]);  // row terminated
     }
 
     rows[idx]         = row;
@@ -193,11 +193,17 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
       vals[threadIdx.x] = val += ValueType(vals[threadIdx.x - 16]);
     }
 
-    if (thread_lane < 31 && row != rows[idx + 1])
+#if defined(MORPHEUS_ENABLE_HIP)
+    if (row == rows[idx - 32]) {
+      vals[threadIdx.x] = val += ValueType(vals[threadIdx.x - 32]);
+    }
+#endif  // MORPHEUS_ENABLE_HIP
+
+    if (thread_lane < LAST_LANE && row != rows[idx + 1])
       y[row] += ValueType(vals[threadIdx.x]);  // row terminated
   }
 
-  if (thread_lane == 31) {
+  if (thread_lane == LAST_LANE) {
     // write the carry out values
     temp_rows[warp_id] = IndexType(rows[idx]);
     temp_vals[warp_id] = ValueType(vals[threadIdx.x]);
@@ -259,33 +265,6 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
       if (rows[threadIdx.x] != rows[threadIdx.x + 1])
         y[rows[threadIdx.x]] += vals[threadIdx.x];
   }
-}
-
-// segmented reduction in shared memory
-template <typename IndexType, typename ValueType>
-__device__ ValueType segreduce_warp(const IndexType thread_lane, IndexType row,
-                                    ValueType val, IndexType* rows,
-                                    ValueType* vals) {
-  rows[threadIdx.x] = row;
-  vals[threadIdx.x] = val;
-
-  if (thread_lane >= 1 && row == rows[threadIdx.x - 1]) {
-    vals[threadIdx.x] = val += vals[threadIdx.x - 1];
-  }
-  if (thread_lane >= 2 && row == rows[threadIdx.x - 2]) {
-    vals[threadIdx.x] = val += vals[threadIdx.x - 2];
-  }
-  if (thread_lane >= 4 && row == rows[threadIdx.x - 4]) {
-    vals[threadIdx.x] = val += vals[threadIdx.x - 4];
-  }
-  if (thread_lane >= 8 && row == rows[threadIdx.x - 8]) {
-    vals[threadIdx.x] = val += vals[threadIdx.x - 8];
-  }
-  if (thread_lane >= 16 && row == rows[threadIdx.x - 16]) {
-    vals[threadIdx.x] = val += vals[threadIdx.x - 16];
-  }
-
-  return val;
 }
 
 template <typename IndexType, typename ValueType>
