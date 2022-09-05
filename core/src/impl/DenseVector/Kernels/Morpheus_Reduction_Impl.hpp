@@ -38,11 +38,11 @@
 #define SHFL_DOWN(mask, val, offset) __shfl_down(val, offset)
 #define BALLOT(mask, predicate) __ballot(predicate)
 #define BIT_MASK 0xffffffffffffffff
-#else
+#elif defined(MORPHEUS_ENABLE_CUDA)
 #include <impl/Morpheus_CudaUtils.hpp>
 
 #define SHFL_DOWN(mask, val, offset) __shfl_down_sync(mask, val, offset)
-#define BALLOT(mask, predicate) __ballot(mask, predicate)
+#define BALLOT(mask, predicate) __ballot_sync(mask, predicate)
 #define BIT_MASK 0xffffffff
 #endif
 
