@@ -32,27 +32,20 @@
 namespace Morpheus {
 namespace Impl {
 
-struct print_fn {
-  using result_type = void;
-  // TODO: Specify the stream to print to
-  // template <typename T, typename S>
-  // result_type operator()(const T& mat, S& s) const {
-  //   Morpheus::print(mat, s);
-  // }
-  template <typename Printable>
-  result_type operator()(const Printable& p) const {
-    Impl::print(p);
-  }
-};
-
 template <typename Printable, typename Stream>
 void print(const Printable& p, Stream& s,
            typename std::enable_if<Morpheus::is_dynamic_matrix_format_container<
                Printable>::value>::type* = nullptr) {
   print_matrix_header(p, s);
-  // TODO: Using a stream in this way doesn't seem to work
-  Morpheus::Impl::Variant::visit([&](auto&& arg) { Impl::print(arg); },
+  Morpheus::Impl::Variant::visit([&](auto&& arg) { Impl::print(arg, s); },
                                  p.const_formats());
+}
+
+template <typename Printable>
+void print(const Printable& p,
+           typename std::enable_if<Morpheus::is_dynamic_matrix_format_container<
+               Printable>::value>::type* = nullptr) {
+  Impl::print(p, std::cout);
 }
 
 }  // namespace Impl
