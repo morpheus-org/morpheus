@@ -61,6 +61,7 @@
 #include <Morpheus_Metaprogramming.hpp>
 #include <Morpheus_ContainerFactory.hpp>
 
+//! Generic Morpheus interfaces
 namespace Morpheus {
 
 struct InitArguments : public Kokkos::InitArguments {
