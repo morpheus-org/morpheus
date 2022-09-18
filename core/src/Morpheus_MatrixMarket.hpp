@@ -27,12 +27,11 @@
 #include <impl/Morpheus_MatrixMarket_Impl.hpp>
 
 namespace Morpheus {
-namespace Io {
+namespace IO {
 
 template <typename Matrix, typename Stream>
 void read_matrix_market_stream(Matrix& mtx, Stream& input) {
-  Morpheus::Io::Impl::read_matrix_market_stream(mtx, input,
-                                                typename Matrix::tag());
+  Morpheus::IO::Impl::read_matrix_market_stream(mtx, input);
 }
 
 template <typename Matrix>
@@ -52,16 +51,15 @@ void read_matrix_market_file(Matrix& mtx, const std::string& filename) {
   file.rdbuf()->sgetn(&buffer[0], buffer.size());
   file_string.write(&buffer[0], buffer.size());
 
-  Morpheus::Io::read_matrix_market_stream(mtx, file_string);
+  Morpheus::IO::read_matrix_market_stream(mtx, file_string);
 #else
-  Morpheus::Io::read_matrix_market_stream(mtx, file);
+  Morpheus::IO::read_matrix_market_stream(mtx, file);
 #endif
 }
 
 template <typename Matrix, typename Stream>
 void write_matrix_market_stream(const Matrix& mtx, Stream& output) {
-  Morpheus::Io::Impl::write_matrix_market_stream(mtx, output,
-                                                 typename Matrix::tag());
+  Morpheus::IO::Impl::write_matrix_market_stream(mtx, output);
 }
 
 template <typename Matrix>
@@ -76,14 +74,14 @@ void write_matrix_market_file(const Matrix& mtx, const std::string& filename) {
   // WAR OSX-specific issue using rdbuf
   std::stringstream file_string(std::stringstream::in | std::stringstream::out);
 
-  Morpheus::Io::write_matrix_market_stream(mtx, file_string);
+  Morpheus::IO::write_matrix_market_stream(mtx, file_string);
 
   file.rdbuf()->sputn(file_string.str().c_str(), file_string.str().size());
 #else
-  Morpheus::Io::write_matrix_market_stream(mtx, file);
+  Morpheus::IO::write_matrix_market_stream(mtx, file);
 #endif
 }
-}  // namespace Io
+}  // namespace IO
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_MATRIXMARKET_HPP

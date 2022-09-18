@@ -39,7 +39,7 @@
 #include <Morpheus_Copy.hpp>
 
 namespace Morpheus {
-namespace Io {
+namespace IO {
 // forward decl
 template <typename Matrix, typename Stream>
 void read_matrix_market_stream(Matrix& mtx, Stream& input);
@@ -246,7 +246,7 @@ void read_coordinate_stream(Morpheus::CooMatrix<ValueType, Properties...>& coo,
     coo = general;
   }  // if (banner.symmetry != "general")
   // sort indices by (row,column)
-  Morpheus::sort_by_row_and_column(coo);
+  Morpheus::sort_by_row_and_column<Kokkos::Serial>(coo);
 }
 
 template <typename ValueType, typename... Properties, typename Stream>
@@ -330,12 +330,12 @@ void read_matrix_market_stream(
   if (banner.storage == "coordinate") {
     Morpheus::CooMatrix<T, P...> temp;
     read_coordinate_stream(temp, input, banner);
-    Morpheus::convert(temp, mtx);
+    Morpheus::convert<Kokkos::Serial>(temp, mtx);
   } else  // banner.storage == "array"
   {
     Morpheus::DenseMatrix<T, P...> temp;
     read_array_stream(temp, input, banner);
-    Morpheus::convert(temp, mtx);
+    Morpheus::convert<Kokkos::Serial>(temp, mtx);
   }
 }
 
@@ -351,7 +351,7 @@ void read_matrix_market_stream(
 
   Morpheus::DenseMatrix<ValueType, Space> temp;
 
-  Morpheus::Io::read_matrix_market_stream(temp, input);
+  Morpheus::IO::read_matrix_market_stream(temp, input);
 
   Morpheus::copy(temp, vec);
 }
@@ -377,7 +377,7 @@ void write_coordinate_stream(
   for (size_t i = 0; i < size_t(coo.nnnz()); i++) {
     output << (coo.row_indices(i) + 1) << " ";
     output << (coo.column_indices(i) + 1) << " ";
-    Morpheus::Io::Impl::write_value(output, coo.values(i));
+    Morpheus::IO::Impl::write_value(output, coo.values(i));
     output << "\n";
   }
 }
@@ -391,9 +391,9 @@ void write_matrix_market_stream(
                                 T, P...>::memory_space>>::type* = nullptr) {
   // general sparse case
   Morpheus::CooMatrix<T, P...> coo;
-  Morpheus::convert(mtx, coo);
+  Morpheus::convert<Kokkos::Serial>(mtx, coo);
 
-  Morpheus::Io::Impl::write_coordinate_stream(coo, output);
+  Morpheus::IO::Impl::write_coordinate_stream(coo, output);
 }
 
 template <typename Matrix, typename Stream>
@@ -445,7 +445,7 @@ void write_matrix_market_stream(
 }
 
 }  // namespace Impl
-}  // namespace Io
+}  // namespace IO
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_MATRIX_MARKET_IMPL_HPP
