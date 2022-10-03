@@ -13,9 +13,11 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-latest']
-        compiler: [{"vendor": "gnu", "compiler": "g++", "version": ["8", "9"]}, 
-                   {"vendor": "clang", "compiler": "clang++", "version": ["11", "12"]}, 
-                   {"vendor": "intel", "compiler": "icpc", "version": ["any"]}]
+        compiler: [{"vendor": "gnu", "compiler": "g++", "version": "8"}, 
+                   {"vendor": "gnu", "compiler": "g++", "version": "9"}, 
+                   {"vendor": "clang", "compiler": "clang++", "version": "11"}, 
+                   {"vendor": "clang", "compiler": "clang++", "version": "12"}, 
+                   {"vendor": "intel", "compiler": "icpc", "version": "12"}]
         cmake_build_type: ['Release', 'Debug']
         backend: ['SERIAL', 'OPENMP']
     runs-on: ${{ matrix.os }}
@@ -31,7 +33,7 @@ jobs:
         if: ${{ matrix.compiler.vendor == 'clang' }}
         uses: egor-tensin/setup-clang@v1
         with:
-          version: latest
+          version: ${{ matrix.compiler.version }}
           platform: x64
           
       - name: Setup Intel Compilers
