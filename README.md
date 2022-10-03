@@ -36,15 +36,15 @@ More information can be found at [BUILD.md](BUILD.md)
 
 ## Documentation
 
-Currently `Morpheus` is under development so no documentation is available yet. Examples in `examples/` and `core/examples` can be a good source of information.
+Documentation can be found [here](morpheus-org.github.io/morpheus).
 
 ### Supported Formats
 
 | Format | Container | Serial | OpenMP | CUDA | HIP | Kokkos |
-| ------ | --------- | ------ | ------ | ---- | --- | --- |
-| Coo    | CooMatrix | yes    | yes    | yes   | no  | no |
-| Csr    | CsrMatrix | yes    | yes    | yes   | no  | yes |
-| Dia    | DiaMatrix | tes    | yes    | yes   | no  | yes |
+| ------ | --------- | ------ | ------ | ---- | --- | ------ |
+| Coo    | CooMatrix | yes    | yes    | yes  | yes | no     |
+| Csr    | CsrMatrix | yes    | yes    | yes  | yes | yes    |
+| Dia    | DiaMatrix | yes    | yes    | yes  | yes | yes    |
 
 ### Specifying a container
 
