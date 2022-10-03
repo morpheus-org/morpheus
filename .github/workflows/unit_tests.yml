@@ -98,8 +98,14 @@ jobs:
                 -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
                 -DKokkos_ROOT=/usr/kokkos-install \
                 -DMorpheus_ENABLE_EXAMPLES=Off \
-                -DMorpheus_ENABLE_TESTS=On
+                -DMorpheus_ENABLE_TESTS=On \
+                -DMorpheus_ENABLE_INDIVIDUAL_TESTS=On
       
       - name: Build Morpheus
         run: |
           cmake --build builddir --parallel 2
+
+      - name: Run Tests
+        working-directory: builddir
+        run: |
+          ./core/tests/MorpheusCore_UnitTest_${${{ env.backend }}^}
