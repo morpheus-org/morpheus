@@ -29,40 +29,40 @@
 #include <utils/Macros_DiaMatrix.hpp>
 
 /**
- * @brief Checks the sizes of a DynamicMatrix container against a number of rows,
- * columns and non-zeros
+ * @brief Checks the sizes of a DynamicMatrix container against a number of
+ * rows, columns and non-zeros
  *
  */
 #define CHECK_DYNAMIC_SIZES(A, num_rows, num_cols, num_nnz, active_index) \
-  {                                                                      \
-    EXPECT_EQ(A.nrows(), num_rows);                                      \
-    EXPECT_EQ(A.ncols(), num_cols);                                      \
-    EXPECT_EQ(A.nnnz(), num_nnz);                                        \
-    EXPECT_EQ(A.formats().index(), active_index);                    \
+  {                                                                       \
+    EXPECT_EQ(A.nrows(), num_rows);                                       \
+    EXPECT_EQ(A.ncols(), num_cols);                                       \
+    EXPECT_EQ(A.nnnz(), num_nnz);                                         \
+    EXPECT_EQ(A.formats().index(), active_index);                         \
   }
 
 /**
  * @brief Checks the sizes of an empty DynamicMatrix container
  *
  */
-#define CHECK_DYNAMIC_EMPTY(A)           \
-  {                                      \
-    EXPECT_EQ(A.nrows(), 0);             \
-    EXPECT_EQ(A.ncols(), 0);             \
-    EXPECT_EQ(A.nnnz(), 0);              \
-    EXPECT_EQ(A.formats().index(), 0);   \
+#define CHECK_DYNAMIC_EMPTY(A)         \
+  {                                    \
+    EXPECT_EQ(A.nrows(), 0);           \
+    EXPECT_EQ(A.ncols(), 0);           \
+    EXPECT_EQ(A.nnnz(), 0);            \
+    EXPECT_EQ(A.formats().index(), 0); \
   }
 
 /**
  * @brief Checks the sizes of two DynamicMatrix containers if they match
  *
  */
-#define CHECK_DYNAMIC_CONTAINERS(A, B)                      \
-  {                                                         \
-    EXPECT_EQ(A.nrows(), B.nrows());                        \
-    EXPECT_EQ(A.ncols(), B.ncols());                        \
-    EXPECT_EQ(A.nnnz(), B.nnnz());                          \
-    EXPECT_EQ(A.formats().index(), B.formats().index());    \
+#define CHECK_DYNAMIC_CONTAINERS(A, B)                   \
+  {                                                      \
+    EXPECT_EQ(A.nrows(), B.nrows());                     \
+    EXPECT_EQ(A.ncols(), B.ncols());                     \
+    EXPECT_EQ(A.nnnz(), B.nnnz());                       \
+    EXPECT_EQ(A.formats().index(), B.formats().index()); \
   }
 
 #endif  // TEST_CORE_UTILS_MACROS_DYNAMICMATRIX_HPP
