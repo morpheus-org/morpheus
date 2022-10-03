@@ -41,9 +41,29 @@ void convert(SourceType& src, const formats_e index) {
       typename SourceType::value_type, typename SourceType::index_type,
       typename SourceType::array_layout, typename SourceType::execution_space>
       temp;
-  Impl::convert<ExecSpace>(src, temp);
-  src.activate(index);
-  Impl::convert<ExecSpace>(temp, src);
+
+  try {
+    Impl::convert<ExecSpace>(src, temp);
+  } catch (...) {
+    std::cout << "Warning: Conversion failed! Active state set to: "
+              << src.active_index() << std::endl;
+
+    return;
+  }
+
+  SourceType dynamic_temp;
+  dynamic_temp.activate(index);
+
+  try {
+    Impl::convert<ExecSpace>(temp, dynamic_temp);
+  } catch (...) {
+    std::cout << "Warning: Conversion failed! Active state set to: "
+              << src.active_index() << std::endl;
+
+    return;
+  }
+
+  src = dynamic_temp;
 }
 
 template <typename ExecSpace, typename SourceType>
