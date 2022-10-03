@@ -17,7 +17,7 @@ jobs:
 
       - name: Applying formatting
         run: |
-          clang-format -i --style=file $BASEDIR/.clang-format *.cpp core/**.hpp core/**.c core/**.h
+          .bash/apply-clang-format
 
       - name: Pushing changes if any
         uses: stefanzweifel/git-auto-commit-action@v4
