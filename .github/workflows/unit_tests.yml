@@ -13,13 +13,37 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-latest']
-        cxx: ['g++-8', 'clang++-11', 'icpc']
+        compiler: [{"vendor": "gnu", "version": ["8", "9"]}, {"vendor": "clang", "version": ["11", "12"]}, {"vendor": "intel", "version": ["any"]}]
         cmake_build_type: ['Release', 'Debug']
         backend: ['SERIAL', 'OPENMP']
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Build Intel Compilers
-        if: ${{ matrix.cxx == 'icpc*' }}
+      - name: set_default_options
+        run: |
+          echo "cxx_compiler=g++" >> $GITHUB_ENV
+          echo "kokkos_omp=Off" >> $GITHUB_ENV
+          echo "debug_mode=Off" >> $GITHUB_ENV
+
+      - name: Set up GCC
+        if: ${{ matrix.compiler.vendor == 'gnu' }}
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: ${{ matrix.compiler.version }}
+          platform: x64
+        run: |
+          echo "cxx_compiler=g++-${{ matrix.compiler.version }}" >> $GITHUB_ENV
+
+      - name: Set up Clang
+        if: ${{ matrix.compiler.vendor == 'clang' }}
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: latest
+          platform: x64
+        run: |
+          echo "cxx_compiler=clang++-${{ matrix.compiler.version }}" >> $GITHUB_ENV
+          
+      - name: Setup Intel Compilers
+        if: ${{ matrix.compiler.vendor == 'intel' }}
         run: |
           wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
           sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
@@ -38,11 +62,6 @@ jobs:
           ref: 3.5.00
           path: kokkos
 
-      - name: set_default_options
-        run: |
-          echo "kokkos_omp=Off" >> $GITHUB_ENV
-          echo "debug_mode=Off" >> $GITHUB_ENV
-
       - name: maybe_enable_openmp_backend
         if: ${{ matrix.backend == 'OPENMP' }}
         run: echo "kokkos_omp=On" >> $GITHUB_ENV
@@ -57,7 +76,7 @@ jobs:
           mkdir build
           cd build
 
-          cmake .. -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
+          cmake .. -DCMAKE_CXX_COMPILER=${{ env.cxx_compiler }} \
                    -DCMAKE_INSTALL_PREFIX=/usr/kokkos-install \
                    -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
                    -DKokkos_ENABLE_DEBUG_BOUNDS_CHECK=${{ matrix.cmake_build_type }} \
