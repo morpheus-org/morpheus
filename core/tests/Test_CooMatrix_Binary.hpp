@@ -109,7 +109,7 @@ TYPED_TEST(CooMatrixBinaryTest, ResizeFromCooMatrix) {
   // Resizing to larger sizes should invoke a new allocation so changes in
   // matrix should not be reflected in reference
   Ah.row_indices(1)    = 1;
-  Ah.column_indices(2) = 10;
+  Ah.column_indices(1) = 10;
   Ah.values(0)         = (value_type)-1.11;
   Morpheus::copy(Ah, A);
 
@@ -117,7 +117,7 @@ TYPED_TEST(CooMatrixBinaryTest, ResizeFromCooMatrix) {
   HostMatrix1 Ahref_test(nrows, ncols, nnnz);
   Morpheus::copy(this->Ahref, Ahref_test);
   EXPECT_NE(Ah.row_indices(1), Ahref_test.row_indices(1));
-  EXPECT_NE(Ah.column_indices(2), Ahref_test.column_indices(2));
+  EXPECT_NE(Ah.column_indices(1), Ahref_test.column_indices(1));
   EXPECT_NE(Ah.values(0), Ahref_test.values(0));
 
   for (index_type n = nnnz; n < Ah.nnnz(); n++) {
@@ -134,7 +134,7 @@ TYPED_TEST(CooMatrixBinaryTest, ResizeFromCooMatrix) {
 
   // Set back to normal
   Ah.row_indices(1)    = 0;
-  Ah.column_indices(2) = 1;
+  Ah.column_indices(1) = 2;
   Ah.values(0)         = (value_type)1.11;
 
   Morpheus::copy(Ah, A);
