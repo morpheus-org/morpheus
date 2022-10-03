@@ -19,7 +19,7 @@ jobs:
         #            {"vendor": "clang", "compiler": "clang++", "version": "12"}]
         compiler: [{"vendor": "gnu", "compiler": "g++", "version": "8"}]
         cmake_build_type: ['Release', 'Debug']
-        backend: ['SERIAL', 'OPENMP']
+        backend: [{"name": 'SERIAL', "tag": "Serial"}, {"name": "OPENMP", "tag": "OpenMP"}]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install/Update Packages
@@ -57,10 +57,6 @@ jobs:
           repository: kokkos/kokkos
           ref: 3.5.00
           path: kokkos
-
-      - name: maybe_enable_openmp_backend
-        if: ${{ matrix.backend == 'OPENMP' }}
-        run: echo "kokkos_omp=On" >> $GITHUB_ENV
       
       - name: maybe_enable_aggressive_vectorization
         if: ${{ matrix.cmake_build_type == 'Debug' }}
@@ -76,8 +72,7 @@ jobs:
                    -DCMAKE_INSTALL_PREFIX=/usr/kokkos-install \
                    -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
                    -DKokkos_ENABLE_DEBUG_BOUNDS_CHECK=${{ env.debug_mode }} \
-                   -DKokkos_ENABLE_OPENMP=${{ env.kokkos_omp }}  \
-                   -DKokkos_ENABLE_SERIAL=On \
+                   -DKokkos_ENABLE_${{ matrix.backend.name }}=On  \
                    -DKokkos_ARCH_NATIVE=On \
                    -DKokkos_CXX_STANDARD=17 \
                    -DKokkos_ENABLE_COMPILER_WARNINGS=On \
@@ -108,4 +103,4 @@ jobs:
       - name: Run Tests
         working-directory: builddir
         run: |
-          ./core/tests/MorpheusCore_UnitTest_${${{ env.backend }}^}
+          ./core/tests/MorpheusCore_UnitTest_${{ matrix.backend.tag }}
