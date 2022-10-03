@@ -12,11 +12,11 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        os: ['ubuntu:latest']
+        # os: ['ubuntu:latest']
         cxx: ['g++-8', 'clang++-11', 'icpc']
         cmake_build_type: ['Release', 'Debug']
         backend: ['SERIAL', 'OPENMP']
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu:latest
     steps:
       - name: Build Intel Compilers
         if: ${{ matrix.cxx == 'icpc*' }}
@@ -60,6 +60,7 @@ jobs:
           cmake .. -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
                    -DCMAKE_INSTALL_PREFIX=/usr/kokkos-install \
                    -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
+                   -DKokkos_ENABLE_DEBUG_BOUNDS_CHECK=${{ matrix.cmake_build_type }} \
                    -DKokkos_ENABLE_OPENMP=${{ env.kokkos_omp }}  \
                    -DKokkos_ENABLE_SERIAL=On \
                    -DKokkos_ARCH_NATIVE=On \
