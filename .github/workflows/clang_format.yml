@@ -13,7 +13,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install clang-format
+          sudo apt-get install clang-format-8
 
       - name: Applying formatting
         run: |
