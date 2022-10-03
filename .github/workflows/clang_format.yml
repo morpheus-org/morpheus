@@ -17,9 +17,6 @@ jobs:
 
       - name: Applying formatting
         run: |
-          BASEDIR=$(pwd)
-
-          cd $BASEDIR/core/src
           clang-format -i --style=file $BASEDIR/.clang-format *.cpp core/**.hpp core/**.c core/**.h
 
       - name: Pushing changes if any
