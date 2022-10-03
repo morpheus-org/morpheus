@@ -12,21 +12,25 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        distro: ['fedora:latest', 'ubuntu:latest']
-        cxx: ['g++', 'clang++']
+        distro: ['ubuntu:latest']
+        cxx: ['g++-8', 'clang++-11', 'icpc']
         cmake_build_type: ['Release', 'Debug']
         backend: ['SERIAL', 'OPENMP']
-        include:
-          - distro: 'fedora:intel'
-            cxx: 'icpc'
-            cmake_build_type: 'Release'
-            backend: ['SERIAL', 'OPENMP']
-          - distro: 'fedora:intel'
-            cxx: 'icpc'
-            cmake_build_type: 'Debug'
-            backend: ['SERIAL', 'OPENMP']
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
+      - name: Build Intel Compilers
+        if: ${{ matrix.cxx == 'icpc*' }}
+        run: |
+          wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+          sudo echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          sudo apt-get update
+
+          sudo apt-get install intel-basekit
+          source /opt/intel/oneapi/setvars.sh
+          printenv >> $GITHUB_ENV
+
       - name: Checkout Kokkos-v3.5.00
         uses: actions/checkout@v3
         with:
