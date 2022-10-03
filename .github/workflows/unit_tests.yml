@@ -60,7 +60,7 @@ jobs:
           path: kokkos
       
       - name: maybe_enable_openmp_backend
-        if: ${{ matrix.backend == 'OPENMP' }}
+        if: ${{ matrix.backend.name == 'OPENMP' }}
         run: echo "kokkos_omp=On" >> $GITHUB_ENV
 
       - name: maybe_enable_aggressive_vectorization
