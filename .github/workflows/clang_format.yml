@@ -22,7 +22,7 @@ jobs:
       - name: Pushing changes if any
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Applying black formatting (from Github Action)
+          commit_message: Applying code formatting (from Github Action)
           commit_user_name: cstyl
           commit_user_email: cstyl16@gmail.com
           commit_author: Christodoulos Stylianou <cstyl16@gmail.com>
