@@ -1,0 +1,31 @@
+name: clang_format-Linux
+on: [push, pull_request]
+
+jobs:
+  code-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install clang-format
+
+      - name: Applying formatting
+        run: |
+          BASEDIR=$(pwd)
+
+          cd $BASEDIR/core/src
+          clang-format -i --style=file $BASEDIR/.clang-format *.cpp core/**.hpp core/**.c core/**.h
+
+      - name: Pushing changes if any
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Applying black formatting (from Github Action)
+          commit_user_name: cstyl
+          commit_user_email: cstyl16@gmail.com
+          commit_author: Christodoulos Stylianou <cstyl16@gmail.com>
