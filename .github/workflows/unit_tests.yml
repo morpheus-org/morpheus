@@ -13,10 +13,11 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-latest']
-        compiler: [{"vendor": "gnu", "compiler": "g++", "version": "8"}, 
-                   {"vendor": "gnu", "compiler": "g++", "version": "9"}, 
-                   {"vendor": "clang", "compiler": "clang++", "version": "11"}, 
-                   {"vendor": "clang", "compiler": "clang++", "version": "12"}]
+        # compiler: [{"vendor": "gnu", "compiler": "g++", "version": "8"}, 
+        #            {"vendor": "gnu", "compiler": "g++", "version": "9"}, 
+        #            {"vendor": "clang", "compiler": "clang++", "version": "11"}, 
+        #            {"vendor": "clang", "compiler": "clang++", "version": "12"}]
+        compiler: [{"vendor": "gnu", "compiler": "g++", "version": "8"}]
         cmake_build_type: ['Release', 'Debug']
         backend: ['SERIAL', 'OPENMP']
     runs-on: ${{ matrix.os }}
@@ -30,20 +31,6 @@ jobs:
         run: |
           sudo apt-get install ${{ matrix.compiler.compiler }}-${{ matrix.compiler.version }} \
                                libomp-${{ matrix.compiler.version }}-dev
-
-      # - name: Set up GCC
-      #   if: ${{ matrix.compiler.vendor == 'gnu' }}
-      #   uses: egor-tensin/setup-gcc@v1
-      #   with:
-      #     version: ${{ matrix.compiler.version }}
-      #     platform: x64
-
-      # - name: Setup Clang
-      #   if: ${{ matrix.compiler.vendor == 'clang' }}
-      #   uses: egor-tensin/setup-clang@v1
-      #   with:
-      #     version: ${{ matrix.compiler.version }}
-      #     platform: x64
           
       # - name: Setup Intel Compilers
       #   if: ${{ matrix.compiler.vendor == 'intel' }}
@@ -99,3 +86,20 @@ jobs:
                    -DKokkos_ENABLE_EXAMPLES=Off
 
           sudo cmake --build . --target install --parallel 2
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure Morpheus
+        run: |
+          cmake -B builddir \
+                -DCMAKE_CXX_COMPILER=${{ env.cxx_compiler }} \
+                -DCMAKE_INSTALL_PREFIX=/usr/morpheus-install \
+                -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
+                -DKokkos_ROOT=/usr/kokkos-install \
+                -DMorpheus_ENABLE_EXAMPLES=Off \
+                -DMorpheus_ENABLE_TESTS=On
+      
+      - name: Build Morpheus
+        run: |
+          cmake --build builddir --parallel 2
