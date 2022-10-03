@@ -1,0 +1,68 @@
+# This workflow runs test when pushing on main and develop branches
+
+name: unit_tests-Linux
+on: [push, pull_request]
+
+concurrency:
+  group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{github.event_name == 'pull_request'}}
+
+jobs:
+  CI:
+    continue-on-error: true
+    strategy:
+      matrix:
+        distro: ['fedora:latest', 'ubuntu:latest']
+        cxx: ['g++', 'clang++']
+        cmake_build_type: ['Release', 'Debug']
+        backend: ['SERIAL', 'OPENMP']
+        include:
+          - distro: 'fedora:intel'
+            cxx: 'icpx'
+            cmake_build_type: 'Release'
+            backend: ['SERIAL', 'OPENMP']
+          - distro: 'fedora:intel'
+            cxx: 'icpx'
+            cmake_build_type: 'Debug'
+            backend: ['SERIAL', 'OPENMP']
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Kokkos-v3.0.2
+        uses: actions/checkout@v2.2.0
+        with:
+          repository: kokkos/kokkos
+          ref: 2541b1294d2704b0964813337f33b291d3f8596b
+          path: kokkos
+
+      - name: set_default_options
+        run: |
+          echo "kokkos_omp=Off" >> $GITHUB_ENV
+          echo "debug_mode=Off" >> $GITHUB_ENV
+
+      - name: maybe_enable_openmp_backend
+        if: ${{ matrix.backend == 'OPENMP' }}
+        run: echo "kokkos_omp=On" >> $GITHUB_ENV
+      
+      - name: maybe_enable_aggressive_vectorization
+        if: ${{ matrix.cmake_build_type == 'Debug' }}
+        run: echo "debug_mode=On" >> $GITHUB_ENV
+
+      - name: Install Kokkos
+        working-directory: kokkos
+        run: |
+          mkdir build
+          cd build
+          cmake -DDESUL_ENABLE_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/usr/desul-install ..
+
+          cmake .. -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
+                   -DCMAKE_INSTALL_PREFIX=/usr/kokkos-install \
+                   -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
+                   -DKokkos_ENABLE_OPENMP=${{ env.kokkos_omp }}  \
+                   -DKokkos_ENABLE_SERIAL=On \
+                   -DKokkos_ARCH_NATIVE=On \
+                   -DKokkos_CXX_STANDARD=17 \
+                   -DKokkos_ENABLE_COMPILER_WARNINGS=On \
+                   -DKokkos_ENABLE_AGGRESSIVE_VECTORIZATION=${{ env.debug_mode }}\
+                   -DKokkos_ENABLE_TESTS=Off \
+                   -DKokkos_ENABLE_EXAMPLES=Off \
+          sudo cmake --build . --target install --parallel 2
