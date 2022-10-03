@@ -12,11 +12,11 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        # os: ['ubuntu:latest']
+        os: ['ubuntu-latest']
         cxx: ['g++-8', 'clang++-11', 'icpc']
         cmake_build_type: ['Release', 'Debug']
         backend: ['SERIAL', 'OPENMP']
-    runs-on: ubuntu:latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Build Intel Compilers
         if: ${{ matrix.cxx == 'icpc*' }}
