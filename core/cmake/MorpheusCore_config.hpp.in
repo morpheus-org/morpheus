@@ -1,4 +1,3 @@
-
 #if !defined(MORPHEUS_MACROS_HPP) || defined(MORPHEUS_CORE_CONFIG_H)
 #error \
     "Do not include MorpheusCore_config.hpp directly; include Moprheus_Macros.hpp instead."
