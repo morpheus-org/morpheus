@@ -29,8 +29,7 @@
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_DynamicMatrix.hpp>
 #include <Morpheus_Sort.hpp>
-
-#include <impl/Morpheus_MatrixBase.hpp>
+#include <Morpheus_MatrixBase.hpp>
 
 namespace Morpheus {
 
@@ -89,13 +88,13 @@ namespace Morpheus {
  * \endcode
  */
 template <class ValueType, class... Properties>
-class CooMatrix : public Impl::MatrixBase<CooMatrix, ValueType, Properties...> {
+class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
  public:
   /*! The traits associated with the particular container */
-  using traits = Impl::ContainerTraits<CooMatrix, ValueType, Properties...>;
+  using traits = ContainerTraits<CooMatrix, ValueType, Properties...>;
   /*! The complete type of the container */
   using type = typename traits::type;
-  using base = Impl::MatrixBase<CooMatrix, ValueType, Properties...>;
+  using base = MatrixBase<CooMatrix, ValueType, Properties...>;
   /*! The tag associated specificaly to the particular container*/
   using tag = typename MatrixFormatTag<Morpheus::CooFormatTag>::tag;
 

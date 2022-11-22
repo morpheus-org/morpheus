@@ -25,9 +25,9 @@
 #define MORPHEUS_DYNAMICMATRIX_HPP
 
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_MatrixBase.hpp>
 
 #include <impl/Morpheus_Variant.hpp>
-#include <impl/Morpheus_MatrixBase.hpp>
 #include <impl/Dynamic/Morpheus_DynamicMatrix_Impl.hpp>
 
 #include <iostream>
@@ -101,13 +101,13 @@ namespace Morpheus {
  */
 template <class ValueType, class... Properties>
 class DynamicMatrix
-    : public Impl::MatrixBase<DynamicMatrix, ValueType, Properties...> {
+    : public MatrixBase<DynamicMatrix, ValueType, Properties...> {
  public:
   /*! The traits associated with the particular container */
-  using traits = Impl::ContainerTraits<DynamicMatrix, ValueType, Properties...>;
+  using traits = ContainerTraits<DynamicMatrix, ValueType, Properties...>;
   /*! The complete type of the container */
   using type = typename traits::type;
-  using base = Impl::MatrixBase<DynamicMatrix, ValueType, Properties...>;
+  using base = MatrixBase<DynamicMatrix, ValueType, Properties...>;
   /*! The tag associated specificaly to the particular container*/
   using tag = typename MatrixFormatTag<Morpheus::DynamicMatrixFormatTag>::tag;
 

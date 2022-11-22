@@ -26,8 +26,8 @@
 
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_MatrixBase.hpp>
 
-#include <impl/Morpheus_MatrixBase.hpp>
 #include <impl/Morpheus_Functors.hpp>
 
 #include <Kokkos_Core.hpp>
@@ -71,14 +71,13 @@ namespace Morpheus {
  * \endcode
  */
 template <class ValueType, class... Properties>
-class DenseMatrix
-    : public Impl::MatrixBase<DenseMatrix, ValueType, Properties...> {
+class DenseMatrix : public MatrixBase<DenseMatrix, ValueType, Properties...> {
  public:
   /*! The traits associated with the particular container */
-  using traits = Impl::ContainerTraits<DenseMatrix, ValueType, Properties...>;
+  using traits = ContainerTraits<DenseMatrix, ValueType, Properties...>;
   /*! The complete type of the container */
   using type = typename traits::type;
-  using base = Impl::MatrixBase<DenseMatrix, ValueType, Properties...>;
+  using base = MatrixBase<DenseMatrix, ValueType, Properties...>;
   /*! The tag associated specificaly to the particular container*/
   using tag = typename MatrixFormatTag<Morpheus::DenseMatrixFormatTag>::tag;
 

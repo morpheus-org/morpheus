@@ -25,11 +25,9 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_MatrixOptions.hpp>
-#include <impl/Morpheus_ContainerTraits.hpp>
+#include <Morpheus_ContainerTraits.hpp>
 
 namespace Morpheus {
-
-namespace Impl {
 
 template <template <class, class...> class Container, class ValueType,
           class... Properties>
@@ -70,9 +68,7 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
   index_type _m, _n, _nnz;
   MatrixStructure _structure = MATSTR_NONE;
   MatrixOptions _options     = MATOPT_NONE;
-
-};  // namespace Impl
-}  // namespace Impl
+};
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_MATRIXBASE_HPP

@@ -26,61 +26,9 @@
 
 #include <Morpheus_TypeTraits.hpp>
 
+#include <impl/Morpheus_MirrorContainers_Impl.hpp>
+
 namespace Morpheus {
-
-namespace Impl {
-template <class Space, template <class, class...> class Container, class T,
-          class... P>
-struct MirrorContainerType {
-  // The incoming container_type
-  using src_container_type = Container<T, P...>;
-  // The memory space for the mirror container
-  using memory_space = typename Space::memory_space;
-  // Check whether it is the same memory space
-  enum {
-    is_same_memspace =
-        std::is_same<memory_space,
-                     typename src_container_type::memory_space>::value
-  };
-  // The data type (we probably want it non-const since otherwise we can't even
-  // deep_copy to it.
-  using value_type   = typename src_container_type::non_const_value_type;
-  using index_type   = typename src_container_type::index_type;
-  using array_layout = typename src_container_type::array_layout;
-  // The destination container type if it is not the same memory space - note
-  // that the new container will always be managed even when the source is
-  // unmanaged
-  using dest_container_type =
-      Container<value_type, index_type, array_layout, Space>;
-  // If it is the same memory_space return the existsing container_type
-  using container_type =
-      typename std::conditional<is_same_memspace, src_container_type,
-                                dest_container_type>::type;
-};
-
-template <class Space, template <class, class...> class Container, class T,
-          class... P>
-struct MirrorType {
-  // The incoming container_type
-  using src_container_type = Container<T, P...>;
-  // The memory space for the mirror container
-  using memory_space = typename Space::memory_space;
-  // Check whether it is the same memory space
-  enum {
-    is_same_memspace =
-        std::is_same<memory_space,
-                     typename src_container_type::memory_space>::value
-  };
-  // we want it non-const to allow deep_copy.
-  using value_type   = typename src_container_type::non_const_value_type;
-  using index_type   = typename src_container_type::non_const_index_type;
-  using array_layout = typename src_container_type::array_layout;
-  // The destination container type if it is not the same memory space - note
-  // that the new container will always be managed even when the source is
-  // unmanaged
-  using container_type = Container<value_type, index_type, array_layout, Space>;
-};
-}  // namespace Impl
 
 // Allocates a mirror container with the same characteristics as source
 // Doesn't copy elements from source to mirror

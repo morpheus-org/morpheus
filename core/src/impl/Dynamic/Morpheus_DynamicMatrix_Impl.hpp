@@ -28,8 +28,7 @@
 
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatsRegistry.hpp>
-
-#include <impl/Morpheus_ContainerTraits.hpp>
+#include <Morpheus_ContainerTraits.hpp>
 
 namespace Morpheus {
 
@@ -37,9 +36,10 @@ namespace Impl {
 
 template <class ValueType, class... Properties>
 struct any_type_resize
-    : public Impl::ContainerTraits<any_type_resize, ValueType, Properties...> {
+    : public Morpheus::ContainerTraits<any_type_resize, ValueType,
+                                       Properties...> {
   using traits =
-      Impl::ContainerTraits<any_type_resize, ValueType, Properties...>;
+      Morpheus::ContainerTraits<any_type_resize, ValueType, Properties...>;
   using index_type  = typename traits::index_type;
   using value_type  = typename traits::value_type;
   using result_type = void;

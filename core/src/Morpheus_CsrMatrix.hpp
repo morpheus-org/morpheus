@@ -28,8 +28,7 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_DynamicMatrix.hpp>
-
-#include <impl/Morpheus_MatrixBase.hpp>
+#include <Morpheus_MatrixBase.hpp>
 
 namespace Morpheus {
 
@@ -89,13 +88,13 @@ namespace Morpheus {
  * \endcode
  */
 template <class ValueType, class... Properties>
-class CsrMatrix : public Impl::MatrixBase<CsrMatrix, ValueType, Properties...> {
+class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
  public:
   /*! The traits associated with the particular container */
-  using traits = Impl::ContainerTraits<CsrMatrix, ValueType, Properties...>;
+  using traits = ContainerTraits<CsrMatrix, ValueType, Properties...>;
   /*! The complete type of the container */
   using type = typename traits::type;
-  using base = Impl::MatrixBase<CsrMatrix, ValueType, Properties...>;
+  using base = MatrixBase<CsrMatrix, ValueType, Properties...>;
   /*! The tag associated specificaly to the particular container*/
   using tag = typename MatrixFormatTag<Morpheus::CsrFormatTag>::tag;
 

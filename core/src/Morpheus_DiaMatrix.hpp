@@ -29,10 +29,9 @@
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_DenseMatrix.hpp>
 #include <Morpheus_DynamicMatrix.hpp>
+#include <Morpheus_MatrixBase.hpp>
 
-#include <impl/Morpheus_MatrixBase.hpp>
 #include <impl/Dia/Morpheus_Utils_Impl.hpp>
-// #include <impl/Morpheus_Utils.hpp>
 
 namespace Morpheus {
 
@@ -95,13 +94,13 @@ namespace Morpheus {
  * \endcode
  */
 template <class ValueType, class... Properties>
-class DiaMatrix : public Impl::MatrixBase<DiaMatrix, ValueType, Properties...> {
+class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
  public:
   /*! The traits associated with the particular container */
-  using traits = Impl::ContainerTraits<DiaMatrix, ValueType, Properties...>;
+  using traits = ContainerTraits<DiaMatrix, ValueType, Properties...>;
   /*! The complete type of the container */
   using type = typename traits::type;
-  using base = Impl::MatrixBase<DiaMatrix, ValueType, Properties...>;
+  using base = MatrixBase<DiaMatrix, ValueType, Properties...>;
   /*! The tag associated specificaly to the particular container*/
   using tag = typename MatrixFormatTag<DiaFormatTag>::tag;
 

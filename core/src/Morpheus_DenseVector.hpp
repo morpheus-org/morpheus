@@ -25,8 +25,8 @@
 
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_ContainerTraits.hpp>
 
-#include <impl/Morpheus_ContainerTraits.hpp>
 #include <impl/Morpheus_Functors.hpp>
 
 #include <Kokkos_Core.hpp>
@@ -80,10 +80,10 @@ namespace Morpheus {
  */
 template <class ValueType, class... Properties>
 class DenseVector
-    : public Impl::ContainerTraits<DenseVector, ValueType, Properties...> {
+    : public ContainerTraits<DenseVector, ValueType, Properties...> {
  public:
   /*! The traits associated with the particular container */
-  using traits = Impl::ContainerTraits<DenseVector, ValueType, Properties...>;
+  using traits = ContainerTraits<DenseVector, ValueType, Properties...>;
   /*! The complete type of the container */
   using type = typename traits::type;
   /*! The tag associated specificaly to the particular container*/
