@@ -28,7 +28,13 @@
 #include <Morpheus_ContainerTraits.hpp>
 
 namespace Morpheus {
-
+/**
+ * @brief
+ *
+ * @tparam Container
+ * @tparam ValueType
+ * @tparam Properties
+ */
 template <template <class, class...> class Container, class ValueType,
           class... Properties>
 class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
@@ -37,15 +43,15 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
   using traits     = ContainerTraits<Container, ValueType, Properties...>;
   using index_type = typename traits::index_type;
 
-  MatrixBase() : _m(0), _n(0), _nnz(0) {}
-
-  template <typename Matrix>
-  MatrixBase(const Matrix& m,
-             typename std::enable_if<is_matrix_container_v<Matrix>>::type* = 0)
-      : _m(m.nrows()), _n(m.ncols()), _nnz(m.nnnz()) {}
+  MatrixBase()
+      : _m(0), _n(0), _nnz(0), _structure(MATSTR_NONE), _options(MATOPT_NONE) {}
 
   MatrixBase(index_type rows, index_type cols, index_type entries = 0)
-      : _m(rows), _n(cols), _nnz(entries) {}
+      : _m(rows),
+        _n(cols),
+        _nnz(entries),
+        _structure(MATSTR_NONE),
+        _options(MATOPT_NONE) {}
 
   void resize(index_type rows, index_type cols, index_type entries) {
     _m   = rows;
@@ -66,8 +72,8 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
 
  private:
   index_type _m, _n, _nnz;
-  MatrixStructure _structure = MATSTR_NONE;
-  MatrixOptions _options     = MATOPT_NONE;
+  MatrixStructure _structure;
+  MatrixOptions _options;
 };
 }  // namespace Morpheus
 

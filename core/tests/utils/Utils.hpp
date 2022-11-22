@@ -27,6 +27,11 @@
 #include <gtest/gtest.h>
 #include <Morpheus_Core.hpp>
 
+namespace Morpheus {
+MORPHEUS_IMPL_HAS_TRAIT(type)
+MORPHEUS_IMPL_HAS_TRAIT(traits)
+}  // namespace Morpheus
+
 namespace types {
 using value_tlist  = Morpheus::TypeList<double, int>;
 using index_tlist  = Morpheus::TypeList<long long, Morpheus::Default>;

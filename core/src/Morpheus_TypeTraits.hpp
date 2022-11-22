@@ -144,6 +144,22 @@ template <typename T, typename Variant>
 inline constexpr bool is_variant_member_v =
     is_variant_member<T, Variant>::value;
 
+#define MORPHEUS_IMPL_HAS_TRAIT(TRAIT)                                 \
+  template <class T>                                                   \
+  class has_##TRAIT {                                                  \
+    typedef char yes[1];                                               \
+    typedef char no[2];                                                \
+                                                                       \
+    template <class U>                                                 \
+    static yes& test(typename U::TRAIT*);                              \
+                                                                       \
+    template <class U>                                                 \
+    static no& test(...);                                              \
+                                                                       \
+   public:                                                             \
+    static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes); \
+  };
+
 /**
  * @brief Checks if \p T has \p tag as a member trait.
  *
