@@ -70,13 +70,27 @@ template <template <class, class...> class Container, class ValueType,
           class... Properties>
 class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
  public:
-  using type       = MatrixBase<Container, ValueType, Properties...>;
-  using traits     = ContainerTraits<Container, ValueType, Properties...>;
+  //!< The complete type of the container
+  using type = MatrixBase<Container, ValueType, Properties...>;
+  //!< The traits associated with the particular container
+  using traits = ContainerTraits<Container, ValueType, Properties...>;
+  //!< The type of the indices held by the container
   using index_type = typename traits::index_type;
-
+  /**
+   * @brief Default constructor
+   *
+   */
   MatrixBase()
       : _m(0), _n(0), _nnz(0), _structure(MATSTR_NONE), _options(MATOPT_NONE) {}
 
+  /**
+   * @brief Construct a MatrixBase object with shape (num_rows, num_cols) and
+   * number of non-zeros equal to num_entries.
+   *
+   * @param num_rows  Number of rows of the matrix.
+   * @param num_cols Number of columns of the matrix.
+   * @param num_entries Number of non-zero values in the matrix.
+   */
   MatrixBase(index_type rows, index_type cols, index_type entries = 0)
       : _m(rows),
         _n(cols),
@@ -84,21 +98,88 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
         _structure(MATSTR_NONE),
         _options(MATOPT_NONE) {}
 
+  /**
+   * @brief Resizes MatrixBase with shape of (num_rows, num_cols) and sets
+   * number of non-zero entries to num_entries.
+   *
+   * @param num_rows Number of rows of resized matrix.
+   * @param num_cols Number of columns of resized matrix.
+   * @param num_entries Number of non-zero entries in resized matrix.
+   */
   void resize(index_type rows, index_type cols, index_type entries) {
     _m   = rows;
     _n   = cols;
     _nnz = entries;
   }
 
+  /**
+   * @brief Number of rows of the matrix
+   *
+   * @return index_type
+   */
   inline index_type nrows() const { return _m; }
+
+  /**
+   * @brief Number of columns of the matrix
+   *
+   * @return index_type
+   */
   inline index_type ncols() const { return _n; }
+
+  /**
+   * @brief Number of non-zeros of the matrix
+   *
+   * @return index_type
+   */
   inline index_type nnnz() const { return _nnz; }
+
+  /**
+   * @brief Set the number of rows of the matrix
+   *
+   * @param rows Number of rows
+   */
   inline void set_nrows(const index_type rows) { _m = rows; }
+
+  /**
+   * @brief Set the number of columns of the matrix
+   *
+   * @param rows Number of columns
+   */
   inline void set_ncols(const index_type cols) { _n = cols; }
+
+  /**
+   * @brief Set the number of non-zeros of the matrix
+   *
+   * @param rows Number of non-zeros
+   */
   inline void set_nnnz(const index_type nnz) { _nnz = nnz; }
+
+  /**
+   * @brief The specialized structure of the matrix e.g Symmetric
+   *
+   * @return MatrixStructure
+   */
   inline MatrixStructure structure() const { return _structure; }
+  /**
+   * @brief Information about specific characteristics of the matrix e.g has
+   * short rows
+   *
+   * @return MatrixOptions
+   */
   inline MatrixOptions options() const { return _options; }
+
+  /**
+   * @brief Set the structure of the matrix
+   *
+   * @param op Enum for the matrix structure
+   */
   inline void set_structure(MatrixStructure op) { _structure = op; }
+
+  /**
+   * @brief Set the characteristics of the matrix
+   *
+   * @param op Enum for available options
+   */
   inline void set_options(MatrixOptions op) { _options = op; }
 
  private:
