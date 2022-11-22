@@ -62,6 +62,10 @@ namespace Test {
  */
 TYPED_TEST_SUITE(MatrixBaseTest, MatrixBaseUnary);
 
+/**
+ * @brief Checks if the container has specific traits attached to it.
+ *
+ */
 TYPED_TEST(MatrixBaseTest, CheckTraits) {
   using Base = typename TestFixture::base;
 
@@ -70,6 +74,10 @@ TYPED_TEST(MatrixBaseTest, CheckTraits) {
   EXPECT_EQ(Morpheus::has_index_type<Base>::value, 1);
 }
 
+/**
+ * @brief Constructs a new container using the default constructor
+ *
+ */
 TYPED_TEST(MatrixBaseTest, DefaultConstruct) {
   using Base = typename TestFixture::base;
 
@@ -82,6 +90,10 @@ TYPED_TEST(MatrixBaseTest, DefaultConstruct) {
   EXPECT_EQ(M.options(), Morpheus::MATSTR_NONE);
 }
 
+/**
+ * @brief Constructs a new container from a provided shape
+ *
+ */
 TYPED_TEST(MatrixBaseTest, ConstructFromShape) {
   using Base       = typename TestFixture::base;
   using index_type = typename Base::index_type;
@@ -117,6 +129,10 @@ TYPED_TEST(MatrixBaseTest, ConstructFromShape) {
   }
 }
 
+/**
+ * @brief Resizes the container from a provided shape
+ *
+ */
 TYPED_TEST(MatrixBaseTest, ResizeFromShape) {
   using Base       = typename TestFixture::base;
   using index_type = typename Base::index_type;
@@ -132,6 +148,10 @@ TYPED_TEST(MatrixBaseTest, ResizeFromShape) {
   EXPECT_EQ(M.nnnz(), nnnz);
 }
 
+/**
+ * @brief Ensures setter member functions work as expected
+ *
+ */
 TYPED_TEST(MatrixBaseTest, CheckSetters) {
   using Base       = typename TestFixture::base;
   using index_type = typename Base::index_type;

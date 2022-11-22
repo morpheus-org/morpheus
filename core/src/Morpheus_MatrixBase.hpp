@@ -28,12 +28,43 @@
 #include <Morpheus_ContainerTraits.hpp>
 
 namespace Morpheus {
+
 /**
- * @brief
+ * \addtogroup base_containers Base Containers
+ * \brief Containers used as base to derive others
+ * \ingroup containers
+ * \{
  *
- * @tparam Container
- * @tparam ValueType
- * @tparam Properties
+ */
+
+/**
+ * @brief Base class used to derive new matrices.
+ *
+ * @tparam Container Type of the new container we are deriving.
+ * @tparam ValueType Type of values to store
+ * @tparam Properties Optional properties to modify the behaviour of the
+ * container. Sensible defaults are selected based on the configuration. Please
+ * refer to \ref impl/Morpheus_ContainerTraits.hpp to find out more about the
+ * valid properties.
+ *
+ * \par Overview
+ * The MatrixBase class is used to organize common information that is often
+ * found across the different matrix types/formats. Examples of such information
+ * is the shape of the matrix, a specific structure might have (e.g Symmetric)
+ * or any specific properties such as it has short rows.
+ *
+ * \par Example
+ * The example below shows how to define a new matrix class that will inherit
+ * from MatrixBase.
+ * \code #include <Morpheus_Core.hpp>
+ *
+ * template <class ValueType, class... Properties>
+ * class NewMatrix : public MatrixBase<NewMatrix, ValueType, Properties...>{
+ *  using base = MatrixBase<NewMatrix, ValueType, Properties...>;
+ *  // Implementation
+ * }
+ * \endcode
+ *
  */
 template <template <class, class...> class Container, class ValueType,
           class... Properties>
@@ -75,6 +106,8 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
   MatrixStructure _structure;
   MatrixOptions _options;
 };
+/*! \}  // end of base_containers group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_MATRIXBASE_HPP
