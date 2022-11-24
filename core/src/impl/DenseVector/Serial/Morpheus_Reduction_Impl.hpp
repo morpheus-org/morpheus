@@ -24,8 +24,11 @@
 #ifndef MORPHEUS_DENSEVECTOR_SERIAL_REDUCTION_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_SERIAL_REDUCTION_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_SERIAL)
+
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
@@ -38,10 +41,9 @@ typename Vector::value_type reduce(
     const Vector& in, typename Vector::index_type size,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using value_type = typename Vector::value_type;
   using index_type = typename Vector::index_type;
   value_type sum   = in[0];
@@ -60,4 +62,5 @@ typename Vector::value_type reduce(
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_SERIAL
 #endif  // MORPHEUS_DENSEVECTOR_SERIAL_REDUCTION_IMPL_HPP

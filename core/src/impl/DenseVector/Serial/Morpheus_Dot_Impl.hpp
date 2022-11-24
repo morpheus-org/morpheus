@@ -24,8 +24,11 @@
 #ifndef MORPHEUS_DENSEVECTOR_SERIAL_DOT_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_SERIAL_DOT_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_SERIAL)
+
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
@@ -37,10 +40,9 @@ inline typename Vector1::value_type dot(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
-                               Vector2>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
   using index_type = typename Vector1::index_type;
   using value_type = typename Vector1::non_const_value_type;
 
@@ -58,4 +60,5 @@ inline typename Vector1::value_type dot(
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_SERIAL
 #endif  // MORPHEUS_DENSEVECTOR_SERIAL_DOT_IMPL_HPP

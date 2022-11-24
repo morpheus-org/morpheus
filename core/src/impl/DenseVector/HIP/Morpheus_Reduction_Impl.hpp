@@ -30,7 +30,7 @@
 #include <Morpheus_Copy.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 
 #include <impl/DenseVector/Kernels/Morpheus_Reduction_Impl.hpp>
 #include <impl/DenseVector/Serial/Morpheus_Reduction_Impl.hpp>
@@ -40,14 +40,13 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename Vector>
-void reduce(
-    const Vector& in, Vector& out, unsigned int size, int threads, int blocks,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_hip_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
+void reduce(const Vector& in, Vector& out, unsigned int size, int threads,
+            int blocks,
+            typename std::enable_if_t<
+                Morpheus::is_dense_vector_format_container_v<Vector> &&
+                Morpheus::is_custom_backend_v<ExecSpace> &&
+                Morpheus::has_hip_execution_space_v<ExecSpace> &&
+                Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using value_type = typename Vector::value_type;
   dim3 dimBlock(threads, 1, 1);
   dim3 dimGrid(blocks, 1, 1);
@@ -178,10 +177,9 @@ typename Vector::value_type reduce(
     const Vector& in, typename Vector::index_type size,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_hip_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_hip_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using value_type = typename Vector::value_type;
 
   value_type result           = 0;

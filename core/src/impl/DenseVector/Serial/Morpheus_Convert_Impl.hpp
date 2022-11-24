@@ -24,8 +24,11 @@
 #ifndef MORPHEUS_DENSEVECTOR_SERIAL_CONVERT_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_SERIAL_CONVERT_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_SERIAL)
+
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_TypeTraits.hpp>
 
 namespace Morpheus {
@@ -38,10 +41,10 @@ void convert(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<SourceType> &&
         Morpheus::is_dense_vector_format_container_v<DestinationType> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
-                               DestinationType>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>* =
+        nullptr) {
   using index_type = typename SourceType::index_type;
 
   MORPHEUS_ASSERT(dst.size() >= src.size(),
@@ -56,4 +59,5 @@ void convert(
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_SERIAL
 #endif  // MORPHEUS_DENSEVECTOR_SERIAL_CONVERT_IMPL_HPP

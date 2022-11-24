@@ -49,7 +49,7 @@
 #include <Morpheus_WAXPBY.hpp>
 
 // Functionality
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_MirrorContainers.hpp>
 #include <Morpheus_TypeTraits.hpp>
 
@@ -60,6 +60,9 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_Metaprogramming.hpp>
 #include <Morpheus_ContainerFactory.hpp>
+
+// // Spaces
+// #include <spaces/Morpheus_Serial.hpp>
 
 //! Generic Morpheus interfaces
 namespace Morpheus {

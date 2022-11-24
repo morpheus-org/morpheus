@@ -25,7 +25,7 @@
 #define MORPHEUS_DENSEVECTOR_KOKKOS_DOT_IMPL_HPP
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
@@ -37,10 +37,9 @@ inline typename Vector1::value_type dot(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
-        Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
-                               Vector2>>* = nullptr) {
-  using execution_space = typename ExecSpace::execution_space;
+        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
+  using execution_space = ExecSpace;
   using IndexType       = Kokkos::IndexType<typename Vector1::index_type>;
   using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
   using ValueArray      = typename Vector1::value_array_type;

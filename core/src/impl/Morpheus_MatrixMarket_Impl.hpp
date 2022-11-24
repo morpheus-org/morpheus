@@ -320,9 +320,9 @@ template <template <class, class...> class Container, class T, class... P,
           typename Stream>
 void read_matrix_market_stream(
     Container<T, P...>& mtx, Stream& input,
-    typename std::enable_if<is_sparse_matrix_container_v<Container<T, P...>> &&
-                            is_host_memory_space_v<typename Container<
-                                T, P...>::memory_space>>::type* = nullptr) {
+    typename std::enable_if<
+        is_sparse_matrix_container_v<Container<T, P...>> &&
+        has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
   // read banner
   matrix_market_banner banner;
   read_matrix_market_banner(banner, input);
@@ -330,12 +330,12 @@ void read_matrix_market_stream(
   if (banner.storage == "coordinate") {
     Morpheus::CooMatrix<T, P...> temp;
     read_coordinate_stream(temp, input, banner);
-    Morpheus::convert<Kokkos::Serial>(temp, mtx);
+    Morpheus::convert<Morpheus::Serial>(temp, mtx);
   } else  // banner.storage == "array"
   {
     Morpheus::DenseMatrix<T, P...> temp;
     read_array_stream(temp, input, banner);
-    Morpheus::convert<Kokkos::Serial>(temp, mtx);
+    Morpheus::convert<Morpheus::Serial>(temp, mtx);
   }
 }
 
@@ -347,7 +347,7 @@ void read_matrix_market_stream(
         nullptr) {
   // array1d case
   using ValueType = typename Vector::value_type;
-  using Space     = Kokkos::DefaultHostExecutionSpace;
+  using Space     = Morpheus::DefaultHostExecutionSpace;
 
   Morpheus::DenseMatrix<ValueType, Space> temp;
 
@@ -386,12 +386,12 @@ template <template <class, class...> class Container, class T, class... P,
           typename Stream>
 void write_matrix_market_stream(
     const Container<T, P...>& mtx, Stream& output,
-    typename std::enable_if<is_sparse_matrix_container_v<Container<T, P...>> &&
-                            is_host_memory_space_v<typename Container<
-                                T, P...>::memory_space>>::type* = nullptr) {
+    typename std::enable_if<
+        is_sparse_matrix_container_v<Container<T, P...>> &&
+        has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
   // general sparse case
   Morpheus::CooMatrix<T, P...> coo;
-  Morpheus::convert<Kokkos::Serial>(mtx, coo);
+  Morpheus::convert<Morpheus::Serial>(mtx, coo);
 
   Morpheus::IO::Impl::write_coordinate_stream(coo, output);
 }

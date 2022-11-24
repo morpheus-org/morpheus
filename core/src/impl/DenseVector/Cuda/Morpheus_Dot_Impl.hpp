@@ -28,7 +28,7 @@
 #if defined(MORPHEUS_ENABLE_CUDA)
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Reduction.hpp>
 
@@ -50,10 +50,9 @@ typename Vector1::value_type dot(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_cuda_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
-                               Vector2>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_cuda_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
   using index_type = typename Vector1::index_type;
   using value_type = typename Vector1::non_const_value_type;
 

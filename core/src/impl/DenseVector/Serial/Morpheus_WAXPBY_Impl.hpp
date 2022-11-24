@@ -24,23 +24,25 @@
 #ifndef MORPHEUS_DENSEVECTOR_SERIAL_WAXPBY_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_SERIAL_WAXPBY_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_SERIAL)
+
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 namespace Impl {
 template <typename ExecSpace, typename Vector>
-inline void waxpby(
-    const typename Vector::index_type n,
-    const typename Vector::value_type alpha, const Vector& x,
-    const typename Vector::value_type beta, const Vector& y, Vector& w,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
+inline void waxpby(const typename Vector::index_type n,
+                   const typename Vector::value_type alpha, const Vector& x,
+                   const typename Vector::value_type beta, const Vector& y,
+                   Vector& w,
+                   typename std::enable_if_t<
+                       Morpheus::is_dense_vector_format_container_v<Vector> &&
+                       Morpheus::is_custom_backend_v<ExecSpace> &&
+                       Morpheus::has_serial_execution_space_v<ExecSpace> &&
+                       Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using index_type = typename Vector::index_type;
 
   if (alpha == 1.0) {
@@ -55,4 +57,5 @@ inline void waxpby(
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_SERIAL
 #endif  // MORPHEUS_DENSEVECTOR_SERIAL_WAXPBY_IMPL_HPP

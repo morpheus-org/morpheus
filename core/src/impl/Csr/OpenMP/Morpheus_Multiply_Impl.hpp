@@ -28,7 +28,7 @@
 #if defined(MORPHEUS_ENABLE_OPENMP)
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
@@ -39,10 +39,9 @@ inline void multiply(
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_openmp_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_openmp_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 

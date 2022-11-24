@@ -90,12 +90,12 @@ namespace Morpheus {
 template <class ValueType, class... Properties>
 class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
  public:
-  /*! The traits associated with the particular container */
+  //!< The traits associated with the particular container
   using traits = ContainerTraits<CooMatrix, ValueType, Properties...>;
-  /*! The complete type of the container */
+  //!< The complete type of the container
   using type = typename traits::type;
   using base = MatrixBase<CooMatrix, ValueType, Properties...>;
-  /*! The tag associated specificaly to the particular container*/
+  //!< The tag associated specificaly to the particular container*/
   using tag = typename MatrixFormatTag<Morpheus::CooFormatTag>::tag;
 
   /*! The type of the values held by the container - can be const */
@@ -103,7 +103,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
   /*! The non-constant type of the values held by the container */
   using non_const_value_type = typename traits::non_const_value_type;
   using size_type            = typename traits::index_type;
-  /*! The type of the indices held by the container - can be const */
+  //!< The type of the indices held by the container - can be const
   using index_type = typename traits::index_type;
   /*! The non-constant type of the indices held by the container */
   using non_const_index_type = typename traits::non_const_index_type;

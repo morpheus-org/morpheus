@@ -25,7 +25,7 @@
 #define MORPHEUS_CSR_KOKKOS_MULTIPLY_IMPL_HPP
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
@@ -37,16 +37,14 @@ inline void multiply(
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
-  using execution_space   = typename ExecSpace::execution_space;
+        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using policy_index_type = Kokkos::IndexType<typename Matrix::index_type>;
-  using range_policy = Kokkos::RangePolicy<policy_index_type, execution_space>;
-  using value_array  = typename Matrix::value_array_type::value_array_type;
-  using index_array  = typename Matrix::index_array_type::value_array_type;
-  using value_type   = typename value_array::value_type;
-  using index_type   = typename index_array::value_type;
+  using range_policy      = Kokkos::RangePolicy<policy_index_type, ExecSpace>;
+  using value_array       = typename Matrix::value_array_type::value_array_type;
+  using index_array       = typename Matrix::index_array_type::value_array_type;
+  using value_type        = typename value_array::value_type;
+  using index_type        = typename index_array::value_type;
 
   const value_array values = A.cvalues().const_view(), x_view = x.const_view();
   const index_array column_indices = A.ccolumn_indices().const_view(),

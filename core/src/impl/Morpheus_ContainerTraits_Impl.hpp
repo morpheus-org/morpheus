@@ -24,8 +24,7 @@
 #ifndef MORPHEUS_CONTAINERTRAITS_IMPL_HPP
 #define MORPHEUS_CONTAINERTRAITS_IMPL_HPP
 
-#include <Morpheus_TypeTraits.hpp>
-#include <type_traits>
+#include <Morpheus_GenericBackend.hpp>
 
 #include <Kokkos_Core.hpp>
 
@@ -33,29 +32,17 @@ namespace Morpheus {
 
 namespace Impl {
 
-/** @class ContainerTraits
- * @brief Traits class for accessing attributes of a Container (Matrix or
- * Vector)
- *
- * Template argument options:
- *  - ContainerTraits<ValueType>
- *  - ContainerTraits<ValueType, ArrayLayout>
- *  - ContainerTraits<ValueType, IndexType, Space>
- *  - ContainerTraits<ValueType, IndexType, ArrayLayout>
- *  - ContainerTraits<ValueType, IndexType, ArrayLayout, Space>
- *  - ContainerTraits<ValueType, ArrayLayout, Space>
- *  - ContainerTraits<ValueType, IndexType, ArrayLayout, Space, MemoryTraits>
- */
 template <typename ValueType, class... Properties>
 struct ContainerTraits;
 
 template <>
 struct ContainerTraits<void> {
-  using index_type      = void;
-  using array_layout    = void;
+  using index_type   = void;
+  using array_layout = void;
+  using space        = void;
+  // using backend         = void;
   using execution_space = void;
   using memory_space    = void;
-  using HostMirrorSpace = void;
   using memory_traits   = void;
 };
 
@@ -65,11 +52,11 @@ struct ContainerTraits<void, void, Prop...> {
 
   using index_type   = typename ContainerTraits<void, Prop...>::index_type;
   using array_layout = typename ContainerTraits<void, Prop...>::array_layout;
+  using space        = typename ContainerTraits<void, Prop...>::space;
+  // using backend = typename ContainerTraits<void, Prop...>::backend;
   using execution_space =
       typename ContainerTraits<void, Prop...>::execution_space;
-  using memory_space = typename ContainerTraits<void, Prop...>::memory_space;
-  using HostMirrorSpace =
-      typename ContainerTraits<void, Prop...>::HostMirrorSpace;
+  using memory_space  = typename ContainerTraits<void, Prop...>::memory_space;
   using memory_traits = typename ContainerTraits<void, Prop...>::memory_traits;
 };
 
@@ -82,11 +69,11 @@ struct ContainerTraits<
 
   using index_type   = IndexType;
   using array_layout = typename ContainerTraits<void, Prop...>::array_layout;
+  using space        = typename ContainerTraits<void, Prop...>::space;
+  // using backend      = typename ContainerTraits<void, Prop...>::backend;
   using execution_space =
       typename ContainerTraits<void, Prop...>::execution_space;
-  using memory_space = typename ContainerTraits<void, Prop...>::memory_space;
-  using HostMirrorSpace =
-      typename ContainerTraits<void, Prop...>::HostMirrorSpace;
+  using memory_space  = typename ContainerTraits<void, Prop...>::memory_space;
   using memory_traits = typename ContainerTraits<void, Prop...>::memory_traits;
 };
 
@@ -99,17 +86,17 @@ struct ContainerTraits<typename std::enable_if_t<
 
   using index_type   = void;
   using array_layout = ArrayLayout;
+  using space        = typename ContainerTraits<void, Prop...>::space;
+  // using backend      = typename ContainerTraits<void, Prop...>::backend;
   using execution_space =
       typename ContainerTraits<void, Prop...>::execution_space;
-  using memory_space = typename ContainerTraits<void, Prop...>::memory_space;
-  using HostMirrorSpace =
-      typename ContainerTraits<void, Prop...>::HostMirrorSpace;
+  using memory_space  = typename ContainerTraits<void, Prop...>::memory_space;
   using memory_traits = typename ContainerTraits<void, Prop...>::memory_traits;
 };
 
 template <class Space, class... Prop>
 struct ContainerTraits<
-    typename std::enable_if<Kokkos::Impl::is_space<Space>::value>::type, Space,
+    typename std::enable_if<Morpheus::is_space<Space>::value>::type, Space,
     Prop...> {
   // Specify Space, memory traits should be the only subsequent argument.
 
@@ -122,12 +109,14 @@ struct ContainerTraits<
                        void>::value,
       "Only one Container Execution or Memory Space template argument");
 
-  using index_type      = void;
-  using array_layout    = void;
-  using execution_space = typename Space::execution_space;
-  using memory_space    = typename Space::memory_space;
-  using HostMirrorSpace =
-      typename Kokkos::Impl::HostMirror<Space>::Space::memory_space;
+  using index_type   = void;
+  using array_layout = void;
+  using space        = typename std::conditional<
+      Kokkos::is_space<Space>::value,  // means we are using Kokkos::<space>
+      Morpheus::GenericBackend<Space>, Space>::type;
+  // using backend         = typename space::backend;
+  using execution_space = typename space::execution_space;
+  using memory_space    = typename space::memory_space;
   using memory_traits = typename ContainerTraits<void, Prop...>::memory_traits;
 };
 
@@ -148,10 +137,11 @@ struct ContainerTraits<typename std::enable_if<
                        void>::value,
       "MemoryTrait is the final optional template argument for a Container");
 
-  using index_type      = void;
+  using index_type = void;
+  using space      = void;
+  // using backend         = void;
   using execution_space = void;
   using memory_space    = void;
-  using HostMirrorSpace = void;
   using array_layout    = void;
   using memory_traits   = MemoryTraits;
 };

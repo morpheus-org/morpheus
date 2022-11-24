@@ -24,8 +24,11 @@
 #ifndef MORPHEUS_DENSEVECTOR_SERIAL_COPY_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_SERIAL_COPY_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_SERIAL)
+
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
@@ -39,10 +42,10 @@ void copy_by_key(
         Morpheus::is_dense_vector_format_container_v<KeyType> &&
         Morpheus::is_dense_vector_format_container_v<SourceType> &&
         Morpheus::is_dense_vector_format_container_v<DestinationType> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, KeyType,
-                               SourceType, DestinationType>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, KeyType, SourceType,
+                               DestinationType>>* = nullptr) {
   MORPHEUS_ASSERT(keys.size() <= src.size(),
                   "Size of keys must be smaller or equal to src size.");
   MORPHEUS_ASSERT(keys.size() <= dst.size(),
@@ -56,4 +59,5 @@ void copy_by_key(
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_SERIAL
 #endif  // MORPHEUS_DENSEVECTOR_SERIAL_COPY_IMPL_HPP

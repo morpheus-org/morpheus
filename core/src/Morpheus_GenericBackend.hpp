@@ -1,5 +1,5 @@
 /**
- * Morpheus_GenericSpace.hpp
+ * Morpheus_GenericBackend.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,28 +21,24 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_GENERICSPACE_HPP
-#define MORPHEUS_GENERICSPACE_HPP
+#ifndef MORPHEUS_GENERICBACKEND_HPP
+#define MORPHEUS_GENERICBACKEND_HPP
 
 #include <Morpheus_TypeTraits.hpp>
 
 namespace Morpheus {
-/**
- * \defgroup wrappers_and_tags Wrappers and Tags
- * \par Overview
- * TODO
- */
+// struct GenericBackendTag {};  //!< Tag that marks a backend as generic
+
 /**
  * \addtogroup wrappers Wrappers
- * \brief Data structures used to wrap around data types
  * \ingroup wrappers_and_tags
  * \{
  */
 
 /**
- * @brief A wrapper that converts a valid custom space into a generic one.
+ * @brief A wrapper that converts a valid space into a custom backend.
  *
- * @tparam Space A space to be converted as a generic.
+ * @tparam Space A space to be converted as a custom.
  *
  * \par Overview
  * A wrapper like that is helpful if we want to distinguish algorithms that
@@ -59,43 +55,47 @@ namespace Morpheus {
  *  Morpheus::DenseVector<double, Kokkos::HostSpace> z1(10,0.0), z2(10,0.0);
  *
  *  using exec = Kokkos::DefaultHostSpace;
- *  Morpheus::dot<exec>(x, y, z1);  // Dispatches custom implementation
  *
- *  using generic_exec = Morpheus::GenericSpace<exec>;
- *  Morpheus::dot<generic_exec>(x, y, z2);  // Dispatches generic implementation
+ *  using custom_back = Morpheus::CustomBackend<exec>;
+ *  Morpheus::dot<custom_back>(x, y, z1);  // Dispatches custom implementation
+ *
+ *  using generic_back = Morpheus::GenericBackend<exec>;
+ *  Morpheus::dot<generic_back>(x, y, z2);  // Dispatches generic implementation
  *
  * }
  * \endcode
  */
+
 template <typename Space>
-struct GenericSpace {
-  static_assert(is_execution_space_v<Space>,
+struct GenericBackend {
+  static_assert(has_execution_space_v<Space>,
                 "Space needs to have a valid Execution Space!");
   static_assert(has_memory_space_v<Space>,
                 "Space needs to have a valid Memory Space!");
-  using generic_space = GenericSpace;
-  using type          = Space;
-
+  using type = GenericBackend<Space>;
+  //   using backend         = GenericBackendTag;
+  using space           = GenericBackend<Space>;
   using execution_space = typename Space::execution_space;
   using memory_space    = typename Space::memory_space;
-  using device_type     = typename Space::device_type;
+  using device_type     = Device<execution_space, memory_space, space>;
 };
 
 namespace Generic {
-
 /**
  * @brief A Generic Space that launches kernels in the default Host Space
  *
  */
 using DefaultHostExecutionSpace =
-    Morpheus::GenericSpace<Kokkos::DefaultHostExecutionSpace>;
+    Morpheus::GenericBackend<Kokkos::DefaultHostExecutionSpace>;
 
 /**
  * @brief A Generic Space that launches kernels in the default Space
  *
  */
 using DefaultExecutionSpace =
-    Morpheus::GenericSpace<Kokkos::DefaultExecutionSpace>;
+    Morpheus::GenericBackend<Kokkos::DefaultExecutionSpace>;
+
+using HostSpace = Morpheus::GenericBackend<Kokkos::HostSpace>;
 
 #if defined(MORPHEUS_ENABLE_SERIAL)
 /**
@@ -103,34 +103,36 @@ using DefaultExecutionSpace =
  * portable backend (Kokkos)
  *
  */
-using Serial = Morpheus::GenericSpace<Kokkos::Serial>;
+using Serial = Morpheus::GenericBackend<Kokkos::Serial>;
 #endif
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
 /**
- * @brief A Generic Space that launches kernels in parallel from the performance
- * portable backend (Kokkos) using OpenMP.
+ * @brief A Generic Space that launches kernels in parallel from the
+ * performance portable backend (Kokkos) using OpenMP.
  *
  */
-using OpenMP = Morpheus::GenericSpace<Kokkos::OpenMP>;
+using OpenMP = Morpheus::GenericBackend<Kokkos::OpenMP>;
 #endif
 
 #if defined(MORPHEUS_ENABLE_CUDA)
 /**
- * @brief A Generic Space that launches kernels in parallel from the performance
- * portable backend (Kokkos) using Cuda.
+ * @brief A Generic Space that launches kernels in parallel from the
+ * performance portable backend (Kokkos) using Cuda.
  *
  */
-using Cuda = Morpheus::GenericSpace<Kokkos::Cuda>;
+using Cuda      = Morpheus::GenericBackend<Kokkos::Cuda>;
+using CudaSpace = Morpheus::GenericBackend<Kokkos::CudaSpace>;
 #endif
 
 #if defined(MORPHEUS_ENABLE_HIP)
 /**
- * @brief A Generic Space that launches kernels in parallel from the performance
- * portable backend (Kokkos) using HIP.
+ * @brief A Generic Space that launches kernels in parallel from the
+ * performance portable backend (Kokkos) using HIP.
  *
  */
-using HIP = Morpheus::GenericSpace<Kokkos::Experimental::HIP>;
+using HIP      = Morpheus::GenericBackend<Kokkos::HIP>;
+using HIPSpace = Morpheus::CustomSpace<Kokkos::HIPSpace>;
 #endif
 }  // namespace Generic
 
@@ -140,10 +142,10 @@ using HIP = Morpheus::GenericSpace<Kokkos::Experimental::HIP>;
 /*! \cond */
 namespace Impl {
 template <typename T>
-struct is_generic_space_helper : std::false_type {};
+struct is_generic_backend_helper : std::false_type {};
 
 template <typename Space>
-struct is_generic_space_helper<GenericSpace<Space>> : std::true_type {};
+struct is_generic_backend_helper<GenericBackend<Space>> : std::true_type {};
 }  // namespace Impl
 /*! \endcond */
 
@@ -155,58 +157,25 @@ struct is_generic_space_helper<GenericSpace<Space>> : std::true_type {};
  */
 /**
  * @brief Checks if the given type \p T is a valid generic space i.e is a
- * \p GenericSpace container
+ * \p GenericBackend container
  *
  * @tparam T Type passed for check.
  */
 template <typename T>
-using is_generic_space = typename Impl::is_generic_space_helper<
+using is_generic_backend = typename Impl::is_generic_backend_helper<
     typename std::remove_cv<T>::type>::type;
 
 /**
- * @brief Short-hand to \p is_generic_space.
+ * @brief Short-hand to \p is_generic_backend.
  *
  * @tparam T Type passed for check.
  */
 template <class T>
-inline constexpr bool is_generic_space_v = is_generic_space<T>::value;
-
-/**
- * @brief Checks if the given type \p T has a valid generic space
- *
- * @tparam T Type passed for check.
- *
- * \par Overview
- * For a type to have a generic space we mean that it has a \p generic_space
- * trait that is a valid generic space satisfying the \p is_generic_space check.
- */
-template <class T>
-class has_generic_space {
-  typedef char yes[1];
-  typedef char no[2];
-
-  template <class U>
-  static yes& test(
-      U*, typename std::enable_if<
-              is_generic_space_v<typename U::generic_space>>::type* = nullptr);
-
-  template <class U>
-  static no& test(...);
-
- public:
-  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
-};
-
-/**
- * @brief Short-hand to \p has_generic_space.
- *
- * @tparam T Type passed for check.
- */
-template <typename T>
-inline constexpr bool has_generic_space_v = has_generic_space<T>::value;
+inline constexpr bool is_generic_backend_v = is_generic_backend<T>::value;
 
 /*! \} // end of typetraits group
  */
+
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_GENERICSPACE_HPP
+#endif  // MORPHEUS_GENERICBACKEND_HPP

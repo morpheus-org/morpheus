@@ -24,17 +24,26 @@
 #ifndef MORPHEUS_COO_SERIAL_SORT_IMPL_HPP
 #define MORPHEUS_COO_SERIAL_SORT_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_SERIAL)
+
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_FormatTags.hpp>
+#include <Morpheus_Spaces.hpp>
 
 #include <impl/DenseVector/Morpheus_Copy_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
-template <typename Vector>
-typename Vector::value_type find_max_element(const Vector& vec) {
+template <typename ExecSpace, typename Vector>
+typename Vector::value_type find_max_element(
+    const Vector& vec,
+    typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using index_type = typename Vector::index_type;
   index_type max   = 0;
 
@@ -45,13 +54,16 @@ typename Vector::value_type find_max_element(const Vector& vec) {
   return max;
 }
 
-template <typename Vector1, typename Vector2>
+template <typename ExecSpace, typename Vector1, typename Vector2>
 void counting_sort_by_key(
     Vector1& keys, Vector2& vals, typename Vector1::value_type min,
     typename Vector1::value_type max,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
-        Morpheus::is_dense_vector_format_container_v<Vector2>>* = nullptr) {
+        Morpheus::is_dense_vector_format_container_v<Vector2> &&
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
   if (min < 0)
     throw Morpheus::InvalidInputException(
         "counting_sort_by_key min element less than 0");
@@ -94,12 +106,14 @@ void sort_by_row_and_column(
     typename Matrix::index_type min_col = 0,
     typename Matrix::index_type max_col = 0,
     typename std::enable_if_t<
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::is_coo_matrix_format_container_v<Matrix>>* = nullptr) {
+        Morpheus::is_coo_matrix_format_container_v<Matrix> &&
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
   using index_type  = typename Matrix::index_type;
   using index_array = typename Matrix::index_array_type;
   using value_array = typename Matrix::value_array_type;
-  using space       = typename Matrix::execution_space;
+  using space       = typename Matrix::space;
 
   index_type N = mat.row_indices().size();
 
@@ -112,16 +126,16 @@ void sort_by_row_and_column(
   index_type maxc = max_col;
 
   if (maxr == 0) {
-    maxr = Impl::find_max_element(mat.row_indices());
+    maxr = Impl::find_max_element<space>(mat.row_indices());
   }
   if (maxc == 0) {
-    maxc = Impl::find_max_element(mat.column_indices());
+    maxc = Impl::find_max_element<space>(mat.column_indices());
   }
 
   {
     index_array temp(mat.column_indices().size());
     Impl::copy(mat.column_indices(), temp);
-    Impl::counting_sort_by_key(temp, permutation, minc, maxc);
+    Impl::counting_sort_by_key<space>(temp, permutation, minc, maxc);
 
     if (mat.row_indices().size() != temp.size()) {
       temp.resize(mat.row_indices().size());
@@ -129,7 +143,8 @@ void sort_by_row_and_column(
     Impl::copy(mat.row_indices(), temp);
     Impl::copy_by_key<space>(permutation, temp, mat.row_indices());
 
-    Impl::counting_sort_by_key(mat.row_indices(), permutation, minr, maxr);
+    Impl::counting_sort_by_key<space>(mat.row_indices(), permutation, minr,
+                                      maxr);
     Impl::copy(mat.column_indices(), temp);
     Impl::copy_by_key<space>(permutation, temp, mat.column_indices());
   }
@@ -142,11 +157,12 @@ void sort_by_row_and_column(
 }
 
 template <typename ExecSpace, typename Matrix>
-bool is_sorted(
-    Matrix& mat,
-    typename std::enable_if_t<
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::is_coo_matrix_format_container_v<Matrix>>* = nullptr) {
+bool is_sorted(Matrix& mat,
+               typename std::enable_if_t<
+                   Morpheus::is_coo_matrix_format_container_v<Matrix> &&
+                   Morpheus::is_custom_backend_v<ExecSpace> &&
+                   Morpheus::has_serial_execution_space_v<ExecSpace> &&
+                   Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
   if (mat.row_indices().size() != mat.column_indices().size()) {
     throw Morpheus::RuntimeException(
         "Sizes of row and column indeces do not match.");
@@ -164,4 +180,5 @@ bool is_sorted(
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_SERIAL
 #endif  // MORPHEUS_COO_SERIAL_SORT_IMPL_HPP

@@ -24,8 +24,11 @@
 #ifndef MORPHEUS_DIA_SERIAL_MULTIPLY_IMPL_HPP
 #define MORPHEUS_DIA_SERIAL_MULTIPLY_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_SERIAL)
+
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
@@ -37,10 +40,9 @@ inline void multiply(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using index_type       = typename Matrix::index_type;
   using value_type       = typename Matrix::value_type;
   const index_type ndiag = A.cvalues().ncols();
@@ -62,4 +64,5 @@ inline void multiply(
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_SERIAL
 #endif  // MORPHEUS_DIA_SERIAL_MULTIPLY_IMPL_HPP

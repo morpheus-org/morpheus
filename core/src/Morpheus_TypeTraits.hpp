@@ -439,8 +439,7 @@ class is_memory_space {
 #if defined(MORPHEUS_ENABLE_CUDA)
                                   std::is_same<U, Kokkos::CudaSpace>::value ||
 #elif defined(MORPHEUS_ENABLE_HIP)
-                                  std::is_same<U, Kokkos::Experimental::
-                                                      HIPSpace>::value ||
+                                  std::is_same<U, Kokkos::HIPSpace>::value ||
 #endif
                                   false>::type* = nullptr);
 
@@ -1108,25 +1107,21 @@ class is_execution_space {
 
   template <class U>
   static yes& test(
-      U*,
-      typename std::enable_if<
-          std::is_same<typename U::execution_space,
-                       Kokkos::DefaultHostExecutionSpace>::value ||
-          std::is_same<typename U::execution_space,
-                       Kokkos::DefaultExecutionSpace>::value ||
+      U*, typename std::enable_if<
+              std::is_same<U, Kokkos::DefaultHostExecutionSpace>::value ||
+              std::is_same<U, Kokkos::DefaultExecutionSpace>::value ||
 #if defined(MORPHEUS_ENABLE_SERIAL)
-          std::is_same<typename U::execution_space, Kokkos::Serial>::value ||
+              std::is_same<U, Kokkos::Serial>::value ||
 #endif
 #if defined(MORPHEUS_ENABLE_OPENMP)
-          std::is_same<typename U::execution_space, Kokkos::OpenMP>::value ||
+              std::is_same<U, Kokkos::OpenMP>::value ||
 #endif
 #if defined(MORPHEUS_ENABLE_CUDA)
-          std::is_same<typename U::execution_space, Kokkos::Cuda>::value ||
+              std::is_same<U, Kokkos::Cuda>::value ||
 #elif defined(MORPHEUS_ENABLE_HIP)
-          std::is_same<typename U::execution_space,
-                       Kokkos::Experimental::HIP>::value ||
+              std::is_same<U, Kokkos::Experimental::HIP>::value ||
 #endif
-          false>::type* = nullptr);
+              false>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -1144,6 +1139,37 @@ template <typename T>
 inline constexpr bool is_execution_space_v = is_execution_space<T>::value;
 
 /**
+ * @brief Checks if the given type \p T has a valid supported execution space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_execution_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<
+          is_execution_space_v<typename U::execution_space>>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_execution_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_execution_space_v = has_execution_space<T>::value;
+
+/**
  * @brief Checks if the given type \p T is a valid supported Host memory space.
  *
  * @tparam T Type passed for check.
@@ -1154,13 +1180,11 @@ class is_host_memory_space {
   typedef char no[2];
 
   template <class U>
-  static yes& test(
-      U*,
-      typename std::enable_if<
+  static yes& test(U*, typename std::enable_if<
 #if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
-          std::is_same<typename U::memory_space, Kokkos::HostSpace>::value ||
+                           std::is_same<U, Kokkos::HostSpace>::value ||
 #endif
-          false>::type* = nullptr);
+                           false>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -1176,6 +1200,39 @@ class is_host_memory_space {
  */
 template <typename T>
 inline constexpr bool is_host_memory_space_v = is_host_memory_space<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a valid supported Host memory space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_host_memory_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(U*,
+                   typename std::enable_if<
+#if defined(MORPHEUS_ENABLE_SERIAL) || defined(MORPHEUS_ENABLE_OPENMP)
+                       is_host_memory_space<typename U::memory_space>::value ||
+#endif
+                       false>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_host_memory_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_host_memory_space_v = has_host_memory_space<T>::value;
 
 /**
  * @brief Checks if the given type \p T is a supported Host execution space.
@@ -1229,13 +1286,11 @@ class is_serial_execution_space {
   typedef char no[2];
 
   template <class U>
-  static yes& test(
-      U*,
-      typename std::enable_if<
+  static yes& test(U*, typename std::enable_if<
 #if defined(MORPHEUS_ENABLE_SERIAL)
-          std::is_same<typename U::execution_space, Kokkos::Serial>::value ||
+                           std::is_same<U, Kokkos::Serial>::value ||
 #endif  // MORPHEUS_ENABLE_SERIAL
-          false>::type* = nullptr);
+                           false>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -1252,6 +1307,40 @@ class is_serial_execution_space {
 template <typename T>
 inline constexpr bool is_serial_execution_space_v =
     is_serial_execution_space<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a Serial execution space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_serial_execution_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<
+#if defined(MORPHEUS_ENABLE_SERIAL)
+              is_serial_execution_space<typename U::execution_space>::value ||
+#endif  // MORPHEUS_ENABLE_SERIAL
+              false>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_serial_execution_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_serial_execution_space_v =
+    has_serial_execution_space<T>::value;
 #endif  // MORPHEUS_ENABLE_SERIAL
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
@@ -1266,13 +1355,11 @@ class is_openmp_execution_space {
   typedef char no[2];
 
   template <class U>
-  static yes& test(
-      U*,
-      typename std::enable_if<
+  static yes& test(U*, typename std::enable_if<
 #if defined(MORPHEUS_ENABLE_OPENMP)
-          std::is_same<typename U::execution_space, Kokkos::OpenMP>::value ||
+                           std::is_same<U, Kokkos::OpenMP>::value ||
 #endif  // MORPHEUS_ENABLE_OPENMP
-          false>::type* = nullptr);
+                           false>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -1289,6 +1376,40 @@ class is_openmp_execution_space {
 template <typename T>
 inline constexpr bool is_openmp_execution_space_v =
     is_openmp_execution_space<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has an OpenMP execution space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_openmp_execution_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<
+#if defined(MORPHEUS_ENABLE_OPENMP)
+              is_openmp_execution_space<typename U::execution_space>::value ||
+#endif  // MORPHEUS_ENABLE_OPENMP
+              false>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_openmp_execution_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_openmp_execution_space_v =
+    has_openmp_execution_space<T>::value;
 #endif  // MORPHEUS_ENABLE_OPENMP
 
 #if defined(MORPHEUS_ENABLE_CUDA)
@@ -1303,12 +1424,11 @@ class is_cuda_execution_space {
   typedef char no[2];
 
   template <class U>
-  static yes& test(
-      U*, typename std::enable_if<
+  static yes& test(U*, typename std::enable_if<
 #if defined(MORPHEUS_ENABLE_CUDA)
-              std::is_same<typename U::execution_space, Kokkos::Cuda>::value ||
+                           std::is_same<U, Kokkos::Cuda>::value ||
 #endif  // MORPHEUS_ENABLE_CUDA
-              false>::type* = nullptr);
+                           false>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -1325,6 +1445,40 @@ class is_cuda_execution_space {
 template <typename T>
 inline constexpr bool is_cuda_execution_space_v =
     is_cuda_execution_space<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a Cuda execution space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_cuda_execution_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(U*, typename std::enable_if<
+#if defined(MORPHEUS_ENABLE_CUDA)
+                           Morpheus::is_cuda_execution_space<
+                               typename U::execution_space>::value ||
+#endif  // MORPHEUS_ENABLE_CUDA
+                           false>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_cuda_execution_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_cuda_execution_space_v =
+    has_cuda_execution_space<T>::value;
 #endif  // MORPHEUS_ENABLE_CUDA
 
 #if defined(MORPHEUS_ENABLE_HIP)
@@ -1341,8 +1495,7 @@ class is_hip_execution_space {
   template <class U>
   static yes& test(U*, typename std::enable_if<
 #if defined(MORPHEUS_ENABLE_HIP)
-                           std::is_same<typename U::execution_space,
-                                        Kokkos::Experimental::HIP>::value ||
+                           std::is_same<U, Kokkos::HIP>::value ||
 #endif  // MORPHEUS_ENABLE_HIP
                            false>::type* = nullptr);
 
@@ -1361,6 +1514,37 @@ class is_hip_execution_space {
 template <typename T>
 inline constexpr bool is_hip_execution_space_v =
     is_hip_execution_space<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a HIP execution space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_hip_execution_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(U*,
+                   typename std::enable_if<is_hip_execution_space<
+                       typename U::execution_space>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_hip_execution_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_hip_execution_space_v =
+    has_hip_execution_space<T>::value;
 #endif  // MORPHEUS_ENABLE_HIP
 
 /*! \cond */
@@ -1377,9 +1561,10 @@ struct has_access<T1, T2> {
   static yes& test(
       U1*, U2*,
       typename std::enable_if<
-          is_execution_space_v<U1> && has_memory_space_v<U2> &&
-          Kokkos::SpaceAccessibility<
-              U1, typename U2::memory_space>::accessible>::type* = nullptr);
+          has_execution_space_v<U1> && has_memory_space_v<U2> &&
+          Kokkos::SpaceAccessibility<typename U1::execution_space,
+                                     typename U2::memory_space>::accessible>::
+          type* = nullptr);
 
   template <class U1, class U2>
   static no& test(...);

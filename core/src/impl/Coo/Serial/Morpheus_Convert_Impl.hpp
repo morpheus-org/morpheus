@@ -24,9 +24,12 @@
 #ifndef MORPHEUS_COO_SERIAL_CONVERT_IMPL_HPP
 #define MORPHEUS_COO_SERIAL_CONVERT_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_SERIAL)
+
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -37,10 +40,10 @@ void convert(
     typename std::enable_if<
         Morpheus::is_coo_matrix_format_container_v<SourceType> &&
         Morpheus::is_coo_matrix_format_container_v<DestinationType> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
-                               DestinationType>>::type* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
+        nullptr) {
   using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
@@ -62,4 +65,5 @@ void convert(
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_SERIAL
 #endif  // MORPHEUS_COO_SERIAL_CONVERT_IMPL_HPP

@@ -25,23 +25,22 @@
 #define MORPHEUS_DENSEVECTOR_KOKKOS_WAXPBY_IMPL_HPP
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename Vector>
-inline void waxpby(
-    const typename Vector::index_type n,
-    const typename Vector::value_type alpha, const Vector& x,
-    const typename Vector::value_type beta, const Vector& y, Vector& w,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
-  using execution_space = typename ExecSpace::execution_space;
+inline void waxpby(const typename Vector::index_type n,
+                   const typename Vector::value_type alpha, const Vector& x,
+                   const typename Vector::value_type beta, const Vector& y,
+                   Vector& w,
+                   typename std::enable_if_t<
+                       Morpheus::is_dense_vector_format_container_v<Vector> &&
+                       Morpheus::is_generic_backend_v<ExecSpace> &&
+                       Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
+  using execution_space = ExecSpace;
   using IndexType       = Kokkos::IndexType<typename Vector::index_type>;
   using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
   using value_array     = typename Vector::value_array_type;

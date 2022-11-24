@@ -24,9 +24,12 @@
 #ifndef MORPHEUS_DIA_SERIAL_MATRIXOPERATIONS_IMPL_HPP
 #define MORPHEUS_DIA_SERIAL_MATRIXOPERATIONS_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_SERIAL)
+
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_Exceptions.hpp>
 
 namespace Morpheus {
@@ -38,10 +41,9 @@ void update_diagonal(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
@@ -65,23 +67,20 @@ void get_diagonal(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
 }
 
 template <typename ExecSpace, typename Matrix, typename IndexType,
           typename ValueType>
-void set_value(
-    Matrix&, IndexType, IndexType, ValueType,
-    typename std::enable_if_t<
-        Morpheus::is_dia_matrix_format_container_v<Matrix> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix>>* =
-        nullptr) {
+void set_value(Matrix&, IndexType, IndexType, ValueType,
+               typename std::enable_if_t<
+                   Morpheus::is_dia_matrix_format_container_v<Matrix> &&
+                   Morpheus::is_custom_backend_v<ExecSpace> &&
+                   Morpheus::has_serial_execution_space_v<ExecSpace> &&
+                   Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
   throw Morpheus::NotImplementedException("set_value not implemented yet");
 }
 
@@ -94,10 +93,10 @@ void set_values(
         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<IndexVector> &&
         Morpheus::is_dense_vector_format_container_v<ValueVector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               IndexVector, ValueVector>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Matrix, IndexVector, ValueVector>>* =
+        nullptr) {
   throw Morpheus::NotImplementedException("set_values not implemented yet");
 }
 
@@ -107,14 +106,15 @@ void transpose(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
         Morpheus::is_dia_matrix_format_container_v<TransposeMatrix> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               TransposeMatrix>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Matrix, TransposeMatrix>>* =
+        nullptr) {
   throw Morpheus::NotImplementedException("transpose not implemented yet");
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_SERIAL
 #endif  // MORPHEUS_DIA_SERIAL_MATRIXOPERATIONS_IMPL_HPP

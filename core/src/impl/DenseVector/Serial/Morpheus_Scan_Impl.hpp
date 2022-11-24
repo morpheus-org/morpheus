@@ -24,23 +24,25 @@
 #ifndef MORPHEUS_DENSEVECTOR_SERIAL_SCAN_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_SERIAL_SCAN_IMPL_HPP
 
+#include <Morpheus_Macros.hpp>
+#if defined(MORPHEUS_ENABLE_SERIAL)
+
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename Vector>
-void inclusive_scan(
-    const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::index_type start,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
+void inclusive_scan(const Vector& in, Vector& out,
+                    typename Vector::index_type size,
+                    typename Vector::index_type start,
+                    typename std::enable_if_t<
+                        Morpheus::is_dense_vector_format_container_v<Vector> &&
+                        Morpheus::is_custom_backend_v<ExecSpace> &&
+                        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+                        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using IndexType = typename Vector::index_type;
 
   out[start] = in[start];
@@ -50,15 +52,14 @@ void inclusive_scan(
 }
 
 template <typename ExecSpace, typename Vector>
-void exclusive_scan(
-    const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::index_type start,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
+void exclusive_scan(const Vector& in, Vector& out,
+                    typename Vector::index_type size,
+                    typename Vector::index_type start,
+                    typename std::enable_if_t<
+                        Morpheus::is_dense_vector_format_container_v<Vector> &&
+                        Morpheus::is_custom_backend_v<ExecSpace> &&
+                        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+                        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using IndexType = typename Vector::index_type;
   using ValueType = typename Vector::value_type;
 
@@ -77,10 +78,9 @@ void inclusive_scan_by_key(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
-                               Vector2>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
   using IndexType = typename Vector2::index_type;
   using KeyType   = typename Vector1::value_type;
   using ValueType = typename Vector2::value_type;
@@ -108,10 +108,9 @@ void exclusive_scan_by_key(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector1,
-                               Vector2>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
   using IndexType = typename Vector2::index_type;
   using KeyType   = typename Vector1::value_type;
   using ValueType = typename Vector2::value_type;
@@ -142,4 +141,5 @@ void exclusive_scan_by_key(
 }  // namespace Impl
 }  // namespace Morpheus
 
+#endif  // MORPHEUS_ENABLE_SERIAL
 #endif  // MORPHEUS_DENSEVECTOR_SERIAL_SCAN_IMPL_HPP

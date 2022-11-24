@@ -25,7 +25,7 @@
 #define MORPHEUS_DIA_KOKKOS_MULTIPLY_IMPL_HPP
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
@@ -37,15 +37,13 @@ inline void multiply(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
-                               Vector>>* = nullptr) {
-  using execution_space  = typename ExecSpace::execution_space;
+        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using value_array_type = typename Matrix::value_array_type::value_array_type;
   using index_array_type = typename Matrix::index_array_type::value_array_type;
   using index_type       = typename Matrix::index_type;
   using value_type       = typename Matrix::value_type;
-  using member_type = typename Kokkos::TeamPolicy<execution_space>::member_type;
+  using member_type      = typename Kokkos::TeamPolicy<ExecSpace>::member_type;
 
   const value_array_type values                  = A.cvalues().const_view();
   const typename Vector::value_array_type x_view = x.const_view();
@@ -53,8 +51,8 @@ inline void multiply(
   typename Vector::value_array_type y_view = y.view();
   index_type ndiag = A.cvalues().ncols(), ncols = A.ncols();
 
-  const Kokkos::TeamPolicy<execution_space> policy(A.nrows(), Kokkos::AUTO,
-                                                   Kokkos::AUTO);
+  const Kokkos::TeamPolicy<ExecSpace> policy(A.nrows(), Kokkos::AUTO,
+                                             Kokkos::AUTO);
 
   Kokkos::parallel_for(
       policy, KOKKOS_LAMBDA(const member_type& team_member) {
@@ -81,16 +79,15 @@ inline void multiply(
 //     typename std::enable_if_t<
 //         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
 //         Morpheus::is_dense_vector_format_container_v<Vector> &&
-//         Morpheus::is_generic_space_v<ExecSpace> &&
-//         Morpheus::has_access_v<typename ExecSpace::execution_space, Matrix,
+//         Morpheus::is_generic_backend_v<ExecSpace> &&
+//         Morpheus::has_access_v<ExecSpace, Matrix,
 //                                Vector>>* = nullptr) {
-//   using execution_space  = typename ExecSpace::execution_space;
 //   using value_array_type = typename
 //   Matrix::value_array_type::value_array_type; using index_array_type =
 //   typename Matrix::index_array_type::value_array_type; using index_type =
 //   typename Matrix::index_type; using value_type       = typename
 //   Matrix::value_type; using range_policy =
-//       Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
+//       Kokkos::RangePolicy<Kokkos::IndexType<index_type>, ExecSpace>;
 
 //   const value_array_type values                   = A.cvalues().const_view();
 //   const typename Vector::value_array_type x_view = x.const_view();

@@ -28,7 +28,7 @@
 #if defined(MORPHEUS_ENABLE_CUDA)
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 #include <impl/Morpheus_CudaUtils.hpp>
@@ -38,16 +38,15 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename Vector>
-inline void waxpby(
-    const typename Vector::index_type n,
-    const typename Vector::value_type alpha, const Vector& x,
-    const typename Vector::value_type beta, const Vector& y, Vector& w,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_cuda_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
+inline void waxpby(const typename Vector::index_type n,
+                   const typename Vector::value_type alpha, const Vector& x,
+                   const typename Vector::value_type beta, const Vector& y,
+                   Vector& w,
+                   typename std::enable_if_t<
+                       Morpheus::is_dense_vector_format_container_v<Vector> &&
+                       Morpheus::is_custom_backend_v<ExecSpace> &&
+                       Morpheus::has_cuda_execution_space_v<ExecSpace> &&
+                       Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using index_type = typename Vector::index_type;
   using value_type = typename Vector::value_type;
 

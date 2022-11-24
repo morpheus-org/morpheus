@@ -28,22 +28,21 @@
 #if defined(MORPHEUS_ENABLE_OPENMP)
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename Vector>
-void inclusive_scan(
-    const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::index_type start,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
+void inclusive_scan(const Vector& in, Vector& out,
+                    typename Vector::index_type size,
+                    typename Vector::index_type start,
+                    typename std::enable_if_t<
+                        Morpheus::is_dense_vector_format_container_v<Vector> &&
+                        Morpheus::is_custom_backend_v<ExecSpace> &&
+                        Morpheus::has_openmp_space_v<ExecSpace> &&
+                        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using index_type = typename Vector::index_type;
   using value_type = typename Vector::value_type;
 
@@ -62,15 +61,14 @@ void inclusive_scan(
 }
 
 template <typename ExecSpace, typename Vector>
-void exclusive_scan(
-    const Vector& in, Vector& out, typename Vector::index_type size,
-    typename Vector::index_type start,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<Vector> &&
-        !Morpheus::is_kokkos_space_v<ExecSpace> &&
-        Morpheus::is_OpenMP_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, Vector>>* =
-        nullptr) {
+void exclusive_scan(const Vector& in, Vector& out,
+                    typename Vector::index_type size,
+                    typename Vector::index_type start,
+                    typename std::enable_if_t<
+                        Morpheus::is_dense_vector_format_container_v<Vector> &&
+                        Morpheus::is_custom_backend_v<ExecSpace> &&
+                        Morpheus::has_openmp_space_v<ExecSpace> &&
+                        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using index_type = typename Vector::index_type;
   using value_type = typename Vector::value_type;
 

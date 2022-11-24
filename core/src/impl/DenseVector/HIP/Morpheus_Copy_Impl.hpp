@@ -28,7 +28,7 @@
 #if defined(MORPHEUS_ENABLE_HIP)
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 #include <impl/Morpheus_HIPUtils.hpp>
@@ -45,10 +45,10 @@ void copy_by_key(
         Morpheus::is_dense_vector_format_container_v<KeyType> &&
         Morpheus::is_dense_vector_format_container_v<SourceType> &&
         Morpheus::is_dense_vector_format_container_v<DestinationType> &&
-        !Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::is_hip_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, KeyType,
-                               SourceType, DestinationType>>* = nullptr) {
+        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_hip_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, KeyType, SourceType,
+                               DestinationType>>* = nullptr) {
   using index_type = typename KeyType::value_type;
   using value_type = typename SourceType::value_type;
 

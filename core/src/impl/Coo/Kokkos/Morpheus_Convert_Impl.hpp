@@ -25,7 +25,7 @@
 #define MORPHEUS_COO_KOKKOS_CONVERT_IMPL_HPP
 
 #include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_GenericSpace.hpp>
+#include <Morpheus_Spaces.hpp>
 #include <Morpheus_Exceptions.hpp>
 
 namespace Morpheus {
@@ -37,9 +37,9 @@ inline void convert(
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<SourceType> &&
         Morpheus::is_coo_matrix_format_container_v<DestinationType> &&
-        Morpheus::is_generic_space_v<ExecSpace> &&
-        Morpheus::has_access_v<typename ExecSpace::execution_space, SourceType,
-                               DestinationType>>* = nullptr) {
+        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>* =
+        nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos>");
 }
 
