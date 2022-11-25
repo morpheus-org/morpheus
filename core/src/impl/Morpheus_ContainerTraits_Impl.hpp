@@ -37,10 +37,9 @@ struct ContainerTraits;
 
 template <>
 struct ContainerTraits<void> {
-  using index_type   = void;
-  using array_layout = void;
-  using space        = void;
-  // using backend         = void;
+  using index_type      = void;
+  using array_layout    = void;
+  using backend         = void;
   using execution_space = void;
   using memory_space    = void;
   using memory_traits   = void;
@@ -52,8 +51,7 @@ struct ContainerTraits<void, void, Prop...> {
 
   using index_type   = typename ContainerTraits<void, Prop...>::index_type;
   using array_layout = typename ContainerTraits<void, Prop...>::array_layout;
-  using space        = typename ContainerTraits<void, Prop...>::space;
-  // using backend = typename ContainerTraits<void, Prop...>::backend;
+  using backend      = typename ContainerTraits<void, Prop...>::backend;
   using execution_space =
       typename ContainerTraits<void, Prop...>::execution_space;
   using memory_space  = typename ContainerTraits<void, Prop...>::memory_space;
@@ -69,8 +67,7 @@ struct ContainerTraits<
 
   using index_type   = IndexType;
   using array_layout = typename ContainerTraits<void, Prop...>::array_layout;
-  using space        = typename ContainerTraits<void, Prop...>::space;
-  // using backend      = typename ContainerTraits<void, Prop...>::backend;
+  using backend      = typename ContainerTraits<void, Prop...>::backend;
   using execution_space =
       typename ContainerTraits<void, Prop...>::execution_space;
   using memory_space  = typename ContainerTraits<void, Prop...>::memory_space;
@@ -86,8 +83,7 @@ struct ContainerTraits<typename std::enable_if_t<
 
   using index_type   = void;
   using array_layout = ArrayLayout;
-  using space        = typename ContainerTraits<void, Prop...>::space;
-  // using backend      = typename ContainerTraits<void, Prop...>::backend;
+  using backend      = typename ContainerTraits<void, Prop...>::backend;
   using execution_space =
       typename ContainerTraits<void, Prop...>::execution_space;
   using memory_space  = typename ContainerTraits<void, Prop...>::memory_space;
@@ -111,12 +107,12 @@ struct ContainerTraits<
 
   using index_type   = void;
   using array_layout = void;
-  using space        = typename std::conditional<
-      Kokkos::is_space<Space>::value,  // means we are using Kokkos::<space>
+  using backend      = typename std::conditional<
+      !Morpheus::has_backend<Space>::value,  // means we are using
+                                             // Kokkos::<space>
       Morpheus::GenericBackend<Space>, Space>::type;
-  // using backend         = typename space::backend;
-  using execution_space = typename space::execution_space;
-  using memory_space    = typename space::memory_space;
+  using execution_space = typename backend::execution_space;
+  using memory_space    = typename backend::memory_space;
   using memory_traits = typename ContainerTraits<void, Prop...>::memory_traits;
 };
 
@@ -137,9 +133,8 @@ struct ContainerTraits<typename std::enable_if<
                        void>::value,
       "MemoryTrait is the final optional template argument for a Container");
 
-  using index_type = void;
-  using space      = void;
-  // using backend         = void;
+  using index_type      = void;
+  using backend         = void;
   using execution_space = void;
   using memory_space    = void;
   using array_layout    = void;

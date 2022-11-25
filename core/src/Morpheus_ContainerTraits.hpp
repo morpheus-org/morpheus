@@ -61,16 +61,10 @@ struct ContainerTraits {
       !std::is_same_v<typename prop::memory_space, void>,
       typename prop::memory_space, typename ExecutionSpace::memory_space>;
 
-  using Space =
-      typename std::conditional_t<!std::is_same_v<typename prop::space, void>,
-                                  typename prop::space,
+  using Backend =
+      typename std::conditional_t<!std::is_same_v<typename prop::backend, void>,
+                                  typename prop::backend,
                                   Morpheus::DefaultExecutionSpace>;
-
-  //   using Backend =
-  //       typename std::conditional_t<!std::is_same_v<typename prop::backend,
-  //       void>,
-  //                                   typename prop::backend,
-  //                                   Morpheus::CustomBackendTag>;
 
   using ArrayLayout = typename std::conditional_t<
       !std::is_same_v<typename prop::array_layout, void>,
@@ -94,22 +88,21 @@ struct ContainerTraits {
 
   using array_layout = ArrayLayout;
 
-  using space = Space;
-  //   using backend         = Backend;
+  using backend         = Backend;
   using execution_space = ExecutionSpace;
   using memory_space    = MemorySpace;
-  using device_type   = Morpheus::Device<execution_space, memory_space, Space>;
-  using memory_traits = MemoryTraits;
-  using host_mirror_space = typename Morpheus::HostMirror<Space>::Space;
+  using device_type = Morpheus::Device<execution_space, memory_space, backend>;
+  using memory_traits       = MemoryTraits;
+  using host_mirror_backend = typename Morpheus::HostMirror<backend>::backend;
 
   using type =
-      Container<value_type, index_type, array_layout, Space, memory_traits>;
-  //  will be morpheus::device
+      Container<value_type, index_type, array_layout, backend, memory_traits>;
+
   using HostMirror =
       Container<non_const_value_type, non_const_index_type, array_layout,
-                Morpheus::Device<typename host_mirror_space::execution_space,
-                                 typename host_mirror_space::memory_space,
-                                 host_mirror_space>>;
+                Morpheus::Device<typename host_mirror_backend::execution_space,
+                                 typename host_mirror_backend::memory_space,
+                                 typename host_mirror_backend::backend>>;
 
   using pointer = typename std::add_pointer<type>::type;
   using const_pointer =

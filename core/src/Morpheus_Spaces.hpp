@@ -37,7 +37,6 @@ struct Device {
   static_assert(Morpheus::is_custom_backend<BackendSpace>::value ||
                     Morpheus::is_generic_backend<BackendSpace>::value,
                 "BackendSpace must be either a custom or generic backend.");
-  using space           = BackendSpace;
   using backend         = typename BackendSpace::backend;
   using execution_space = typename ExecutionSpace::execution_space;
   using memory_space    = typename MemorySpace::memory_space;
@@ -69,7 +68,7 @@ struct HostMirror {
 
  public:
   //  static_assert(check that S is not Kokkos::)
-  using Space = typename std::conditional<
+  using backend = typename std::conditional<
       keep_exe && keep_mem, wrapped_space,
       typename std::conditional<
           keep_mem,
@@ -97,6 +96,37 @@ struct is_space {
  public:
   static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
 };
+
+/**
+ * @brief Checks if the given type \p T has a valid supported backend.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_backend {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<
+              is_custom_backend_v<typename U::backend> ||
+              is_generic_backend_v<typename U::backend>>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_backend.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_backend_v = has_backend<T>::value;
 
 }  // namespace Morpheus
 

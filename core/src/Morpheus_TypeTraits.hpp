@@ -1246,17 +1246,15 @@ class is_host_execution_space {
 
   template <class U>
   static yes& test(
-      U*,
-      typename std::enable_if<
-          std::is_same<typename U::execution_space,
-                       Kokkos::DefaultHostExecutionSpace>::value ||
+      U*, typename std::enable_if<
+              std::is_same<U, Kokkos::DefaultHostExecutionSpace>::value ||
 #if defined(MORPHEUS_ENABLE_SERIAL)
-          std::is_same<typename U::execution_space, Kokkos::Serial>::value ||
+              std::is_same<U, Kokkos::Serial>::value ||
 #endif
 #if defined(MORPHEUS_ENABLE_OPENMP)
-          std::is_same<typename U::execution_space, Kokkos::OpenMP>::value ||
+              std::is_same<U, Kokkos::OpenMP>::value ||
 #endif
-          false>::type* = nullptr);
+              false>::type* = nullptr);
 
   template <class U>
   static no& test(...);
@@ -1273,6 +1271,36 @@ class is_host_execution_space {
 template <typename T>
 inline constexpr bool is_host_execution_space_v =
     is_host_execution_space<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a supported Host execution space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_host_execution_space {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(U*, typename std::enable_if<is_host_execution_space_v<
+                           typename U::execution_space>>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p has_host_execution_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_host_execution_space_v =
+    has_host_execution_space<T>::value;
 
 #if defined(MORPHEUS_ENABLE_SERIAL)
 /**
