@@ -24,7 +24,7 @@
 #ifndef MORPHEUS_FORMATTAGS_HPP
 #define MORPHEUS_FORMATTAGS_HPP
 
-#include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_FormatTraits.hpp>
 
 #include <impl/Morpheus_MatrixTags.hpp>
 #include <impl/Morpheus_VectorTags.hpp>
@@ -80,8 +80,8 @@ struct DenseVectorFormatTag : public Impl::DenseVectorTag {};
  */
 
 /**
- * \addtogroup typetraits Type Traits
- * \ingroup utilities
+ * \addtogroup format_traits Format Traits
+ * \ingroup type_traits
  * \{
  *
  */
@@ -298,7 +298,7 @@ template <typename T>
 inline constexpr bool is_dense_vector_format_container_v =
     is_dense_vector_format_container<T>::value;
 
-/*! \} // end of typetraits group
+/*! \} // end of type_traits group
  */
 }  // namespace Morpheus
 

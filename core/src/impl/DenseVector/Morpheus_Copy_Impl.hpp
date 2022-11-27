@@ -24,7 +24,6 @@
 #ifndef MORPHEUS_DENSEVECTOR_COPY_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_COPY_IMPL_HPP
 
-#include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 
 #include <impl/Morpheus_Utils.hpp>

@@ -27,9 +27,10 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_HIP)
 
-#include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_Spaces.hpp>
+#include <Morpheus_SpaceTraits.hpp>
+#include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_Spaces.hpp>
 
 #include <impl/Morpheus_HIPUtils.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_WAXPBY_Impl.hpp>

@@ -24,9 +24,10 @@
 #ifndef MORPHEUS_DENSEVECTOR_KOKKOS_DOT_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_KOKKOS_DOT_IMPL_HPP
 
-#include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_Spaces.hpp>
+#include <Morpheus_SpaceTraits.hpp>
+#include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_Spaces.hpp>
 
 namespace Morpheus {
 namespace Impl {

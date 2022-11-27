@@ -27,9 +27,6 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_HIP)
 
-#include <Morpheus_FormatTags.hpp>
-#include <Morpheus_TypeTraits.hpp>
-
 #include <impl/Morpheus_HIPUtils.hpp>
 
 #ifdef MORPHEUS_ENABLE_TPL_HIPBLAS

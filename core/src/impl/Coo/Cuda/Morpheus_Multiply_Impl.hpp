@@ -27,7 +27,8 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_CUDA)
 
-#include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_SpaceTraits.hpp>
+#include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 

@@ -24,6 +24,8 @@
 #ifndef MORPHEUS_CONTAINERTRAITS_IMPL_HPP
 #define MORPHEUS_CONTAINERTRAITS_IMPL_HPP
 
+#include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_SpaceTraits.hpp>
 #include <Morpheus_GenericBackend.hpp>
 
 #include <Kokkos_Core.hpp>
@@ -75,9 +77,9 @@ struct ContainerTraits<
 };
 
 template <typename ArrayLayout, class... Prop>
-struct ContainerTraits<typename std::enable_if_t<
-                           Kokkos::Impl::is_array_layout<ArrayLayout>::value>,
-                       ArrayLayout, Prop...> {
+struct ContainerTraits<
+    typename std::enable_if_t<Morpheus::is_layout<ArrayLayout>::value>,
+    ArrayLayout, Prop...> {
   // Specify Layout
   // Keep Space and MemoryTraits arguments
 

@@ -24,8 +24,6 @@
 #ifndef MORPHEUS_PRINT_IMPL_HPP
 #define MORPHEUS_PRINT_IMPL_HPP
 
-#include <Morpheus_FormatTags.hpp>
-
 #include <impl/DenseVector/Morpheus_Print_Impl.hpp>
 #include <impl/DenseMatrix/Morpheus_Print_Impl.hpp>
 

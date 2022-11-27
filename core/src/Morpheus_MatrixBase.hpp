@@ -23,7 +23,6 @@
 #ifndef MORPHEUS_MATRIXBASE_HPP
 #define MORPHEUS_MATRIXBASE_HPP
 
-#include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_MatrixOptions.hpp>
 #include <Morpheus_ContainerTraits.hpp>
 

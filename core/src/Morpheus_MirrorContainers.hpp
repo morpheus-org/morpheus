@@ -24,7 +24,7 @@
 #ifndef MORPHEUS_MIRRORCONTAINERS_HPP
 #define MORPHEUS_MIRRORCONTAINERS_HPP
 
-#include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_FormatTraits.hpp>
 
 #include <impl/Morpheus_MirrorContainers_Impl.hpp>
 

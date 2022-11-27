@@ -24,7 +24,8 @@
 #ifndef MORPHEUS_COO_KOKKOS_CONVERT_IMPL_HPP
 #define MORPHEUS_COO_KOKKOS_CONVERT_IMPL_HPP
 
-#include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_SpaceTraits.hpp>
+#include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_Spaces.hpp>
 #include <Morpheus_Exceptions.hpp>
 

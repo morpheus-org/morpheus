@@ -26,9 +26,10 @@
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
 
-#include <Morpheus_TypeTraits.hpp>
-#include <Morpheus_Spaces.hpp>
+#include <Morpheus_SpaceTraits.hpp>
+#include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_Spaces.hpp>
 
 namespace Morpheus {
 namespace Impl {

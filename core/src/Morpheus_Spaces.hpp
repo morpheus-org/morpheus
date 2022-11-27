@@ -77,26 +77,6 @@ struct HostMirror {
           Morpheus::HostSpace>::type>::type;
 };
 
-template <typename T>
-struct is_space {
-  typedef char yes[1];
-  typedef char no[2];
-
-  template <class U>
-  static yes& test(U*,
-                   typename std::enable_if<
-                       Kokkos::is_space<typename U::execution_space>::value ||
-                       Kokkos::is_space<typename U::memory_space>::value ||
-                       Kokkos::is_space<typename U::device_type>::value ||
-                       Kokkos::is_space<U>::value>::type* = nullptr);
-
-  template <class U>
-  static no& test(...);
-
- public:
-  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
-};
-
 /**
  * @brief Checks if the given type \p T has a valid supported backend.
  *

@@ -24,12 +24,10 @@
 #ifndef MORPHEUS_CUSTOMBACKEND_HPP
 #define MORPHEUS_CUSTOMBACKEND_HPP
 
-#include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_SpaceTraits.hpp>
 #include <fwd/Morpheus_Fwd_Spaces.hpp>
 
 namespace Morpheus {
-// struct CustomBackendTag {};  //!< Tag that marks a backend as custom
-
 /**
  * \defgroup wrappers_and_tags Wrappers and Tags
  * \par Overview
@@ -186,8 +184,8 @@ struct is_custom_backend_helper<CustomBackend<Space>> : std::true_type {};
 /*! \endcond */
 
 /**
- * \addtogroup typetraits Type Traits
- * \ingroup utilities
+ * \addtogroup space_traits Space Traits
+ * \ingroup type_traits
  * \{
  *
  */
@@ -208,6 +206,9 @@ using is_custom_backend = typename Impl::is_custom_backend_helper<
  */
 template <class T>
 inline constexpr bool is_custom_backend_v = is_custom_backend<T>::value;
+
+/*! \} // end of space_traits group
+ */
 
 }  // namespace Morpheus
 

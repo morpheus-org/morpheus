@@ -24,11 +24,9 @@
 #ifndef MORPHEUS_GENERICBACKEND_HPP
 #define MORPHEUS_GENERICBACKEND_HPP
 
-#include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_SpaceTraits.hpp>
 
 namespace Morpheus {
-// struct GenericBackendTag {};  //!< Tag that marks a backend as generic
-
 /**
  * \addtogroup wrappers Wrappers
  * \ingroup wrappers_and_tags
@@ -149,8 +147,8 @@ struct is_generic_backend_helper<GenericBackend<Space>> : std::true_type {};
 /*! \endcond */
 
 /**
- * \addtogroup typetraits Type Traits
- * \ingroup utilities
+ * \addtogroup space_traits Space Traits
+ * \ingroup type_traits
  * \{
  *
  */
@@ -172,7 +170,7 @@ using is_generic_backend = typename Impl::is_generic_backend_helper<
 template <class T>
 inline constexpr bool is_generic_backend_v = is_generic_backend<T>::value;
 
-/*! \} // end of typetraits group
+/*! \} // end of space_traits group
  */
 
 }  // namespace Morpheus

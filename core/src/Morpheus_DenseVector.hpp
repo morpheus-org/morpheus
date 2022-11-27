@@ -23,7 +23,7 @@
 #ifndef MORPHEUS_DENSEVECTOR_HPP
 #define MORPHEUS_DENSEVECTOR_HPP
 
-#include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_ContainerTraits.hpp>
 

@@ -25,8 +25,8 @@
 #define MORPHEUS_DYNAMIC_COPY_IMPL_HPP
 
 #include <Morpheus_Exceptions.hpp>
+#include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_TypeTraits.hpp>
 
 #include <impl/Morpheus_Copy_Impl.hpp>
 #include <impl/Morpheus_Variant.hpp>

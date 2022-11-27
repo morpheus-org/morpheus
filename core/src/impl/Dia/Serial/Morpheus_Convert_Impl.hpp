@@ -28,8 +28,9 @@
 #if defined(MORPHEUS_ENABLE_SERIAL)
 
 #include <Morpheus_Exceptions.hpp>
+#include <Morpheus_SpaceTraits.hpp>
+#include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
-#include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_Spaces.hpp>
 
 // TODO: Remove use of set during Coo to Dia Conversion

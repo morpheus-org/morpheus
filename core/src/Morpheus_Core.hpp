@@ -52,6 +52,8 @@
 #include <Morpheus_Spaces.hpp>
 #include <Morpheus_MirrorContainers.hpp>
 #include <Morpheus_TypeTraits.hpp>
+#include <Morpheus_SpaceTraits.hpp>
+#include <Morpheus_FormatTraits.hpp>
 
 // I/O
 #include <Morpheus_MatrixMarket.hpp>
@@ -60,9 +62,6 @@
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_Metaprogramming.hpp>
 #include <Morpheus_ContainerFactory.hpp>
-
-// // Spaces
-// #include <spaces/Morpheus_Serial.hpp>
 
 //! Generic Morpheus interfaces
 namespace Morpheus {
