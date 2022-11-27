@@ -95,6 +95,14 @@ class has_memory_space {
 };
 
 /**
+ * @brief Short-hand to \p has_memory_space.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool has_memory_space_v = has_memory_space<T>::value;
+
+/**
  * @brief Checks if the given type \p T is a valid supported execution space.
  *
  * @tparam T Type passed for check.
@@ -167,14 +175,6 @@ class has_execution_space {
  */
 template <typename T>
 inline constexpr bool has_execution_space_v = has_execution_space<T>::value;
-
-/**
- * @brief Short-hand to \p has_memory_space.
- *
- * @tparam T Type passed for check.
- */
-template <typename T>
-inline constexpr bool has_memory_space_v = has_memory_space<T>::value;
 
 /**
  * @brief Checks if the two types are in the same valid supported memory space
