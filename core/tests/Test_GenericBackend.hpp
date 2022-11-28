@@ -27,102 +27,110 @@
 #include <Morpheus_Core.hpp>
 
 namespace Test {
+#define MORPHEUS_CHECK_GENERIC_BACKEND(SPACE, ref_res)                        \
+  {                                                                           \
+    bool _res;                                                                \
+    _res = Morpheus::is_generic_backend<Kokkos::SPACE>::value;                \
+    EXPECT_EQ(_res, ref_res[0]);                                              \
+    _res = Morpheus::is_generic_backend<Morpheus::SPACE>::value;              \
+    EXPECT_EQ(_res, ref_res[1]);                                              \
+    _res = Morpheus::is_generic_backend<Morpheus::Custom::SPACE>::value;      \
+    EXPECT_EQ(_res, ref_res[2]);                                              \
+    _res = Morpheus::is_generic_backend<Morpheus::Generic::SPACE>::value;     \
+    EXPECT_EQ(_res, ref_res[3]);                                              \
+    _res = Morpheus::is_generic_backend<                                      \
+        typename Morpheus::SPACE::backend>::value;                            \
+    EXPECT_EQ(_res, ref_res[4]);                                              \
+    _res = Morpheus::is_generic_backend<                                      \
+        typename Morpheus::Custom::SPACE::backend>::value;                    \
+    EXPECT_EQ(_res, ref_res[5]);                                              \
+    _res = Morpheus::is_generic_backend<                                      \
+        typename Morpheus::Generic::SPACE::backend>::value;                   \
+    EXPECT_EQ(_res, ref_res[6]);                                              \
+    /* Checking Alias */                                                      \
+    _res = Morpheus::is_generic_backend_v<Kokkos::SPACE>;                     \
+    EXPECT_EQ(_res, ref_res[0]);                                              \
+    _res = Morpheus::is_generic_backend_v<Morpheus::SPACE>;                   \
+    EXPECT_EQ(_res, ref_res[1]);                                              \
+    _res = Morpheus::is_generic_backend_v<Morpheus::Custom::SPACE>;           \
+    EXPECT_EQ(_res, ref_res[2]);                                              \
+    _res = Morpheus::is_generic_backend_v<Morpheus::Generic::SPACE>;          \
+    EXPECT_EQ(_res, ref_res[3]);                                              \
+    _res = Morpheus::is_generic_backend_v<typename Morpheus::SPACE::backend>; \
+    EXPECT_EQ(_res, ref_res[4]);                                              \
+    _res = Morpheus::is_generic_backend_v<                                    \
+        typename Morpheus::Custom::SPACE::backend>;                           \
+    EXPECT_EQ(_res, ref_res[5]);                                              \
+    _res = Morpheus::is_generic_backend_v<                                    \
+        typename Morpheus::Generic::SPACE::backend>;                          \
+    EXPECT_EQ(_res, ref_res[6]);                                              \
+  }
+
 /**
  * @brief The \p is_generic_space checks if the passed type is a valid Generic
- * execution space. For the check to be valid, the type should be a
- * \p GenericBackend container.
+ * backend. For the check to be valid, the type should be a \p GenericBackend
+ * container.
  *
  */
 TEST(GenericBackendTest, IsGenericBackend) {
-  bool res = Morpheus::is_generic_backend<int>::value;
-  EXPECT_EQ(res, 0);
+  {
+    bool res = Morpheus::is_generic_backend<int>::value;
+    EXPECT_EQ(res, 0);
+  }
 
-  res = Morpheus::is_generic_backend<Kokkos::DefaultHostExecutionSpace>::value;
-  EXPECT_EQ(res, 1);
+  {
+    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
+    MORPHEUS_CHECK_GENERIC_BACKEND(DefaultHostExecutionSpace, ref_results);
+  }
+
+  {
+    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
+    MORPHEUS_CHECK_GENERIC_BACKEND(TEST_SPACE, ref_results);
+  }
+
+  {
+    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
+    MORPHEUS_CHECK_GENERIC_BACKEND(HostSpace, ref_results);
+  }
 
 #if defined(MORPHEUS_ENABLE_SERIAL)
-  res = Morpheus::is_generic_backend<Kokkos::Serial>::value;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::is_generic_backend<
-      Morpheus::GenericBackend<Kokkos::Serial>>::value;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::is_generic_backend<Morpheus::Generic::Serial>::value;
-  EXPECT_EQ(res, 1);
+  {
+    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
+    MORPHEUS_CHECK_GENERIC_BACKEND(Serial, ref_results);
+  }
 #endif
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
-  res = Morpheus::is_generic_backend<Kokkos::OpenMP>::value;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::is_generic_backend<Morpheus::Generic::OpenMP>::value;
-  EXPECT_EQ(res, 1);
+  {
+    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
+    MORPHEUS_CHECK_GENERIC_BACKEND(OpenMP, ref_results);
+  }
 #endif
 
 #if defined(MORPHEUS_ENABLE_CUDA)
-  res = Morpheus::is_generic_backend<Kokkos::Cuda>::value;
-  EXPECT_EQ(res, 0);
+  {
+    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
+    MORPHEUS_CHECK_GENERIC_BACKEND(Cuda, ref_results);
+  }
 
-  res = Morpheus::is_generic_backend<Morpheus::Generic::Cuda>::value;
-  EXPECT_EQ(res, 1);
+  {
+    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
+    MORPHEUS_CHECK_GENERIC_BACKEND(CudaSpace, ref_results);
+  }
 #endif
 
 #if defined(MORPHEUS_ENABLE_HIP)
-  res = Morpheus::is_generic_backend<Kokkos::HIP>::value;
-  EXPECT_EQ(res, 0);
+  {
+    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
+    MORPHEUS_CHECK_GENERIC_BACKEND(HIP, ref_results);
+  }
 
-  res = Morpheus::is_generic_backend<Morpheus::Generic::HIP>::value;
-  EXPECT_EQ(res, 1);
-#endif
-
-  /* Testing Alias */
-  res = Morpheus::is_generic_backend_v<Kokkos::DefaultHostExecutionSpace>;
-  EXPECT_EQ(res, 1);
-
-#if defined(MORPHEUS_ENABLE_SERIAL)
-  res =
-      Morpheus::is_generic_backend_v<Morpheus::GenericBackend<Kokkos::Serial>>;
-  EXPECT_EQ(res, 1);
+  {
+    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
+    MORPHEUS_CHECK_GENERIC_BACKEND(HIPSpace, ref_results);
+  }
 #endif
 }
-
-// /**
-//  * @brief The \p has_generic_space checks if the passed type has a valid
-//  * Generic execution space. For the check to be valid, the type should have a
-//  * \p generic_space trait which is a valid generic space.
-//  *
-//  */
-// TEST(GenericBackendTest, HasGenericBackend) {
-//   bool res = Morpheus::has_generic_backend<int>::value;
-//   EXPECT_EQ(res, 0);
-
-//   struct TestNotGeneric {
-//     using generic_space = Kokkos::DefaultHostExecutionSpace;
-//   };
-
-//   // TestNotGeneric has a generic_space trait but that is not a generic space
-//   res = Morpheus::has_generic_backend<TestNotGeneric>::value;
-//   EXPECT_EQ(res, 0);
-
-//   struct TestGeneric {
-//     using generic_space =
-//         Morpheus::GenericBackend<Kokkos::DefaultHostExecutionSpace>;
-//   };
-
-//   // TestNotGeneric has a generic_space trait which is also a generic space
-//   res = Morpheus::has_generic_backend<TestGeneric>::value;
-//   EXPECT_EQ(res, 1);
-
-//   /* Testing Alias */
-//   // TestNotGeneric has a generic_space trait but that is not a generic space
-//   res = Morpheus::has_generic_backend_v<TestNotGeneric>;
-//   EXPECT_EQ(res, 0);
-
-//   // TestNotGeneric has a generic_space trait which is also a generic space
-//   res = Morpheus::has_generic_backend_v<TestGeneric>;
-//   EXPECT_EQ(res, 1);
-// }
 
 }  // namespace Test
 

@@ -77,11 +77,20 @@ struct CustomBackend {
                 "Space needs to have a valid Execution Space!");
   static_assert(has_memory_space_v<Space>,
                 "Space needs to have a valid Memory Space!");
-  using type            = CustomBackend<Space>;
-  using backend         = CustomBackend<Space>;
-  using execution_space = typename Space::execution_space;
-  using memory_space    = typename Space::memory_space;
-  using device_type     = Device<execution_space, memory_space, backend>;
+  using type =
+      CustomBackend<Space>;  //!< The complete type of the custom backend
+
+  using backend =
+      CustomBackend<Space>;  //!< Alias for the type of the custom backend
+
+  using execution_space =
+      typename Space::execution_space;  //!< Execution space of custom backend
+
+  using memory_space =
+      typename Space::memory_space;  //!< Memory space of the custom backend
+
+  using device_type = Device<execution_space, memory_space,
+                             backend>;  //!< Device type of custom backend
 };
 
 /**
@@ -89,88 +98,93 @@ struct CustomBackend {
  * @brief Namespace for Custom Backend definitions
  */
 namespace Custom {
-/**
- * @brief A Custom Space that launches kernels in the default Host Space
- *
+/*! @brief A Custom Space that launches kernels in the default Host Space
  */
 using DefaultHostExecutionSpace =
     Morpheus::CustomBackend<Kokkos::DefaultHostExecutionSpace>;
-
-/**
- * @brief A Custom Space that launches kernels in the default Space
- *
+/*! @brief A Custom Space that launches kernels in the default Space
  */
 using DefaultExecutionSpace =
     Morpheus::CustomBackend<Kokkos::DefaultExecutionSpace>;
-
-/**
- * @brief The Custom Host memory space
- *
+/*! @brief The Custom Host memory space
  */
 using HostSpace = Morpheus::CustomBackend<Kokkos::HostSpace>;
 
 #if defined(MORPHEUS_ENABLE_SERIAL)
-/**
- * @brief A Custom Space that launches kernels in serial using the Serial
+/*! @brief A Custom Space that launches kernels in serial using the Serial
  * backend
- *
  */
 using Serial = Morpheus::CustomBackend<Kokkos::Serial>;
+
 #endif
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
-/**
- * @brief A Custom Space that launches kernels in parallel using the OpenMP
+/*! @brief A Custom Space that launches kernels in parallel using the OpenMP
  * backend.
- *
  */
 using OpenMP = Morpheus::CustomBackend<Kokkos::OpenMP>;
+
 #endif
 
 #if defined(MORPHEUS_ENABLE_CUDA)
-/**
- * @brief A Custom Space that launches kernels in parallel using the Cuda
+/*! @brief A Custom Space that launches kernels in parallel using the Cuda
  * backend.
- *
  */
 using Cuda = Morpheus::CustomBackend<Kokkos::Cuda>;
-/**
- * @brief The Custom Cuda memory space
- *
+/*! @brief The Custom Cuda memory space
  */
 using CudaSpace = Morpheus::CustomBackend<Kokkos::CudaSpace>;
 #endif
 
 #if defined(MORPHEUS_ENABLE_HIP)
-/**
- * @brief A Generic Space that launches kernels in parallel from the performance
- * portable backend (Kokkos) using HIP.
- *
+/*! @brief A Custom Space that launches kernels in parallel using the HIP
+ * backend.
  */
-using HIP      = Morpheus::CustomBackend<Kokkos::HIP>;
+using HIP = Morpheus::CustomBackend<Kokkos::HIP>;
+
+/*! @brief The Custom HIP memory space
+ */
 using HIPSpace = Morpheus::CustomBackend<Kokkos::HIPSpace>;
 #endif
 }  // namespace Custom
 
+/*! @brief Alias to \p Morpheus::Custom::DefaultHostExecutionSpace
+ */
 using DefaultHostExecutionSpace = Custom::DefaultHostExecutionSpace;
-using DefaultExecutionSpace     = Custom::DefaultExecutionSpace;
-using HostSpace                 = Custom::HostSpace;
+/*! @brief Alias to \p Morpheus::Custom::DefaultExecutionSpace
+ */
+using DefaultExecutionSpace = Custom::DefaultExecutionSpace;
+/*! @brief Alias to \p Morpheus::Custom::HostSpace
+ */
+using HostSpace = Custom::HostSpace;
 
 #if defined(MORPHEUS_ENABLE_SERIAL)
+/*! @brief Alias to \p Morpheus::Custom::Serial
+ */
 using Serial = Custom::Serial;
 #endif
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
+/*! @brief Alias to \p Morpheus::Custom::OpenMP
+ */
 using OpenMP = Custom::OpenMP;
 #endif
 
 #if defined(MORPHEUS_ENABLE_CUDA)
-using Cuda      = Custom::Cuda;
+/*! @brief Alias to \p Morpheus::Custom::Cuda
+ */
+using Cuda = Custom::Cuda;
+/*! @brief Alias to \p Morpheus::Custom::CudaSpace
+ */
 using CudaSpace = Custom::CudaSpace;
 #endif
 
 #if defined(MORPHEUS_ENABLE_HIP)
-using HIP      = Custom::HIP;
+/*! @brief Alias to \p Morpheus::Custom::HIP
+ */
+using HIP = Custom::HIP;
+/*! @brief Alias to \p Morpheus::Custom::HIPSpace
+ */
 using HIPSpace = Custom::HIPSpace;
 #endif
 
@@ -194,8 +208,8 @@ struct is_custom_backend_helper<CustomBackend<Space>> : std::true_type {};
  *
  */
 /**
- * @brief Checks if the given type \p T is a valid custom space i.e is a
- * \p CustomBackend container
+ * @brief Checks if the given type \p T is a valid custom backend i.e is a
+ * \p CustomBackend container.
  *
  * @tparam T Type passed for check.
  */

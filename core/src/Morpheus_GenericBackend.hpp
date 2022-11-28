@@ -70,11 +70,21 @@ struct GenericBackend {
                 "Space needs to have a valid Execution Space!");
   static_assert(has_memory_space_v<Space>,
                 "Space needs to have a valid Memory Space!");
-  using type            = GenericBackend<Space>;
-  using backend         = GenericBackend<Space>;
-  using execution_space = typename Space::execution_space;
-  using memory_space    = typename Space::memory_space;
-  using device_type     = Device<execution_space, memory_space, backend>;
+  using type =
+      GenericBackend<Space>;  //!< The complete type of the generic backend
+
+  using backend =
+      GenericBackend<Space>;  //!< Alias for the type of the generic backend
+
+  using execution_space =
+      typename Space::execution_space;  //!< Execution space of generic backend
+
+  using memory_space =
+      typename Space::memory_space;  //!< Memory space of generic backend
+
+  using device_type =
+      Device<execution_space, memory_space,
+             backend>;  //!< The device type of the generic backend
 };
 
 /**
@@ -82,58 +92,50 @@ struct GenericBackend {
  * @brief Namespace for Generic Backend definitions
  */
 namespace Generic {
-/**
- * @brief A Generic Space that launches kernels in the default Host Space
- *
+/*! @brief A Generic Space that launches kernels in the default Host Space
  */
 using DefaultHostExecutionSpace =
     Morpheus::GenericBackend<Kokkos::DefaultHostExecutionSpace>;
-
-/**
- * @brief A Generic Space that launches kernels in the default Space
- *
+/*! @brief A Generic Space that launches kernels in the default Space
  */
 using DefaultExecutionSpace =
     Morpheus::GenericBackend<Kokkos::DefaultExecutionSpace>;
-
+/*! @brief The Generic Host memory space
+ */
 using HostSpace = Morpheus::GenericBackend<Kokkos::HostSpace>;
 
 #if defined(MORPHEUS_ENABLE_SERIAL)
-/**
- * @brief A Generic Space that launches kernels in serial from the performance
- * portable backend (Kokkos)
- *
+/*! @brief A Generic Space that launches kernels in serial using the Serial
+ * backend
  */
 using Serial = Morpheus::GenericBackend<Kokkos::Serial>;
 #endif
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
-/**
- * @brief A Generic Space that launches kernels in parallel from the
- * performance portable backend (Kokkos) using OpenMP.
- *
+/*! @brief A Generic Space that launches kernels in parallel using the OpenMP
+ * backend.
  */
 using OpenMP = Morpheus::GenericBackend<Kokkos::OpenMP>;
 #endif
 
 #if defined(MORPHEUS_ENABLE_CUDA)
-/**
- * @brief A Generic Space that launches kernels in parallel from the
- * performance portable backend (Kokkos) using Cuda.
- *
+/*! @brief  A Generic Space that launches kernels in parallel using the Cuda
+ * backend.
  */
-using Cuda      = Morpheus::GenericBackend<Kokkos::Cuda>;
+using Cuda = Morpheus::GenericBackend<Kokkos::Cuda>;
+/*! @brief The Generic Cuda memory space
+ */
 using CudaSpace = Morpheus::GenericBackend<Kokkos::CudaSpace>;
 #endif
 
 #if defined(MORPHEUS_ENABLE_HIP)
-/**
- * @brief A Generic Space that launches kernels in parallel from the
- * performance portable backend (Kokkos) using HIP.
- *
+/*! @brief A Generic Space that launches kernels in parallel using the HIP
+ * backend.
  */
-using HIP      = Morpheus::GenericBackend<Kokkos::HIP>;
-using HIPSpace = Morpheus::CustomSpace<Kokkos::HIPSpace>;
+using HIP = Morpheus::GenericBackend<Kokkos::HIP>;
+/*! @brief The Generic HIP memory space
+ */
+using HIPSpace = Morpheus::GenericSpace<Kokkos::HIPSpace>;
 #endif
 }  // namespace Generic
 
@@ -152,6 +154,10 @@ template <typename T>
 using is_generic_backend = typename Impl::is_generic_backend_helper<
     typename std::remove_cv<T>::type>::type;
 }  // namespace Impl
+
+// Forward decl
+template <class T>
+class has_backend;
 /*! \endcond */
 
 /**
@@ -161,8 +167,9 @@ using is_generic_backend = typename Impl::is_generic_backend_helper<
  *
  */
 /**
- * @brief Checks if the given type \p T is a valid generic space i.e is a
- * \p GenericBackend container
+ * @brief Checks if the given type \p T is a valid generic backend i.e is a
+ * \p GenericBackend container. A valid generic backend is also assumed to be
+ * any valid Kokkos Execution Space, Memory Space or Device.
  *
  * @tparam T Type passed for check.
  */
@@ -174,8 +181,10 @@ class is_generic_backend {
   template <class U>
   static yes& test(
       U*,
-      typename std::enable_if<Impl::is_generic_backend<U>::value ||
-                              is_execution_space<U>::value>::type* = nullptr);
+      typename std::enable_if<
+          Impl::is_generic_backend<U>::value || is_execution_space<U>::value ||
+          is_memory_space<U>::value || Kokkos::is_device<U>::value>::type* =
+          nullptr);
 
   template <class U>
   static no& test(...);
