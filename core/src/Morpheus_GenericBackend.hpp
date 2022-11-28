@@ -64,7 +64,6 @@ namespace Morpheus {
  * }
  * \endcode
  */
-
 template <typename Space>
 struct GenericBackend {
   static_assert(has_execution_space_v<Space>,
@@ -78,7 +77,6 @@ struct GenericBackend {
   using device_type     = Device<execution_space, memory_space, backend>;
 };
 
-//!< Namespace for Generic backends to exist in
 namespace Generic {
 /**
  * @brief A Generic Space that launches kernels in the default Host Space

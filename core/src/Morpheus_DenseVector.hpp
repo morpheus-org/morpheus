@@ -35,7 +35,7 @@
 namespace Morpheus {
 
 /**
- * \addtogroup containers Containers
+ * \defgroup containers Containers
  * \par Overview
  * TODO
  *

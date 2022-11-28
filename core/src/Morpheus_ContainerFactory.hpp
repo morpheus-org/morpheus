@@ -44,7 +44,7 @@ struct Default {};
  */
 
 /**
- * \addtogroup typetraits Type Traits
+ * \addtogroup type_traits Type Traits
  * \ingroup utilities
  * \{
  */
@@ -78,7 +78,7 @@ class is_default {
  */
 template <typename T>
 inline constexpr bool is_default_v = is_default<T>::value;
-/*! \} // end of typetraits group
+/*! \} // end of type_traits group
  */
 
 /**
@@ -89,8 +89,7 @@ inline constexpr bool is_default_v = is_default<T>::value;
  * \{
  *
  */
-// template <typename ContainerType, typename... Types>
-// struct UnaryContainer {};
+
 /**
  * @brief A wrapper that constructs a new container type from \p ContainerType
  using as arguments the types in \p TypeSet.

@@ -298,8 +298,9 @@ template <typename T>
 inline constexpr bool is_dense_vector_format_container_v =
     is_dense_vector_format_container<T>::value;
 
-/*! \} // end of type_traits group
+/*! \} // end of format_traits group
  */
+
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_FORMATTAGS_HPP
