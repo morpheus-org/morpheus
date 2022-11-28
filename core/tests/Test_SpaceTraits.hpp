@@ -1681,6 +1681,137 @@ TEST(SpaceTraitsTest, HasAccessMulti) {
 #endif  // MORPHEUS_ENABLE_HIP
 }
 
+#define MORPHEUS_CHECK_BACKEND(REL, SPACE, TRAIT, ref_res)                 \
+  {                                                                        \
+    bool _res;                                                             \
+    _res = Morpheus::REL<Morpheus::SPACE>::value;                          \
+    EXPECT_EQ(_res, ref_res[0]);                                           \
+    _res = Morpheus::REL<Morpheus::Custom::SPACE>::value;                  \
+    EXPECT_EQ(_res, ref_res[1]);                                           \
+    _res = Morpheus::REL<Morpheus::Generic::SPACE>::value;                 \
+    EXPECT_EQ(_res, ref_res[2]);                                           \
+    _res = Morpheus::REL<typename Morpheus::SPACE::TRAIT>::value;          \
+    EXPECT_EQ(_res, ref_res[3]);                                           \
+    _res = Morpheus::REL<typename Morpheus::Custom::SPACE::TRAIT>::value;  \
+    EXPECT_EQ(_res, ref_res[4]);                                           \
+    _res = Morpheus::REL<typename Morpheus::Generic::SPACE::TRAIT>::value; \
+    EXPECT_EQ(_res, ref_res[5]);                                           \
+    /* Checking Alias */                                                   \
+    _res = Morpheus::REL##_v<Morpheus::SPACE>;                             \
+    EXPECT_EQ(_res, ref_res[0]);                                           \
+    _res = Morpheus::REL##_v<Morpheus::Custom::SPACE>;                     \
+    EXPECT_EQ(_res, ref_res[1]);                                           \
+    _res = Morpheus::REL##_v<Morpheus::Generic::SPACE>;                    \
+    EXPECT_EQ(_res, ref_res[2]);                                           \
+    _res = Morpheus::REL##_v<typename Morpheus::SPACE::TRAIT>;             \
+    EXPECT_EQ(_res, ref_res[3]);                                           \
+    _res = Morpheus::REL##_v<typename Morpheus::Custom::SPACE::TRAIT>;     \
+    EXPECT_EQ(_res, ref_res[4]);                                           \
+    _res = Morpheus::REL##_v<typename Morpheus::Generic::SPACE::TRAIT>;    \
+    EXPECT_EQ(_res, ref_res[5]);                                           \
+  }
+
+TEST(SpaceTraitsTest, IsSpace) {
+  {
+    bool result = Morpheus::is_space<int>::value;
+    EXPECT_EQ(result, 0);
+
+    result = Morpheus::is_space_v<int>;
+    EXPECT_EQ(result, 0);
+  }
+
+  {
+    struct A {};
+    bool result = Morpheus::is_space<A>::value;
+    EXPECT_EQ(result, 0);
+
+    result = Morpheus::is_space_v<A>;
+    EXPECT_EQ(result, 0);
+  }
+
+  {
+    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_SPACE(is_space, HostSpace, execution_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, HostSpace, memory_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, HostSpace, device_type, ref_results);
+
+    bool backend_results[6] = {1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_BACKEND(is_space, HostSpace, backend, backend_results);
+  }
+
+  {
+    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_SPACE(is_space, DefaultHostExecutionSpace, execution_space,
+                         ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, DefaultHostExecutionSpace, memory_space,
+                         ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, DefaultHostExecutionSpace, device_type,
+                         ref_results);
+
+    bool backend_results[6] = {1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_BACKEND(is_space, DefaultHostExecutionSpace, backend,
+                           backend_results);
+  }
+
+#if defined(MORPHEUS_ENABLE_SERIAL)
+  {
+    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_SPACE(is_space, Serial, execution_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, Serial, memory_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, Serial, device_type, ref_results);
+
+    bool backend_results[6] = {1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_BACKEND(is_space, Serial, backend, backend_results);
+  }
+#endif  // MORPHEUS_ENABLE_SERIAL
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+  {
+    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_SPACE(is_space, OpenMP, execution_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, OpenMP, memory_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, OpenMP, device_type, ref_results);
+
+    bool backend_results[6] = {1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_BACKEND(is_space, OpenMP, backend, backend_results);
+  }
+#endif  // MORPHEUS_ENABLE_OPENMP
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+  {
+    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_SPACE(is_space, Cuda, execution_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, Cuda, memory_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, Cuda, device_type, ref_results);
+
+    MORPHEUS_CHECK_SPACE(is_space, CudaSpace, execution_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, CudaSpace, memory_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, CudaSpace, device_type, ref_results);
+
+    bool backend_results[6] = {1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_BACKEND(is_space, Cuda, backend, backend_results);
+    MORPHEUS_CHECK_BACKEND(is_space, CudaSpace, backend, backend_results);
+  }
+#endif  // MORPHEUS_ENABLE_CUDA
+
+#if defined(MORPHEUS_ENABLE_HIP)
+  {
+    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_SPACE(is_space, HIP, execution_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, HIP, memory_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, HIP, device_type, ref_results);
+
+    MORPHEUS_CHECK_SPACE(is_space, HIPSpace, execution_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, HIPSpace, memory_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_space, HIPSpace, device_type, ref_results);
+
+    bool backend_results[6] = {1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_BACKEND(is_space, HIP, backend, backend_results);
+    MORPHEUS_CHECK_BACKEND(is_space, HIPSpace, backend, backend_results);
+  }
+#endif  // MORPHEUS_ENABLE_HIP
+}
+
 }  // namespace Test
 
 #endif  // TEST_CORE_TEST_SPACETRAITS_HPP
