@@ -34,13 +34,13 @@ namespace Morpheus {
  */
 
 /**
- * @brief A wrapper that converts a valid space into a custom backend.
+ * @brief A wrapper that converts a valid space into a generic backend.
  *
- * @tparam Space A space to be converted as a custom.
+ * @tparam Space A space to be converted as a generic.
  *
  * \par Overview
  * A wrapper like that is helpful if we want to distinguish algorithms that
- * explicitly use a custom backend from the ones that we want to use a
+ * explicitly use a generic backend from the ones that we want to use a
  * performance portable kernel and effectively keep a single source
  * implementation.
  *
