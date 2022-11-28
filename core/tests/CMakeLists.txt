@@ -38,10 +38,12 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       DynamicMatrix
       Dot
       TypeTraits
+      SpaceTraits
+      FormatTraits
       Metaprogramming
       ContainerFactory
       FormatTags
-      GenericSpace)
+      GenericBackend)
       set(file ${testdir}/Test_${Tag}_${Name}.cpp)
       # Write to a temporary intermediate file and call configure_file to avoid
       # updating timestamps triggering unnecessary rebuilds on subsequent cmake

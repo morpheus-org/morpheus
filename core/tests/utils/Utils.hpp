@@ -37,7 +37,8 @@ using value_tlist  = Morpheus::TypeList<double, int>;
 using index_tlist  = Morpheus::TypeList<long long, Morpheus::Default>;
 using layout_tlist = Morpheus::TypeList<Kokkos::LayoutRight, Kokkos::LayoutLeft,
                                         Morpheus::Default>;
-using space_tlist  = Morpheus::TypeList<TEST_EXECSPACE>;
+// using space_tlist  = Morpheus::TypeList<TEST_EXECSPACE>;
+using space_tlist = Morpheus::TypeList<TEST_CUSTOM_SPACE>;
 // Generate all unary combinations
 using types_set = typename Morpheus::cross_product<
     value_tlist,

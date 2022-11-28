@@ -28,7 +28,10 @@
 
 #define TEST_CATEGORY serial
 #define TEST_CATEGORY_NUMBER 0
+#define TEST_SPACE Serial
 #define TEST_EXECSPACE Kokkos::Serial
+#define TEST_CUSTOM_SPACE Morpheus::Serial
+#define TEST_GENERIC_SPACE Morpheus::Generic::Serial
 #define TEST_CATEGORY_FIXTURE(name) serial_##name
 
 #endif  // MORPHEUS_CORE_TEST_SERIAL_HPP

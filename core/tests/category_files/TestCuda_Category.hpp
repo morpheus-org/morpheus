@@ -28,7 +28,10 @@
 
 #define TEST_CATEGORY cuda
 #define TEST_CATEGORY_NUMBER 5
+#define TEST_SPACE Cuda
 #define TEST_EXECSPACE Kokkos::Cuda
+#define TEST_CUSTOM_SPACE Morpheus::Cuda
+#define TEST_GENERIC_SPACE Morpheus::Generic::Cuda
 #define TEST_CATEGORY_FIXTURE(name) cuda_##name
 
 #endif  // MORPHEUS_CORE_TEST_CUDA_HPP

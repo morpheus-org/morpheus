@@ -60,6 +60,7 @@ namespace Morpheus {
  *  Morpheus::DenseVector<double, Kokkos::HostSpace> z1(10,0.0), z2(10,0.0);
  *
  *  using exec = Kokkos::DefaultHostSpace;
+ *  Morpheus::dot<exec>(x, y, z2);  // Dispatches generic implementation
  *
  *  using custom_back = Morpheus::CustomBackend<exec>;
  *  Morpheus::dot<custom_back>(x, y, z1);  // Dispatches custom implementation

@@ -53,6 +53,7 @@ namespace Morpheus {
  *  Morpheus::DenseVector<double, Kokkos::HostSpace> z1(10,0.0), z2(10,0.0);
  *
  *  using exec = Kokkos::DefaultHostSpace;
+ *  Morpheus::dot<exec>(x, y, z2);  // Dispatches generic implementation
  *
  *  using custom_back = Morpheus::CustomBackend<exec>;
  *  Morpheus::dot<custom_back>(x, y, z1);  // Dispatches custom implementation
@@ -143,6 +144,10 @@ struct is_generic_backend_helper : std::false_type {};
 
 template <typename Space>
 struct is_generic_backend_helper<GenericBackend<Space>> : std::true_type {};
+
+template <typename T>
+using is_generic_backend = typename Impl::is_generic_backend_helper<
+    typename std::remove_cv<T>::type>::type;
 }  // namespace Impl
 /*! \endcond */
 
@@ -158,10 +163,23 @@ struct is_generic_backend_helper<GenericBackend<Space>> : std::true_type {};
  *
  * @tparam T Type passed for check.
  */
-template <typename T>
-using is_generic_backend = typename Impl::is_generic_backend_helper<
-    typename std::remove_cv<T>::type>::type;
+template <class T>
+class is_generic_backend {
+  typedef char yes[1];
+  typedef char no[2];
 
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<Impl::is_generic_backend<U>::value ||
+                              is_execution_space<U>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
 /**
  * @brief Short-hand to \p is_generic_backend.
  *
