@@ -77,6 +77,10 @@ struct GenericBackend {
   using device_type     = Device<execution_space, memory_space, backend>;
 };
 
+/**
+ * @namespace Morpheus::Generic
+ * @brief Namespace for Generic Backend definitions
+ */
 namespace Generic {
 /**
  * @brief A Generic Space that launches kernels in the default Host Space

@@ -84,8 +84,11 @@ struct CustomBackend {
   using device_type     = Device<execution_space, memory_space, backend>;
 };
 
+/**
+ * @namespace Morpheus::Custom
+ * @brief Namespace for Custom Backend definitions
+ */
 namespace Custom {
-
 /**
  * @brief A Custom Space that launches kernels in the default Host Space
  *
