@@ -91,7 +91,7 @@ struct ValueType {
  */
 
 /**
- * \addtogroup typetraits Type Traits
+ * \addtogroup type_traits Type Traits
  * \ingroup utilities
  * \{
  */

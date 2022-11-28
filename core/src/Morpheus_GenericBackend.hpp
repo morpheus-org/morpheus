@@ -78,6 +78,7 @@ struct GenericBackend {
   using device_type     = Device<execution_space, memory_space, backend>;
 };
 
+//!< Namespace for Generic backends to exist in
 namespace Generic {
 /**
  * @brief A Generic Space that launches kernels in the default Host Space

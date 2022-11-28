@@ -84,6 +84,7 @@ struct CustomBackend {
   using device_type     = Device<execution_space, memory_space, backend>;
 };
 
+//!< Namespace for Custom backends to exist in
 namespace Custom {
 
 /**
