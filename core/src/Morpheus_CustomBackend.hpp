@@ -77,18 +77,11 @@ struct CustomBackend {
                 "Space needs to have a valid Execution Space!");
   static_assert(has_memory_space_v<Space>,
                 "Space needs to have a valid Memory Space!");
-  using type =
-      CustomBackend<Space>;  //!< The complete type of the custom backend
-
-  using backend =
-      CustomBackend<Space>;  //!< Alias for the type of the custom backend
-
+  using backend = CustomBackend<Space>;  //!< The type of the custom backend
   using execution_space =
       typename Space::execution_space;  //!< Execution space of custom backend
-
   using memory_space =
       typename Space::memory_space;  //!< Memory space of the custom backend
-
   using device_type = Device<execution_space, memory_space,
                              backend>;  //!< Device type of custom backend
 };

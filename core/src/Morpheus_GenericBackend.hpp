@@ -70,18 +70,11 @@ struct GenericBackend {
                 "Space needs to have a valid Execution Space!");
   static_assert(has_memory_space_v<Space>,
                 "Space needs to have a valid Memory Space!");
-  using type =
-      GenericBackend<Space>;  //!< The complete type of the generic backend
-
-  using backend =
-      GenericBackend<Space>;  //!< Alias for the type of the generic backend
-
+  using backend = GenericBackend<Space>;  //!< The type of the generic backend
   using execution_space =
       typename Space::execution_space;  //!< Execution space of generic backend
-
   using memory_space =
       typename Space::memory_space;  //!< Memory space of generic backend
-
   using device_type =
       Device<execution_space, memory_space,
              backend>;  //!< The device type of the generic backend
