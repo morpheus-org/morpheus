@@ -38,6 +38,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       DiaMatrix_CompatibleDynamicBinary
       DynamicMatrix
       DynamicMatrix_CompatibleBinary
+      DynamicMatrix_CompatibleConcreteBinary
       DynamicMatrix_Binary
       TypeTraits
       SpaceTraits
