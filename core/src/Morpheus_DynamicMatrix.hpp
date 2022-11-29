@@ -303,9 +303,9 @@ class DynamicMatrix
 
   /**
    * @brief Resizes DynamicMatrix with the shape and number of non-zero entries
-   * of another Matrix with possibly a different storage format. Note that upon
-   * resizing the new DynamicMatrix will set to have the same active type as
-   * the source Matrix.
+   * of another Matrix with possibly a different storage format.
+   * \note Upon resizing the new DynamicMatrix will set to have the same active
+   * type as the source Matrix.
    *
    * @tparam VR Type of values the source matrix stores.
    * @tparam PR Other properties of source matrix.
@@ -327,8 +327,9 @@ class DynamicMatrix
   /**
    * @brief Allocates DynamicMatrix with the shape and number of non-zero
    * entries of the active type of another DynamicMatrix with different
-   * parameters. Note that upon allocation the new DynamicMatrix will set to
-   * have the same active type as the source Matrix.
+   * parameters.
+   * \note Upon allocation the new DynamicMatrix will set to have the same
+   * active type as the source Matrix.
    *
    * @tparam VR Type of values the source matrix stores.
    * @tparam PR Other properties of source matrix.
