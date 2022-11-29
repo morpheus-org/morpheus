@@ -205,19 +205,12 @@ TEST(SpacesTest, HostMirror) {
 
 #if defined(MORPHEUS_ENABLE_SERIAL)
   {
-    using exe    = Morpheus::Serial;
-    using mirror = Morpheus::HostMirror<exe>;
     if (std::is_same<Morpheus::Serial,
                      Morpheus::DefaultHostExecutionSpace>::value) {
+      using exe    = Morpheus::Serial;
+      using mirror = Morpheus::HostMirror<exe>;
       // keep_exe & keep_mem
       bool res = std::is_same<typename mirror::backend, exe>::value;
-      EXPECT_EQ(res, 1);
-    } else {
-      // keep_mem
-      using dev = Morpheus::Device<Kokkos::HostSpace::execution_space,
-                                   typename exe::memory_space, exe>;
-
-      bool res = std::is_same<typename mirror::backend, dev>::value;
       EXPECT_EQ(res, 1);
     }
   }

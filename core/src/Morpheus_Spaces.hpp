@@ -119,7 +119,7 @@ struct HostMirror {
       keep_exe && keep_mem,
       wrapped_space,  // Already on host (Serial or OpenMP)
       typename std::conditional<
-          keep_mem,  // Wrapped_exe = Serial, DefaultHostExecutionSpace = OpenMP
+          keep_mem,
           Morpheus::Device<Kokkos::HostSpace::execution_space,
                            typename wrapped_space::memory_space, wrapped_space>,
           Morpheus::HostSpace>::type>::type;  // Cuda or HIP

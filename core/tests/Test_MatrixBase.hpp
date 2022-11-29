@@ -69,9 +69,20 @@ TYPED_TEST_SUITE(MatrixBaseTest, MatrixBaseUnary);
 TYPED_TEST(MatrixBaseTest, CheckTraits) {
   using Base = typename TestFixture::base;
 
-  EXPECT_EQ(Morpheus::has_type<Base>::value, 1);
-  EXPECT_EQ(Morpheus::has_traits<Base>::value, 1);
-  EXPECT_EQ(Morpheus::has_index_type<Base>::value, 1);
+  {
+    bool res = Morpheus::has_type<Base>::value;
+    EXPECT_EQ(res, 1);
+  }
+
+  {
+    bool res = Morpheus::has_traits<Base>::value;
+    EXPECT_EQ(res, 1);
+  }
+
+  {
+    bool res = Morpheus::has_index_type<Base>::value;
+    EXPECT_EQ(res, 1);
+  }
 }
 
 /**
