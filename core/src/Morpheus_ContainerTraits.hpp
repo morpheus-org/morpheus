@@ -79,35 +79,71 @@ struct ContainerTraits {
                 "ValueType must be an arithmetic type such as int or double");
 
  public:
-  using value_type           = ValueType;
-  using const_value_type     = typename std::add_const<ValueType>::type;
+  /*! @brief The type of values held by the container
+   */
+  using value_type = ValueType;
+  /*! @brief The const type of values held by the container
+   */
+  using const_value_type = typename std::add_const<ValueType>::type;
+  /*! @brief The non-const type of values held by the container
+   */
   using non_const_value_type = typename std::remove_const<ValueType>::type;
-
-  using index_type           = IndexType;
+  /*! @brief The type of indices held by the container
+   */
+  using index_type = IndexType;
+  /*! @brief The non-const type of indices held by the container
+   */
   using non_const_index_type = typename std::remove_const<IndexType>::type;
 
+  /*! @brief The storage layout of data held by the container
+   */
   using array_layout = ArrayLayout;
-
-  using backend         = Backend;
+  /*! @brief The backend out of which algorithms will be dispatched from.
+   */
+  using backend = Backend;
+  /*! @brief The space in which member functions will be executed in.
+   */
   using execution_space = ExecutionSpace;
-  using memory_space    = MemorySpace;
+  /*! @brief The space in which data will be stored in.
+   */
+  using memory_space = MemorySpace;
+  /*! @brief A device aware of the execution, memory spaces and backend.
+   */
   using device_type = Morpheus::Device<execution_space, memory_space, backend>;
-  using memory_traits       = MemoryTraits;
+  /*! @brief Represents the user's intended access behaviour.
+   */
+  using memory_traits = MemoryTraits;
+  /*! @brief The host equivalent backend.
+   */
   using host_mirror_backend = typename Morpheus::HostMirror<backend>::backend;
 
+  /*! @brief The complete type of the container
+   */
   using type =
       Container<value_type, index_type, array_layout, backend, memory_traits>;
 
+  /*! @brief The host mirror equivalent for the container.
+   * \note HostMirror is assumed to always be a managed container.
+   */
   using HostMirror =
       Container<non_const_value_type, non_const_index_type, array_layout,
                 Morpheus::Device<typename host_mirror_backend::execution_space,
                                  typename host_mirror_backend::memory_space,
-                                 typename host_mirror_backend::backend>>;
+                                 typename host_mirror_backend::backend>,
+                typename Kokkos::MemoryManaged>;
 
+  /*! @brief The pointer type of the container
+   */
   using pointer = typename std::add_pointer<type>::type;
+  /*! @brief The const pointer type of the container
+   */
   using const_pointer =
       typename std::add_pointer<typename std::add_const<type>::type>::type;
-  using reference       = typename std::add_lvalue_reference<type>::type;
+  /*! @brief The reference type of the container
+   */
+  using reference = typename std::add_lvalue_reference<type>::type;
+  /*! @brief The const reference type of the container
+   */
   using const_reference = typename std::add_lvalue_reference<
       typename std::add_const<type>::type>::type;
 

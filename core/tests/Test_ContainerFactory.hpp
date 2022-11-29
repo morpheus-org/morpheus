@@ -804,4 +804,4 @@ TEST(ContainerFactoryTest, GenerateBinaryTypeList) {
 
 }  // namespace Test
 
-#endif  // TEST_CORE_TEST_METAPROGRAMMING_HPP
+#endif  // TEST_CORE_TEST_CONTAINERFACTORY_HPP

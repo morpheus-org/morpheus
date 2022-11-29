@@ -53,7 +53,7 @@ class CompatibleDynamicMatrixBinaryTest : public ::testing::Test {
   using IndexType = typename device1::index_type;
   using ValueType = typename device1::value_type;
   using DevLayout = typename device1::array_layout;
-  using DevSpace  = typename device1::execution_space;
+  using DevSpace  = typename device1::backend;
 
   using CooDev = Morpheus::CooMatrix<ValueType, IndexType, DevLayout, DevSpace>;
   using CooHost = typename CooDev::HostMirror;

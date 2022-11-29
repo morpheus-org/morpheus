@@ -16,6 +16,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
 
     foreach(
       Name
+      ContainerTraits
       MatrixBase
       DenseVector
       DenseVector_Binary
@@ -36,6 +37,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       DiaMatrix_CompatibleBinary
       DiaMatrix_CompatibleDynamicBinary
       DynamicMatrix
+      DynamicMatrix_CompatibleBinary
       TypeTraits
       SpaceTraits
       FormatTraits
