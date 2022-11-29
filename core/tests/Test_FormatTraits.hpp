@@ -800,16 +800,16 @@ TEST(FormatTraitsTest, IsFormatCompatibleDifferentSpace) {
                        Morpheus::CooFormatTag>>::value;
   EXPECT_EQ(res, 0);
 
-  // Different value type, same format layout and index type - Different
-  Space res = Morpheus::is_format_compatible_different_space<
+  // Different value type, same format layout and index type - Different Space
+  res = Morpheus::is_format_compatible_different_space<
       Impl::TestStruct<double, int, Morpheus::CudaSpace, Kokkos::LayoutRight,
                        Morpheus::CooFormatTag>,
       Impl::TestStruct<float, int, Morpheus::HostSpace, Kokkos::LayoutRight,
                        Morpheus::CooFormatTag>>::value;
   EXPECT_EQ(res, 0);
 
-  // Different index type, same format layout and value type - Different
-  Space res = Morpheus::is_format_compatible_different_space<
+  // Different index type, same format layout and value type - Different Space
+  res = Morpheus::is_format_compatible_different_space<
       Impl::TestStruct<double, int, Morpheus::CudaSpace, Kokkos::LayoutRight,
                        Morpheus::CooFormatTag>,
       Impl::TestStruct<double, long long, Morpheus::HostSpace,
@@ -842,16 +842,16 @@ TEST(FormatTraitsTest, IsFormatCompatibleDifferentSpace) {
                        Morpheus::CooFormatTag>>::value;
   EXPECT_EQ(res, 0);
 
-  // Different value type, same format layout and index type - Different
-  Space res = Morpheus::is_format_compatible_different_space<
+  // Different value type, same format layout and index type - Different Space
+  res = Morpheus::is_format_compatible_different_space<
       Impl::TestStruct<double, int, Morpheus::HIPSpace, Kokkos::LayoutRight,
                        Morpheus::CooFormatTag>,
       Impl::TestStruct<float, int, Morpheus::HostSpace, Kokkos::LayoutRight,
                        Morpheus::CooFormatTag>>::value;
   EXPECT_EQ(res, 0);
 
-  // Different index type, same format layout and value type - Different
-  Space res = Morpheus::is_format_compatible_different_space<
+  // Different index type, same format layout and value type - Different Space
+  res = Morpheus::is_format_compatible_different_space<
       Impl::TestStruct<double, int, Morpheus::HIPSpace, Kokkos::LayoutRight,
                        Morpheus::CooFormatTag>,
       Impl::TestStruct<double, long long, Morpheus::HostSpace,
