@@ -43,7 +43,7 @@ class DynamicMatrixUnaryTest : public ::testing::Test {
   using IndexType = typename device::index_type;
   using ValueType = typename device::value_type;
   using DevLayout = typename device::array_layout;
-  using DevSpace  = typename device::execution_space;
+  using DevSpace  = typename device::backend;
 
   using CooDev = Morpheus::CooMatrix<ValueType, IndexType, DevLayout, DevSpace>;
   using CooHost = typename CooDev::HostMirror;
@@ -128,21 +128,21 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultConstruction) {
  *
  */
 TYPED_TEST(DynamicMatrixUnaryTest, FormatEnum) {
-  using Matrix          = typename TestFixture::device;
-  using value_type      = typename Matrix::value_type;
-  using index_type      = typename Matrix::index_type;
-  using array_layout    = typename Matrix::array_layout;
-  using execution_space = typename Matrix::execution_space;
+  using Matrix       = typename TestFixture::device;
+  using value_type   = typename Matrix::value_type;
+  using index_type   = typename Matrix::index_type;
+  using array_layout = typename Matrix::array_layout;
+  using backend      = typename Matrix::backend;
   Matrix A = typename Morpheus::CooMatrix<value_type, index_type, array_layout,
-                                          execution_space>::type();
+                                          backend>::type();
   EXPECT_EQ(Morpheus::COO_FORMAT, A.format_enum());
 
   A = typename Morpheus::DiaMatrix<value_type, index_type, array_layout,
-                                   execution_space>::type();
+                                   backend>::type();
   EXPECT_EQ(Morpheus::DIA_FORMAT, A.format_enum());
 
   A = typename Morpheus::CsrMatrix<value_type, index_type, array_layout,
-                                   execution_space>::type();
+                                   backend>::type();
   EXPECT_EQ(Morpheus::CSR_FORMAT, A.format_enum());
 }
 
@@ -152,21 +152,21 @@ TYPED_TEST(DynamicMatrixUnaryTest, FormatEnum) {
  *
  */
 TYPED_TEST(DynamicMatrixUnaryTest, ActiveEnum) {
-  using Matrix          = typename TestFixture::device;
-  using value_type      = typename Matrix::value_type;
-  using index_type      = typename Matrix::index_type;
-  using array_layout    = typename Matrix::array_layout;
-  using execution_space = typename Matrix::execution_space;
+  using Matrix       = typename TestFixture::device;
+  using value_type   = typename Matrix::value_type;
+  using index_type   = typename Matrix::index_type;
+  using array_layout = typename Matrix::array_layout;
+  using backend      = typename Matrix::backend;
   Matrix A = typename Morpheus::CooMatrix<value_type, index_type, array_layout,
-                                          execution_space>::type();
+                                          backend>::type();
   EXPECT_EQ(Morpheus::COO_FORMAT, A.active_enum());
 
   A = typename Morpheus::DiaMatrix<value_type, index_type, array_layout,
-                                   execution_space>::type();
+                                   backend>::type();
   EXPECT_EQ(Morpheus::DIA_FORMAT, A.active_enum());
 
   A = typename Morpheus::CsrMatrix<value_type, index_type, array_layout,
-                                   execution_space>::type();
+                                   backend>::type();
   EXPECT_EQ(Morpheus::CSR_FORMAT, A.active_enum());
 }
 
@@ -176,21 +176,21 @@ TYPED_TEST(DynamicMatrixUnaryTest, ActiveEnum) {
  *
  */
 TYPED_TEST(DynamicMatrixUnaryTest, FormatIndex) {
-  using Matrix          = typename TestFixture::device;
-  using value_type      = typename Matrix::value_type;
-  using index_type      = typename Matrix::index_type;
-  using array_layout    = typename Matrix::array_layout;
-  using execution_space = typename Matrix::execution_space;
+  using Matrix       = typename TestFixture::device;
+  using value_type   = typename Matrix::value_type;
+  using index_type   = typename Matrix::index_type;
+  using array_layout = typename Matrix::array_layout;
+  using backend      = typename Matrix::backend;
   Matrix A = typename Morpheus::CooMatrix<value_type, index_type, array_layout,
-                                          execution_space>::type();
+                                          backend>::type();
   EXPECT_EQ(0, A.format_index());
 
   A = typename Morpheus::DiaMatrix<value_type, index_type, array_layout,
-                                   execution_space>::type();
+                                   backend>::type();
   EXPECT_EQ(2, A.format_index());
 
   A = typename Morpheus::CsrMatrix<value_type, index_type, array_layout,
-                                   execution_space>::type();
+                                   backend>::type();
   EXPECT_EQ(1, A.format_index());
 }
 
@@ -200,21 +200,21 @@ TYPED_TEST(DynamicMatrixUnaryTest, FormatIndex) {
  *
  */
 TYPED_TEST(DynamicMatrixUnaryTest, ActiveIndex) {
-  using Matrix          = typename TestFixture::device;
-  using value_type      = typename Matrix::value_type;
-  using index_type      = typename Matrix::index_type;
-  using array_layout    = typename Matrix::array_layout;
-  using execution_space = typename Matrix::execution_space;
+  using Matrix       = typename TestFixture::device;
+  using value_type   = typename Matrix::value_type;
+  using index_type   = typename Matrix::index_type;
+  using array_layout = typename Matrix::array_layout;
+  using backend      = typename Matrix::backend;
   Matrix A = typename Morpheus::CooMatrix<value_type, index_type, array_layout,
-                                          execution_space>::type();
+                                          backend>::type();
   EXPECT_EQ(0, A.active_index());
 
   A = typename Morpheus::DiaMatrix<value_type, index_type, array_layout,
-                                   execution_space>::type();
+                                   backend>::type();
   EXPECT_EQ(2, A.active_index());
 
   A = typename Morpheus::CsrMatrix<value_type, index_type, array_layout,
-                                   execution_space>::type();
+                                   backend>::type();
   EXPECT_EQ(1, A.active_index());
 }
 

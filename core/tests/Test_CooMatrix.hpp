@@ -510,12 +510,14 @@ TYPED_TEST(CooMatrixUnaryTest, SortByRow) {
 
 TYPED_TEST(CooMatrixUnaryTest, Sort) {
   using Matrix     = typename TestFixture::device;
-  using space      = typename Matrix::execution_space;
+  using backend    = typename Matrix::backend;
+  using space      = typename backend::execution_space;
   using value_type = typename Matrix::value_type;
 
   Matrix A(5, 5, 7);
 
-  if (Morpheus::is_serial_execution_space<space>::value) {
+  if (Morpheus::is_custom_backend<backend>::value &&
+      Morpheus::is_serial_execution_space<space>::value) {
     // clang-format off
     A.row_indices(0) = 3; A.column_indices(0) = 1; A.values(0) = (value_type)1;
     A.row_indices(1) = 4; A.column_indices(1) = 2; A.values(1) = (value_type)2;
@@ -549,12 +551,14 @@ TYPED_TEST(CooMatrixUnaryTest, IsSortedByRow) {
 
 TYPED_TEST(CooMatrixUnaryTest, IsSorted) {
   using Matrix     = typename TestFixture::device;
-  using space      = typename Matrix::execution_space;
+  using backend    = typename Matrix::backend;
+  using space      = typename backend::execution_space;
   using value_type = typename Matrix::value_type;
 
   Matrix A(5, 5, 7);
 
-  if (Morpheus::is_serial_execution_space<space>::value) {
+  if (Morpheus::is_custom_backend<backend>::value &&
+      Morpheus::is_serial_execution_space<space>::value) {
     // clang-format off
     A.row_indices(0) = 3; A.column_indices(0) = 1; A.values(0) = (value_type)1;
     A.row_indices(1) = 4; A.column_indices(1) = 2; A.values(1) = (value_type)2;

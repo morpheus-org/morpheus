@@ -109,6 +109,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
   using non_const_index_type = typename traits::non_const_index_type;
 
   using array_layout    = typename traits::array_layout;
+  using backend         = typename traits::backend;
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
@@ -122,16 +123,16 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
 
   /*! The type of \p DenseVector that holds the index_type data */
   using index_array_type =
-      Morpheus::DenseVector<index_type, index_type, array_layout,
-                            execution_space, memory_traits>;
+      Morpheus::DenseVector<index_type, index_type, array_layout, backend,
+                            memory_traits>;
   using index_array_pointer = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
 
   /*! The type of \p DenseVector that holds the value_type data */
   using value_array_type =
-      Morpheus::DenseVector<value_type, index_type, array_layout,
-                            execution_space, memory_traits>;
+      Morpheus::DenseVector<value_type, index_type, array_layout, backend,
+                            memory_traits>;
   using value_array_pointer = typename value_array_type::value_array_pointer;
   using value_array_reference =
       typename value_array_type::value_array_reference;
@@ -406,7 +407,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
    * @brief Sorts matrix elements by row index first and then by column index.
    *
    */
-  void sort(void) { Morpheus::sort_by_row_and_column<execution_space>(*this); }
+  void sort(void) { Morpheus::sort_by_row_and_column<backend>(*this); }
 
   /**
    * @brief Determines whether matrix elements are sorted by row index
@@ -422,7 +423,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
    * index
    *
    */
-  bool is_sorted(void) { return Morpheus::is_sorted<execution_space>(*this); }
+  bool is_sorted(void) { return Morpheus::is_sorted<backend>(*this); }
 
   /**
    * @brief Returns the format enum assigned to the CooMatrix container.

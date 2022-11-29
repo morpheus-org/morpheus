@@ -109,6 +109,7 @@ class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
   using non_const_index_type = typename traits::non_const_index_type;
 
   using array_layout    = typename traits::array_layout;
+  using backend         = typename traits::backend;
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;
@@ -122,8 +123,8 @@ class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
 
   /*! The type of \p DenseVector that holds the index_type data */
   using index_array_type =
-      Morpheus::DenseVector<index_type, index_type, array_layout,
-                            execution_space, memory_traits>;
+      Morpheus::DenseVector<index_type, index_type, array_layout, backend,
+                            memory_traits>;
   using const_index_array_type = const index_array_type;
   using index_array_pointer    = typename index_array_type::value_array_pointer;
   using index_array_reference =
@@ -132,8 +133,8 @@ class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
 
   /*! The type of \p DenseVector that holds the value_type data */
   using value_array_type =
-      Morpheus::DenseVector<value_type, index_type, array_layout,
-                            execution_space, memory_traits>;
+      Morpheus::DenseVector<value_type, index_type, array_layout, backend,
+                            memory_traits>;
   using const_value_array_type = const value_array_type;
   using value_array_pointer    = typename value_array_type::value_array_pointer;
   using value_array_reference =

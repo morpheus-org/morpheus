@@ -99,6 +99,7 @@ class DenseVector
   using non_const_index_type = typename traits::non_const_index_type;
 
   using array_layout    = typename traits::array_layout;
+  using backend         = typename traits::backend;
   using memory_space    = typename traits::memory_space;
   using execution_space = typename traits::execution_space;
   using device_type     = typename traits::device_type;

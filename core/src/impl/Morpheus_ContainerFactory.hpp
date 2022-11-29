@@ -52,10 +52,10 @@ struct UnaryContainerProxy_Impl<Container<T>, ValueType, Default, Default,
                                 Default> {
   using type = Container<ValueType>;
 
-  using value_type      = ValueType;
-  using index_type      = Default;
-  using array_layout    = Default;
-  using execution_space = Default;
+  using value_type   = ValueType;
+  using index_type   = Default;
+  using array_layout = Default;
+  using backend      = Default;
 };
 
 // A unary container specialization that is build by selecting the ValueType and
@@ -66,10 +66,10 @@ struct UnaryContainerProxy_Impl<Container<T>, ValueType, IndexType, Default,
                                 Default> {
   using type = Container<ValueType, IndexType>;
 
-  using value_type      = ValueType;
-  using index_type      = IndexType;
-  using array_layout    = Default;
-  using execution_space = Default;
+  using value_type   = ValueType;
+  using index_type   = IndexType;
+  using array_layout = Default;
+  using backend      = Default;
 };
 
 // A unary container specialization that is build by selecting the ValueType and
@@ -80,10 +80,10 @@ struct UnaryContainerProxy_Impl<Container<T>, ValueType, Default, Layout,
                                 Default> {
   using type = Container<ValueType, Layout>;
 
-  using value_type      = ValueType;
-  using index_type      = Default;
-  using array_layout    = Layout;
-  using execution_space = Default;
+  using value_type   = ValueType;
+  using index_type   = Default;
+  using array_layout = Layout;
+  using backend      = Default;
 };
 
 // A unary container specialization that is build by selecting the ValueType and
@@ -94,10 +94,10 @@ struct UnaryContainerProxy_Impl<Container<T>, ValueType, Default, Default,
                                 Space> {
   using type = Container<ValueType, Space>;
 
-  using value_type      = ValueType;
-  using index_type      = Default;
-  using array_layout    = Default;
-  using execution_space = Space;
+  using value_type   = ValueType;
+  using index_type   = Default;
+  using array_layout = Default;
+  using backend      = Space;
 };
 
 // A unary container specialization that is build by selecting the ValueType,
@@ -108,10 +108,10 @@ struct UnaryContainerProxy_Impl<Container<T>, ValueType, IndexType, Layout,
                                 Default> {
   using type = Container<ValueType, IndexType, Layout>;
 
-  using value_type      = ValueType;
-  using index_type      = IndexType;
-  using array_layout    = Layout;
-  using execution_space = Default;
+  using value_type   = ValueType;
+  using index_type   = IndexType;
+  using array_layout = Layout;
+  using backend      = Default;
 };
 
 // A unary container specialization that is build by selecting the ValueType,
@@ -122,10 +122,10 @@ struct UnaryContainerProxy_Impl<Container<T>, ValueType, IndexType, Default,
                                 Space> {
   using type = Container<ValueType, IndexType, Space>;
 
-  using value_type      = ValueType;
-  using index_type      = IndexType;
-  using array_layout    = Default;
-  using execution_space = Space;
+  using value_type   = ValueType;
+  using index_type   = IndexType;
+  using array_layout = Default;
+  using backend      = Space;
 };
 
 // A unary container specialization that is build by selecting the ValueType,
@@ -136,10 +136,10 @@ struct UnaryContainerProxy_Impl<Container<T>, ValueType, Default, Layout,
                                 Space> {
   using type = Container<ValueType, Layout, Space>;
 
-  using value_type      = ValueType;
-  using index_type      = Default;
-  using array_layout    = Layout;
-  using execution_space = Space;
+  using value_type   = ValueType;
+  using index_type   = Default;
+  using array_layout = Layout;
+  using backend      = Space;
 };
 
 // A unary container specialization that is build by selecting the ValueType,
@@ -150,10 +150,10 @@ struct UnaryContainerProxy_Impl<Container<T>, ValueType, IndexType, Layout,
                                 Space> {
   using type = Container<ValueType, IndexType, Layout, Space>;
 
-  using value_type      = ValueType;
-  using index_type      = IndexType;
-  using array_layout    = Layout;
-  using execution_space = Space;
+  using value_type   = ValueType;
+  using index_type   = IndexType;
+  using array_layout = Layout;
+  using backend      = Space;
 };
 
 // Takes in types as a set and forwards it to the UnaryContainer.
@@ -163,10 +163,10 @@ struct UnaryContainerProxy<Container<T>, Set<T1, T2, T3, T4>> {
   using unary = UnaryContainerProxy_Impl<Container<T>, T1, T2, T3, T4>;
   using type  = typename unary::type;
 
-  using value_type      = typename unary::value_type;
-  using index_type      = typename unary::index_type;
-  using array_layout    = typename unary::array_layout;
-  using execution_space = typename unary::execution_space;
+  using value_type   = typename unary::value_type;
+  using index_type   = typename unary::index_type;
+  using array_layout = typename unary::array_layout;
+  using backend      = typename unary::backend;
 };
 
 template <typename... Ts>

@@ -86,7 +86,7 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     EXPECT_EQ(res, 1);
     res = std::is_same<typename unary::array_layout, DD>::value;
     EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::execution_space, DD>::value;
+    res = std::is_same<typename unary::backend, DD>::value;
     EXPECT_EQ(res, 1);
   }
 
@@ -103,7 +103,7 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     EXPECT_EQ(res, 1);
     res = std::is_same<typename unary::array_layout, DD>::value;
     EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::execution_space, DD>::value;
+    res = std::is_same<typename unary::backend, DD>::value;
     EXPECT_EQ(res, 1);
   }
 
@@ -120,7 +120,7 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     EXPECT_EQ(res, 1);
     res = std::is_same<typename unary::array_layout, B>::value;
     EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::execution_space, DD>::value;
+    res = std::is_same<typename unary::backend, DD>::value;
     EXPECT_EQ(res, 1);
   }
 
@@ -137,7 +137,7 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     EXPECT_EQ(res, 1);
     res = std::is_same<typename unary::array_layout, DD>::value;
     EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::execution_space, B>::value;
+    res = std::is_same<typename unary::backend, B>::value;
     EXPECT_EQ(res, 1);
   }
 
@@ -154,7 +154,7 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     EXPECT_EQ(res, 1);
     res = std::is_same<typename unary::array_layout, C>::value;
     EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::execution_space, DD>::value;
+    res = std::is_same<typename unary::backend, DD>::value;
     EXPECT_EQ(res, 1);
   }
 
@@ -171,7 +171,7 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     EXPECT_EQ(res, 1);
     res = std::is_same<typename unary::array_layout, DD>::value;
     EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::execution_space, C>::value;
+    res = std::is_same<typename unary::backend, C>::value;
     EXPECT_EQ(res, 1);
   }
 
@@ -188,7 +188,7 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     EXPECT_EQ(res, 1);
     res = std::is_same<typename unary::array_layout, B>::value;
     EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::execution_space, C>::value;
+    res = std::is_same<typename unary::backend, C>::value;
     EXPECT_EQ(res, 1);
   }
 
@@ -205,7 +205,7 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     EXPECT_EQ(res, 1);
     res = std::is_same<typename unary::array_layout, C>::value;
     EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::execution_space, D>::value;
+    res = std::is_same<typename unary::backend, D>::value;
     EXPECT_EQ(res, 1);
   }
 }

@@ -115,7 +115,7 @@ void sort_by_row_and_column(
   using index_type  = typename Matrix::index_type;
   using index_array = typename Matrix::index_array_type;
   using value_array = typename Matrix::value_array_type;
-  using space       = typename Matrix::space;
+  using backend     = typename Matrix::backend;
 
   index_type N = mat.row_indices().size();
 
@@ -128,33 +128,33 @@ void sort_by_row_and_column(
   index_type maxc = max_col;
 
   if (maxr == 0) {
-    maxr = Impl::find_max_element<space>(mat.row_indices());
+    maxr = Impl::find_max_element<backend>(mat.row_indices());
   }
   if (maxc == 0) {
-    maxc = Impl::find_max_element<space>(mat.column_indices());
+    maxc = Impl::find_max_element<backend>(mat.column_indices());
   }
 
   {
     index_array temp(mat.column_indices().size());
     Impl::copy(mat.column_indices(), temp);
-    Impl::counting_sort_by_key<space>(temp, permutation, minc, maxc);
+    Impl::counting_sort_by_key<backend>(temp, permutation, minc, maxc);
 
     if (mat.row_indices().size() != temp.size()) {
       temp.resize(mat.row_indices().size());
     }
     Impl::copy(mat.row_indices(), temp);
-    Impl::copy_by_key<space>(permutation, temp, mat.row_indices());
+    Impl::copy_by_key<backend>(permutation, temp, mat.row_indices());
 
-    Impl::counting_sort_by_key<space>(mat.row_indices(), permutation, minr,
-                                      maxr);
+    Impl::counting_sort_by_key<backend>(mat.row_indices(), permutation, minr,
+                                        maxr);
     Impl::copy(mat.column_indices(), temp);
-    Impl::copy_by_key<space>(permutation, temp, mat.column_indices());
+    Impl::copy_by_key<backend>(permutation, temp, mat.column_indices());
   }
 
   {
     value_array temp(mat.values().size());
     Impl::copy(mat.values(), temp);
-    Impl::copy_by_key<space>(permutation, temp, mat.values());
+    Impl::copy_by_key<backend>(permutation, temp, mat.values());
   }
 }
 
