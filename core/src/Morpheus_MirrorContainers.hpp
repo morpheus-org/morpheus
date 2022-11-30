@@ -30,8 +30,35 @@
 
 namespace Morpheus {
 
-// Allocates a mirror container with the same characteristics as source
-// Doesn't copy elements from source to mirror
+/**
+ * \defgroup data_management Data Management
+ * \par Overview
+ * TODO
+ *
+ */
+
+/**
+ * \addtogroup mirroring Mirroring
+ * \brief Mirroring Operations on Containers
+ * \ingroup data_management
+ * \{
+ *
+ */
+
+/**
+ * @brief Allocates a mirror with the same characteristics as source on Host
+ * (specialization for different space)
+ *
+ * @tparam Container
+ * @tparam T The type of values held by the container
+ * @tparam P Properties of the container
+ * @param src The source container we are mirroring from
+ * @return typename Container<T, P...>::HostMirror A mirror of the original
+ * container on Host
+ *
+ * \note \p create_mirror operation always issues a new allocation and doesn't
+ * copy elements from source to mirror.
+ */
 template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror(
     const Container<T, P...>& src,
@@ -42,7 +69,19 @@ typename Container<T, P...>::HostMirror create_mirror(
   return dst_type().allocate(src);
 }
 
-// Create a mirror in a new space (specialization for different space)
+/**
+ * @brief Create a mirror in a new space (specialization for different space)
+ *
+ * @tparam Space The new space in which the mirror is created
+ * @tparam Container
+ * @tparam T The type of values held by the container
+ * @tparam P Properties of the container
+ * @param src The source container we are mirroring from
+ * @return Impl::MirrorType<Space, Container, T, P...>::container_type A mirror
+ * of the original container in Space
+ *
+ * \note \p create_mirror operation always issues a new allocation.
+ */
 template <class Space, template <class, class...> class Container, class T,
           class... P>
 typename Impl::MirrorType<Space, Container, T, P...>::container_type
@@ -54,6 +93,20 @@ create_mirror(
   return container_type().allocate(src);
 }
 
+/**
+ * @brief Creates a mirror container on Host (specialization for
+ * same space)
+ *
+ * @tparam Container The type of the container to mirror
+ * @tparam T The type of values held by the container
+ * @tparam P Properties of the container
+ * @param src The source container we are mirroring from
+ * @return Container<T, P...>::HostMirror The Host Mirror type of source
+ * container
+ *
+ * \note Here no actual mirror is created as the source container already lives
+ * on Host. As a result the resulting container aliases the source.
+ */
 template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror_container(
     const Container<T, P...>& src,
@@ -63,6 +116,17 @@ typename Container<T, P...>::HostMirror create_mirror_container(
   return src;
 }
 
+/**
+ * @brief Creates a mirror container on Host (specialization for
+ * different space)
+ *
+ * @tparam Container The type of the container to mirror
+ * @tparam T The type of values held by the container
+ * @tparam P Properties of the container
+ * @param src The source container we are mirroring from
+ * @return Container<T, P...>::HostMirror The Host Mirror type of source
+ * container
+ */
 template <template <class, class...> class Container, class T, class... P>
 typename Container<T, P...>::HostMirror create_mirror_container(
     const Container<T, P...>& src,
@@ -72,7 +136,22 @@ typename Container<T, P...>::HostMirror create_mirror_container(
   return Morpheus::create_mirror(src);
 }
 
-// Create a mirror container in a new space (specialization for same space)
+/**
+ * @brief Create a mirror container in a new space (specialization for same
+ * space)
+ *
+ * @tparam Space The new space in which the mirror is created
+ * @tparam Container The type of the container to mirror
+ * @tparam T The type of values held by the container
+ * @tparam P Properties of the container
+ * @param src The source container we are mirroring from
+ * @return Impl::MirrorContainerType<Space, Container, T, P...>::container_type
+ * Same type as source
+ *
+ * \note Here no actual mirror is created as the source container already lives
+ * in the same space with resulting container. As a result the resulting
+ * container aliases the source.
+ */
 template <class Space, template <class, class...> class Container, class T,
           class... P>
 typename Impl::MirrorContainerType<Space, Container, T, P...>::container_type
@@ -85,7 +164,18 @@ create_mirror_container(
   return src;
 }
 
-// Create a mirror container in a new space (specialization for different space)
+/**
+ * @brief Creates a mirror container in a new space (specialization for
+ * different space)
+ *
+ * @tparam Space The new space in which the mirror is created
+ * @tparam Container The type of the container to mirror
+ * @tparam T The type of values held by the container
+ * @tparam P Properties of the container
+ * @param src The source container we are mirroring from
+ * @return Impl::MirrorContainerType<Space, Container, T, P...>::container_type
+ * A mirror of the original container in Space
+ */
 template <class Space, template <class, class...> class Container, class T,
           class... P>
 typename Impl::MirrorContainerType<Space, Container, T, P...>::container_type
@@ -100,6 +190,9 @@ create_mirror_container(
                                          P...>::container_type;
   return container_type().allocate(src);
 }
+
+/*! \}  // end of data_management group
+ */
 
 }  // namespace Morpheus
 
