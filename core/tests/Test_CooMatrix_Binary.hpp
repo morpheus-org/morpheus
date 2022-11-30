@@ -52,7 +52,7 @@ class CooMatrixBinaryTest : public ::testing::Test {
   CooMatrixBinaryTest() : Aref(3, 3, 4), Ahref(3, 3, 4) {}
 
   void SetUp() override {
-    build_coomatrix(Ahref);
+    Morpheus::Test::build_small_container(Ahref);
 
     // Send Matrix to device
     Morpheus::copy(Ahref, Aref);
@@ -164,7 +164,7 @@ TYPED_TEST(CooMatrixBinaryTest, AllocateFromCooMatrix) {
 
   HostMatrix1 Ah(nrows, ncols, nnnz);
   CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
-  build_coomatrix(Ah);
+  Morpheus::Test::build_small_container(Ah);
 
   Matrix1 A(nrows, ncols, nnnz);
   CHECK_COO_SIZES(A, nrows, ncols, nnnz);

@@ -38,35 +38,29 @@ using index_tlist  = Morpheus::TypeList<Morpheus::Default>;
 using layout_tlist = Morpheus::TypeList<Morpheus::Default>;
 using space_tlist  = Morpheus::TypeList<TEST_CUSTOM_SPACE>;
 
-// Generate all unary combinations
-using mirror_types_set = typename Morpheus::cross_product<
-    value_tlist,
-    typename Morpheus::cross_product<
-        index_tlist, typename Morpheus::cross_product<
-                         layout_tlist, space_tlist>::type>::type>::type;
-
+// Generate all unary combinations for every container and combine
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
-                                               mirror_types_set>::type;
+                                               types::types_set>::type;
 
 using DenseMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseMatrix<double>,
-                                               mirror_types_set>::type;
+                                               types::types_set>::type;
 
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
-                                               mirror_types_set>::type;
+                                               types::types_set>::type;
 
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
-                                               mirror_types_set>::type;
+                                               types::types_set>::type;
 
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
-                                               mirror_types_set>::type;
+                                               types::types_set>::type;
 using DynamicMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DynamicMatrix<double>,
-                                               mirror_types_set>::type;
+                                               types::types_set>::type;
 
 using ContainerTypes = Morpheus::concat<
     DenseVectorTypes,

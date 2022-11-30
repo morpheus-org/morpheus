@@ -38,24 +38,14 @@ struct Container2 {};
  *
  */
 TEST(ContainerFactoryTest, IsDefault) {
-  bool res = Morpheus::is_default<Morpheus::Default>::value;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::is_default<double>::value;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::is_default<int>::value;
-  EXPECT_EQ(res, 0);
-
-  res = Morpheus::is_default<Morpheus::Impl::SparseMatrixTag>::value;
-  EXPECT_EQ(res, 0);
+  EXPECT_TRUE((Morpheus::is_default<Morpheus::Default>::value));
+  EXPECT_FALSE((Morpheus::is_default<double>::value));
+  EXPECT_FALSE((Morpheus::is_default<int>::value));
+  EXPECT_FALSE((Morpheus::is_default<Morpheus::Impl::SparseMatrixTag>::value));
 
   /* Testing Alias */
-  res = Morpheus::is_default_v<Morpheus::Default>;
-  EXPECT_EQ(res, 1);
-
-  res = Morpheus::is_default_v<double>;
-  EXPECT_EQ(res, 0);
+  EXPECT_TRUE((Morpheus::is_default_v<Morpheus::Default>));
+  EXPECT_FALSE(Morpheus::is_default_v<double>);
 }
 
 /**
@@ -78,16 +68,11 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
     using reference = Container1<A>;
 
-    bool res = std::is_same<typename unary::type, reference>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::value_type, A>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::index_type, DD>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::array_layout, DD>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::backend, DD>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same<typename unary::type, reference>::value));
+    EXPECT_TRUE((std::is_same<typename unary::value_type, A>::value));
+    EXPECT_TRUE((std::is_same<typename unary::index_type, DD>::value));
+    EXPECT_TRUE((std::is_same<typename unary::array_layout, DD>::value));
+    EXPECT_TRUE((std::is_same<typename unary::backend, DD>::value));
   }
 
   {
@@ -95,16 +80,11 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
     using reference = Container1<A, B>;
 
-    bool res = std::is_same<typename unary::type, reference>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::value_type, A>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::index_type, B>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::array_layout, DD>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::backend, DD>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same<typename unary::type, reference>::value));
+    EXPECT_TRUE((std::is_same<typename unary::value_type, A>::value));
+    EXPECT_TRUE((std::is_same<typename unary::index_type, B>::value));
+    EXPECT_TRUE((std::is_same<typename unary::array_layout, DD>::value));
+    EXPECT_TRUE((std::is_same<typename unary::backend, DD>::value));
   }
 
   {
@@ -112,16 +92,11 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
     using reference = Container1<A, B>;
 
-    bool res = std::is_same<typename unary::type, reference>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::value_type, A>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::index_type, DD>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::array_layout, B>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::backend, DD>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same<typename unary::type, reference>::value));
+    EXPECT_TRUE((std::is_same<typename unary::value_type, A>::value));
+    EXPECT_TRUE((std::is_same<typename unary::index_type, DD>::value));
+    EXPECT_TRUE((std::is_same<typename unary::array_layout, B>::value));
+    EXPECT_TRUE((std::is_same<typename unary::backend, DD>::value));
   }
 
   {
@@ -129,16 +104,11 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
     using reference = Container1<A, B>;
 
-    bool res = std::is_same<typename unary::type, reference>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::value_type, A>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::index_type, DD>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::array_layout, DD>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::backend, B>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same<typename unary::type, reference>::value));
+    EXPECT_TRUE((std::is_same<typename unary::value_type, A>::value));
+    EXPECT_TRUE((std::is_same<typename unary::index_type, DD>::value));
+    EXPECT_TRUE((std::is_same<typename unary::array_layout, DD>::value));
+    EXPECT_TRUE((std::is_same<typename unary::backend, B>::value));
   }
 
   {
@@ -146,16 +116,11 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
     using reference = Container1<A, B, C>;
 
-    bool res = std::is_same<typename unary::type, reference>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::value_type, A>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::index_type, B>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::array_layout, C>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::backend, DD>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same<typename unary::type, reference>::value));
+    EXPECT_TRUE((std::is_same<typename unary::value_type, A>::value));
+    EXPECT_TRUE((std::is_same<typename unary::index_type, B>::value));
+    EXPECT_TRUE((std::is_same<typename unary::array_layout, C>::value));
+    EXPECT_TRUE((std::is_same<typename unary::backend, DD>::value));
   }
 
   {
@@ -163,16 +128,11 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
     using reference = Container1<A, B, C>;
 
-    bool res = std::is_same<typename unary::type, reference>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::value_type, A>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::index_type, B>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::array_layout, DD>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::backend, C>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same<typename unary::type, reference>::value));
+    EXPECT_TRUE((std::is_same<typename unary::value_type, A>::value));
+    EXPECT_TRUE((std::is_same<typename unary::index_type, B>::value));
+    EXPECT_TRUE((std::is_same<typename unary::array_layout, DD>::value));
+    EXPECT_TRUE((std::is_same<typename unary::backend, C>::value));
   }
 
   {
@@ -180,16 +140,11 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
     using reference = Container1<A, B, C>;
 
-    bool res = std::is_same<typename unary::type, reference>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::value_type, A>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::index_type, DD>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::array_layout, B>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::backend, C>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same<typename unary::type, reference>::value));
+    EXPECT_TRUE((std::is_same<typename unary::value_type, A>::value));
+    EXPECT_TRUE((std::is_same<typename unary::index_type, DD>::value));
+    EXPECT_TRUE((std::is_same<typename unary::array_layout, B>::value));
+    EXPECT_TRUE((std::is_same<typename unary::backend, C>::value));
   }
 
   {
@@ -197,16 +152,11 @@ TEST(ContainerFactoryTest, UnaryContainer) {
     using unary     = Morpheus::UnaryContainer<Container1<t>, set>;
     using reference = Container1<A, B, C, D>;
 
-    bool res = std::is_same<typename unary::type, reference>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::value_type, A>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::index_type, B>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::array_layout, C>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename unary::backend, D>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same<typename unary::type, reference>::value));
+    EXPECT_TRUE((std::is_same<typename unary::value_type, A>::value));
+    EXPECT_TRUE((std::is_same<typename unary::index_type, B>::value));
+    EXPECT_TRUE((std::is_same<typename unary::array_layout, C>::value));
+    EXPECT_TRUE((std::is_same<typename unary::backend, D>::value));
   }
 }
 
@@ -300,8 +250,7 @@ TEST(ContainerFactoryTest, GenerateUnaryTypeList) {
       Morpheus::UnaryContainer<Container1<double>,
                                Morpheus::Set<C, DD, DD, DD>>>;
 
-  bool res = std::is_same<unary_types, res_t>::value;
-  EXPECT_EQ(res, 1);
+  EXPECT_TRUE((std::is_same<unary_types, res_t>::value));
 }
 
 /**
@@ -338,8 +287,7 @@ TEST(ContainerFactoryTest, GenerateUnaryTypeListSingleEntry) {
   using res_t = Morpheus::TypeList<
       Morpheus::UnaryContainer<Container1<double>, Morpheus::Set<A, D, F, H>>>;
 
-  bool res = std::is_same<unary_types, res_t>::value;
-  EXPECT_EQ(res, 1);
+  EXPECT_TRUE((std::is_same<unary_types, res_t>::value));
 }
 
 /**
@@ -357,8 +305,7 @@ TEST(ContainerFactoryTest, GenerateUnaryTypeListNoEntry) {
 
   using res_t = empty_list;
 
-  bool res = std::is_same<unary_types, res_t>::value;
-  EXPECT_EQ(res, 1);
+  EXPECT_TRUE((std::is_same<unary_types, res_t>::value));
 }
 
 /**
@@ -378,10 +325,8 @@ TEST(ContainerFactoryTest, BinaryContainer) {
     using c2  = Container2<C, D>;
     using bin = Morpheus::BinaryContainer<c1, c2>;
 
-    bool res = std::is_same<typename bin::type1, c1>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename bin::type2, c2>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same<typename bin::type1, c1>::value));
+    EXPECT_TRUE((std::is_same<typename bin::type2, c2>::value));
   }
 
   {
@@ -389,20 +334,16 @@ TEST(ContainerFactoryTest, BinaryContainer) {
     using c2  = Container2<C, D>;
     using bin = Morpheus::BinaryContainer<c2, c1>;
 
-    bool res = std::is_same<typename bin::type1, c2>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename bin::type2, c1>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same<typename bin::type1, c2>::value));
+    EXPECT_TRUE((std::is_same<typename bin::type2, c1>::value));
   }
 
   {
     using c1  = Container1<A, B>;
     using bin = Morpheus::BinaryContainer<c1, c1>;
 
-    bool res = std::is_same<typename bin::type1, c1>::value;
-    EXPECT_EQ(res, 1);
-    res = std::is_same<typename bin::type2, c1>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same<typename bin::type1, c1>::value));
+    EXPECT_TRUE((std::is_same<typename bin::type2, c1>::value));
   }
 }
 
@@ -449,8 +390,7 @@ TEST(ContainerFactoryTest, GenerateBinaryTypeList) {
       Morpheus::UnaryContainer<Container1<double>,
                                Morpheus::Set<A, DD, DD, DD>>>;
 
-  bool res = std::is_same<container1_types, res_container1_t>::value;
-  EXPECT_EQ(res, 1);
+  EXPECT_TRUE((std::is_same<container1_types, res_container1_t>::value));
 
   // Generate unary containers for List2
   using container2_types =
@@ -468,8 +408,7 @@ TEST(ContainerFactoryTest, GenerateBinaryTypeList) {
       Morpheus::UnaryContainer<Container2<double>,
                                Morpheus::Set<A, DD, DD, DD>>>;
 
-  res = std::is_same<container2_types, res_container2_t>::value;
-  EXPECT_EQ(res, 1);
+  EXPECT_TRUE((std::is_same<container2_types, res_container2_t>::value));
 
   using binary_containers =
       typename Morpheus::generate_binary_typelist<container1_types,
@@ -798,8 +737,7 @@ TEST(ContainerFactoryTest, GenerateBinaryTypeList) {
           Morpheus::UnaryContainer<Container2<double>,
                                    Morpheus::Set<A, DD, DD, DD>>>>;
 
-  res = std::is_same<binary_containers, res_t>::value;
-  EXPECT_EQ(res, 1);
+  EXPECT_TRUE((std::is_same<binary_containers, res_t>::value));
 }
 
 }  // namespace Test

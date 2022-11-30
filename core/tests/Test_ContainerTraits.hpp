@@ -59,22 +59,19 @@ TYPED_TEST(ContainerTraitsUnaryTest, TestValueType) {
   using traits = typename TestFixture::container_traits;
   using unary  = typename TestFixture::type;
 
-  bool res = Morpheus::has_same_value_type_v<traits, unary>;
-  EXPECT_EQ(res, 1);
+  EXPECT_TRUE((Morpheus::has_same_value_type_v<traits, unary>));
 }
 
 TYPED_TEST(ContainerTraitsUnaryTest, TestIndexType) {
   using traits      = typename TestFixture::container_traits;
   using unary       = typename TestFixture::type;
   using default_int = int;
-  bool res;
 
   if (Morpheus::is_default_v<typename unary::index_type>) {
-    res = std::is_same<typename traits::index_type, default_int>::value;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE(
+        (std::is_same<typename traits::index_type, default_int>::value));
   } else {
-    res = Morpheus::has_same_index_type_v<traits, unary>;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((Morpheus::has_same_index_type_v<traits, unary>));
   }
 }
 
@@ -86,96 +83,79 @@ TYPED_TEST(ContainerTraitsUnaryTest, TestBackend) {
   using default_exe  = Kokkos::DefaultExecutionSpace;
   using default_mem  = typename default_exe::memory_space;
   using default_back = Morpheus::DefaultExecutionSpace;
-  bool res;
 
   if (Morpheus::is_default_v<typename unary::backend>) {
-    res = std::is_same_v<typename traits::execution_space, default_exe>;
-    EXPECT_EQ(res, 1);
-
-    res = std::is_same_v<typename traits::memory_space, default_mem>;
-    EXPECT_EQ(res, 1);
-
-    res = std::is_same_v<typename traits::backend, default_back>;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE(
+        (std::is_same_v<typename traits::execution_space, default_exe>));
+    EXPECT_TRUE((std::is_same_v<typename traits::memory_space, default_mem>));
+    EXPECT_TRUE((std::is_same_v<typename traits::backend, default_back>));
   } else {
     if (!Morpheus::has_backend_v<space>) {
       // Means we are using Kokkos::<spaces>
-      res = std::is_same_v<typename traits::backend,
-                           Morpheus::GenericBackend<space>>;
-      EXPECT_EQ(res, 1);
+      EXPECT_TRUE((std::is_same_v<typename traits::backend,
+                                  Morpheus::GenericBackend<space>>));
     } else {
-      res = std::is_same_v<typename traits::backend, space>;
-      EXPECT_EQ(res, 1);
+      EXPECT_TRUE((std::is_same_v<typename traits::backend, space>));
     }
     using exe = typename traits::execution_space;
     using mem = typename traits::memory_space;
 
-    res = std::is_same_v<exe, typename space::execution_space>;
-    EXPECT_EQ(res, 1);
-    res = std::is_same_v<mem, typename space::memory_space>;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same_v<exe, typename space::execution_space>));
+    EXPECT_TRUE((std::is_same_v<mem, typename space::memory_space>));
   }
 
-  res = std::is_same_v<
-      typename traits::device_type,
-      Morpheus::Device<typename space::execution_space,
-                       typename space::memory_space, typename space::backend>>;
-  EXPECT_EQ(res, 1);
+  EXPECT_TRUE((std::is_same_v<typename traits::device_type,
+                              Morpheus::Device<typename space::execution_space,
+                                               typename space::memory_space,
+                                               typename space::backend>>));
 
-  res = std::is_same_v<
-      typename traits::host_mirror_backend,
-      typename Morpheus::HostMirror<typename traits::backend>::backend>;
-  EXPECT_EQ(res, 1);
+  EXPECT_TRUE(
+      (std::is_same_v<
+          typename traits::host_mirror_backend,
+          typename Morpheus::HostMirror<typename traits::backend>::backend>));
 
   if (std::is_same_v<typename traits::memory_space, Kokkos::HostSpace>) {
-    EXPECT_EQ(traits::is_hostspace, 1);
+    EXPECT_TRUE(traits::is_hostspace);
   } else {
-    EXPECT_EQ(traits::is_hostspace, 0);
+    EXPECT_FALSE(traits::is_hostspace);
   }
 }
 
 TYPED_TEST(ContainerTraitsUnaryTest, TestLayout) {
   using traits = typename TestFixture::container_traits;
   using unary  = typename TestFixture::type;
-  bool res;
 
   if (Morpheus::is_default_v<typename unary::array_layout>) {
-    res = std::is_same_v<typename traits::array_layout,
-                         typename traits::execution_space::array_layout>;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE(
+        (std::is_same_v<typename traits::array_layout,
+                        typename traits::execution_space::array_layout>));
   } else {
-    res = Morpheus::has_same_layout_v<traits, unary>;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((Morpheus::has_same_layout_v<traits, unary>));
   }
 }
 
 TYPED_TEST(ContainerTraitsUnaryTest, TestMemoryTraits) {
   using traits = typename TestFixture::container_traits;
-  bool res;
 
   // // TODO: Enable memory traits in unary container
   // if (Morpheus::is_default_v<typename unary::memory_traits>) {
-  //   res = std::is_same_v<typename traits::memory_traits,
-  //                        typename Kokkos::MemoryManaged>;
-  //   EXPECT_EQ(res, 1);
+  //   EXPECT_TRUE((std::is_same_v<typename traits::memory_traits,
+  //                               typename Kokkos::MemoryManaged>));
   // } else {
-  //   res = std::is_same_v<typename traits::memory_traits,
-  //                        typename unary::memory_traits>;
-  //   EXPECT_EQ(res, 1);
+  //   EXPECT_TRUE((std::is_same_v<typename traits::memory_traits,
+  //                               typename unary::memory_traits>));
   // }
 
   // if (std::is_same_v<typename traits::memory_traits,
   //                    typename Kokkos::MemoryManaged>) {
-  //   EXPECT_EQ(traits::is_managed, 1);
+  //   EXPECT_TRUE(traits::is_managed);
   // } else {
-  //   EXPECT_EQ(traits::is_managed, 0);
+  //   EXPECT_FALSE(traits::is_managed);
   // }
 
-  res = std::is_same_v<typename traits::memory_traits,
-                       typename Kokkos::MemoryManaged>;
-  EXPECT_EQ(res, 1);
-
-  EXPECT_EQ(traits::is_managed, 1);
+  EXPECT_TRUE((std::is_same_v<typename traits::memory_traits,
+                              typename Kokkos::MemoryManaged>));
+  EXPECT_TRUE(traits::is_managed);
 }
 
 TYPED_TEST(ContainerTraitsUnaryTest, TestType) {
@@ -187,22 +167,11 @@ TYPED_TEST(ContainerTraitsUnaryTest, TestType) {
   using memory_traits = typename traits::memory_traits;
   using ctype = TestContainer<value_type, index_type, array_layout, backend,
                               memory_traits>;
-  bool res;
-
-  res = std::is_same_v<typename traits::type, ctype>;
-  EXPECT_EQ(res, 1);
-
-  res = std::is_same_v<typename traits::pointer, ctype*>;
-  EXPECT_EQ(res, 1);
-
-  res = std::is_same_v<typename traits::const_pointer, const ctype*>;
-  EXPECT_EQ(res, 1);
-
-  res = std::is_same_v<typename traits::reference, ctype&>;
-  EXPECT_EQ(res, 1);
-
-  res = std::is_same_v<typename traits::const_reference, const ctype&>;
-  EXPECT_EQ(res, 1);
+  EXPECT_TRUE((std::is_same_v<typename traits::type, ctype>));
+  EXPECT_TRUE((std::is_same_v<typename traits::pointer, ctype*>));
+  EXPECT_TRUE((std::is_same_v<typename traits::const_pointer, const ctype*>));
+  EXPECT_TRUE((std::is_same_v<typename traits::reference, ctype&>));
+  EXPECT_TRUE((std::is_same_v<typename traits::const_reference, const ctype&>));
 }
 
 TYPED_TEST(ContainerTraitsUnaryTest, TestHostMirror) {
@@ -215,30 +184,26 @@ TYPED_TEST(ContainerTraitsUnaryTest, TestHostMirror) {
   using mem          = typename traits::host_mirror_backend::memory_space;
   using back         = typename traits::host_mirror_backend::backend;
   using dev          = Morpheus::Device<exe, mem, back>;
-  bool res;
 
-  res = std::is_same_v<typename traits::HostMirror,
-                       TestContainer<value_type, index_type, array_layout, dev,
-                                     typename Kokkos::MemoryManaged>>;
-  EXPECT_EQ(res, 1);
+  EXPECT_TRUE(
+      (std::is_same_v<typename traits::HostMirror,
+                      TestContainer<value_type, index_type, array_layout, dev,
+                                    typename Kokkos::MemoryManaged>>));
 }
 
 TEST(ContainerTraitsTest, TestConst) {
   {
     using const_container = TestContainer<const double, const int>;
-    bool res =
-        std::is_same_v<typename const_container::non_const_value_type, double>;
-    EXPECT_EQ(res, 1);
-
-    res = std::is_same_v<typename const_container::non_const_index_type, int>;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE((std::is_same_v<typename const_container::non_const_value_type,
+                                double>));
+    EXPECT_TRUE(
+        (std::is_same_v<typename const_container::non_const_index_type, int>));
   }
 
   {
     using container = TestContainer<double, int>;
-    bool res =
-        std::is_same_v<typename container::const_value_type, const double>;
-    EXPECT_EQ(res, 1);
+    EXPECT_TRUE(
+        (std::is_same_v<typename container::const_value_type, const double>));
   }
 }
 

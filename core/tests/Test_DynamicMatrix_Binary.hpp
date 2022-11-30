@@ -89,7 +89,6 @@ class DynamicMatrixBinaryTest : public ::testing::Test {
   }
 
   void build_coo2() {
-    using value_type = ValueType2;
     Aref_coo_h.resize(this->Acoo_nrows, this->Acoo_ncols, this->Acoo_nnnz);
     CHECK_COO_SIZES(Aref_coo_h, this->Acoo_nrows, this->Acoo_ncols,
                     this->Acoo_nnnz);
@@ -108,7 +107,6 @@ class DynamicMatrixBinaryTest : public ::testing::Test {
   }
 
   void build_csr1() {
-    using value_type = ValueType1;
     Aref_csr_h.resize(this->Acsr_nrows, this->Acsr_ncols, this->Acsr_nnnz);
     CHECK_CSR_SIZES(Aref_csr_h, this->Acsr_nrows, this->Acsr_ncols,
                     this->Acsr_nnnz);

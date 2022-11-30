@@ -73,10 +73,7 @@ namespace Test {
  *
  */
 TEST(CustomBackendTest, IsCustomBackend) {
-  {
-    bool res = Morpheus::is_custom_backend<int>::value;
-    EXPECT_EQ(res, 0);
-  }
+  { EXPECT_FALSE((Morpheus::is_custom_backend<int>::value)); }
 
   {
     bool ref_results[7] = {0, 1, 1, 0, 1, 1, 0};

@@ -52,7 +52,7 @@ class CompatibleCooMatrixBinaryTest : public ::testing::Test {
   CompatibleCooMatrixBinaryTest() : Aref(3, 3, 4), Ahref(3, 3, 4) {}
 
   void SetUp() override {
-    build_coomatrix(Ahref);
+    Morpheus::Test::build_small_container(Ahref);
 
     // Send Matrix to device
     Morpheus::copy(Ahref, Aref);

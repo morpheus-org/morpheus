@@ -61,7 +61,7 @@ class CompatibleDiaMatrixBinaryTest : public ::testing::Test {
         Ahref(3, 3, 4, 4) {}
 
   void SetUp() override {
-    build_diamatrix(Ahref);
+    Morpheus::Test::build_small_container(Ahref);
 
     // Send Matrix to device
     Morpheus::copy(Ahref, Aref);

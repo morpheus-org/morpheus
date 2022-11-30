@@ -68,7 +68,7 @@ class CompatibleDynamicMatrixBinaryTest : public ::testing::Test {
   void switch_coo() {
     Aref_coo_h.resize(this->nrows, this->ncols, this->nnnz);
     CHECK_COO_SIZES(Aref_coo_h, this->nrows, this->ncols, this->nnnz);
-    build_coomatrix(Aref_coo_h);
+    Morpheus::Test::build_small_container(Aref_coo_h);
 
     Aref_coo.resize(this->nrows, this->ncols, this->nnnz);
     CHECK_COO_SIZES(Aref_coo, this->nrows, this->ncols, this->nnnz);
@@ -84,7 +84,7 @@ class CompatibleDynamicMatrixBinaryTest : public ::testing::Test {
   void switch_csr() {
     Aref_csr_h.resize(this->nrows, this->ncols, this->nnnz);
     CHECK_CSR_SIZES(Aref_csr_h, this->nrows, this->ncols, this->nnnz);
-    build_csrmatrix(Aref_csr_h);
+    Morpheus::Test::build_small_container(Aref_csr_h);
 
     Aref_csr.resize(this->nrows, this->ncols, this->nnnz);
     CHECK_CSR_SIZES(Aref_csr, this->nrows, this->ncols, this->nnnz);
