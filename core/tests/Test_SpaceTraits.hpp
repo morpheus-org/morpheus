@@ -1613,13 +1613,13 @@ TEST(SpaceTraitsTest, HasAccessMulti) {
   }
 #if defined(MORPHEUS_ENABLE_CUDA)
   {
-    bool ref_results[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    bool ref_results[12] = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0};
     MORPHEUS_CHECK_ACCESS_MULTI_SPACE("", Serial, CudaSpace, ref_results);
   }
 #endif  // MORPHEUS_ENABLE_CUDA
 #if defined(MORPHEUS_ENABLE_HIP)
   {
-    bool ref_results[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    bool ref_results[12] = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0};
     MORPHEUS_CHECK_ACCESS_MULTI_SPACE("", Serial, HIPSpace, ref_results);
   }
 #endif  // MORPHEUS_ENABLE_HIP
@@ -1632,13 +1632,13 @@ TEST(SpaceTraitsTest, HasAccessMulti) {
   }
 #if defined(MORPHEUS_ENABLE_CUDA)
   {
-    bool ref_results[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    bool ref_results[12] = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0};
     MORPHEUS_CHECK_ACCESS_MULTI_SPACE("", OpenMP, CudaSpace, ref_results);
   }
 #endif  // MORPHEUS_ENABLE_CUDA
 #if defined(MORPHEUS_ENABLE_HIP)
   {
-    bool ref_results[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    bool ref_results[12] = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0};
     MORPHEUS_CHECK_ACCESS_MULTI_SPACE("", OpenMP, HIPSpace, ref_results);
   }
 #endif  // MORPHEUS_ENABLE_HIP
