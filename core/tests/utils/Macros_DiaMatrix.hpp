@@ -97,6 +97,8 @@
     }                                                             \
   }
 
+namespace Morpheus {
+namespace Test {
 /**
  * @brief Builds a sample DiaMatrix container. Assumes we have already
  * constructed the matrix and we are only adding data.
@@ -104,30 +106,131 @@
  * @tparam Matrix A DiaMatrix type
  * @param A The DiaMatrix we will be initializing.
  */
-template <typename Matrix>
-void build_diamatrix(Matrix& A) {
-  using value_type = typename Matrix::value_type;
+template <typename Container>
+void build_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
+  using value_type = typename Container::value_type;
   // Matrix to Build
   // [1.11 *    2.22]
   // [*    *    3.33]
   // [*    4.44 *   ]
-  CHECK_DIA_SIZES(A, 3, 3, 4, 4, 32);
+  CHECK_DIA_SIZES(c, 3, 3, 4, 4, 32);
 
   // clang-format off
-  A.diagonal_offsets(0) = -1; 
-  A.diagonal_offsets(1) = 0; 
-  A.diagonal_offsets(2) = 1; 
-  A.diagonal_offsets(3) = 2; 
+  c.diagonal_offsets(0) = -1; 
+  c.diagonal_offsets(1) = 0; 
+  c.diagonal_offsets(2) = 1; 
+  c.diagonal_offsets(3) = 2; 
   // values are:
   // [*    1.11 0    2.22]
   // [0    0    3.33 *]
   // [4.44 0    *    *]
-  // * -> -99
-  A.values(0,0) = (value_type)-99; A.values(1,0) = (value_type)0; A.values(2,0) = (value_type)4.44;
-  A.values(0,1) = (value_type)1.11; A.values(1,1) = (value_type)0; A.values(2,1) = (value_type)0;
-  A.values(0,2) = (value_type)0; A.values(1,2) = (value_type)3.33; A.values(2,2) = (value_type)-99;
-  A.values(0,3) = (value_type)2.22; A.values(1,3) = (value_type)-99; A.values(2,3) = (value_type)-99;
+  c.values(0,0) = (value_type)0;    c.values(1,0) = (value_type)0;    c.values(2,0) = (value_type)4.44;
+  c.values(0,1) = (value_type)1.11; c.values(1,1) = (value_type)0;    c.values(2,1) = (value_type)0;
+  c.values(0,2) = (value_type)0;    c.values(1,2) = (value_type)3.33; c.values(2,2) = (value_type)0;
+  c.values(0,3) = (value_type)2.22; c.values(1,3) = (value_type)0;    c.values(2,3) = (value_type)0;
   // clang-format on
 }
+
+template <class Container>
+void setup_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
+  c.resize(3, 3, 4, 4, 32);
+  build_small_container(c);
+}
+
+template <class Container1, class Container2>
+bool is_same_size(
+    Container1& c1, Container2& c2,
+    typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Container1> &&
+        Morpheus::is_dia_matrix_format_container_v<Container2>>* = nullptr) {
+  bool same_nrows      = c1.nrows() == c2.nrows() ? true : false;
+  bool same_ncols      = c1.ncols() == c2.ncols() ? true : false;
+  bool same_nnnz       = c1.nnnz() == c2.nnnz() ? true : false;
+  bool same_ndiags     = c1.ndiags() == c2.ndiags() ? true : false;
+  bool same_nalignment = c1.alignment() == c2.alignment() ? true : false;
+  bool same_doff_size =
+      c1.diagonal_offsets().size() == c2.diagonal_offsets().size() ? true
+                                                                   : false;
+  bool same_values_size = c1.values().nrows() * c1.values().ncols() ==
+                                  c2.values().nrows() * c2.values().ncols()
+                              ? true
+                              : false;
+
+  return same_nrows && same_ncols && same_nnnz && same_ndiags &&
+         same_nalignment && same_doff_size && same_values_size;
+}
+
+template <class Container>
+bool is_empty_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
+  using value_type = typename Container::value_type;
+  using index_type = typename Container::index_type;
+
+  typename Container::HostMirror ch;
+  ch.resize(c);
+  Morpheus::copy(c, ch);
+
+  for (index_type i = 0; i < c.values().nrows(); i++) {
+    for (index_type j = 0; j < c.values().ncols(); j++) {
+      if (ch.values(i, j) != (value_type)0.0) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+template <typename Container, typename ValueType, typename IndexType,
+          typename ArrayLayout, typename Space>
+Morpheus::DiaMatrix<ValueType, IndexType, ArrayLayout, Space> create_container(
+    typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
+  return Morpheus::DiaMatrix<ValueType, IndexType, ArrayLayout, Space>();
+}
+
+template <class Container1, class Container2>
+bool have_same_data(
+    Container1& c1, Container2& c2,
+    typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Container1> &&
+        Morpheus::is_dia_matrix_format_container_v<Container2>>* = nullptr) {
+  using index_type = typename Container1::index_type;
+
+  if (!is_same_size(c1, c2)) return false;
+
+  typename Container1::HostMirror c1_h;
+  c1_h.resize(c1);
+  Morpheus::copy(c1, c1_h);
+
+  typename Container1::HostMirror c2_h;
+  c2_h.resize(c2);
+  Morpheus::copy(c2, c2_h);
+
+  for (index_type i = 0; i < c1_h.ndiags(); i++) {
+    if (c1_h.diagonal_offsets(i) != c2_h.diagonal_offsets(i)) return false;
+  }
+
+  for (index_type i = 0; i < c1_h.values().nrows(); i++) {
+    for (index_type j = 0; j < c1_h.values().ncols(); j++) {
+      if (c1_h.values(i, j) != c2_h.values(i, j)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+}  // namespace Test
+}  // namespace Morpheus
 
 #endif  // TEST_CORE_UTILS_MACROS_DIAMATRIX_HPP

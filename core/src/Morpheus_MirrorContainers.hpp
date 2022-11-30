@@ -78,8 +78,10 @@ template <class Space, template <class, class...> class Container, class T,
 typename Impl::MirrorContainerType<Space, Container, T, P...>::container_type
 create_mirror_container(
     const Container<T, P...>& src,
-    typename std::enable_if<Impl::MirrorContainerType<
-        Space, Container, T, P...>::is_same_memspace>::type* = nullptr) {
+    typename std::enable_if<Impl::MirrorContainerType<Space, Container, T,
+                                                      P...>::is_same_memspace &&
+                            is_container<Container<T, P...>>::value>::type* =
+        nullptr) {
   return src;
 }
 

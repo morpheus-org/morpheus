@@ -268,6 +268,19 @@ class DenseMatrix : public MatrixBase<DenseMatrix, ValueType, Properties...> {
   }
 
   /**
+   * @brief Resizes DenseVector with the shape another DenseMatrix with
+   * different parameters.
+   *
+   * @tparam VR Type of values the source matrix stores.
+   * @tparam PR Other properties of source matrix.
+   * @param src The source DenseMatrix we are resizing from.
+   */
+  template <class VR, class... PR>
+  inline void resize(const DenseMatrix<VR, PR...> &src) {
+    resize(src.nrows(), src.ncols());
+  }
+
+  /**
    * @brief Allocates memory from another DenseMatrix container with
    * different properties.
    *

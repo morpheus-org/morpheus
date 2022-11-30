@@ -347,6 +347,19 @@ class DenseVector
     assign(n, val);
   }
 
+  /**
+   * @brief Resizes DenseVector with the shape another DenseVector with
+   * different parameters.
+   *
+   * @tparam VR Type of values the source vector stores.
+   * @tparam PR Other properties of source vector.
+   * @param src The source DenseVector we are resizing from.
+   */
+  template <class VR, class... PR>
+  inline void resize(const DenseVector<VR, PR...>& src) {
+    resize(src.size());
+  }
+
  private:
   size_t _size;
   value_array_type _values;

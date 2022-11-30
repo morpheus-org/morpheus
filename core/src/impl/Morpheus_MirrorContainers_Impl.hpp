@@ -63,14 +63,7 @@ template <class Space, template <class, class...> class Container, class T,
 struct MirrorType {
   // The incoming container_type
   using src_container_type = Container<T, P...>;
-  // The memory space for the mirror container
-  using memory_space = typename Space::memory_space;
-  // Check whether it is the same memory space
-  enum {
-    is_same_memspace =
-        std::is_same<memory_space,
-                     typename src_container_type::memory_space>::value
-  };
+
   // we want it non-const to allow deep_copy.
   using value_type   = typename src_container_type::non_const_value_type;
   using index_type   = typename src_container_type::non_const_index_type;

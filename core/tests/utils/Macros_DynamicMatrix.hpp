@@ -65,4 +65,112 @@
     EXPECT_EQ(A.formats().index(), B.formats().index()); \
   }
 
+namespace Morpheus {
+namespace Test {
+namespace Impl {
+struct is_same_size_fn {
+  using result_type = bool;
+
+  template <class Container1, class Container2>
+  result_type operator()(
+      Container1& c1, Container2& c2,
+      typename std::enable_if_t<
+          Morpheus::has_same_format_v<Container1, Container2>>* = nullptr) {
+    return is_same_size(c1, c2);
+  }
+
+  template <class Container1, class Container2>
+  result_type operator()(
+      Container1&, Container2&,
+      typename std::enable_if_t<
+          !Morpheus::has_same_format_v<Container1, Container2>>* = nullptr) {
+    return false;
+  }
+};
+
+struct have_same_data_fn {
+  using result_type = bool;
+
+  template <class Container1, class Container2>
+  result_type operator()(
+      Container1& c1, Container2& c2,
+      typename std::enable_if_t<
+          Morpheus::has_same_format_v<Container1, Container2>>* = nullptr) {
+    return have_same_data(c1, c2);
+  }
+
+  template <class Container1, class Container2>
+  result_type operator()(
+      Container1&, Container2&,
+      typename std::enable_if_t<
+          !Morpheus::has_same_format_v<Container1, Container2>>* = nullptr) {
+    return false;
+  }
+};
+}  // namespace Impl
+template <typename Container>
+void build_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dynamic_matrix_format_container_v<Container>>* = nullptr) {
+  using value_type   = typename Container::value_type;
+  using index_type   = typename Container::index_type;
+  using array_layout = typename Container::array_layout;
+  using backend      = typename Container::backend;
+  typename Morpheus::CooMatrix<value_type, index_type, array_layout,
+                               backend>::HostMirror coo_mat;
+
+  setup_small_container(coo_mat);
+
+  c = coo_mat;
+}
+
+template <class Container>
+void setup_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dynamic_matrix_format_container_v<Container>>* = nullptr) {
+  build_small_container(c);
+}
+
+template <class Container1, class Container2>
+bool is_same_size(
+    Container1& c1, Container2& c2,
+    typename std::enable_if_t<
+        Morpheus::is_dynamic_matrix_format_container_v<Container1> &&
+        Morpheus::is_dynamic_matrix_format_container_v<Container2>>* =
+        nullptr) {
+  return std::visit(Impl::is_same_size_fn(), c1.formats(), c2.formats());
+}
+
+template <class Container>
+bool is_empty_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dynamic_matrix_format_container_v<Container>>* = nullptr) {
+  return std::visit([&](auto&& arg) { return is_empty_container(arg); },
+                    c.formats());
+}
+
+template <typename Container, typename ValueType, typename IndexType,
+          typename ArrayLayout, typename Space>
+Morpheus::DynamicMatrix<ValueType, IndexType, ArrayLayout, Space>
+create_container(
+    typename std::enable_if_t<
+        Morpheus::is_dynamic_matrix_format_container_v<Container>>* = nullptr) {
+  return Morpheus::DynamicMatrix<ValueType, IndexType, ArrayLayout, Space>();
+}
+
+template <class Container1, class Container2>
+bool have_same_data(
+    Container1& c1, Container2& c2,
+    typename std::enable_if_t<
+        Morpheus::is_dynamic_matrix_format_container_v<Container1> &&
+        Morpheus::is_dynamic_matrix_format_container_v<Container2>>* =
+        nullptr) {
+  return std::visit(Impl::have_same_data_fn(), c1.formats(), c2.formats());
+}
+}  // namespace Test
+}  // namespace Morpheus
+
 #endif  // TEST_CORE_UTILS_MACROS_DYNAMICMATRIX_HPP

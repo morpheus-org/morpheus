@@ -16,39 +16,40 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
 
     foreach(
       Name
+      ContainerFactory
       ContainerTraits
-      MatrixBase
-      DenseVector
-      DenseVector_Binary
-      DenseVector_CompatibleBinary
-      DenseMatrix
-      DenseMatrix_Binary
-      DenseMatrix_CompatibleBinary
-      CooMatrix
       CooMatrix_Binary
       CooMatrix_CompatibleBinary
       CooMatrix_CompatibleDynamicBinary
-      CsrMatrix
+      CooMatrix
+      DenseMatrix_Binary
+      DenseMatrix_CompatibleBinary
+      DenseMatrix
       CsrMatrix_Binary
       CsrMatrix_CompatibleBinary
       CsrMatrix_CompatibleDynamicBinary
-      DiaMatrix
+      CsrMatrix
+      CustomBackend
+      DenseVector_Binary
+      DenseVector_CompatibleBinary
+      DenseVector
       DiaMatrix_Binary
       DiaMatrix_CompatibleBinary
       DiaMatrix_CompatibleDynamicBinary
-      DynamicMatrix
+      DiaMatrix
+      DynamicMatrix_Binary
       DynamicMatrix_CompatibleBinary
       DynamicMatrix_CompatibleConcreteBinary
-      DynamicMatrix_Binary
-      TypeTraits
-      SpaceTraits
-      FormatTraits
-      Metaprogramming
-      ContainerFactory
+      DynamicMatrix
       FormatTags
+      FormatTraits
       GenericBackend
-      CustomBackend
-      Spaces)
+      MatrixBase
+      Metaprogramming
+      MirrorContainers
+      Spaces
+      SpaceTraits
+      TypeTraits)
       set(file ${testdir}/Test_${Tag}_${Name}.cpp)
       # Write to a temporary intermediate file and call configure_file to avoid
       # updating timestamps triggering unnecessary rebuilds on subsequent cmake
