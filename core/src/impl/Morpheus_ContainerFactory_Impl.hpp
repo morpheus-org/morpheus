@@ -1,5 +1,5 @@
 /**
- * Morpheus_ContainerFactory.hpp
+ * Morpheus_ContainerFactory_Impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_IMPL_CONTAINERFACTORY_HPP
-#define MORPHEUS_IMPL_CONTAINERFACTORY_HPP
+#ifndef MORPHEUS_CONTAINERFACTORY_IMPL_HPP
+#define MORPHEUS_CONTAINERFACTORY_IMPL_HPP
 
 #include <Morpheus_Metaprogramming.hpp>
 
@@ -236,4 +236,4 @@ struct generate_binary_typelist_proxy<TypeList<List1...>, TypeList<List2...>> {
 }  // namespace Impl
 }  // namespace Morpheus
 /*! \endcond */
-#endif  // MORPHEUS_IMPL_CONTAINERFACTORY_HPP
+#endif  // MORPHEUS_CONTAINERFACTORY_IMPL_HPP

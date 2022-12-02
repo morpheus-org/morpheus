@@ -77,6 +77,7 @@ using test_types_set = typename Morpheus::cross_product<
         test_index_tlist,
         typename Morpheus::cross_product<test_layout_tlist,
                                          space_tlist>::type>::type>::type;
+
 }  // namespace types
 
 template <typename... Ts>

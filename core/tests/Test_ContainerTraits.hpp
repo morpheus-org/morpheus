@@ -115,9 +115,9 @@ TYPED_TEST(ContainerTraitsUnaryTest, TestBackend) {
           typename Morpheus::HostMirror<typename traits::backend>::backend>));
 
   if (std::is_same_v<typename traits::memory_space, Kokkos::HostSpace>) {
-    EXPECT_TRUE(traits::is_hostspace);
+    EXPECT_TRUE((traits::is_hostspace));
   } else {
-    EXPECT_FALSE(traits::is_hostspace);
+    EXPECT_FALSE((traits::is_hostspace));
   }
 }
 
@@ -148,14 +148,14 @@ TYPED_TEST(ContainerTraitsUnaryTest, TestMemoryTraits) {
 
   // if (std::is_same_v<typename traits::memory_traits,
   //                    typename Kokkos::MemoryManaged>) {
-  //   EXPECT_TRUE(traits::is_managed);
+  //   EXPECT_TRUE((traits::is_managed));
   // } else {
-  //   EXPECT_FALSE(traits::is_managed);
+  //   EXPECT_FALSE((traits::is_managed));
   // }
 
   EXPECT_TRUE((std::is_same_v<typename traits::memory_traits,
                               typename Kokkos::MemoryManaged>));
-  EXPECT_TRUE(traits::is_managed);
+  EXPECT_TRUE((traits::is_managed));
 }
 
 TYPED_TEST(ContainerTraitsUnaryTest, TestType) {

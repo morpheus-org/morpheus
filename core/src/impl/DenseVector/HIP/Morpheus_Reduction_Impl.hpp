@@ -31,8 +31,8 @@
 #include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
-#include <Morpheus_Copy.hpp>
 
+#include <impl/DenseVector/Morpheus_Copy_Impl.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_Reduction_Impl.hpp>
 #include <impl/DenseVector/Serial/Morpheus_Reduction_Impl.hpp>
 #include <impl/Morpheus_HIPUtils.hpp>
@@ -206,7 +206,7 @@ typename Vector::value_type reduce(
   while (s > cpuFinalThreshold) {
     int threads = 0, blocks = 0;
     getNumBlocksAndThreads<int>(s, maxBlocks, maxThreads, blocks, threads);
-    Morpheus::copy(out, inter_sums, 0, s);
+    Impl::copy(out, inter_sums, 0, s);
 
     Impl::reduce<ExecSpace>(inter_sums, out, s, threads, blocks);
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
@@ -219,12 +219,12 @@ typename Vector::value_type reduce(
   if (s > 1) {
     typename Vector::HostMirror h_out(s, 0);
     // copy result from device to host
-    Morpheus::copy(out, h_out, 0, s);
+    Impl::copy(out, h_out, 0, s);
     result = reduce<Kokkos::Serial>(h_out, s);
   } else {
     // copy final sum from device to host
     typename Vector::HostMirror h_out(1, 0);
-    Morpheus::copy(out, h_out, 0, 1);
+    Impl::copy(out, h_out, 0, 1);
     result = h_out[0];
   }
 

@@ -21,10 +21,12 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_CONTAINERFACTORY_HPP
-#define MORPHEUS_CONTAINERFACTORY_HPP
+#ifndef MORPHEUS_CONTAINER_FACTORY_HPP
+#define MORPHEUS_CONTAINER_FACTORY_HPP
 
-#include <impl/Morpheus_ContainerFactory.hpp>
+#include <impl/Morpheus_ContainerFactory_Impl.hpp>
+
+#include <type_traits>
 
 namespace Morpheus {
 
@@ -202,4 +204,4 @@ struct generate_binary_typelist {
 
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_CONTAINERFACTORY_HPP
+#endif  // MORPHEUS_CONTAINER_FACTORY_HPP

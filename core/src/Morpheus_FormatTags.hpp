@@ -21,10 +21,10 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_FORMATTAGS_HPP
-#define MORPHEUS_FORMATTAGS_HPP
+#ifndef MORPHEUS_FORMAT_TAGS_HPP
+#define MORPHEUS_FORMAT_TAGS_HPP
 
-#include <Morpheus_FormatTraits.hpp>
+#include <fwd/Morpheus_Fwd_FormatTraits.hpp>
 
 #include <impl/Morpheus_MatrixTags.hpp>
 #include <impl/Morpheus_VectorTags.hpp>
@@ -136,7 +136,7 @@ class is_csr_matrix_format_container {
   static yes& test(
       U*,
       typename std::enable_if<
-          is_matrix_container_v<U> &&
+          is_matrix_container<U>::value &&
           std::is_same<CsrFormatTag, typename U::tag>::value>::type* = nullptr);
 
   template <class U>
@@ -171,7 +171,7 @@ class is_dia_matrix_format_container {
   static yes& test(
       U*,
       typename std::enable_if<
-          is_matrix_container_v<U> &&
+          is_matrix_container<U>::value &&
           std::is_same<DiaFormatTag, typename U::tag>::value>::type* = nullptr);
 
   template <class U>
@@ -206,7 +206,7 @@ class is_dynamic_matrix_format_container {
   static yes& test(
       U*,
       typename std::enable_if<
-          is_matrix_container_v<U> &&
+          is_matrix_container<U>::value &&
           std::is_same<DynamicMatrixFormatTag, typename U::tag>::value>::type* =
           nullptr);
 
@@ -242,7 +242,7 @@ class is_dense_matrix_format_container {
   static yes& test(
       U*,
       typename std::enable_if<
-          is_matrix_container_v<U> &&
+          is_matrix_container<U>::value &&
           std::is_same<DenseMatrixFormatTag, typename U::tag>::value>::type* =
           nullptr);
 
@@ -303,4 +303,4 @@ inline constexpr bool is_dense_vector_format_container_v =
 
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_FORMATTAGS_HPP
+#endif  // MORPHEUS_FORMAT_TAGS_HPP

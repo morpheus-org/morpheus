@@ -31,7 +31,6 @@
 #include <iostream>
 #include <algorithm>
 
-#include <Morpheus_Core.hpp>
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_CooMatrix.hpp>
 #include <Morpheus_DenseMatrix.hpp>

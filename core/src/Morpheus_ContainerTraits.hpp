@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_CONTAINERTRAITS_HPP
-#define MORPHEUS_CONTAINERTRAITS_HPP
+#ifndef MORPHEUS_CONTAINER_TRAITS_HPP
+#define MORPHEUS_CONTAINER_TRAITS_HPP
 
 #include <Morpheus_Spaces.hpp>
 
@@ -152,4 +152,4 @@ struct ContainerTraits {
 };
 
 }  // namespace Morpheus
-#endif  // MORPHEUS_CONTAINERTRAITS_HPP
+#endif  // MORPHEUS_CONTAINER_TRAITS_HPP

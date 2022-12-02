@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef TEST_CORE_TEST_FORMATTRAITS_HPP
-#define TEST_CORE_TEST_FORMATTRAITS_HPP
+#ifndef TEST_CORE_TEST_FORMAT_TRAITS_HPP
+#define TEST_CORE_TEST_FORMAT_TRAITS_HPP
 
 #include <Morpheus_Core.hpp>
 
@@ -57,40 +57,49 @@ namespace Test {
  *
  */
 TEST(FormatTraitsTest, IsMatrixContainer) {
-  EXPECT_FALSE((Morpheus::is_matrix_container<Impl::with_tag<int>>::value));
+  bool res = Morpheus::is_matrix_container<Impl::with_tag<int>>::value;
+  EXPECT_EQ(res, 0);
 
-  EXPECT_FALSE((Morpheus::is_matrix_container<Impl::no_traits>::value));
+  res = Morpheus::is_matrix_container<Impl::no_traits>::value;
+  EXPECT_EQ(res, 0);
 
   // A Matrix Tag is a valid tag for Container
-  EXPECT_TRUE((Morpheus::is_matrix_container<
-               Impl::with_tag<Morpheus::Impl::MatrixTag>>::value));
+  res = Morpheus::is_matrix_container<
+      Impl::with_tag<Morpheus::Impl::MatrixTag>>::value;
+  EXPECT_EQ(res, 1);
 
   // A Dense Matrix Tag is a valid tag for Matrix Container
-  EXPECT_TRUE((Morpheus::is_matrix_container<
-               Impl::with_tag<Morpheus::Impl::DenseMatrixTag>>::value));
+  res = Morpheus::is_matrix_container<
+      Impl::with_tag<Morpheus::Impl::DenseMatrixTag>>::value;
+  EXPECT_EQ(res, 1);
 
   // A Sparse Matrix Tag is a valid tag for Matrix Container
-  EXPECT_TRUE((Morpheus::is_matrix_container<
-               Impl::with_tag<Morpheus::Impl::SparseMatrixTag>>::value));
+  res = Morpheus::is_matrix_container<
+      Impl::with_tag<Morpheus::Impl::SparseMatrixTag>>::value;
+  EXPECT_EQ(res, 1);
 
   // A Dynamic Matrix Tag is a valid tag for Matrix Container
-  EXPECT_TRUE((Morpheus::is_matrix_container<
-               Impl::with_tag<Morpheus::DynamicMatrixFormatTag>>::value));
+  res = Morpheus::is_matrix_container<
+      Impl::with_tag<Morpheus::DynamicMatrixFormatTag>>::value;
+  EXPECT_EQ(res, 1);
 
   // A COO Tag is a valid tag for Matrix Container
-  EXPECT_TRUE((Morpheus::is_matrix_container<
-               Impl::with_tag<Morpheus::CooFormatTag>>::value));
+  res = Morpheus::is_matrix_container<
+      Impl::with_tag<Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 1);
 
   // A Vector Tag is not a valid tag for Matrix Container
-  EXPECT_FALSE((Morpheus::is_matrix_container<
-                Impl::with_tag<Morpheus::Impl::VectorTag>>::value));
+  res = Morpheus::is_matrix_container<
+      Impl::with_tag<Morpheus::Impl::VectorTag>>::value;
+  EXPECT_EQ(res, 0);
 
   /* Testing Alias */
-  EXPECT_FALSE((Morpheus::is_matrix_container_v<Impl::with_tag<int>>));
+  res = Morpheus::is_matrix_container_v<Impl::with_tag<int>>;
+  EXPECT_EQ(res, 0);
 
   // A COO Tag is a valid tag for Matrix Container
-  EXPECT_TRUE((
-      Morpheus::is_matrix_container_v<Impl::with_tag<Morpheus::CooFormatTag>>));
+  res = Morpheus::is_matrix_container_v<Impl::with_tag<Morpheus::CooFormatTag>>;
+  EXPECT_EQ(res, 1);
 }
 
 /**
@@ -103,44 +112,53 @@ TEST(FormatTraitsTest, IsMatrixContainer) {
  *
  */
 TEST(FormatTraitsTest, IsSparseMatrixContainer) {
-  EXPECT_FALSE(
-      (Morpheus::is_sparse_matrix_container<Impl::with_tag<int>>::value));
+  bool res = Morpheus::is_sparse_matrix_container<Impl::with_tag<int>>::value;
+  EXPECT_EQ(res, 0);
 
-  EXPECT_FALSE((Morpheus::is_sparse_matrix_container<Impl::no_traits>::value));
+  res = Morpheus::is_sparse_matrix_container<Impl::no_traits>::value;
+  EXPECT_EQ(res, 0);
 
   // A COO Tag is a valid tag for Sparse Matrix Container
-  EXPECT_TRUE((Morpheus::is_sparse_matrix_container<
-               Impl::with_tag<Morpheus::CooFormatTag>>::value));
+  res = Morpheus::is_sparse_matrix_container<
+      Impl::with_tag<Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 1);
 
   // A Sparse Matrix Tag is a valid tag for Sparse Matrix Container
-  EXPECT_TRUE((Morpheus::is_sparse_matrix_container<
-               Impl::with_tag<Morpheus::Impl::SparseMatrixTag>>::value));
+  res = Morpheus::is_sparse_matrix_container<
+      Impl::with_tag<Morpheus::Impl::SparseMatrixTag>>::value;
+  EXPECT_EQ(res, 1);
 
   // A Matrix Tag is not a valid tag for Sparse Matrix Container - A sparse
   // matrix is a matrix but a matrix is not necessarilly sparse
-  EXPECT_FALSE((Morpheus::is_sparse_matrix_container<
-                Impl::with_tag<Morpheus::Impl::MatrixTag>>::value));
+  res = Morpheus::is_sparse_matrix_container<
+      Impl::with_tag<Morpheus::Impl::MatrixTag>>::value;
+  EXPECT_EQ(res, 0);
 
   // A Dense Matrix Tag is not a valid tag for Sparse Matrix Container
-  EXPECT_FALSE((Morpheus::is_sparse_matrix_container<
-                Impl::with_tag<Morpheus::Impl::DenseMatrixTag>>::value));
+  res = Morpheus::is_sparse_matrix_container<
+      Impl::with_tag<Morpheus::Impl::DenseMatrixTag>>::value;
+  EXPECT_EQ(res, 0);
 
   // A Dense Matrix Format Tag is not a valid tag for Sparse Matrix Container
-  EXPECT_FALSE((Morpheus::is_sparse_matrix_container<
-                Impl::with_tag<Morpheus::DenseMatrixFormatTag>>::value));
+  res = Morpheus::is_sparse_matrix_container<
+      Impl::with_tag<Morpheus::DenseMatrixFormatTag>>::value;
+  EXPECT_EQ(res, 0);
 
   // A Vector Tag is not a valid tag for Sparse Matrix Container
-  EXPECT_FALSE((Morpheus::is_sparse_matrix_container<
-                Impl::with_tag<Morpheus::Impl::VectorTag>>::value));
+  res = Morpheus::is_sparse_matrix_container<
+      Impl::with_tag<Morpheus::Impl::VectorTag>>::value;
+  EXPECT_EQ(res, 0);
 
   /* Testing Alias */
   // A Sparse Matrix Tag is a valid tag for Sparse Matrix Container
-  EXPECT_TRUE((Morpheus::is_sparse_matrix_container_v<
-               Impl::with_tag<Morpheus::Impl::SparseMatrixTag>>));
+  res = Morpheus::is_sparse_matrix_container_v<
+      Impl::with_tag<Morpheus::Impl::SparseMatrixTag>>;
+  EXPECT_EQ(res, 1);
 
   // A Dense Matrix Tag is not a valid tag for Sparse Matrix Container
-  EXPECT_FALSE((Morpheus::is_sparse_matrix_container_v<
-                Impl::with_tag<Morpheus::Impl::DenseMatrixTag>>));
+  res = Morpheus::is_sparse_matrix_container_v<
+      Impl::with_tag<Morpheus::Impl::DenseMatrixTag>>;
+  EXPECT_EQ(res, 0);
 }
 
 /**
@@ -154,44 +172,53 @@ TEST(FormatTraitsTest, IsSparseMatrixContainer) {
  *
  */
 TEST(FormatTraitsTest, IsDenseMatrixContainer) {
-  EXPECT_FALSE(
-      (Morpheus::is_dense_matrix_container<Impl::with_tag<int>>::value));
+  bool res = Morpheus::is_dense_matrix_container<Impl::with_tag<int>>::value;
+  EXPECT_EQ(res, 0);
 
-  EXPECT_FALSE((Morpheus::is_dense_matrix_container<Impl::no_traits>::value));
+  res = Morpheus::is_dense_matrix_container<Impl::no_traits>::value;
+  EXPECT_EQ(res, 0);
 
   // A COO Tag is a not valid tag for Dense Matrix Container
-  EXPECT_FALSE((Morpheus::is_dense_matrix_container<
-                Impl::with_tag<Morpheus::CooFormatTag>>::value));
+  res = Morpheus::is_dense_matrix_container<
+      Impl::with_tag<Morpheus::CooFormatTag>>::value;
+  EXPECT_EQ(res, 0);
 
   // A Sparse Matrix Tag is not a valid tag for Dense Matrix Container
-  EXPECT_FALSE((Morpheus::is_dense_matrix_container<
-                Impl::with_tag<Morpheus::Impl::SparseMatrixTag>>::value));
+  res = Morpheus::is_dense_matrix_container<
+      Impl::with_tag<Morpheus::Impl::SparseMatrixTag>>::value;
+  EXPECT_EQ(res, 0);
 
   // A Matrix Tag is not a valid tag for Dense Matrix Container - A dense
   // matrix is a matrix but a matrix is not necessarilly dense
-  EXPECT_FALSE((Morpheus::is_dense_matrix_container<
-                Impl::with_tag<Morpheus::Impl::MatrixTag>>::value));
+  res = Morpheus::is_dense_matrix_container<
+      Impl::with_tag<Morpheus::Impl::MatrixTag>>::value;
+  EXPECT_EQ(res, 0);
 
   // A Dense Matrix Tag is a valid tag for Dense Matrix Container
-  EXPECT_TRUE((Morpheus::is_dense_matrix_container<
-               Impl::with_tag<Morpheus::Impl::DenseMatrixTag>>::value));
+  res = Morpheus::is_dense_matrix_container<
+      Impl::with_tag<Morpheus::Impl::DenseMatrixTag>>::value;
+  EXPECT_EQ(res, 1);
 
   // A Dense Matrix Tag is a valid tag for Dense Matrix Container
-  EXPECT_TRUE((Morpheus::is_dense_matrix_container<
-               Impl::with_tag<Morpheus::DenseMatrixFormatTag>>::value));
+  res = Morpheus::is_dense_matrix_container<
+      Impl::with_tag<Morpheus::DenseMatrixFormatTag>>::value;
+  EXPECT_EQ(res, 1);
 
   // A Vector Tag is not a valid tag for Dense Matrix Container
-  EXPECT_FALSE((Morpheus::is_dense_matrix_container<
-                Impl::with_tag<Morpheus::Impl::VectorTag>>::value));
+  res = Morpheus::is_dense_matrix_container<
+      Impl::with_tag<Morpheus::Impl::VectorTag>>::value;
+  EXPECT_EQ(res, 0);
 
   /* Testing Alias */
   // A Dense Matrix Tag is a valid tag for Dense Matrix Container
-  EXPECT_TRUE((Morpheus::is_dense_matrix_container_v<
-               Impl::with_tag<Morpheus::DenseMatrixFormatTag>>));
+  res = Morpheus::is_dense_matrix_container_v<
+      Impl::with_tag<Morpheus::DenseMatrixFormatTag>>;
+  EXPECT_EQ(res, 1);
 
   // A Vector Tag is not a valid tag for Dense Matrix Container
-  EXPECT_FALSE((Morpheus::is_dense_matrix_container_v<
-                Impl::with_tag<Morpheus::Impl::VectorTag>>));
+  res = Morpheus::is_dense_matrix_container_v<
+      Impl::with_tag<Morpheus::Impl::VectorTag>>;
+  EXPECT_EQ(res, 0);
 }
 
 /**
@@ -970,4 +997,4 @@ TEST(FormatTraitsTest, IsFormatCompatibleDifferentSpace) {
 
 }  // namespace Test
 
-#endif  // TEST_CORE_TEST_FORMATTRAITS_HPP
+#endif  // TEST_CORE_TEST_FORMAT_TRAITS_HPP

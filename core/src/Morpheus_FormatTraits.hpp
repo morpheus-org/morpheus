@@ -20,10 +20,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MORPHEUS_FORMATTRAITS_HPP
-#define MORPHEUS_FORMATTRAITS_HPP
+#ifndef MORPHEUS_FORMAT_TRAITS_HPP
+#define MORPHEUS_FORMAT_TRAITS_HPP
 
-#include <Morpheus_FormatTags.hpp>
+// #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_TypeTraits.hpp>
 #include <Morpheus_SpaceTraits.hpp>
 
@@ -404,4 +404,4 @@ class is_format_compatible_different_space {
  */
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_FORMATTRAITS_HPP
+#endif  // MORPHEUS_FORMAT_TRAITS_HPP

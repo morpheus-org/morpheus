@@ -24,7 +24,9 @@
 #ifndef MORPHEUS_CONVERT_HPP
 #define MORPHEUS_CONVERT_HPP
 
-#include <Morpheus_DynamicMatrix.hpp>
+#include <Morpheus_FormatTags.hpp>
+#include <fwd/Morpheus_Fwd_CooMatrix.hpp>
+
 #include <impl/Morpheus_Convert_Impl.hpp>
 #include <impl/Dynamic/Morpheus_Convert_Impl.hpp>
 
@@ -37,6 +39,8 @@ void convert(const SourceType& src, DestinationType& dst) {
 
 template <typename ExecSpace, typename SourceType>
 void convert(SourceType& src, const formats_e index) {
+  static_assert(Morpheus::is_dynamic_matrix_format_container<SourceType>::value,
+                "Container must be a DynamicMatrix.");
   Morpheus::CooMatrix<
       typename SourceType::value_type, typename SourceType::index_type,
       typename SourceType::array_layout, typename SourceType::execution_space>

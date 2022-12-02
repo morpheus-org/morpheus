@@ -38,14 +38,24 @@ struct Container2 {};
  *
  */
 TEST(ContainerFactoryTest, IsDefault) {
-  EXPECT_TRUE((Morpheus::is_default<Morpheus::Default>::value));
-  EXPECT_FALSE((Morpheus::is_default<double>::value));
-  EXPECT_FALSE((Morpheus::is_default<int>::value));
-  EXPECT_FALSE((Morpheus::is_default<Morpheus::Impl::SparseMatrixTag>::value));
+  bool res = Morpheus::is_default<Morpheus::Default>::value;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_default<double>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_default<int>::value;
+  EXPECT_EQ(res, 0);
+
+  res = Morpheus::is_default<Morpheus::Impl::SparseMatrixTag>::value;
+  EXPECT_EQ(res, 0);
 
   /* Testing Alias */
-  EXPECT_TRUE((Morpheus::is_default_v<Morpheus::Default>));
-  EXPECT_FALSE(Morpheus::is_default_v<double>);
+  res = Morpheus::is_default_v<Morpheus::Default>;
+  EXPECT_EQ(res, 1);
+
+  res = Morpheus::is_default_v<double>;
+  EXPECT_EQ(res, 0);
 }
 
 /**
