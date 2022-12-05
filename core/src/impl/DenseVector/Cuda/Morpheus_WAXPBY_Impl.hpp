@@ -45,7 +45,7 @@ inline void waxpby(const typename Vector::index_type n,
                    Vector& w,
                    typename std::enable_if_t<
                        Morpheus::is_dense_vector_format_container_v<Vector> &&
-                       Morpheus::is_custom_backend_v<ExecSpace> &&
+                       Morpheus::has_custom_backend_v<ExecSpace> &&
                        Morpheus::has_cuda_execution_space_v<ExecSpace> &&
                        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using index_type = typename Vector::index_type;

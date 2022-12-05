@@ -159,6 +159,7 @@ class has_backend;
  * \{
  *
  */
+
 /**
  * @brief Checks if the given type \p T is a valid generic backend i.e is a
  * \p GenericBackend container. A valid generic backend is also assumed to be
@@ -192,6 +193,37 @@ class is_generic_backend {
  */
 template <class T>
 inline constexpr bool is_generic_backend_v = is_generic_backend<T>::value;
+
+/**
+ * @brief Checks if the given type \p T has a valid generic backend i.e has a
+ * \p GenericBackend container. A valid generic backend is also assumed to be
+ * any valid Kokkos Execution Space, Memory Space or Device.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_generic_backend {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<is_generic_backend_v<typename U::backend> ||
+                                  is_generic_backend_v<U>>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+/**
+ * @brief Short-hand to \p has_generic_backend.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+inline constexpr bool has_generic_backend_v = has_generic_backend<T>::value;
 
 /*! \} // end of space_traits group
  */

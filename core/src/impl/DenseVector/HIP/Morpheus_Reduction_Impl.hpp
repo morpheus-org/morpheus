@@ -45,7 +45,7 @@ void reduce(const Vector& in, Vector& out, unsigned int size, int threads,
             int blocks,
             typename std::enable_if_t<
                 Morpheus::is_dense_vector_format_container_v<Vector> &&
-                Morpheus::is_custom_backend_v<ExecSpace> &&
+                Morpheus::has_custom_backend_v<ExecSpace> &&
                 Morpheus::has_hip_execution_space_v<ExecSpace> &&
                 Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using value_type = typename Vector::value_type;
@@ -178,7 +178,7 @@ typename Vector::value_type reduce(
     const Vector& in, typename Vector::index_type size,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_hip_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using value_type = typename Vector::value_type;

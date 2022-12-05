@@ -42,7 +42,7 @@ void update_diagonal(
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using index_type = typename Matrix::index_type;
@@ -64,7 +64,7 @@ void get_diagonal(
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
@@ -75,7 +75,7 @@ template <typename ExecSpace, typename Matrix, typename IndexType,
 void set_value(Matrix&, IndexType, IndexType, ValueType,
                typename std::enable_if_t<
                    Morpheus::is_csr_matrix_format_container_v<Matrix> &&
-                   Morpheus::is_custom_backend_v<ExecSpace> &&
+                   Morpheus::has_custom_backend_v<ExecSpace> &&
                    Morpheus::has_openmp_execution_space_v<ExecSpace> &&
                    Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
   throw Morpheus::NotImplementedException("set_value not implemented yet");
@@ -90,7 +90,7 @@ void set_values(
         Morpheus::is_csr_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<IndexVector> &&
         Morpheus::is_dense_vector_format_container_v<ValueVector> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, IndexVector, ValueVector>>* =
         nullptr) {
@@ -103,7 +103,7 @@ void transpose(
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Matrix> &&
         Morpheus::is_csr_matrix_format_container_v<TransposeMatrix> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, TransposeMatrix>>* =
         nullptr) {

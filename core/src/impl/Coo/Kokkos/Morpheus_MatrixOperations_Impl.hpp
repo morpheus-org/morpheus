@@ -39,7 +39,7 @@ void update_diagonal(
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using index_type  = typename Matrix::index_type;
   using value_array = typename Matrix::value_array_type::value_array_type;
@@ -68,7 +68,7 @@ void get_diagonal(
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
 }
@@ -78,7 +78,7 @@ template <typename ExecSpace, typename Matrix, typename IndexType,
 void set_value(Matrix&, IndexType, IndexType, ValueType,
                typename std::enable_if_t<
                    Morpheus::is_coo_matrix_format_container_v<Matrix> &&
-                   Morpheus::is_generic_backend_v<ExecSpace> &&
+                   Morpheus::has_generic_backend_v<ExecSpace> &&
                    Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
   throw Morpheus::NotImplementedException("set_value not implemented yet");
 }
@@ -92,7 +92,7 @@ void set_values(
         Morpheus::is_coo_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<IndexVector> &&
         Morpheus::is_dense_vector_format_container_v<ValueVector> &&
-        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, IndexVector, ValueVector>>* =
         nullptr) {
   throw Morpheus::NotImplementedException("set_values not implemented yet");
@@ -104,7 +104,7 @@ void transpose(
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<Matrix> &&
         Morpheus::is_coo_matrix_format_container_v<TransposeMatrix> &&
-        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, TransposeMatrix>>* =
         nullptr) {
   throw Morpheus::NotImplementedException("transpose not implemented yet");

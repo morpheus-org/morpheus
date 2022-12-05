@@ -41,7 +41,7 @@ void inclusive_scan(const Vector& in, Vector& out,
                     typename Vector::index_type start,
                     typename std::enable_if_t<
                         Morpheus::is_dense_vector_format_container_v<Vector> &&
-                        Morpheus::is_custom_backend_v<ExecSpace> &&
+                        Morpheus::has_custom_backend_v<ExecSpace> &&
                         Morpheus::has_serial_execution_space_v<ExecSpace> &&
                         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using IndexType = typename Vector::index_type;
@@ -58,7 +58,7 @@ void exclusive_scan(const Vector& in, Vector& out,
                     typename Vector::index_type start,
                     typename std::enable_if_t<
                         Morpheus::is_dense_vector_format_container_v<Vector> &&
-                        Morpheus::is_custom_backend_v<ExecSpace> &&
+                        Morpheus::has_custom_backend_v<ExecSpace> &&
                         Morpheus::has_serial_execution_space_v<ExecSpace> &&
                         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using IndexType = typename Vector::index_type;
@@ -79,7 +79,7 @@ void inclusive_scan_by_key(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
   using IndexType = typename Vector2::index_type;
@@ -109,7 +109,7 @@ void exclusive_scan_by_key(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
   using IndexType = typename Vector2::index_type;

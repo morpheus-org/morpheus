@@ -42,7 +42,7 @@ void sort_by_row_and_column(
     typename Matrix::index_type = 0, typename Matrix::index_type = 0,
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<Matrix> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_hip_execution_space_v<ExecSpace>>* = nullptr) {
   throw Morpheus::NotImplementedException(
       "Impl.Coo.Cuda.sort_by_row_and_column()");
@@ -52,7 +52,7 @@ template <typename ExecSpace, typename Matrix>
 bool is_sorted(Matrix&,
                typename std::enable_if_t<
                    Morpheus::is_coo_matrix_format_container_v<Matrix> &&
-                   Morpheus::is_custom_backend_v<ExecSpace> &&
+                   Morpheus::has_custom_backend_v<ExecSpace> &&
                    Morpheus::has_hip_execution_space_v<ExecSpace>>* = nullptr) {
   throw Morpheus::NotImplementedException("Impl.Coo.Cuda.is_sorted()");
 }

@@ -39,7 +39,7 @@ void convert(
     typename std::enable_if<
         Morpheus::is_dense_vector_format_container_v<SourceType> &&
         Morpheus::is_dense_vector_format_container_v<DestinationType> &&
-        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos>");

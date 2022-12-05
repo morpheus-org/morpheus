@@ -51,7 +51,7 @@ typename Vector1::value_type dot(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_hip_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
   using index_type = typename Vector1::index_type;

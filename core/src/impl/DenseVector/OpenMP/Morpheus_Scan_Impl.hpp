@@ -41,7 +41,7 @@ void inclusive_scan(const Vector& in, Vector& out,
                     typename Vector::index_type start,
                     typename std::enable_if_t<
                         Morpheus::is_dense_vector_format_container_v<Vector> &&
-                        Morpheus::is_custom_backend_v<ExecSpace> &&
+                        Morpheus::has_custom_backend_v<ExecSpace> &&
                         Morpheus::has_openmp_space_v<ExecSpace> &&
                         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using index_type = typename Vector::index_type;
@@ -67,7 +67,7 @@ void exclusive_scan(const Vector& in, Vector& out,
                     typename Vector::index_type start,
                     typename std::enable_if_t<
                         Morpheus::is_dense_vector_format_container_v<Vector> &&
-                        Morpheus::is_custom_backend_v<ExecSpace> &&
+                        Morpheus::has_custom_backend_v<ExecSpace> &&
                         Morpheus::has_openmp_space_v<ExecSpace> &&
                         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using index_type = typename Vector::index_type;

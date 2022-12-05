@@ -46,7 +46,7 @@ void copy_by_key(
         Morpheus::is_dense_vector_format_container_v<KeyType> &&
         Morpheus::is_dense_vector_format_container_v<SourceType> &&
         Morpheus::is_dense_vector_format_container_v<DestinationType> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_hip_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, KeyType, SourceType,
                                DestinationType>>* = nullptr) {

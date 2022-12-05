@@ -53,7 +53,7 @@ inline void multiply(
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_hip_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   switch (A.options()) {

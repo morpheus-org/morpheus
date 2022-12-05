@@ -39,7 +39,7 @@ inline void convert(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<SourceType> &&
         Morpheus::is_dia_matrix_format_container_v<DestinationType> &&
-        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>* =
         nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos>");
@@ -51,7 +51,7 @@ inline void convert(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<SourceType> &&
         Morpheus::is_coo_matrix_format_container_v<DestinationType> &&
-        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>* =
         nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos>");
@@ -63,7 +63,7 @@ inline void convert(
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<SourceType> &&
         Morpheus::is_dia_matrix_format_container_v<DestinationType> &&
-        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>* =
         nullptr) {
   throw Morpheus::NotImplementedException("convert<Kokkos>");

@@ -42,7 +42,7 @@ void convert(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<SourceType> &&
         Morpheus::is_dense_vector_format_container_v<DestinationType> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>* =
         nullptr) {
@@ -52,7 +52,7 @@ void convert(
                   "Destination vector must be of equal or larger size to the "
                   "source vector");
 
-  for (index_type i = 0; i < src.size(); i++) {
+  for (index_type i = 0; i < (index_type)src.size(); i++) {
     dst[i] = src[i];
   }
 }

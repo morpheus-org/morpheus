@@ -43,7 +43,7 @@ typename Vector::value_type find_max_element(
     const Vector& vec,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using index_type = typename Vector::index_type;
@@ -63,7 +63,7 @@ void counting_sort_by_key(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
   if (min < 0)
@@ -109,7 +109,7 @@ void sort_by_row_and_column(
     typename Matrix::index_type max_col = 0,
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<Matrix> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
   using index_type  = typename Matrix::index_type;
@@ -162,7 +162,7 @@ template <typename ExecSpace, typename Matrix>
 bool is_sorted(Matrix& mat,
                typename std::enable_if_t<
                    Morpheus::is_coo_matrix_format_container_v<Matrix> &&
-                   Morpheus::is_custom_backend_v<ExecSpace> &&
+                   Morpheus::has_custom_backend_v<ExecSpace> &&
                    Morpheus::has_serial_execution_space_v<ExecSpace> &&
                    Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
   if (mat.row_indices().size() != mat.column_indices().size()) {

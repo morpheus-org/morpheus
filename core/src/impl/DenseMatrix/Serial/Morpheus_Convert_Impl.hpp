@@ -41,7 +41,7 @@ void convert(
     typename std::enable_if<
         Morpheus::is_dense_matrix_format_container_v<SourceType> &&
         Morpheus::is_dense_matrix_format_container_v<DestinationType> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
@@ -64,7 +64,7 @@ void convert(
     typename std::enable_if<
         Morpheus::is_dense_matrix_format_container_v<SourceType> &&
         Morpheus::is_dense_vector_format_container_v<DestinationType> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
@@ -86,7 +86,7 @@ void convert(
     typename std::enable_if<
         Morpheus::is_dense_matrix_format_container_v<SourceType> &&
         Morpheus::is_coo_matrix_format_container_v<DestinationType> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
@@ -121,7 +121,7 @@ void convert(
     typename std::enable_if<
         Morpheus::is_coo_matrix_format_container_v<SourceType> &&
         Morpheus::is_dense_matrix_format_container_v<DestinationType> &&
-        Morpheus::is_custom_backend_v<ExecSpace> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {

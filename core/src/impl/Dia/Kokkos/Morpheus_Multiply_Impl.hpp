@@ -38,7 +38,7 @@ inline void multiply(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using value_array_type = typename Matrix::value_array_type::value_array_type;
   using index_array_type = typename Matrix::index_array_type::value_array_type;
@@ -80,7 +80,7 @@ inline void multiply(
 //     typename std::enable_if_t<
 //         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
 //         Morpheus::is_dense_vector_format_container_v<Vector> &&
-//         Morpheus::is_generic_backend_v<ExecSpace> &&
+//         Morpheus::has_generic_backend_v<ExecSpace> &&
 //         Morpheus::has_access_v<ExecSpace, Matrix,
 //                                Vector>>* = nullptr) {
 //   using value_array_type = typename

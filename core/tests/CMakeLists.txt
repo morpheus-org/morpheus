@@ -18,10 +18,12 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       Name
       ContainerFactory
       ContainerTraits
+      Convert
       CooMatrix_Binary
       CooMatrix_CompatibleBinary
       CooMatrix_CompatibleDynamicBinary
       CooMatrix
+      Copy
       DenseMatrix_Binary
       DenseMatrix_CompatibleBinary
       DenseMatrix
@@ -49,8 +51,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       MirrorContainers
       Spaces
       SpaceTraits
-      TypeTraits
-      Copy)
+      TypeTraits)
       set(file ${testdir}/Test_${Tag}_${Name}.cpp)
       # Write to a temporary intermediate file and call configure_file to avoid
       # updating timestamps triggering unnecessary rebuilds on subsequent cmake

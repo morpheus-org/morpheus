@@ -218,6 +218,36 @@ using is_custom_backend = typename Impl::is_custom_backend_helper<
 template <class T>
 inline constexpr bool is_custom_backend_v = is_custom_backend<T>::value;
 
+/**
+ * @brief Checks if the given type \p T has a valid custom backend i.e has a
+ * \p CustomBackend container.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class has_custom_backend {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*, typename std::enable_if<is_custom_backend_v<typename U::backend> ||
+                                  is_custom_backend_v<U>>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+/**
+ * @brief Short-hand to \p has_custom_backend.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+inline constexpr bool has_custom_backend_v = has_custom_backend<T>::value;
+
 /*! \} // end of space_traits group
  */
 

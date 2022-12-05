@@ -38,7 +38,7 @@ inline typename Vector1::value_type dot(
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
-        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
   using execution_space = ExecSpace;
   using IndexType       = Kokkos::IndexType<typename Vector1::index_type>;

@@ -38,7 +38,7 @@ inline void multiply(
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::is_generic_backend_v<ExecSpace> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using policy_index_type = Kokkos::IndexType<typename Matrix::index_type>;
   using range_policy      = Kokkos::RangePolicy<policy_index_type, ExecSpace>;
