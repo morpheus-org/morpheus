@@ -136,20 +136,26 @@ TYPED_TEST(ConvertTypesTest, Forward) {
 
   Morpheus::copy(this->src_ref_h, src_h);
 
-  Morpheus::convert<Morpheus::HostSpace>(src_h, dst_h);
-  Morpheus::Test::have_same_data(dst_h, this->dst_ref);
-
 #if defined(MORPHEUS_ENABLE_SERIAL)
   if (Morpheus::has_serial_execution_space<TEST_CUSTOM_SPACE>::value) {
     Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
-    Morpheus::Test::have_same_data(dst_h, this->dst_ref);
+    Morpheus::Test::have_same_data(dst_h, this->dst_ref_h);
   }
 #endif
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
   if (Morpheus::has_openmp_execution_space<TEST_CUSTOM_SPACE>::value) {
-    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
-                 Morpheus::NotImplementedException);
+    if (Morpheus::has_same_format_v<src_t, dst_t>) {
+      Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
+      Morpheus::Test::have_same_data(dst_h, this->dst_ref_h);
+    } else if (Morpheus::is_csr_matrix_format_container_v<src_t> &&
+               Morpheus::is_coo_matrix_format_container_v<dst_t>) {
+      Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
+      Morpheus::Test::have_same_data(dst_h, this->dst_ref_h);
+    } else {
+      EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
+                   Morpheus::NotImplementedException);
+    }
   }
 #endif
 
@@ -183,20 +189,29 @@ TYPED_TEST(ConvertTypesTest, Backward) {
 
   Morpheus::copy(this->dst_ref_h, src_h);
 
-  Morpheus::convert<Morpheus::HostSpace>(src_h, dst_h);
-  Morpheus::Test::have_same_data(dst_h, this->src_ref);
+  // Morpheus::convert<Morpheus::HostSpace>(src_h, dst_h);
+  // Morpheus::Test::have_same_data(dst_h, this->src_ref);
 
 #if defined(MORPHEUS_ENABLE_SERIAL)
   if (Morpheus::has_serial_execution_space<TEST_CUSTOM_SPACE>::value) {
     Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
-    Morpheus::Test::have_same_data(dst_h, this->src_ref);
+    Morpheus::Test::have_same_data(dst_h, this->src_ref_h);
   }
 #endif
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
   if (Morpheus::has_openmp_execution_space<TEST_CUSTOM_SPACE>::value) {
-    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
-                 Morpheus::NotImplementedException);
+    if (Morpheus::has_same_format_v<src_t, dst_t>) {
+      Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
+      Morpheus::Test::have_same_data(dst_h, this->src_ref_h);
+    } else if (Morpheus::is_coo_matrix_format_container_v<src_t> &&
+               Morpheus::is_dense_matrix_format_container_v<dst_t>) {
+      Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
+      Morpheus::Test::have_same_data(dst_h, this->src_ref_h);
+    } else {
+      EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
+                   Morpheus::NotImplementedException);
+    }
   }
 #endif
 

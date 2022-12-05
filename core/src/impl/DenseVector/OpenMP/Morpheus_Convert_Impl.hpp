@@ -53,7 +53,7 @@ void convert(
                   "source vector");
 
 #pragma omp parallel for
-  for (index_type i = 0; i < src.size(); i++) {
+  for (index_type i = 0; i < (index_type)src.size(); i++) {
     dst[i] = src[i];
   }
 }

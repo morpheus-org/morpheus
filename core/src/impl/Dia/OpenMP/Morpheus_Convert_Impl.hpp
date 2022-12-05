@@ -53,7 +53,7 @@ void convert(
 
 // element-wise copy of indices and values
 #pragma omp parallel for
-  for (index_type n = 0; n < src.cdiagonal_offsets().size(); n++) {
+  for (index_type n = 0; n < (index_type)src.cdiagonal_offsets().size(); n++) {
     dst.diagonal_offsets(n) = src.cdiagonal_offsets(n);
   }
 
