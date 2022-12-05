@@ -76,9 +76,10 @@ void convert(
   using IndexType   = typename SourceType::index_type;
   using ArrayLayout = typename SourceType::array_layout;
   using MemorySpace = typename SourceType::memory_space;
+  using Backend     = typename ExecSpace::backend;
 
   using Coo = CooMatrix<ValueType, IndexType, ArrayLayout,
-                        Kokkos::Device<ExecSpace, MemorySpace>>;
+                        Morpheus::Device<ExecSpace, MemorySpace, Backend>>;
   Coo tmp;
 
   Impl::convert<ExecSpace>(src, tmp);

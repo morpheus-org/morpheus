@@ -31,7 +31,6 @@
 #include <utils/Macros_DiaMatrix.hpp>
 #include <utils/Macros_DenseMatrix.hpp>
 #include <utils/Macros_DenseVector.hpp>
-#include <utils/Macros_DynamicMatrix.hpp>
 
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
@@ -131,13 +130,13 @@ TYPED_TEST(ConvertTypesTest, Forward) {
   src_t src;
   src.resize(this->src_ref);
 
-  auto dst_h = Morpheus::create_mirror_container(dst);
-  auto src_h = Morpheus::create_mirror_container(src);
-
-  Morpheus::copy(this->src_ref_h, src_h);
-
 #if defined(MORPHEUS_ENABLE_SERIAL)
   if (Morpheus::has_serial_execution_space<TEST_CUSTOM_SPACE>::value) {
+    auto dst_h = Morpheus::create_mirror_container(dst);
+    auto src_h = Morpheus::create_mirror_container(src);
+
+    Morpheus::copy(this->src_ref_h, src_h);
+
     Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
     Morpheus::Test::have_same_data(dst_h, this->dst_ref_h);
   }
@@ -145,6 +144,10 @@ TYPED_TEST(ConvertTypesTest, Forward) {
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
   if (Morpheus::has_openmp_execution_space<TEST_CUSTOM_SPACE>::value) {
+    auto dst_h = Morpheus::create_mirror_container(dst);
+    auto src_h = Morpheus::create_mirror_container(src);
+    Morpheus::copy(this->src_ref_h, src_h);
+
     if (Morpheus::has_same_format_v<src_t, dst_t>) {
       Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
       Morpheus::Test::have_same_data(dst_h, this->dst_ref_h);
@@ -161,14 +164,14 @@ TYPED_TEST(ConvertTypesTest, Forward) {
 
 #if defined(MORPHEUS_ENABLE_CUDA)
   if (Morpheus::has_cuda_execution_space<TEST_CUSTOM_SPACE>::value) {
-    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
+    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src, dst),
                  Morpheus::NotImplementedException);
   }
 #endif
 
 #if defined(MORPHEUS_ENABLE_HIP)
   if (Morpheus::has_hip_execution_space<TEST_CUSTOM_SPACE>::value) {
-    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
+    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src, dst),
                  Morpheus::NotImplementedException);
   }
 #endif
@@ -184,16 +187,12 @@ TYPED_TEST(ConvertTypesTest, Backward) {
   src_t src;
   src.resize(this->dst_ref);
 
-  auto dst_h = Morpheus::create_mirror_container(dst);
-  auto src_h = Morpheus::create_mirror_container(src);
-
-  Morpheus::copy(this->dst_ref_h, src_h);
-
-  // Morpheus::convert<Morpheus::HostSpace>(src_h, dst_h);
-  // Morpheus::Test::have_same_data(dst_h, this->src_ref);
-
 #if defined(MORPHEUS_ENABLE_SERIAL)
   if (Morpheus::has_serial_execution_space<TEST_CUSTOM_SPACE>::value) {
+    auto dst_h = Morpheus::create_mirror_container(dst);
+    auto src_h = Morpheus::create_mirror_container(src);
+    Morpheus::copy(this->dst_ref_h, src_h);
+
     Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
     Morpheus::Test::have_same_data(dst_h, this->src_ref_h);
   }
@@ -201,6 +200,10 @@ TYPED_TEST(ConvertTypesTest, Backward) {
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
   if (Morpheus::has_openmp_execution_space<TEST_CUSTOM_SPACE>::value) {
+    auto dst_h = Morpheus::create_mirror_container(dst);
+    auto src_h = Morpheus::create_mirror_container(src);
+    Morpheus::copy(this->dst_ref_h, src_h);
+
     if (Morpheus::has_same_format_v<src_t, dst_t>) {
       Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
       Morpheus::Test::have_same_data(dst_h, this->src_ref_h);
@@ -217,14 +220,14 @@ TYPED_TEST(ConvertTypesTest, Backward) {
 
 #if defined(MORPHEUS_ENABLE_CUDA)
   if (Morpheus::has_cuda_execution_space<TEST_CUSTOM_SPACE>::value) {
-    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
+    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src, dst),
                  Morpheus::NotImplementedException);
   }
 #endif
 
 #if defined(MORPHEUS_ENABLE_HIP)
   if (Morpheus::has_hip_execution_space<TEST_CUSTOM_SPACE>::value) {
-    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
+    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src, dst),
                  Morpheus::NotImplementedException);
   }
 #endif

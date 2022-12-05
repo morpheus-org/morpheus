@@ -18,6 +18,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       Name
       ContainerFactory
       ContainerTraits
+      Convert_Dynamic
       Convert
       CooMatrix_Binary
       CooMatrix_CompatibleBinary
