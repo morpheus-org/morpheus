@@ -24,6 +24,8 @@
 #ifndef TEST_CORE_UTILS_MACROS_CSRMATRIX_HPP
 #define TEST_CORE_UTILS_MACROS_CSRMATRIX_HPP
 
+#include <Morpheus_Core.hpp>
+
 /**
  * @brief Checks the sizes of a CsrMatrix container against a number of rows,
  * columns and non-zeros
@@ -85,6 +87,30 @@
 
 namespace Morpheus {
 namespace Test {
+template <typename Container>
+void reset_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_csr_matrix_format_container_v<Container>>* = nullptr) {
+  using value_type = typename Container::value_type;
+  // Matrix
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
+
+  // clang-format off
+  c.row_offsets(0) = 0; 
+  c.row_offsets(1) = 2; 
+  c.row_offsets(2) = 3; 
+  c.row_offsets(3) = 4; 
+
+  c.column_indices(0) = 0; c.values(0) = (value_type)1.11;
+  c.column_indices(1) = 2; c.values(1) = (value_type)2.22;
+  c.column_indices(2) = 2; c.values(2) = (value_type)3.33;
+  c.column_indices(3) = 1; c.values(3) = (value_type)4.44;
+  // clang-format on
+}
+
 /**
  * @brief Builds a sample CsrMatrix container. Assumes we have already
  * constructed the matrix and we are only adding data.
@@ -97,22 +123,35 @@ void build_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Container>>* = nullptr) {
-  using value_type = typename Container::value_type;
   // Matrix to Build
   // [1.11 *    2.22]
   // [*    *    3.33]
   // [*    4.44 *   ]
   CHECK_CSR_SIZES(c, 3, 3, 4);
 
+  reset_small_container(c);
+}
+
+template <typename Container>
+void update_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_csr_matrix_format_container_v<Container>>* = nullptr) {
+  using value_type = typename Container::value_type;
+  // New Matrix
+  // [1.11 *    *    ]
+  // [*    *    -3.33]
+  // [2.22 4.44 *    ]
+
   // clang-format off
   c.row_offsets(0) = 0; 
-  c.row_offsets(1) = 2; 
-  c.row_offsets(2) = 3; 
+  c.row_offsets(1) = 1; 
+  c.row_offsets(2) = 2; 
   c.row_offsets(3) = 4; 
 
   c.column_indices(0) = 0; c.values(0) = (value_type)1.11;
-  c.column_indices(1) = 2; c.values(1) = (value_type)2.22;
-  c.column_indices(2) = 2; c.values(2) = (value_type)3.33;
+  c.column_indices(1) = 2; c.values(1) = (value_type)-3.33;
+  c.column_indices(2) = 0; c.values(2) = (value_type)2.22;
   c.column_indices(3) = 1; c.values(3) = (value_type)4.44;
   // clang-format on
 }

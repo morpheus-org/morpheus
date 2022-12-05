@@ -24,6 +24,8 @@
 #ifndef TEST_CORE_UTILS_MACROS_DENSEMATRIX_HPP
 #define TEST_CORE_UTILS_MACROS_DENSEMATRIX_HPP
 
+#include <Morpheus_Core.hpp>
+
 /**
  * @brief Checks the sizes of a DenseMatrix container against a number of rows,
  * columns and non-zeros
@@ -65,6 +67,25 @@
 
 namespace Morpheus {
 namespace Test {
+template <typename Container>
+void reset_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dense_matrix_format_container_v<Container>>* = nullptr) {
+  using value_type = typename Container::value_type;
+  // Matrix
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
+
+  // clang-format off
+  c(0, 0) = (value_type)1.11;
+  c(0, 2) = (value_type)2.22;
+  c(1, 2) = (value_type)3.33;
+  c(2, 1) = (value_type)4.44;
+  // clang-format on
+}
+
 /**
  * @brief Builds a sample DenseMatrix container. Assumes we have already
  * constructed the matrix and we are only adding data.
@@ -77,30 +98,32 @@ void build_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_dense_matrix_format_container_v<Container>>* = nullptr) {
-  using value_type = typename Container::value_type;
-  using index_type = typename Container::index_type;
   // Matrix to Build
   // [1.11 *    2.22]
   // [*    *    3.33]
   // [*    4.44 *   ]
-
   CHECK_DENSE_MATRIX_SIZES(c, 3, 3, 3 * 3);
 
-  for (index_type i = 0; i < c.nrows(); i++) {
-    for (index_type j = 0; j < c.ncols(); j++) {
-      if (i == 0 && j == 0) {
-        c(i, j) = (value_type)1.11;
-      } else if (i == 0 && j == 2) {
-        c(i, j) = (value_type)2.22;
-      } else if (i == 1 && j == 2) {
-        c(i, j) = (value_type)3.33;
-      } else if (i == 2 && j == 1) {
-        c(i, j) = (value_type)4.44;
-      } else {
-        c(i, j) = (value_type)0.00;
-      }
-    }
-  }
+  reset_small_container(c);
+}
+
+template <typename Container>
+void update_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dense_matrix_format_container_v<Container>>* = nullptr) {
+  using value_type = typename Container::value_type;
+  // New Matrix
+  // [1.11 *    *    ]
+  // [*    *    -3.33]
+  // [2.22 4.44 *    ]
+
+  // clang-format off
+  c(0, 0) = (value_type)1.11;
+  c(1, 2) = (value_type)-3.33;
+  c(2, 0) = (value_type)2.22;
+  c(2, 1) = (value_type)4.44;
+  // clang-format on
 }
 
 template <class Container>

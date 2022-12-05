@@ -64,6 +64,9 @@ template <typename ExecSpace, typename KeyType, typename SourceType,
           typename DestinationType>
 void copy_by_key(const KeyType keys, const SourceType& src,
                  DestinationType& dst) {
+  static_assert(is_dense_vector_format_container_v<SourceType> &&
+                    is_dense_vector_format_container_v<DestinationType>,
+                "Both src and dst must be vectors.");
   Impl::copy_by_key<ExecSpace>(keys, src, dst);
 }
 

@@ -24,6 +24,8 @@
 #ifndef TEST_CORE_UTILS_MACROS_DENSEVECTOR_HPP
 #define TEST_CORE_UTILS_MACROS_DENSEVECTOR_HPP
 
+#include <Morpheus_Core.hpp>
+
 /**
  * @brief Checks the sizes of a DenseVector container against a size
  *
@@ -58,6 +60,19 @@
 
 namespace Morpheus {
 namespace Test {
+template <typename Container>
+void reset_small_container(
+    Container& c,
+    typename std::enable_if_t<Morpheus::is_vector_container_v<Container>>* =
+        nullptr) {
+  using value_type = typename Container::value_type;
+  using index_type = typename Container::index_type;
+
+  for (index_type i = 0; i < (index_type)c.size(); i++) {
+    c[i] = (value_type)1.11 * (value_type)i;
+  }
+}
+
 /**
  * @brief Builds a sample DenseVector container. Assumes we have already
  * constructed the vector and we are only adding data.
@@ -70,13 +85,22 @@ void build_small_container(
     Container& c,
     typename std::enable_if_t<Morpheus::is_vector_container_v<Container>>* =
         nullptr) {
+  CHECK_DENSE_VECTOR_SIZES(c, 3);
+
+  reset_small_container(c);
+}
+
+template <typename Container>
+void update_small_container(
+    Container& c,
+    typename std::enable_if_t<Morpheus::is_vector_container_v<Container>>* =
+        nullptr) {
+  using value_type = typename Container::value_type;
   using value_type = typename Container::value_type;
   using index_type = typename Container::index_type;
 
-  CHECK_DENSE_VECTOR_SIZES(c, 3);
-
   for (index_type i = 0; i < (index_type)c.size(); i++) {
-    c[i] = (value_type)1.11 * (value_type)i;
+    c[i] = (value_type)-1.11 * (value_type)i;
   }
 }
 

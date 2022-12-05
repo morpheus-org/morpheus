@@ -24,6 +24,8 @@
 #ifndef TEST_CORE_UTILS_MACROS_DIAMATRIX_HPP
 #define TEST_CORE_UTILS_MACROS_DIAMATRIX_HPP
 
+#include <Morpheus_Core.hpp>
+
 /**
  * @brief Checks the sizes of a DiaMatrix container against a number of rows,
  * columns and non-zeros
@@ -99,24 +101,16 @@
 
 namespace Morpheus {
 namespace Test {
-/**
- * @brief Builds a sample DiaMatrix container. Assumes we have already
- * constructed the matrix and we are only adding data.
- *
- * @tparam Matrix A DiaMatrix type
- * @param A The DiaMatrix we will be initializing.
- */
 template <typename Container>
-void build_small_container(
+void reset_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
   using value_type = typename Container::value_type;
-  // Matrix to Build
+  // Matrix
   // [1.11 *    2.22]
   // [*    *    3.33]
   // [*    4.44 *   ]
-  CHECK_DIA_SIZES(c, 3, 3, 4, 4, 32);
 
   // clang-format off
   c.diagonal_offsets(0) = -1; 
@@ -131,6 +125,55 @@ void build_small_container(
   c.values(0,1) = (value_type)1.11; c.values(1,1) = (value_type)0;    c.values(2,1) = (value_type)0;
   c.values(0,2) = (value_type)0;    c.values(1,2) = (value_type)3.33; c.values(2,2) = (value_type)0;
   c.values(0,3) = (value_type)2.22; c.values(1,3) = (value_type)0;    c.values(2,3) = (value_type)0;
+  // clang-format on
+}
+
+/**
+ * @brief Builds a sample DiaMatrix container. Assumes we have already
+ * constructed the matrix and we are only adding data.
+ *
+ * @tparam Matrix A DiaMatrix type
+ * @param A The DiaMatrix we will be initializing.
+ */
+template <typename Container>
+void build_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
+  // Matrix to Build
+  // [1.11 *    2.22]
+  // [*    *    3.33]
+  // [*    4.44 *   ]
+  CHECK_DIA_SIZES(c, 3, 3, 4, 4, 32);
+
+  reset_small_container(c);
+}
+
+template <typename Container>
+void update_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
+  using value_type = typename Container::value_type;
+  // New Matrix
+  // [1.11 *    *    ]
+  // [*    *    -3.33]
+  // [2.22 4.44 *    ]
+
+  // clang-format off
+  c.diagonal_offsets(0) = -2; 
+  c.diagonal_offsets(1) = -1; 
+  c.diagonal_offsets(2) = 0; 
+  c.diagonal_offsets(3) = 1; 
+  // values are:
+  // [*    *    1.11 0    ]
+  // [*    0    0    -3.33]
+  // [2.22 4.44 0    *    ]
+
+  c.values(0,0) = (value_type)0;    c.values(1,0) = (value_type)0;    c.values(2,0) = (value_type)2.22;
+  c.values(0,1) = (value_type)0;    c.values(1,1) = (value_type)0;    c.values(2,1) = (value_type)4.44;
+  c.values(0,2) = (value_type)1.11; c.values(1,2) = (value_type)0;    c.values(2,2) = (value_type)0;
+  c.values(0,3) = (value_type)0;    c.values(1,3) = (value_type)3.33; c.values(2,3) = (value_type)0;
   // clang-format on
 }
 

@@ -33,11 +33,6 @@
 #include <utils/Macros_DenseVector.hpp>
 #include <utils/Macros_DynamicMatrix.hpp>
 
-using value_tlist  = Morpheus::TypeList<double>;
-using index_tlist  = Morpheus::TypeList<Morpheus::Default>;
-using layout_tlist = Morpheus::TypeList<Morpheus::Default>;
-using space_tlist  = Morpheus::TypeList<TEST_CUSTOM_SPACE>;
-
 // Generate all unary combinations for every container and combine
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,

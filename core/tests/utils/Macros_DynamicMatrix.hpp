@@ -28,6 +28,8 @@
 #include <utils/Macros_CsrMatrix.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
 
+#include <Morpheus_Core.hpp>
+
 /**
  * @brief Checks the sizes of a DynamicMatrix container against a number of
  * rows, columns and non-zeros
@@ -123,6 +125,22 @@ void build_small_container(
   setup_small_container(coo_mat);
 
   c = coo_mat;
+}
+
+template <typename Container>
+void update_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dynamic_matrix_format_container_v<Container>>* = nullptr) {
+  std::visit([&](auto&& arg) { update_small_container(arg); }, c.formats());
+}
+
+template <typename Container>
+void reset_small_container(
+    Container& c,
+    typename std::enable_if_t<
+        Morpheus::is_dynamic_matrix_format_container_v<Container>>* = nullptr) {
+  std::visit([&](auto&& arg) { reset_small_container(arg); }, c.formats());
 }
 
 template <class Container>
