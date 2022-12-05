@@ -247,7 +247,7 @@ TYPED_TEST(CopyVectorTypesUnaryTest, PartialCopySrc) {
   // Copy src on device
   Morpheus::copy(src_h, src);
 
-  // Copy by key
+  // Copy range
   Morpheus::copy(src, dst, begin, end);
 
   // Check result
@@ -281,7 +281,7 @@ TYPED_TEST(CopyVectorTypesUnaryTest, PartialCopySrcDst) {
   // Copy src on device
   Morpheus::copy(src_h, src);
 
-  // Copy by key
+  // Copy range
   Morpheus::copy(src, dst, src_begin, src_end, dst_begin, dst_end);
 
   // Check result
