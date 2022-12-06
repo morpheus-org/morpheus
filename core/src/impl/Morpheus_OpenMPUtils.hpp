@@ -27,6 +27,8 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_OPENMP)
 
+#include <omp.h>
+
 namespace Morpheus {
 namespace Impl {
 

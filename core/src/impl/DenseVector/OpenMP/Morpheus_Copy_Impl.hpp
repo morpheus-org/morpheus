@@ -32,6 +32,8 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 
+#include <impl/Morpheus_OpenMPUtils.hpp>
+
 namespace Morpheus {
 namespace Impl {
 
@@ -50,7 +52,7 @@ void copy_by_key(
   using index_type = typename KeyType::value_type;
 
 #pragma omp parallel for
-  for (index_type i = 0; i < keys.size(); i++) {
+  for (index_type i = 0; i < (index_type)keys.size(); i++) {
     dst[i] = src[keys[i]];
   }
 }

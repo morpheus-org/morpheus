@@ -195,8 +195,14 @@ TYPED_TEST(CopyVectorTypesUnaryTest, CopyByKey) {
   using DevContainer  = typename TestFixture::device;
   using HostContainer = typename TestFixture::host;
   using value_type    = typename DevContainer::value_type;
+  using index_type    = typename DevContainer::index_type;
+  using array_layout  = typename DevContainer::array_layout;
+  using space         = typename DevContainer::backend;
+  using KeyVec =
+      Morpheus::DenseVector<index_type, index_type, array_layout, space>;
 
-  DevContainer src(20, 0), dst(20, 0), keys(10, 0);
+  DevContainer src(20, 0), dst(20, 0);
+  KeyVec keys(10, 0);
 
   // Set src & keys on host
   auto src_h = Morpheus::create_mirror_container(src);
