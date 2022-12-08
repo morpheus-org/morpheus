@@ -51,6 +51,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       MatrixBase
       Metaprogramming
       MirrorContainers
+      Reduce
       Spaces
       SpaceTraits
       TypeTraits

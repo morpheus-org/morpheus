@@ -28,5 +28,6 @@
 #include <impl/DenseVector/OpenMP/Morpheus_Reduction_Impl.hpp>
 #include <impl/DenseVector/Cuda/Morpheus_Reduction_Impl.hpp>
 #include <impl/DenseVector/HIP/Morpheus_Reduction_Impl.hpp>
+#include <impl/DenseVector/Kokkos/Morpheus_Reduction_Impl.hpp>
 
 #endif  // MORPHEUS_IMPL_REDUCTION_IMPL_HPP
