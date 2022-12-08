@@ -29,8 +29,7 @@ jobs:
 
       - name: Install/Update Compilers
         run: |
-          sudo apt-get install ${{ matrix.compiler.compiler }}-${{ matrix.compiler.version }} \
-                               libomp-${{ matrix.compiler.version }}-dev
+          sudo apt-get install ${{ matrix.compiler.compiler }}-${{ matrix.compiler.version }}
           
       # - name: Setup Intel Compilers
       #   if: ${{ matrix.compiler.vendor == 'intel' }}
