@@ -46,7 +46,7 @@ class DotTypesTest : public ::testing::Test {
   using src_host_t = typename src_t::type::HostMirror;
   using dst_dev_t  = typename dst_t::type;
   using dst_host_t = typename dst_t::type::HostMirror;
-  using IndexType  = typename src_dev_t::index_type;
+  using IndexType  = size_t;
   using ValueType  = typename dst_dev_t::value_type;
 
   src_dev_t small_x, med_x, large_x;
@@ -72,7 +72,7 @@ class DotTypesTest : public ::testing::Test {
     dst_host_t yh_(sz_, 0);
 
     result = 0;
-    for (int i = 0; i < sz_; i++) {
+    for (IndexType i = 0; i < sz_; i++) {
       xh_(i) = i + 1;
       yh_(i) = sz_ - i;
       result += (i + 1) * (sz_ - i);

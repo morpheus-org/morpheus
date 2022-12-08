@@ -24,14 +24,21 @@
 #ifndef MORPHEUS_DENSEVECTOR_KERNELS_WAXPBY_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_KERNELS_WAXPBY_IMPL_HPP
 
+#if defined(MORPHEUS_ENABLE_HIP)
+#include <impl/Morpheus_HIPUtils.hpp>
+#elif defined(MORPHEUS_ENABLE_CUDA)
+#include <impl/Morpheus_CudaUtils.hpp>
+#endif
+
 namespace Morpheus {
 namespace Impl {
 namespace Kernels {
 
-template <typename ValueType, typename IndexType>
-__global__ void waxpby_kernel(IndexType n, ValueType alpha, const ValueType* x,
-                              ValueType beta, const ValueType* y,
-                              ValueType* w) {
+template <typename ValueType1, typename ValueType2, typename ValueType3,
+          typename IndexType>
+__global__ void waxpby_kernel(IndexType n, ValueType1 alpha,
+                              const ValueType1* x, ValueType2 beta,
+                              const ValueType2* y, ValueType3* w) {
   const IndexType tid = blockDim.x * blockIdx.x + threadIdx.x;
   if (tid > n) return;
 

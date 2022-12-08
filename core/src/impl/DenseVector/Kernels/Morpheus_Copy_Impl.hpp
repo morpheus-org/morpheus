@@ -24,6 +24,12 @@
 #ifndef MORPHEUS_DENSEVECTOR_KERNELS_COPY_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_KERNELS_COPY_IMPL_HPP
 
+#if defined(MORPHEUS_ENABLE_HIP)
+#include <impl/Morpheus_HIPUtils.hpp>
+#elif defined(MORPHEUS_ENABLE_CUDA)
+#include <impl/Morpheus_CudaUtils.hpp>
+#endif
+
 namespace Morpheus {
 namespace Impl {
 namespace Kernels {

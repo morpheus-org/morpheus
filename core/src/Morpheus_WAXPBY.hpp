@@ -28,11 +28,11 @@
 
 namespace Morpheus {
 
-template <typename ExecSpace, typename Vector>
-inline void waxpby(const typename Vector::index_type n,
-                   const typename Vector::value_type alpha, const Vector& x,
-                   const typename Vector::value_type beta, const Vector& y,
-                   Vector& w) {
+template <typename ExecSpace, typename Vector1, typename Vector2,
+          typename Vector3>
+inline void waxpby(const size_t n, const typename Vector1::value_type alpha,
+                   const Vector1& x, const typename Vector2::value_type beta,
+                   const Vector2& y, Vector3& w) {
   Impl::waxpby<ExecSpace>(n, alpha, x, beta, y, w);
 }
 

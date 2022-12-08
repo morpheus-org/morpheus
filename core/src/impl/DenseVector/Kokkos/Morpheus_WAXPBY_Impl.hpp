@@ -29,41 +29,48 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 
+#include <cassert>
+
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Vector>
-inline void waxpby(const typename Vector::index_type n,
-                   const typename Vector::value_type alpha, const Vector& x,
-                   const typename Vector::value_type beta, const Vector& y,
-                   Vector& w,
-                   typename std::enable_if_t<
-                       Morpheus::is_dense_vector_format_container_v<Vector> &&
-                       Morpheus::has_generic_backend_v<ExecSpace> &&
-                       Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
+template <typename ExecSpace, typename Vector1, typename Vector2,
+          typename Vector3>
+inline void waxpby(
+    const size_t n, const typename Vector1::value_type alpha, const Vector1& x,
+    const typename Vector2::value_type beta, const Vector2& y, Vector3& w,
+    typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector1> &&
+        Morpheus::is_dense_vector_format_container_v<Vector2> &&
+        Morpheus::is_dense_vector_format_container_v<Vector3> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector1, Vector2, Vector3>>* =
+        nullptr) {
   using execution_space = typename ExecSpace::execution_space;
-  using IndexType       = Kokkos::IndexType<typename Vector::index_type>;
-  using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
-  using value_array     = typename Vector::value_array_type;
-  using index_type      = typename Vector::index_type;
+  using range_policy    = Kokkos::RangePolicy<size_t, execution_space>;
 
-  const value_array x_view = x.const_view(), y_view = y.const_view();
-  value_array w_view = w.view();
+  assert(x.size() >= n);
+  assert(y.size() >= n);
+  assert(w.size() >= n);
+
+  const typename Vector1::value_array_type x_view = x.const_view();
+  const typename Vector2::value_array_type y_view = y.const_view();
+  typename Vector3::value_array_type w_view       = w.view();
   range_policy policy(0, n);
 
   if (alpha == 1.0) {
     Kokkos::parallel_for(
-        "waxpby_alpha", policy, KOKKOS_LAMBDA(const index_type& i) {
+        "waxpby_alpha", policy, KOKKOS_LAMBDA(const size_t& i) {
           w_view[i] = x_view[i] + beta * y_view[i];
         });
   } else if (beta == 1.0) {
     Kokkos::parallel_for(
-        "waxpby_beta", policy, KOKKOS_LAMBDA(const index_type& i) {
+        "waxpby_beta", policy, KOKKOS_LAMBDA(const size_t& i) {
           w_view[i] = alpha * x_view[i] + y_view[i];
         });
   } else {
     Kokkos::parallel_for(
-        "waxpby", policy, KOKKOS_LAMBDA(const index_type& i) {
+        "waxpby", policy, KOKKOS_LAMBDA(const size_t& i) {
           w_view[i] = alpha * x_view[i] + beta * y_view[i];
         });
   }
