@@ -35,15 +35,26 @@
 
 #include <impl/DenseVector/Cuda/Morpheus_Workspace.hpp>
 
-#ifdef MORPHEUS_ENABLE_TPL_CUBLAS
-#include <cublas_v2.h>
-#else
 #include <impl/Morpheus_CudaUtils.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_Dot_Impl.hpp>
+
+#ifdef MORPHEUS_ENABLE_TPL_CUBLAS
+#include <Morpheus_TypeTraits.hpp>
+#include <cublas_v2.h>
 #endif  // MORPHEUS_ENABLE_TPL_CUBLAS
 
 namespace Morpheus {
 namespace Impl {
+
+template <typename Vector1, typename Vector2>
+typename Vector2::value_type dot_ref(const typename Vector1::index_type n,
+                                     const Vector1& x, const Vector2& y);
+template <typename IndexType>
+double dot_cublas(const IndexType n, const double* x, int incx, const double* y,
+                  int incy);
+template <typename IndexType>
+double dot_cublas(const IndexType n, const float* x, int incx, const float* y,
+                  int incy);
 
 template <typename ExecSpace, typename Vector1, typename Vector2>
 typename Vector2::value_type dot(
@@ -54,21 +65,65 @@ typename Vector2::value_type dot(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
-  using index_type = typename Vector1::index_type;
-  using value_type = typename Vector1::non_const_value_type;
+  using value_type1 = typename Vector1::non_const_value_type;
+  using value_type2 = typename Vector2::value_type;
 
-  value_type local_result;
+  value_type2 local_result;
 
 #ifdef MORPHEUS_ENABLE_TPL_CUBLAS
-  cublasdotspace.init();
-  cublasdotspace.allocate<value_type>(1);
-  index_type incx = 1, incy = 1;
-  cublasDdot(cublasdotspace.handle(), n, x.data(), incx, y.data(), incy,
-             cublasdotspace.data<value_type>());
-
-  cudaMemcpy(&local_result, cublasdotspace.data<value_type>(),
-             sizeof(value_type), cudaMemcpyDeviceToHost);
+  using index_type = typename Vector1::index_type;
+  using val_t =
+      typename std::remove_pointer_t<Morpheus::remove_cvref_t<value_type1>>;
+  if constexpr (std::is_floating_point_v<val_t>) {
+    index_type incx = 1, incy = 1;
+    local_result = dot_cublas(n, x.data(), incx, y.data(), incy);
+  } else {
+    local_result = dot_ref(n, x, y);
+  }
 #else
+  local_result = dot_ref(n, x, y);
+#endif  // MORPHEUS_ENABLE_TPL_CUBLAS
+
+  return local_result;
+}
+
+template <typename IndexType>
+double dot_cublas(const IndexType n, const double* x, int incx, const double* y,
+                  int incy) {
+  double lres = 0;
+  cublasdotspace.init();
+  cublasdotspace.allocate<double>(1);
+  cublasDdot(cublasdotspace.handle(), n, x, incx, y, incy,
+             (double*)cublasdotspace.data<double>());
+
+  checkCudaErrors(cudaMemcpy(&lres, cublasdotspace.data<double>(),
+                             sizeof(double), cudaMemcpyDeviceToHost));
+
+  return lres;
+}
+
+template <typename IndexType>
+float dot_cublas(const IndexType n, const float* x, int incx, const float* y,
+                 int incy) {
+  float lres = 0;
+  cublasdotspace.init();
+  cublasdotspace.allocate<float>(1);
+  cublasDdot(cublasdotspace.handle(), n, x, incx, y, incy,
+             (float*)cublasdotspace.data<float>());
+
+  checkCudaErrors(cudaMemcpy(&lres, cublasdotspace.data<float>(), sizeof(float),
+                             cudaMemcpyDeviceToHost));
+
+  return lres;
+}
+
+template <typename Vector1, typename Vector2>
+typename Vector2::value_type dot_ref(const typename Vector1::index_type n,
+                                     const Vector1& x, const Vector2& y) {
+  using index_type = typename Vector1::index_type;
+  using value_type = typename Vector2::value_type;
+
+  value_type lres = 0;
   cudotspace.allocate<value_type>(n);
 
   Kernels::dot_kernel_part1<256, value_type, index_type>
@@ -83,11 +138,9 @@ typename Vector2::value_type dot(
   getLastCudaError("dot: Kernel execution failed");
 #endif
 
-  cudaMemcpy(&local_result, cudotspace.data<value_type>(), sizeof(value_type),
+  cudaMemcpy(&lres, cudotspace.data<value_type>(), sizeof(value_type),
              cudaMemcpyDeviceToHost);
-#endif  // MORPHEUS_ENABLE_TPL_CUBLAS
-
-  return local_result;
+  return lres;
 }
 
 }  // namespace Impl
