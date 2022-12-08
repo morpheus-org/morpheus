@@ -61,7 +61,8 @@ inline void waxpby(
   const size_t NUM_BLOCKS = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
   Kernels::waxpby_kernel<typename Vector1::value_type,
-                         typename Vector2::value_type, size_t>
+                         typename Vector2::value_type,
+                         typename Vector3::value_type, size_t>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(n, alpha, x.data(), beta, y.data(),
                                       w.data());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
