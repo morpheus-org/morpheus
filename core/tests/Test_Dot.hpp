@@ -49,37 +49,41 @@ class DotTypesTest : public ::testing::Test {
   using IndexType  = size_t;
   using ValueType  = typename dst_dev_t::value_type;
 
-  src_dev_t small_x, med_x, large_x;
-  dst_dev_t small_y, med_y, large_y;
+  struct vectors {
+    src_dev_t x;
+    dst_dev_t y;
+    IndexType size;
+    ValueType dot;
 
-  IndexType small_size = 50, med_size = 5000, large_size = 50000;
-  ValueType small_ref_res = 0, med_ref_res = 0, large_ref_res = 0;
+    vectors(IndexType _size)
+        : x(_size, 0), y(_size, 0), size(_size), dot((ValueType)0) {}
+  };
 
-  // You can define per-test set-up logic as usual.
+  IndexType sizes[3] = {50, 5000, 50000};
+
+  struct vectors vecs[3] = {vectors(sizes[0]), vectors(sizes[1]),
+                            vectors(sizes[2])};
+
   void SetUp() override {
-    local_setup(small_x, small_y, small_size, small_ref_res);
-    local_setup(med_x, med_y, med_size, med_ref_res);
-    local_setup(large_x, large_y, large_size, large_ref_res);
+    for (size_t i = 0; i < 3; i++) {
+      local_setup(&vecs[i]);
+    }
   }
 
  private:
-  void local_setup(src_dev_t& x_, dst_dev_t& y_, IndexType sz_,
-                   ValueType& result) {
-    x_.resize(sz_);
-    y_.resize(sz_);
+  void local_setup(struct vectors* vec) {
+    src_host_t xh_(vec->size, 0);
+    dst_host_t yh_(vec->size, 0);
 
-    src_host_t xh_(sz_, 0);
-    dst_host_t yh_(sz_, 0);
-
-    result = 0;
-    for (IndexType i = 0; i < sz_; i++) {
+    vec->dot = 0;
+    for (IndexType i = 0; i < vec->size; i++) {
       xh_(i) = i + 1;
-      yh_(i) = sz_ - i;
-      result += (i + 1) * (sz_ - i);
+      yh_(i) = vec->size - i;
+      vec->dot += (i + 1) * (vec->size - i);
     }
 
-    Morpheus::copy(xh_, x_);
-    Morpheus::copy(yh_, y_);
+    Morpheus::copy(xh_, vec->x);
+    Morpheus::copy(yh_, vec->y);
   }
 };
 
@@ -104,34 +108,11 @@ TYPED_TEST(DotTypesTest, DotCustom) {
   using value_type = typename TestFixture::ValueType;
   using index_type = typename TestFixture::IndexType;
 
-  // Small Custom
-  {
-    index_type sz      = this->small_size;
-    value_type ref_res = this->small_ref_res;
-    auto x = this->small_x, y = this->small_y;
+  for (index_type i = 0; i < 3; i++) {
+    auto v = this->vecs[i];
 
-    auto result = Morpheus::dot<TEST_CUSTOM_SPACE>(sz, x, y);
-    MORPHEUS_VALIDATE_DOT(value_type, result, ref_res);
-  }
-
-  // Medium Custom
-  {
-    index_type sz      = this->med_size;
-    value_type ref_res = this->med_ref_res;
-    auto x = this->med_x, y = this->med_y;
-
-    auto result = Morpheus::dot<TEST_CUSTOM_SPACE>(sz, x, y);
-    MORPHEUS_VALIDATE_DOT(value_type, result, ref_res);
-  }
-
-  // Large Custom
-  {
-    index_type sz      = this->large_size;
-    value_type ref_res = this->large_ref_res;
-    auto x = this->large_x, y = this->large_y;
-
-    auto result = Morpheus::dot<TEST_CUSTOM_SPACE>(sz, x, y);
-    MORPHEUS_VALIDATE_DOT(value_type, result, ref_res);
+    auto result = Morpheus::dot<TEST_CUSTOM_SPACE>(v.size, v.x, v.y);
+    MORPHEUS_VALIDATE_DOT(value_type, result, v.dot);
   }
 }
 
@@ -139,34 +120,11 @@ TYPED_TEST(DotTypesTest, DotGeneric) {
   using value_type = typename TestFixture::ValueType;
   using index_type = typename TestFixture::IndexType;
 
-  // Small Generic
-  {
-    index_type sz      = this->small_size;
-    value_type ref_res = this->small_ref_res;
-    auto x = this->small_x, y = this->small_y;
+  for (index_type i = 0; i < 3; i++) {
+    auto v = this->vecs[i];
 
-    auto result = Morpheus::dot<TEST_GENERIC_SPACE>(sz, x, y);
-    MORPHEUS_VALIDATE_DOT(value_type, result, ref_res);
-  }
-
-  // Medium Generic
-  {
-    index_type sz      = this->med_size;
-    value_type ref_res = this->med_ref_res;
-    auto x = this->med_x, y = this->med_y;
-
-    auto result = Morpheus::dot<TEST_GENERIC_SPACE>(sz, x, y);
-    MORPHEUS_VALIDATE_DOT(value_type, result, ref_res);
-  }
-
-  // Large Generic
-  {
-    index_type sz      = this->large_size;
-    value_type ref_res = this->large_ref_res;
-    auto x = this->large_x, y = this->large_y;
-
-    auto result = Morpheus::dot<TEST_GENERIC_SPACE>(sz, x, y);
-    MORPHEUS_VALIDATE_DOT(value_type, result, ref_res);
+    auto result = Morpheus::dot<TEST_GENERIC_SPACE>(v.size, v.x, v.y);
+    MORPHEUS_VALIDATE_DOT(value_type, result, v.dot);
   }
 }
 

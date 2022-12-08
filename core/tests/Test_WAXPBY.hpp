@@ -55,41 +55,52 @@ class WAXPBYTypesTest : public ::testing::Test {
   using ValueType2       = typename src2_dev_t::value_type;
   using ValueType3       = typename dst_dev_t::value_type;
 
-  src1_dev_t small_x, med_x, large_x;
-  src2_dev_t small_y, med_y, large_y;
-  dst_dev_t small_w, med_w, large_w;
+  struct vectors {
+    src1_dev_t x;
+    src2_dev_t y;
+    dst_dev_t w;
+    IndexType size;
+    ValueType1 alpha;
+    ValueType2 beta;
 
-  IndexType small_size = 50, med_size = 5000, large_size = 50000;
-  ValueType1 alpha = 0.15;
-  ValueType2 beta  = -1.2;
+    vectors(IndexType _size, ValueType1 _alpha, ValueType2 _beta)
+        : x(_size, 0),
+          y(_size, 0),
+          w(_size, 0),
+          size(_size),
+          alpha(_alpha),
+          beta(_beta) {}
+  };
 
-  // You can define per-test set-up logic as usual.
+  IndexType sizes[3]   = {50, 5000, 50000};
+  ValueType1 alphas[3] = {(ValueType1)2.15, (ValueType1)2.15, (ValueType1)2.15};
+  ValueType2 betas[3]  = {(ValueType2)-3.2, (ValueType2)-3.2, (ValueType2)-3.2};
+
+  struct vectors vecs[3] = {vectors(sizes[0], alphas[0], betas[0]),
+                            vectors(sizes[1], alphas[1], betas[1]),
+                            vectors(sizes[2], alphas[2], betas[2])};
+
   void SetUp() override {
-    local_setup(small_size, small_x, small_y, small_w);
-    local_setup(med_size, med_x, med_y, med_w);
-    local_setup(large_size, large_x, large_y, large_w);
+    for (size_t i = 0; i < 3; i++) {
+      local_setup(&vecs[i]);
+    }
   }
 
  private:
-  void local_setup(IndexType sz_, src1_dev_t& x_, src2_dev_t& y_,
-                   dst_dev_t& w_) {
-    x_.resize(sz_);
-    y_.resize(sz_);
-    w_.resize(sz_);
+  void local_setup(struct vectors* vec) {
+    src1_host_t xh_(vec->size, 0);
+    src2_host_t yh_(vec->size, 0);
+    dst_host_t wh_(vec->size, 0);
 
-    src1_host_t xh_(sz_, 0);
-    src2_host_t yh_(sz_, 0);
-    dst_host_t wh_(sz_, 0);
-
-    for (IndexType i = 0; i < sz_; i++) {
+    for (IndexType i = 0; i < vec->size; i++) {
       xh_(i) = i + 1;
-      yh_(i) = sz_ - i;
-      wh_(i) = alpha * xh_(i) + beta * yh_(i);
+      yh_(i) = vec->size - i;
+      wh_(i) = vec->alpha * xh_(i) + vec->beta * yh_(i);
     }
 
-    Morpheus::copy(xh_, x_);
-    Morpheus::copy(yh_, y_);
-    Morpheus::copy(wh_, w_);
+    Morpheus::copy(xh_, vec->x);
+    Morpheus::copy(yh_, vec->y);
+    Morpheus::copy(wh_, vec->w);
   }
 };
 
@@ -101,46 +112,14 @@ TYPED_TEST(WAXPBYTypesTest, WAXPBYCustom) {
   using dst_t      = typename TestFixture::dst_dev_t;
   using index_type = typename TestFixture::IndexType;
 
-  auto a = this->alpha;
-  auto b = this->beta;
+  for (index_type i = 0; i < 3; i++) {
+    auto v = this->vecs[i];
 
-  // Small Custom
-  {
-    index_type sz = this->small_size;
-    auto x        = this->small_x;
-    auto y        = this->small_y;
-    auto wref     = this->small_w;
+    dst_t w(v.size, 0);
 
-    dst_t w(sz, 0);
-
-    Morpheus::waxpby<TEST_CUSTOM_SPACE>(sz, a, x, b, y, w);
-    Morpheus::Test::have_same_data(w, wref);
-  }
-
-  // Medium Custom
-  {
-    index_type sz = this->med_size;
-    auto x        = this->med_x;
-    auto y        = this->med_y;
-    auto wref     = this->med_w;
-
-    dst_t w(sz, 0);
-
-    Morpheus::waxpby<TEST_CUSTOM_SPACE>(sz, a, x, b, y, w);
-    Morpheus::Test::have_same_data(w, wref);
-  }
-
-  // Large Custom
-  {
-    index_type sz = this->large_size;
-    auto x        = this->large_x;
-    auto y        = this->large_y;
-    auto wref     = this->large_w;
-
-    dst_t w(sz, 0);
-
-    Morpheus::waxpby<TEST_CUSTOM_SPACE>(sz, a, x, b, y, w);
-    Morpheus::Test::have_same_data(w, wref);
+    Morpheus::waxpby<TEST_CUSTOM_SPACE>(v.size, v.alpha, v.x, v.beta, v.y, w);
+    EXPECT_EQ(Morpheus::Test::is_empty_container(w), 0);
+    Morpheus::Test::have_same_data(w, v.w);
   }
 }
 
@@ -148,46 +127,14 @@ TYPED_TEST(WAXPBYTypesTest, WAXPBYGeneric) {
   using dst_t      = typename TestFixture::dst_dev_t;
   using index_type = typename TestFixture::IndexType;
 
-  auto a = this->alpha;
-  auto b = this->beta;
+  for (index_type i = 0; i < 3; i++) {
+    auto v = this->vecs[i];
 
-  // Small Custom
-  {
-    index_type sz = this->small_size;
-    auto x        = this->small_x;
-    auto y        = this->small_y;
-    auto wref     = this->small_w;
+    dst_t w(v.size, 0);
 
-    dst_t w(sz, 0);
-
-    Morpheus::waxpby<TEST_GENERIC_SPACE>(sz, a, x, b, y, w);
-    Morpheus::Test::have_same_data(w, wref);
-  }
-
-  // Medium Custom
-  {
-    index_type sz = this->med_size;
-    auto x        = this->med_x;
-    auto y        = this->med_y;
-    auto wref     = this->med_w;
-
-    dst_t w(sz, 0);
-
-    Morpheus::waxpby<TEST_GENERIC_SPACE>(sz, a, x, b, y, w);
-    Morpheus::Test::have_same_data(w, wref);
-  }
-
-  // Large Custom
-  {
-    index_type sz = this->large_size;
-    auto x        = this->large_x;
-    auto y        = this->large_y;
-    auto wref     = this->large_w;
-
-    dst_t w(sz, 0);
-
-    Morpheus::waxpby<TEST_GENERIC_SPACE>(sz, a, x, b, y, w);
-    Morpheus::Test::have_same_data(w, wref);
+    Morpheus::waxpby<TEST_GENERIC_SPACE>(v.size, v.alpha, v.x, v.beta, v.y, w);
+    EXPECT_EQ(Morpheus::Test::is_empty_container(w), 0);
+    Morpheus::Test::have_same_data(w, v.w);
   }
 }
 

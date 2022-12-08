@@ -17,7 +17,7 @@ jobs:
         #            {"vendor": "gnu", "compiler": "g++", "version": "9"}, 
         #            {"vendor": "clang", "compiler": "clang++", "version": "11"}, 
         #            {"vendor": "clang", "compiler": "clang++", "version": "12"}]
-        compiler: [{"vendor": "gnu", "compiler": "g++", "version": "8"}]
+        compiler: [{"vendor": "gnu", "compiler": "g++", "version": "9"}]
         cmake_build_type: ['Release', 'Debug']
         backend: [{"name": 'SERIAL', "tag": "Serial"}, {"name": "OPENMP", "tag": "OpenMP"}]
     runs-on: ${{ matrix.os }}
