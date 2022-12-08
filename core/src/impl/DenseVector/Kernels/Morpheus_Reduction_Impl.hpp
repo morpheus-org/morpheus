@@ -84,7 +84,7 @@ template <class T>
 __device__ __forceinline__ T warpReduceSum(unsigned int mask, T mySum) {
   for (int offset = WARP_SIZE / 2; offset > 0; offset /= 2) {
     // mySum += __shfl_down_sync(mask, mySum, offset);
-    SHFL_DOWN(mask, mySum, offset);
+    mySum += SHFL_DOWN(mask, mySum, offset);
   }
   return mySum;
 }
@@ -99,13 +99,6 @@ __device__ __forceinline__ int warpReduceSum<int>(unsigned int mask,
   return mySum;
 }
 #endif
-
-/*
-    Parallel sum reduction using shared memory
-    - takes log(n) steps for n input elements
-    - uses n threads
-    - only works for power-of-2 arrays
-*/
 
 template <typename ValueType, unsigned int blockSize, bool nIsPow2>
 __global__ void reduce_kernel(const ValueType *__restrict__ g_idata,

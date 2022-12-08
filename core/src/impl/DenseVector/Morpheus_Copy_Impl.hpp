@@ -30,6 +30,7 @@
 #include <impl/DenseVector/Serial/Morpheus_Copy_Impl.hpp>
 #include <impl/DenseVector/OpenMP/Morpheus_Copy_Impl.hpp>
 #include <impl/DenseVector/Cuda/Morpheus_Copy_Impl.hpp>
+#include <impl/DenseVector/HIP/Morpheus_Copy_Impl.hpp>
 
 #include <Kokkos_Core.hpp>
 

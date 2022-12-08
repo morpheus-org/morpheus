@@ -50,8 +50,6 @@ void reduce(const Vector& in, Vector& out, unsigned int size, int threads,
                 Morpheus::has_cuda_execution_space_v<ExecSpace> &&
                 Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using value_type = typename Vector::value_type;
-  dim3 dimBlock(threads, 1, 1);
-  dim3 dimGrid(blocks, 1, 1);
 
   value_type* d_idata = in.data();
   value_type* d_odata = out.data();
@@ -63,112 +61,112 @@ void reduce(const Vector& in, Vector& out, unsigned int size, int threads,
     switch (threads) {
       case 1024:
         Kernels::reduce_kernel<value_type, 1024, true>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
       case 512:
         Kernels::reduce_kernel<value_type, 512, true>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 256:
         Kernels::reduce_kernel<value_type, 256, true>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 128:
         Kernels::reduce_kernel<value_type, 128, true>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 64:
         Kernels::reduce_kernel<value_type, 64, true>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 32:
         Kernels::reduce_kernel<value_type, 32, true>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 16:
         Kernels::reduce_kernel<value_type, 16, true>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 8:
         Kernels::reduce_kernel<value_type, 8, true>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 4:
         Kernels::reduce_kernel<value_type, 4, true>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 2:
         Kernels::reduce_kernel<value_type, 2, true>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 1:
         Kernels::reduce_kernel<value_type, 1, true>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
     }
   } else {
     switch (threads) {
       case 1024:
         Kernels::reduce_kernel<value_type, 1024, false>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
       case 512:
         Kernels::reduce_kernel<value_type, 512, false>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 256:
         Kernels::reduce_kernel<value_type, 256, false>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 128:
         Kernels::reduce_kernel<value_type, 128, false>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 64:
         Kernels::reduce_kernel<value_type, 64, false>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 32:
         Kernels::reduce_kernel<value_type, 32, false>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 16:
         Kernels::reduce_kernel<value_type, 16, false>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 8:
         Kernels::reduce_kernel<value_type, 8, false>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 4:
         Kernels::reduce_kernel<value_type, 4, false>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 2:
         Kernels::reduce_kernel<value_type, 2, false>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
 
       case 1:
         Kernels::reduce_kernel<value_type, 1, false>
-            <<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+            <<<blocks, threads, smemSize>>>(d_idata, d_odata, size);
         break;
     }
   }
@@ -184,9 +182,10 @@ typename Vector::value_type reduce(
         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using value_type = typename Vector::value_type;
 
-  value_type result           = 0;
-  const int maxThreads        = 256;  // number of threads per block
-  const int maxBlocks         = min(size / maxThreads, MAX_BLOCK_DIM_SIZE);
+  value_type result    = 0;
+  const int maxThreads = 256;  // number of threads per block
+  const int maxBlocks =
+      min((size_t)size / maxThreads + 1, (size_t)MAX_BLOCK_DIM_SIZE);
   const int cpuFinalThreshold = WARP_SIZE;
   int numBlocks               = 0;
   int numThreads              = 0;
@@ -196,37 +195,37 @@ typename Vector::value_type reduce(
 
   Vector inter_sums(maxBlocks, 0);
   Vector out(numBlocks, 0);
-  reduce<ExecSpace>(in, out, size, numThreads, numBlocks,
-                    typename Vector::tag{}, typename Vector::tag{});
+  reduce<ExecSpace>(in, out, size, numThreads, numBlocks);
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
   getLastCudaError("reduce_kernel: Kernel execution failed");
 #endif
 
   // sum partial block sums on GPU
-  int s = numBlocks;
+  int reduced_size = numBlocks;
 
-  while (s > cpuFinalThreshold) {
+  while (reduced_size > cpuFinalThreshold) {
     int threads = 0, blocks = 0;
-    getNumBlocksAndThreads<int>(s, maxBlocks, maxThreads, blocks, threads);
-    Impl::copy(out, inter_sums, 0, s);
+    getNumBlocksAndThreads<int>(reduced_size, maxBlocks, maxThreads, blocks,
+                                threads);
+    Impl::copy(out, inter_sums, 0, reduced_size, 0, reduced_size);
 
-    Impl::reduce<ExecSpace>(inter_sums, out, s, threads, blocks);
+    Impl::reduce<ExecSpace>(inter_sums, out, reduced_size, threads, blocks);
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
     getLastCudaError("reduce_kernel: Kernel execution failed");
 #endif
 
-    s = (s + (threads * 2 - 1)) / (threads * 2);
+    reduced_size = (reduced_size + (threads * 2 - 1)) / (threads * 2);
   }
 
-  if (s > 1) {
-    typename Vector::HostMirror h_out(s, 0);
+  if (reduced_size > 1) {
+    typename Vector::HostMirror h_out(reduced_size, 0);
     // copy result from device to host
-    Impl::copy(out, h_out, 0, s);
-    result = reduce<Kokkos::Serial>(h_out, s);
+    Impl::copy(out, h_out, 0, reduced_size, 0, reduced_size);
+    result = Impl::reduce<Morpheus::Serial>(h_out, reduced_size);
   } else {
     // copy final sum from device to host
     typename Vector::HostMirror h_out(1, 0);
-    Impl::copy(out, h_out, 0, 1);
+    Impl::copy(out, h_out, 0, 1, 0, 1);
     result = h_out[0];
   }
 
