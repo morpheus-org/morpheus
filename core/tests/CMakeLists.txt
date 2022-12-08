@@ -40,6 +40,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       DiaMatrix_CompatibleBinary
       DiaMatrix_CompatibleDynamicBinary
       DiaMatrix
+      Dot
       DynamicMatrix_Binary
       DynamicMatrix_CompatibleBinary
       DynamicMatrix_CompatibleConcreteBinary

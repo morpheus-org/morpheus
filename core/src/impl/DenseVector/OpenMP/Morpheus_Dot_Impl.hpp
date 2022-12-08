@@ -36,7 +36,7 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename Vector1, typename Vector2>
-inline typename Vector1::value_type dot(
+inline typename Vector2::value_type dot(
     typename Vector1::index_type n, const Vector1& x, const Vector2& y,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&

@@ -33,18 +33,18 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename Vector1, typename Vector2>
-inline typename Vector1::value_type dot(
+inline typename Vector2::value_type dot(
     typename Vector1::index_type n, const Vector1& x, const Vector2& y,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
-  using execution_space = ExecSpace;
+  using execution_space = typename ExecSpace::execution_space;
   using IndexType       = Kokkos::IndexType<typename Vector1::index_type>;
   using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
   using ValueArray      = typename Vector1::value_array_type;
-  using value_type      = typename Vector1::non_const_value_type;
+  using value_type      = typename Vector2::non_const_value_type;
   using index_type      = typename Vector1::index_type;
 
   const ValueArray x_view = x.const_view(), y_view = y.const_view();

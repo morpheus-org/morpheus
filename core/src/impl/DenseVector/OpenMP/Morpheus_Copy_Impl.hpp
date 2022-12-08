@@ -49,10 +49,8 @@ void copy_by_key(
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, KeyType, SourceType,
                                DestinationType>>* = nullptr) {
-  using index_type = typename KeyType::value_type;
-
 #pragma omp parallel for
-  for (index_type i = 0; i < (index_type)keys.size(); i++) {
+  for (size_t i = 0; i < keys.size(); i++) {
     dst[i] = src[keys[i]];
   }
 }

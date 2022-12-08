@@ -41,7 +41,7 @@ inline void waxpby(const typename Vector::index_type n,
                        Morpheus::is_dense_vector_format_container_v<Vector> &&
                        Morpheus::has_generic_backend_v<ExecSpace> &&
                        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
-  using execution_space = ExecSpace;
+  using execution_space = typename ExecSpace::execution_space;
   using IndexType       = Kokkos::IndexType<typename Vector::index_type>;
   using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
   using value_array     = typename Vector::value_array_type;
