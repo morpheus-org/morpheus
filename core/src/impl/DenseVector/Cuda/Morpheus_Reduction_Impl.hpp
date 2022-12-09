@@ -36,7 +36,6 @@
 #include <impl/DenseVector/Kernels/Morpheus_Reduction_Impl.hpp>
 #include <impl/DenseVector/Serial/Morpheus_Reduction_Impl.hpp>
 #include <impl/Morpheus_CudaUtils.hpp>
-#include <impl/DenseVector/Morpheus_Copy_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
