@@ -93,8 +93,8 @@ class WAXPBYTypesTest : public ::testing::Test {
     dst_host_t wh_(vec->size, 0);
 
     for (IndexType i = 0; i < vec->size; i++) {
-      xh_(i) = i + 1;
-      yh_(i) = vec->size - i;
+      xh_(i) = -5.0 + (((ValueType1)rand() / RAND_MAX) * (5.0 - (-5.0)));
+      yh_(i) = -2.0 + (((ValueType2)rand() / RAND_MAX) * (2.0 - (-2.0)));
       wh_(i) = vec->alpha * xh_(i) + vec->beta * yh_(i);
     }
 

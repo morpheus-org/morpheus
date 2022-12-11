@@ -58,7 +58,7 @@ inline void waxpby(
   assert(w.size() >= n);
 
   const size_t BLOCK_SIZE = 256;
-  const size_t NUM_BLOCKS = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
+  const size_t NUM_BLOCKS = Impl::ceil_div(n, BLOCK_SIZE);
 
   Kernels::waxpby_kernel<typename Vector1::value_type,
                          typename Vector2::value_type,
