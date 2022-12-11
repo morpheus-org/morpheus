@@ -48,6 +48,12 @@ T _split_work(const T load, const T workers, const T worker_id) {
   return bound;
 }
 
+template <typename T>
+void atomic_add(T* out, T val) {
+#pragma omp atomic
+  *out += val;
+}
+
 template <typename T = int>
 T threads() {
   T t = 1;

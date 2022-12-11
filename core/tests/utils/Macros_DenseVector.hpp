@@ -181,6 +181,41 @@ bool have_same_data(
 
   return true;
 }
+
+template <class Container1, class Container2>
+bool have_approx_same_data(
+    Container1& c1, Container2& c2,
+    typename std::enable_if_t<Morpheus::is_vector_container_v<Container1> &&
+                              Morpheus::is_vector_container_v<Container2>>* =
+        nullptr) {
+  using value_type = typename Container1::value_type;
+  double epsilon   = 1.0e-14;
+  if (std::is_same_v<value_type, double>) {
+    epsilon = 1.0e-13;
+  } else if (std::is_same_v<value_type, float>) {
+    epsilon = 1.0e-5;
+  } else {
+    epsilon = 0;
+  }
+
+  if (!is_same_size(c1, c2)) return false;
+
+  typename Container1::HostMirror c1_h;
+  c1_h.resize(c1);
+  Morpheus::copy(c1, c1_h);
+
+  typename Container1::HostMirror c2_h;
+  c2_h.resize(c2);
+  Morpheus::copy(c2, c2_h);
+
+  bool res = true;
+  for (size_t i = 0; i < c1_h.size(); i++) {
+    if (fabs(c1_h[i] - c2_h[i]) > epsilon) {
+      res = false;
+    }
+  }
+  return res;
+}  // namespace Test
 }  // namespace Test
 }  // namespace Morpheus
 

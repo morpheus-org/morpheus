@@ -43,6 +43,11 @@ MORPHEUS_INLINE_FUNCTION Size1 DIVIDE_INTO(Size1 N, Size2 granularity) {
 }
 
 template <typename T>
+T ceil_div(T x, T y) {
+  return (x + y - 1) / y;
+}
+
+template <typename T>
 MORPHEUS_INLINE_FUNCTION T min(T x, T y) {
   return x < y ? x : y;
 }

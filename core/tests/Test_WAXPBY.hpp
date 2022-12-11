@@ -119,7 +119,7 @@ TYPED_TEST(WAXPBYTypesTest, WAXPBYCustom) {
 
     Morpheus::waxpby<TEST_CUSTOM_SPACE>(v.size, v.alpha, v.x, v.beta, v.y, w);
     EXPECT_EQ(Morpheus::Test::is_empty_container(w), 0);
-    Morpheus::Test::have_same_data(w, v.w);
+    EXPECT_TRUE(Morpheus::Test::have_approx_same_data(w, v.w));
   }
 }
 
@@ -134,7 +134,7 @@ TYPED_TEST(WAXPBYTypesTest, WAXPBYGeneric) {
 
     Morpheus::waxpby<TEST_GENERIC_SPACE>(v.size, v.alpha, v.x, v.beta, v.y, w);
     EXPECT_EQ(Morpheus::Test::is_empty_container(w), 0);
-    Morpheus::Test::have_same_data(w, v.w);
+    EXPECT_TRUE(Morpheus::Test::have_approx_same_data(w, v.w));
   }
 }
 
