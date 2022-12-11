@@ -44,7 +44,7 @@ void print(const Printable& p, Stream& s,
   for (index_type n = 0; n < p.nnnz(); n++) {
     s << " " << std::setw(14) << p.crow_indices(n);
     s << " " << std::setw(14) << p.ccolumn_indices(n);
-    s << " " << std::setprecision(4) << std::setw(8) << "(" << p.cvalues(n)
+    s << " " << std::setprecision(12) << std::setw(12) << "(" << p.cvalues(n)
       << ")\n";
   }
 }

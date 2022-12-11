@@ -46,7 +46,7 @@ inline void multiply(
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using index_type       = typename Matrix::index_type;
   using value_type       = typename Matrix::value_type;
-  const index_type ndiag = A.cvalues().ncols();
+  const index_type ndiag = A.cdiagonal_offsets().size();
 
 #pragma omp parallel for
   for (index_type row = 0; row < A.nrows(); row++) {

@@ -30,18 +30,24 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 
+#include <impl/Coo/Serial/Morpheus_Multiply_Impl.hpp>
+#include <impl/Coo/OpenMP/Morpheus_Multiply_Impl.hpp>
+#include <impl/Coo/Cuda/Morpheus_Multiply_Impl.hpp>
+#include <impl/Coo/HIP/Morpheus_Multiply_Impl.hpp>
+
 namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(
-    const Matrix&, const Vector&, Vector&,
+    const Matrix& A, const Vector& x, Vector& y, const bool init,
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
-  throw Morpheus::NotImplementedException("multiply<Kokkos>");
+  using backend = Morpheus::CustomBackend<typename ExecSpace::execution_space>;
+  Impl::multiply<backend>(A, x, y, init);
 }
 
 }  // namespace Impl

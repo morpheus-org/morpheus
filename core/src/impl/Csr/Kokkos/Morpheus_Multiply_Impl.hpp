@@ -40,12 +40,13 @@ inline void multiply(
         Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
+  using execution_space   = typename ExecSpace::execution_space;
   using policy_index_type = Kokkos::IndexType<typename Matrix::index_type>;
-  using range_policy      = Kokkos::RangePolicy<policy_index_type, ExecSpace>;
-  using value_array       = typename Matrix::value_array_type::value_array_type;
-  using index_array       = typename Matrix::index_array_type::value_array_type;
-  using value_type        = typename value_array::value_type;
-  using index_type        = typename index_array::value_type;
+  using range_policy = Kokkos::RangePolicy<policy_index_type, execution_space>;
+  using value_array  = typename Matrix::value_array_type::value_array_type;
+  using index_array  = typename Matrix::index_array_type::value_array_type;
+  using value_type   = typename value_array::value_type;
+  using index_type   = typename index_array::value_type;
 
   const value_array values = A.cvalues().const_view(), x_view = x.const_view();
   const index_array column_indices = A.ccolumn_indices().const_view(),

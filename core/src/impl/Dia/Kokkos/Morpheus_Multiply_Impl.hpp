@@ -40,20 +40,21 @@ inline void multiply(
         Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
+  using execution_space  = typename ExecSpace::execution_space;
   using value_array_type = typename Matrix::value_array_type::value_array_type;
   using index_array_type = typename Matrix::index_array_type::value_array_type;
   using index_type       = typename Matrix::index_type;
   using value_type       = typename Matrix::value_type;
-  using member_type      = typename Kokkos::TeamPolicy<ExecSpace>::member_type;
+  using member_type = typename Kokkos::TeamPolicy<execution_space>::member_type;
 
   const value_array_type values                  = A.cvalues().const_view();
   const typename Vector::value_array_type x_view = x.const_view();
   const index_array_type diagonal_offsets  = A.cdiagonal_offsets().const_view();
   typename Vector::value_array_type y_view = y.view();
-  index_type ndiag = A.cvalues().ncols(), ncols = A.ncols();
+  index_type ndiag = A.cdiagonal_offsets().size(), ncols = A.ncols();
 
-  const Kokkos::TeamPolicy<ExecSpace> policy(A.nrows(), Kokkos::AUTO,
-                                             Kokkos::AUTO);
+  const Kokkos::TeamPolicy<execution_space> policy(A.nrows(), Kokkos::AUTO,
+                                                   Kokkos::AUTO);
 
   Kokkos::parallel_for(
       policy, KOKKOS_LAMBDA(const member_type& team_member) {
@@ -70,7 +71,7 @@ inline void multiply(
               }
             },
             sum);
-        y_view[row] = sum;
+        y_view[row] = init ? sum : sum + y_view[row];
       });
 }
 

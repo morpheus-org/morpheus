@@ -45,7 +45,7 @@ void print(const Printable& p, Stream& s,
     for (index_type j = 0; j < p.ncols(); j++) {
       s << " " << std::setw(14) << i;
       s << " " << std::setw(14) << j;
-      s << " " << std::setprecision(4) << std::setw(8) << "(" << p(i, j)
+      s << " " << std::setprecision(12) << std::setw(12) << "(" << p(i, j)
         << ")\n";
     }
   }
