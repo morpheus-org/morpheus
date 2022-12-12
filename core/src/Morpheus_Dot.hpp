@@ -27,15 +27,37 @@
 #include <impl/Morpheus_Dot_Impl.hpp>
 
 namespace Morpheus {
+/**
+ * \addtogroup dense_vector_algorithms DenseVector Algorithms
+ * \brief Algorithms for the DenseVector container.
+ * \ingroup algorithms
+ * \{
+ *
+ */
 
+/**
+ * @brief Computes the dot product of two vectors.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam Vector1 Type of vector x
+ * @tparam Vector2 Type of vector y
+ * @param n The number of vector elements to run the operation for
+ * @param x The first input vector
+ * @param y The second input vector
+ * @return Vector2::value_type Scalar value of the result
+ *
+ */
 template <typename ExecSpace, typename Vector1, typename Vector2>
 inline typename Vector2::value_type dot(typename Vector1::index_type n,
                                         const Vector1& x, const Vector2& y) {
-  static_assert(is_format_compatible<Vector1, Vector2>::value,
-                "x and y must be compatible types");
+  static_assert(is_dense_vector_format_container_v<Vector1>,
+                "x must be a DenseVector container");
+  static_assert(is_dense_vector_format_container_v<Vector2>,
+                "y must be a DenseVector container");
   return Impl::dot<ExecSpace>(n, x, y);
 }
-
+/*! \}  // end of dense_vector_algorithms group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_DOT_HPP

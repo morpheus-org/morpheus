@@ -27,13 +27,31 @@
 #include <impl/Morpheus_Reduction_Impl.hpp>
 
 namespace Morpheus {
+/**
+ * \addtogroup dense_vector_algorithms DenseVector Algorithms
+ * \ingroup algorithms
+ * \{
+ *
+ */
 
+/**
+ * @brief Performs a sum reduction on the contents of a vector.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam Vector Type of input vector
+ * @param in The input vector
+ * @param size The number of vector elements to run the operation for
+ * @return Vector::value_type Scalar value of the result
+ */
 template <typename ExecSpace, typename Vector>
 typename Vector::value_type reduce(const Vector& in,
                                    typename Vector::index_type size) {
+  static_assert(is_dense_vector_format_container_v<Vector>,
+                "in must be a DenseVector container");
   return Impl::reduce<ExecSpace>(in, size);
 }
-
+/*! \}  // end of dense_vector_algorithms group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_REDUCTION_HPP

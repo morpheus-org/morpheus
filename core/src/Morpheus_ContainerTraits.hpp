@@ -29,6 +29,13 @@
 #include <impl/Morpheus_ContainerTraits_Impl.hpp>
 
 namespace Morpheus {
+/**
+ * \addtogroup base_containers Base Containers
+ * \ingroup containers
+ * \{
+ *
+ */
+
 /** @class ContainerTraits
  * @brief Traits class for accessing attributes of a Container (Matrix or
  * Vector)
@@ -150,6 +157,7 @@ struct ContainerTraits {
   enum { is_hostspace = std::is_same<MemorySpace, Kokkos::HostSpace>::value };
   enum { is_managed = MemoryTraits::is_unmanaged == 0 };
 };
-
+/*! \}  // end of base_containers group
+ */
 }  // namespace Morpheus
 #endif  // MORPHEUS_CONTAINER_TRAITS_HPP

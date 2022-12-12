@@ -190,10 +190,8 @@ create_mirror_container(
                                          P...>::container_type;
   return container_type().allocate(src);
 }
-
-/*! \}  // end of data_management group
+/*! \}  // end of mirroring group
  */
-
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_MIRRORCONTAINERS_HPP

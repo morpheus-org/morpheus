@@ -28,18 +28,56 @@
 #include <impl/Dynamic/Morpheus_Multiply_Impl.hpp>
 
 namespace Morpheus {
+/**
+ * \defgroup algorithms Algorithms
+ * \par Overview
+ * TODO
+ *
+ */
 
+/**
+ * \addtogroup sparse_algorithms Sparse Algorithms
+ * \brief Algorithms for sparse and dynamic containers
+ * \ingroup algorithms
+ * \{
+ *
+ */
+
+/**
+ * @brief Computes the matrix vector product y = Ax
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam Matrix The type of the system matrix
+ * @tparam Vector The type of the vectors
+ * @param A The known system matrix
+ * @param x The known vector
+ * @param y The vector that contains the result Ax
+ * @param init Whether to initialize y to zero.
+ */
 template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(const Matrix& A, const Vector& x, Vector& y,
                      const bool init) {
   Impl::multiply<ExecSpace>(A, x, y, init);
 }
 
+/**
+ * @brief Computes the matrix vector product y = Ax
+ *
+ * @tparam ExecSpace ExecSpace Execution space to run the algorithm
+ * @tparam Matrix The type of the system matrix
+ * @tparam Vector The type of the vectors
+ * @param A The known system matrix
+ * @param x The known vector
+ * @param y The vector that contains the result Ax
+ *
+ * \note This routine initializes the vector y to zero by default.
+ */
 template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(const Matrix& A, const Vector& x, Vector& y) {
   Impl::multiply<ExecSpace>(A, x, y, true);
 }
-
+/*! \}  // end of sparse_algorithms group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_MULTIPLY_HPP

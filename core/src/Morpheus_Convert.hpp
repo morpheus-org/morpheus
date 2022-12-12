@@ -31,12 +31,47 @@
 #include <impl/Dynamic/Morpheus_Convert_Impl.hpp>
 
 namespace Morpheus {
+/**
+ * \addtogroup conversions Conversions
+ * \brief Conversion Operations on Containers
+ * \ingroup data_management
+ * \{
+ *
+ */
 
+/**
+ * @brief Performs a conversion operation between two containers.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam SourceType The type of the source container
+ * @tparam DestinationType The type of the destination container
+ * @param src The source container we are converting from
+ * @param dst The destination container we are converting to
+ *
+ */
 template <typename ExecSpace, typename SourceType, typename DestinationType>
 void convert(const SourceType& src, DestinationType& dst) {
   Impl::convert<ExecSpace>(src, dst);
 }
 
+/**
+ * @brief Performs an in-place conversion operation of the DynamicMatrix
+ * container to the format indicated by the enum index.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam SourceType The type of the source container
+ * @param src The source container to convert
+ * @param index The enum index of the format to convert to
+ *
+ * \note The src container must be a DynamicMatrix for the conversion to take
+ * place.
+ *
+ * \note Internally the in-place conversion is achieved using a temporary
+ * CooMatrix container.
+ *
+ * \note In case the conversion fails internally it throws
+ * an error and the state of the input container is maintained.
+ */
 template <typename ExecSpace, typename SourceType>
 void convert(SourceType& src, const formats_e index) {
   static_assert(Morpheus::is_dynamic_matrix_format_container<SourceType>::value,
@@ -70,10 +105,22 @@ void convert(SourceType& src, const formats_e index) {
   src = dynamic_temp;
 }
 
+/**
+ * @brief Performs an in-place conversion operation of the DynamicMatrix
+ * container to the format indicated by the index.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam SourceType The type of the source container
+ * @param src The source container to convert
+ * @param index The index of the container we will be converting to
+ *
+ */
 template <typename ExecSpace, typename SourceType>
 void convert(SourceType& src, const int index) {
   Morpheus::convert<ExecSpace>(src, static_cast<formats_e>(index));
 }
+/*! \}  // end of conversion group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_CONVERT_HPP
