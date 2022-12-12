@@ -60,9 +60,6 @@ void convert(const SourceType& src, DestinationType& dst,
                  Morpheus::is_sparse_matrix_container<SourceType>::value &&
                  Morpheus::is_dynamic_matrix_format_container<
                      DestinationType>::value>::type* = nullptr) {
-  if (src.format_index() != dst.active_index()) {
-    dst.activate(src.format_index());
-  }
   dst.set_nrows(src.nrows());
   dst.set_ncols(src.ncols());
   dst.set_nnnz(src.nnnz());

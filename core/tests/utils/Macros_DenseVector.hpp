@@ -184,7 +184,7 @@ bool have_same_data(
 
 template <class Container1, class Container2>
 bool have_approx_same_data(
-    Container1& c1, Container2& c2,
+    Container1& c1, Container2& c2, bool verbose = false,
     typename std::enable_if_t<Morpheus::is_vector_container_v<Container1> &&
                               Morpheus::is_vector_container_v<Container2>>* =
         nullptr) {
@@ -211,6 +211,10 @@ bool have_approx_same_data(
   bool res = true;
   for (size_t i = 0; i < c1_h.size(); i++) {
     if (fabs(c1_h[i] - c2_h[i]) > epsilon) {
+      if (verbose) {
+        std::cout << "Entry at " << i << " differs! fabs(" << c1_h[i] << " - "
+                  << c2_h[i] << ") = " << fabs(c1_h[i] - c2_h[i]) << std::endl;
+      }
       res = false;
     }
   }

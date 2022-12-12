@@ -27,6 +27,9 @@
 #include <gtest/gtest.h>
 #include <Morpheus_Core.hpp>
 #include <random>
+
+#include <utils/Macros_DenseMatrix.hpp>
+
 namespace Morpheus {
 namespace Test {
 template <typename ValueType, typename IndexType, typename ArrayLayout,

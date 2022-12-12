@@ -178,9 +178,10 @@ TYPED_TEST(ConvertDynamicTypesTest, SparseToDynamic) {
     auto src_h = Morpheus::create_mirror_container(src);
     Morpheus::copy(this->con_ref_h, src_h);
 
+    auto fmt_idx = dst_h.active_index();
     Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
-    // Check dynamic matrix has now same active type as original src
-    EXPECT_EQ(src_h.format_index(), dst_h.active_index());
+    // Check dynamic matrix maintains the same active type
+    EXPECT_EQ(fmt_idx, dst_h.active_index());
 
     // Convert back to concrete format and check with original src
     src_host_t ref_h;
@@ -195,12 +196,13 @@ TYPED_TEST(ConvertDynamicTypesTest, SparseToDynamic) {
     auto src_h = Morpheus::create_mirror_container(src);
     Morpheus::copy(this->con_ref_h, src_h);
 
+    auto fmt_idx = dst_h.active_index();
     /* NOTE: Dst should always have the same format as src so we do not expect
      * to throw any NotImplemented errors
      */
     Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
     // Check dynamic matrix has now same active type as original src
-    EXPECT_EQ(src_h.format_index(), dst_h.active_index());
+    EXPECT_EQ(fmt_idx, dst_h.active_index());
 
     // Convert back to concrete format and check with original src
     src_host_t ref_h;
