@@ -105,7 +105,14 @@ jobs:
         run: |
           cmake --build builddir --parallel 2
 
-      - name: Run Tests
+      - name: Run Serial Tests
         working-directory: builddir
+        if: ${{ matrix.backend.tag == 'Serial' }}
         run: |
           ./core/tests/MorpheusCore_UnitTest_${{ matrix.backend.tag }}
+          
+      - name: Run OpenMP Tests
+        working-directory: builddir
+        if: ${{ matrix.backend.tag == 'OpenMP' }}
+        run: |
+          export OMP_NUM_THREADS=2 && ./core/tests/MorpheusCore_UnitTest_${{ matrix.backend.tag }} --kokkos-num-threads=2

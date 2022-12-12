@@ -121,7 +121,7 @@ TYPED_TEST(ConvertDynamicTypesTest, DynamicToSparse) {
     Morpheus::copy(this->dyn_ref_h, src_h);
 
     Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
-    Morpheus::Test::have_same_data(dst_h, this->con_ref_h);
+    EXPECT_TRUE(Morpheus::Test::have_same_data(dst_h, this->con_ref_h));
   }
 #endif
 
@@ -134,11 +134,11 @@ TYPED_TEST(ConvertDynamicTypesTest, DynamicToSparse) {
 
     if (Morpheus::has_same_format_v<csr_t, dst_t>) {
       Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
-      Morpheus::Test::have_same_data(dst_h, this->con_ref_h);
+      EXPECT_TRUE(Morpheus::Test::have_same_data(dst_h, this->con_ref_h));
     } else if (Morpheus::is_csr_matrix_format_container_v<csr_t> &&
                Morpheus::is_coo_matrix_format_container_v<dst_t>) {
       Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
-      Morpheus::Test::have_same_data(dst_h, this->con_ref_h);
+      EXPECT_TRUE(Morpheus::Test::have_same_data(dst_h, this->con_ref_h));
     } else {
       EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
                    Morpheus::NotImplementedException);
@@ -186,33 +186,44 @@ TYPED_TEST(ConvertDynamicTypesTest, SparseToDynamic) {
     // Convert back to concrete format and check with original src
     src_host_t ref_h;
     Morpheus::convert<TEST_CUSTOM_SPACE>(dst_h, ref_h);
-    Morpheus::Test::have_same_data(src_h, ref_h);
+    EXPECT_TRUE(Morpheus::Test::have_same_data(src_h, ref_h));
   }
 #endif  // MORPHEUS_ENABLE_SERIAL
 
 #if defined(MORPHEUS_ENABLE_OPENMP)
   if (Morpheus::has_openmp_execution_space<TEST_CUSTOM_SPACE>::value) {
     auto dst_h = Morpheus::create_mirror_container(dst);
+    // Switch to COO such that conversions are from CSR to COO
+    dst_h.activate(Morpheus::COO_FORMAT);
+
     auto src_h = Morpheus::create_mirror_container(src);
     Morpheus::copy(this->con_ref_h, src_h);
 
-    auto fmt_idx = dst_h.active_index();
-    /* NOTE: Dst should always have the same format as src so we do not expect
-     * to throw any NotImplemented errors
-     */
-    Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
-    // Check dynamic matrix has now same active type as original src
-    EXPECT_EQ(fmt_idx, dst_h.active_index());
+    if (Morpheus::is_dia_matrix_format_container_v<src_host_t>) {
+      EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
+                   Morpheus::NotImplementedException);
+    } else {
+      auto fmt_idx = dst_h.active_index();
 
-    // Convert back to concrete format and check with original src
-    src_host_t ref_h;
-    Morpheus::convert<TEST_CUSTOM_SPACE>(dst_h, ref_h);
-    Morpheus::Test::have_same_data(src_h, ref_h);
+      Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
+      // Check dynamic matrix has now same active type as original src
+      EXPECT_EQ(fmt_idx, dst_h.active_index());
+
+      // Convert back to concrete format and check with original src
+      src_host_t ref_h;
+      if (Morpheus::is_csr_matrix_format_container_v<src_host_t>) {
+        // Convert on Serial backend since OMP not implemented yet
+        Morpheus::convert<Morpheus::Serial>(dst_h, ref_h);
+      } else {
+        Morpheus::convert<TEST_CUSTOM_SPACE>(dst_h, ref_h);
+      }
+      EXPECT_TRUE(Morpheus::Test::have_same_data(src_h, ref_h));
+    }
   }
 #endif  // MORPHEUS_ENABLE_OPENMP
 }
 
-// TODO
+// TODO Src and Destination defined by their active index before conversion
 TYPED_TEST(ConvertDynamicTypesTest, DynamicToDynamic) { EXPECT_EQ(1, 1); }
 
 // TODO: In-place conversion using format index.
