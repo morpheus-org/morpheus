@@ -50,20 +50,22 @@ inline void multiply(
   using value_type = typename Matrix::value_type;
 
 #if defined(MORPHEUS_ENABLE_TPL_ARMPL)
-  if constexpr (std::is_floating_point_v<value_type> && std::is_same_v<index_type, int>) {
-    multiply_armpl_csr(A.nrows(), A.ncols(), A.crow_offsets().data(), 
-                 A.ccolumn_indices().data(), A.cvalues().data(),
-                 x.const_view().data(), y.data(), init);
-  }else{
+  if constexpr (std::is_floating_point_v<value_type> &&
+                std::is_same_v<index_type, int>) {
+    multiply_armpl_csr(A.nrows(), A.ncols(), A.crow_offsets().data(),
+                       A.ccolumn_indices().data(), A.cvalues().data(),
+                       x.const_view().data(), y.data(), init);
+  } else {
     for (index_type i = 0; i < A.nrows(); i++) {
-    value_type sum = init ? value_type(0) : y[i];
-    for (index_type jj = A.crow_offsets(i); jj < A.crow_offsets(i + 1); jj++) {
-      sum += A.cvalues(jj) * x[A.ccolumn_indices(jj)];
+      value_type sum = init ? value_type(0) : y[i];
+      for (index_type jj = A.crow_offsets(i); jj < A.crow_offsets(i + 1);
+           jj++) {
+        sum += A.cvalues(jj) * x[A.ccolumn_indices(jj)];
+      }
+      y[i] = sum;
     }
-    y[i] = sum;
   }
-  }
-  
+
 #else
   for (index_type i = 0; i < A.nrows(); i++) {
     value_type sum = init ? value_type(0) : y[i];
@@ -72,7 +74,7 @@ inline void multiply(
     }
     y[i] = sum;
   }
-#endif // MORPHEUS_ENABLE_TPL_ARMPL
+#endif  // MORPHEUS_ENABLE_TPL_ARMPL
 }
 
 }  // namespace Impl

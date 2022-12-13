@@ -55,16 +55,17 @@ inline void multiply(
   }
 
 #if defined(MORPHEUS_ENABLE_TPL_ARMPL)
-  if constexpr (std::is_floating_point_v<value_type> && std::is_same_v<index_type, int>) {
-    multiply_armpl_coo(A.nrows(), A.ncols(), A.nnnz(), A.crow_indices().data(), 
-                 A.ccolumn_indices().data(), A.cvalues().data(),
-                 x.const_view().data(), y.data(), init);
-  }else{
+  if constexpr (std::is_floating_point_v<value_type> &&
+                std::is_same_v<index_type, int>) {
+    multiply_armpl_coo(A.nrows(), A.ncols(), A.nnnz(), A.crow_indices().data(),
+                       A.ccolumn_indices().data(), A.cvalues().data(),
+                       x.const_view().data(), y.data(), init);
+  } else {
     for (index_type n = 0; n < A.nnnz(); n++) {
       y[A.crow_indices(n)] += A.cvalues(n) * x[A.ccolumn_indices(n)];
     }
   }
-  
+
 #else
 
   for (index_type n = 0; n < A.nnnz(); n++) {

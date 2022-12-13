@@ -32,46 +32,48 @@
 namespace Morpheus {
 namespace Impl {
 
-template<typename IndexType>
-void multiply_armpl_csr(const size_t M, const size_t N,
-                  const IndexType* roff, const IndexType* cind, 
-                  const double* vals, const double* x, double* y, bool init){
+template <typename IndexType>
+void multiply_armpl_csr(const size_t M, const size_t N, const IndexType* roff,
+                        const IndexType* cind, const double* vals,
+                        const double* x, double* y, bool init) {
   armpl_spmat_t armpl_mat;
   double beta = init ? 0.0 : 1.0;
-  
-  armpl_status_t info = armpl_spmat_create_csr_d(&armpl_mat, M, N, roff, cind, vals, ARMPL_SPARSE_CREATE_NOCOPY);
-  if (info!=ARMPL_STATUS_SUCCESS)
+
+  armpl_status_t info = armpl_spmat_create_csr_d(
+      &armpl_mat, M, N, roff, cind, vals, ARMPL_SPARSE_CREATE_NOCOPY);
+  if (info != ARMPL_STATUS_SUCCESS)
     printf("ERROR: armpl_spmat_create_coo_d returned %d\n", info);
 
-  info = armpl_spmv_exec_d(ARMPL_SPARSE_OPERATION_NOTRANS, 1.0,
-                            armpl_mat, x, beta, y);
-  if (info!=ARMPL_STATUS_SUCCESS)
+  info = armpl_spmv_exec_d(ARMPL_SPARSE_OPERATION_NOTRANS, 1.0, armpl_mat, x,
+                           beta, y);
+  if (info != ARMPL_STATUS_SUCCESS)
     printf("ERROR: armpl_spmv_exec_d returned %d\n", info);
 
   info = armpl_spmat_destroy(armpl_mat);
-  if (info!=ARMPL_STATUS_SUCCESS)
-        printf("ERROR: armpl_spmat_destroy returned %d\n", info);
+  if (info != ARMPL_STATUS_SUCCESS)
+    printf("ERROR: armpl_spmat_destroy returned %d\n", info);
 }
 
-template<typename IndexType>
-void multiply_armpl_csr(const size_t M, const size_t N,
-                  const IndexType* roff, const IndexType* cind, 
-                  const float* vals, const float* x, float* y, bool init){
+template <typename IndexType>
+void multiply_armpl_csr(const size_t M, const size_t N, const IndexType* roff,
+                        const IndexType* cind, const float* vals,
+                        const float* x, float* y, bool init) {
   armpl_spmat_t armpl_mat;
   float beta = init ? 0.0 : 1.0;
 
-  armpl_status_t info = armpl_spmat_create_csr_s(&armpl_mat, M, N, roff, cind, vals, ARMPL_SPARSE_CREATE_NOCOPY);
-  if (info!=ARMPL_STATUS_SUCCESS)
+  armpl_status_t info = armpl_spmat_create_csr_s(
+      &armpl_mat, M, N, roff, cind, vals, ARMPL_SPARSE_CREATE_NOCOPY);
+  if (info != ARMPL_STATUS_SUCCESS)
     printf("ERROR: armpl_spmat_create_coo_s returned %d\n", info);
 
-  info = armpl_spmv_exec_s(ARMPL_SPARSE_OPERATION_NOTRANS, 1.0,
-                            armpl_mat, x, beta, y);
-  if (info!=ARMPL_STATUS_SUCCESS)
+  info = armpl_spmv_exec_s(ARMPL_SPARSE_OPERATION_NOTRANS, 1.0, armpl_mat, x,
+                           beta, y);
+  if (info != ARMPL_STATUS_SUCCESS)
     printf("ERROR: armpl_spmv_exec_s returned %d\n", info);
 
   info = armpl_spmat_destroy(armpl_mat);
-  if (info!=ARMPL_STATUS_SUCCESS)
-        printf("ERROR: armpl_spmat_destroy returned %d\n", info);
+  if (info != ARMPL_STATUS_SUCCESS)
+    printf("ERROR: armpl_spmat_destroy returned %d\n", info);
 }
 
 }  // namespace Impl
