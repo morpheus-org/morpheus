@@ -248,6 +248,9 @@ Options can be enabled by specifying `-DMorpheus_ENABLE_X`.
   
 ## Third-party Libraries (TPLs)
 The following options control enabling TPLs:
+* Morpheus_ENABLE_TPL_ARMPL: BOOL
+    * Whether to enable ARMPL
+    * Default: OFF
 * Morpheus_ENABLE_TPL_CUBLAS: BOOL
     * Whether to enable CUBLAS
     * Default: ON if CUDA-enabled Kokkos, otherwise OFF
@@ -262,6 +265,9 @@ The following options control `find_package` paths for CMake-based TPLs:
 * Morpheus_CUBLAS_ROOT: PATH
     * Location of CUBLAS install root.
     * Default: None or the value of the environment variable CUBLAS_ROOT if set
+* Morpheus_ARMPL_ROOT: PATH
+    * Location of ARMPL install root.
+    * Default: None or the value of the environment variable ARMPL_ROOT if set
 * GTest_ROOT: PATH
     * Location of GoogleTest install root.
     * Default: None or the value of the environment variable GTest_ROOT if set

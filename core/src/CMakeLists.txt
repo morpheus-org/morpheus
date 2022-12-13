@@ -130,3 +130,4 @@ target_include_directories(
 
 morpheus_link_tpl(morpheus-core PUBLIC MPARK_VARIANT)
 morpheus_link_tpl(morpheus-core PUBLIC CUBLAS)
+morpheus_link_tpl(morpheus-core PUBLIC ARMPL)
