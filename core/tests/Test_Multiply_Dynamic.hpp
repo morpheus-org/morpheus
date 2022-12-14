@@ -62,16 +62,17 @@ class DynamicMultiplyTypesTest : public ::testing::Test {
   using MirrorArrayLayout = typename mat_host_t::array_layout;
   using MirrorBackend     = typename mat_host_t::backend;
 
-  struct containers {
+  class ContainersClass {
+   public:
     using diag_generator = Morpheus::Test::DiagonalMatrixGenerator<
         ValueType, IndexType, MirrorArrayLayout, MirrorBackend>;
 
     mat_dev_t A;
     vec1_dev_t x;
     vec2_dev_t y;
-    containers() : A(), x(), y() {}
+    ContainersClass() : A(), x(), y() {}
 
-    containers(size_t nrows, size_t ncols, std::vector<int>& diag_indexes)
+    ContainersClass(size_t nrows, size_t ncols, std::vector<int>& diag_indexes)
         : A(), x(ncols, 0), y(nrows, 0) {
       // Generate the diagonal matrix
       diag_generator generator(nrows, ncols, diag_indexes);
@@ -111,7 +112,7 @@ class DynamicMultiplyTypesTest : public ::testing::Test {
   size_t nrows[samples]    = {10, 100, 1000};
   size_t ncols[samples]    = {10, 100, 1000};
 
-  struct containers containers[samples];
+  ContainersClass containers[samples];
 
   void SetUp() override {
     for (size_t i = 0; i < samples; i++) {
@@ -129,7 +130,7 @@ class DynamicMultiplyTypesTest : public ::testing::Test {
         }
       }
 
-      struct containers c(nrows[i], ncols[i], diags);
+      ContainersClass c(nrows[i], ncols[i], diags);
       containers[i] = c;
     }
   }
