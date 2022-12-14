@@ -49,6 +49,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       FormatTraits
       GenericBackend
       MatrixBase
+      MatrixOperations
       Metaprogramming
       MirrorContainers
       Multiply_Dynamic

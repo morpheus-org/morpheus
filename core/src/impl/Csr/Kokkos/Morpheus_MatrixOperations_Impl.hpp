@@ -41,12 +41,13 @@ void update_diagonal(
         Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
-  using index_type  = typename Matrix::index_type;
-  using value_array = typename Matrix::value_array_type::value_array_type;
-  using index_array = typename Matrix::index_array_type::value_array_type;
+  using execution_space = typename ExecSpace::execution_space;
+  using index_type      = typename Matrix::index_type;
+  using value_array     = typename Matrix::value_array_type::value_array_type;
+  using index_array     = typename Matrix::index_array_type::value_array_type;
 
   using range_policy =
-      Kokkos::RangePolicy<Kokkos::IndexType<index_type>, ExecSpace>;
+      Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
 
   value_array values              = A.values().view();
   index_array column_indices      = A.column_indices().view();
