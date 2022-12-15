@@ -96,7 +96,8 @@ void read_matrix_market_banner(matrix_market_banner& banner, Stream& input) {
                                 banner.type + "]");
 
   if (banner.symmetry != "general" && banner.symmetry != "symmetric" &&
-      banner.symmetry != "hermitian" && banner.symmetry != "skew-symmetric")
+      banner.symmetry != "unsymmetric" && banner.symmetry != "hermitian" &&
+      banner.symmetry != "skew-symmetric")
     throw Morpheus::IOException("invalid MatrixMarket symmetry [" +
                                 banner.symmetry + "]");
 }
@@ -155,8 +156,7 @@ void read_coordinate_stream(Morpheus::CooMatrix<ValueType, Properties...>& coo,
     }
   } else if (banner.type == "complex") {
     throw Morpheus::NotImplementedException(
-        "Morpheus does not currently support complex "
-        "matrices");
+        "Morpheus does not currently support complex matrices");
 
   } else {
     throw Morpheus::IOException("invalid MatrixMarket data type");
@@ -235,17 +235,18 @@ void read_coordinate_stream(Morpheus::CooMatrix<ValueType, Properties...>& coo,
           "MatrixMarket I/O does not currently support hermitian matrices");
       // TODO
     } else if (banner.symmetry == "skew-symmetric") {
-      // TODO
       throw Morpheus::NotImplementedException(
           "MatrixMarket I/O does not currently support skew-symmetric "
           "matrices");
+      // TODO
     }
 
     // store full matrix in coo
     coo = general;
   }  // if (banner.symmetry != "general")
+
   // sort indices by (row,column)
-  Morpheus::sort_by_row_and_column<Kokkos::Serial>(coo);
+  Morpheus::sort_by_row_and_column<Morpheus::Serial>(coo);
 }
 
 template <typename ValueType, typename... Properties, typename Stream>

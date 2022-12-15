@@ -31,11 +31,19 @@ namespace IO {
 
 template <typename Matrix, typename Stream>
 void read_matrix_market_stream(Matrix& mtx, Stream& input) {
+  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix>,
+                "Matrix must be a CooMatrix container");
+  static_assert(Morpheus::has_host_memory_space_v<Matrix>,
+                "Matrix must reside in HostSpace");
   Morpheus::IO::Impl::read_matrix_market_stream(mtx, input);
 }
 
 template <typename Matrix>
 void read_matrix_market_file(Matrix& mtx, const std::string& filename) {
+  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix>,
+                "Matrix must be a CooMatrix container");
+  static_assert(Morpheus::has_host_memory_space_v<Matrix>,
+                "Matrix must reside in HostSpace");
   std::ifstream file(filename.c_str());
 
   if (!file)
@@ -59,11 +67,19 @@ void read_matrix_market_file(Matrix& mtx, const std::string& filename) {
 
 template <typename Matrix, typename Stream>
 void write_matrix_market_stream(const Matrix& mtx, Stream& output) {
+  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix>,
+                "Matrix must be a CooMatrix container");
+  static_assert(Morpheus::has_host_memory_space_v<Matrix>,
+                "Matrix must reside in HostSpace");
   Morpheus::IO::Impl::write_matrix_market_stream(mtx, output);
 }
 
 template <typename Matrix>
 void write_matrix_market_file(const Matrix& mtx, const std::string& filename) {
+  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix>,
+                "Matrix must be a CooMatrix container");
+  static_assert(Morpheus::has_host_memory_space_v<Matrix>,
+                "Matrix must reside in HostSpace");
   std::ofstream file(filename.c_str());
 
   if (!file)

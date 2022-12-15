@@ -1,0 +1,7 @@
+%%MatrixMarket matrix coordinate real symmetric
+% Zero-based indexing on rows
+4 4 4
+0 2 2.123
+0 3 -45.345
+1 3 -4.8765
+3 4 1.15
