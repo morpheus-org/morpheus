@@ -33,6 +33,8 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 
+#include <impl/Coo/Serial/Morpheus_Sort_Impl.hpp>
+
 // TODO: Remove use of set during Coo to Dia Conversion
 #include <set>
 
@@ -104,8 +106,9 @@ void convert(
     }
   }
 
-  if (!dst.is_sorted()) {
-    dst.sort();
+  if (!Impl::is_sorted<ExecSpace>(dst)) {
+    Impl::sort_by_row_and_column<ExecSpace>(dst);
+    // dst.sort();
   }
 }
 

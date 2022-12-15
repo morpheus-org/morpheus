@@ -1,5 +1,5 @@
 /**
- * Test_MatrixOperations.hpp
+ * Test_MatrixOperations_Dynamic.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,46 +21,32 @@
  * limitations under the License.
  */
 
-#ifndef TEST_CORE_TEST_MATRIXOPERATIONS_HPP
-#define TEST_CORE_TEST_MATRIXOPERATIONS_HPP
+#ifndef TEST_CORE_TEST_MATRIXOPERATIONS_DYNAMIC_HPP
+#define TEST_CORE_TEST_MATRIXOPERATIONS_DYNAMIC_HPP
 
 #include <Morpheus_Core.hpp>
 #include <utils/Utils.hpp>
 #include <utils/Macros_DenseVector.hpp>
-#include <utils/Macros_DenseMatrix.hpp>
-#include <utils/Macros_CooMatrix.hpp>
-#include <utils/Macros_CsrMatrix.hpp>
-#include <utils/Macros_DiaMatrix.hpp>
+#include <utils/Macros_DynamicMatrix.hpp>
 #include <utils/MatrixGenerator.hpp>
 
-using CooMatrixTypes =
-    typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
-                                               types::types_set>::type;
-
-using CsrMatrixTypes =
-    typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
-                                               types::types_set>::type;
-
-using DiaMatrixTypes =
-    typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
+using DynamicMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::DynamicMatrix<double>,
                                                types::types_set>::type;
 
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
                                                types::types_set>::type;
 
-using CooMatrixPairs = generate_pair<CooMatrixTypes, DenseVectorTypes>::type;
-using CsrMatrixPairs = generate_pair<CsrMatrixTypes, DenseVectorTypes>::type;
-using DiaMatrixPairs = generate_pair<DiaMatrixTypes, DenseVectorTypes>::type;
+using DynamicMatrixPairs =
+    generate_pair<DynamicMatrixTypes, DenseVectorTypes>::type;
 
-using pairs = typename Morpheus::concat<
-    CooMatrixPairs,
-    typename Morpheus::concat<CsrMatrixPairs, DiaMatrixPairs>::type>::type;
+using pairs = DynamicMatrixPairs;
 
-using MatrixOperationsTypes = to_gtest_types<pairs>::type;
+using DynamicMatrixOperationsTypes = to_gtest_types<pairs>::type;
 
 template <typename Containers>
-class MatrixOperationsTypesTest : public ::testing::Test {
+class DynamicMatrixOperationsTypesTest : public ::testing::Test {
  public:
   using type              = Containers;
   using mat_container_t   = typename Containers::first_type::type;
@@ -99,9 +85,8 @@ class MatrixOperationsTypesTest : public ::testing::Test {
         ref_diag(i) = Adense(i, i);
       }
 
-      // Convert it in the format we are interested in
-      mat_host_t Ah;
-      Morpheus::convert<Morpheus::Serial>(Acoo, Ah);
+      // Assign Coo Host matrix to Dynamic Host container
+      mat_host_t Ah = Acoo;
 
       // Copy on device
       A.resize(Ah);
@@ -139,89 +124,110 @@ class MatrixOperationsTypesTest : public ::testing::Test {
 
 namespace Test {
 
-TYPED_TEST_SUITE(MatrixOperationsTypesTest, MatrixOperationsTypes);
+TYPED_TEST_SUITE(DynamicMatrixOperationsTypesTest,
+                 DynamicMatrixOperationsTypes);
 
-TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalCustom) {
+TYPED_TEST(DynamicMatrixOperationsTypesTest, DynamicUpdateDiagonalCustom) {
   using vec_t      = typename TestFixture::vec_dev_t;
   using vec_h_t    = typename TestFixture::vec_host_t;
-  using mat_t      = typename TestFixture::mat_dev_t;
-  using mat_h_t    = typename TestFixture::mat_host_t;
   using index_type = typename TestFixture::IndexType;
+  using backend    = typename TestFixture::Backend;
   using dense_mat_h_t =
       typename TestFixture::ContainersClass::diag_generator::DenseMatrix;
+  using coo_mat_h_t =
+      typename TestFixture::ContainersClass::diag_generator::SparseMatrix;
 
   for (index_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
-    vec_t new_diag(c.A.nrows(), 1);
-    mat_t A = Morpheus::create_mirror<TEST_CUSTOM_SPACE>(c.A);
-    Morpheus::copy(c.A, A);
+    // Create a duplicate of A on host
+    auto Ah = Morpheus::create_mirror(c.A);
+    Morpheus::copy(c.A, Ah);
 
-    Morpheus::update_diagonal<TEST_CUSTOM_SPACE>(A, new_diag);
+    for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Convert to the new active state
+      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      auto A = Morpheus::create_mirror_container<backend>(Ah);
+      Morpheus::copy(Ah, A);
 
-    mat_h_t Ah = Morpheus::create_mirror_container<Morpheus::Serial>(A);
-    Morpheus::copy(A, Ah);
+      vec_t new_diag(c.A.nrows(), 1);
 
-    dense_mat_h_t Adense;
-    Morpheus::convert<Morpheus::Serial>(Ah, Adense);
-    vec_h_t diag(Adense.nrows(), 0);
+      Morpheus::update_diagonal<TEST_CUSTOM_SPACE>(A, new_diag);
 
-    for (size_t row = 0; row < (size_t)Adense.nrows(); row++) {
-      diag[row] = Adense(row, row);
-    }
+      coo_mat_h_t Acoo;
+      dense_mat_h_t Adense;
+      Morpheus::convert<Morpheus::Serial>(Ah, Acoo);
+      Morpheus::convert<Morpheus::Serial>(Acoo, Adense);
 
-    vec_h_t new_diag_h = Morpheus::create_mirror_container(new_diag);
-    Morpheus::copy(new_diag, new_diag_h);
+      vec_h_t diag(Adense.nrows(), 0);
 
-    EXPECT_FALSE(Morpheus::Test::is_empty_container(diag));
-    for (size_t idx = 0; idx < diag.size(); idx++) {
-      if (c.ref_diag[idx] == 0) {
-        EXPECT_EQ(diag[idx], c.ref_diag[idx]);
-      } else {
-        EXPECT_EQ(diag[idx], new_diag_h[idx]);
+      for (size_t row = 0; row < (size_t)Adense.nrows(); row++) {
+        diag[row] = Adense(row, row);
+      }
+
+      vec_h_t new_diag_h = Morpheus::create_mirror_container(new_diag);
+      Morpheus::copy(new_diag, new_diag_h);
+
+      EXPECT_FALSE(Morpheus::Test::is_empty_container(diag));
+      for (size_t idx = 0; idx < diag.size(); idx++) {
+        if (c.ref_diag[idx] == 0) {
+          EXPECT_EQ(diag[idx], c.ref_diag[idx]);
+        } else {
+          EXPECT_EQ(diag[idx], new_diag_h[idx]);
+        }
       }
     }
   }
 }
 
-TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalGeneric) {
+TYPED_TEST(DynamicMatrixOperationsTypesTest, DynamicUpdateDiagonalGeneric) {
   using vec_t      = typename TestFixture::vec_dev_t;
   using vec_h_t    = typename TestFixture::vec_host_t;
-  using mat_t      = typename TestFixture::mat_dev_t;
-  using mat_h_t    = typename TestFixture::mat_host_t;
   using index_type = typename TestFixture::IndexType;
+  using backend    = typename TestFixture::Backend;
   using dense_mat_h_t =
       typename TestFixture::ContainersClass::diag_generator::DenseMatrix;
+  using coo_mat_h_t =
+      typename TestFixture::ContainersClass::diag_generator::SparseMatrix;
 
   for (index_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
-    vec_t new_diag(c.A.nrows(), 1);
-    mat_t A = Morpheus::create_mirror<TEST_CUSTOM_SPACE>(c.A);
-    Morpheus::copy(c.A, A);
+    // Create a duplicate of A on host
+    auto Ah = Morpheus::create_mirror(c.A);
+    Morpheus::copy(c.A, Ah);
 
-    Morpheus::update_diagonal<TEST_GENERIC_SPACE>(A, new_diag);
+    for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Convert to the new active state
+      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      auto A = Morpheus::create_mirror_container<backend>(Ah);
+      Morpheus::copy(Ah, A);
 
-    mat_h_t Ah = Morpheus::create_mirror_container<Morpheus::Serial>(A);
-    Morpheus::copy(A, Ah);
+      vec_t new_diag(c.A.nrows(), 1);
 
-    dense_mat_h_t Adense;
-    Morpheus::convert<Morpheus::Serial>(Ah, Adense);
-    vec_h_t diag(Adense.nrows(), 0);
+      Morpheus::update_diagonal<TEST_GENERIC_SPACE>(A, new_diag);
 
-    for (size_t row = 0; row < (size_t)Adense.nrows(); row++) {
-      diag[row] = Adense(row, row);
-    }
+      coo_mat_h_t Acoo;
+      dense_mat_h_t Adense;
+      Morpheus::convert<Morpheus::Serial>(Ah, Acoo);
+      Morpheus::convert<Morpheus::Serial>(Acoo, Adense);
 
-    vec_h_t new_diag_h = Morpheus::create_mirror_container(new_diag);
-    Morpheus::copy(new_diag, new_diag_h);
+      vec_h_t diag(Adense.nrows(), 0);
 
-    EXPECT_FALSE(Morpheus::Test::is_empty_container(diag));
-    for (size_t idx = 0; idx < diag.size(); idx++) {
-      if (c.ref_diag[idx] == 0) {
-        EXPECT_EQ(diag[idx], c.ref_diag[idx]);
-      } else {
-        EXPECT_EQ(diag[idx], new_diag_h[idx]);
+      for (size_t row = 0; row < (size_t)Adense.nrows(); row++) {
+        diag[row] = Adense(row, row);
+      }
+
+      vec_h_t new_diag_h = Morpheus::create_mirror_container(new_diag);
+      Morpheus::copy(new_diag, new_diag_h);
+
+      EXPECT_FALSE(Morpheus::Test::is_empty_container(diag));
+      for (size_t idx = 0; idx < diag.size(); idx++) {
+        if (c.ref_diag[idx] == 0) {
+          EXPECT_EQ(diag[idx], c.ref_diag[idx]);
+        } else {
+          EXPECT_EQ(diag[idx], new_diag_h[idx]);
+        }
       }
     }
   }
@@ -229,4 +235,4 @@ TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalGeneric) {
 
 }  // namespace Test
 
-#endif  // TEST_CORE_TEST_MATRIXOPERATIONS_HPP
+#endif  // TEST_CORE_TEST_MATRIXOPERATIONS_DYNAMIC_HPP
