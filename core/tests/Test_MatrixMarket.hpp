@@ -561,10 +561,10 @@ TEST(MatrixMarket, ReadArrayInvalidSymmetrySymmetric) {
 TEST(MatrixMarket, WriteMatrixDoubleGeneralCoo) {
   // create_mm_out_path();
   // std::cout << "post  create_mm_out_path";
-  std::string filename("/tmp/coo_double.mtx");
+  std::string filename("./coo_double.mtx");
 
-  std::cout << "Created file with permissions: ";
-  demo_perms(fs::status(filename).permissions());
+  // std::cout << "Created file with permissions: ";
+  // demo_perms(fs::status(filename).permissions());
 
   Morpheus::CooMatrix<double, Morpheus::HostSpace> A(2, 2, 4), Aref;
 
