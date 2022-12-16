@@ -560,6 +560,7 @@ TEST(MatrixMarket, ReadArrayInvalidSymmetrySymmetric) {
 
 TEST(MatrixMarket, WriteMatrixDoubleGeneralCoo) {
   create_mm_out_path();
+  std::cout << "post  create_mm_out_path";
   std::string filename(get_mm_out_path() + "/coo_double.mtx");
 
   std::cout << "Created file with permissions: ";
