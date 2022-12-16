@@ -41,17 +41,17 @@ std::string get_mm_test_path() {
   return file_path.substr(0, file_path.rfind("/")) + "/mm_data";
 }
 
-void create_mm_out_path() {
-  std::cout << "Creating mm out path " << std::endl;
-  auto mmpath = std::filesystem::temp_directory_path();
-  std::cout << "MMDIR = " << mmpath.string() << std::endl;
-  if (!std::filesystem::exists(mmpath)) {
-    std::cout << "Creating MMDIR at " << mmpath.string() << std::endl;
-    bool res = std::filesystem::create_directories(mmpath);
-    std::cout << "Creating MMDIR at " << mmpath.string() << "(" << res << ")"
-              << std::endl;
-  }
-}
+// void create_mm_out_path() {
+//   std::cout << "Creating mm out path " << std::endl;
+//   auto mmpath = std::filesystem::temp_directory_path();
+//   std::cout << "MMDIR = " << mmpath.string() << std::endl;
+//   if (!std::filesystem::exists(mmpath)) {
+//     std::cout << "Creating MMDIR at " << mmpath.string() << std::endl;
+//     bool res = std::filesystem::create_directories(mmpath);
+//     std::cout << "Creating MMDIR at " << mmpath.string() << "(" << res << ")"
+//               << std::endl;
+//   }
+// }
 namespace fs = std::filesystem;
 
 void demo_perms(fs::perms p) {
@@ -559,8 +559,8 @@ TEST(MatrixMarket, ReadArrayInvalidSymmetrySymmetric) {
 }
 
 TEST(MatrixMarket, WriteMatrixDoubleGeneralCoo) {
-  create_mm_out_path();
-  std::cout << "post  create_mm_out_path";
+  // create_mm_out_path();
+  // std::cout << "post  create_mm_out_path";
   std::string filename(get_mm_out_path() + "/coo_double.mtx");
 
   std::cout << "Created file with permissions: ";
