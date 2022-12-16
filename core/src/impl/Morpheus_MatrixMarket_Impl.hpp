@@ -39,10 +39,6 @@
 
 namespace Morpheus {
 namespace IO {
-// forward decl
-template <typename Matrix, typename Stream>
-void read_matrix_market_stream(Matrix& mtx, Stream& input);
-
 namespace Impl {
 
 inline void tokenize(std::vector<std::string>& tokens, const std::string& str,
@@ -324,7 +320,6 @@ void read_matrix_market_stream(
     typename std::enable_if<
         is_coo_matrix_format_container_v<Container<T, P...>> &&
         has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
-  // read banner
   matrix_market_banner banner;
   read_matrix_market_banner(banner, input);
 
@@ -346,7 +341,6 @@ void read_matrix_market_stream(
     typename std::enable_if<
         is_dynamic_matrix_format_container_v<Container<T, P...>> &&
         has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
-  // read banner
   matrix_market_banner banner;
   read_matrix_market_banner(banner, input);
 
@@ -375,7 +369,6 @@ void read_matrix_market_stream(
     typename std::enable_if<
         is_dense_matrix_format_container_v<Container<T, P...>> &&
         has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
-  // read banner
   matrix_market_banner banner;
   read_matrix_market_banner(banner, input);
 
@@ -425,17 +418,15 @@ void write_coordinate_stream(
   if (std::is_floating_point_v<ValueType> || std::is_integral_v<ValueType>) {
     output << "%%MatrixMarket matrix coordinate real general\n";
   } else {
-    // output << "%%MatrixMarket matrix coordinate complex general\n";
     throw Morpheus::NotImplementedException("complex type is not supported.");
   }
 
-  output << "\t" << coo.nrows() << "\t" << coo.ncols() << "\t" << coo.nnnz()
-         << "\n";
+  output << coo.nrows() << "\t" << coo.ncols() << "\t" << coo.nnnz() << "\n";
 
   for (size_t i = 0; i < size_t(coo.nnnz()); i++) {
-    output << (coo.row_indices(i) + 1) << " ";
-    output << (coo.column_indices(i) + 1) << " ";
-    Morpheus::IO::Impl::write_value(output, coo.values(i));
+    output << (coo.crow_indices(i) + 1) << " ";
+    output << (coo.ccolumn_indices(i) + 1) << " ";
+    Impl::write_value(output, coo.cvalues(i));
     output << "\n";
   }
 }
@@ -445,58 +436,66 @@ template <template <class, class...> class Container, class T, class... P,
 void write_matrix_market_stream(
     const Container<T, P...>& mtx, Stream& output,
     typename std::enable_if<
-        is_sparse_matrix_container_v<Container<T, P...>> &&
+        is_coo_matrix_format_container_v<Container<T, P...>> &&
         has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
-  // general sparse case
-  Morpheus::CooMatrix<T, P...> coo;
-  Morpheus::convert<Morpheus::Serial>(mtx, coo);
-
-  Morpheus::IO::Impl::write_coordinate_stream(coo, output);
+  Impl::write_coordinate_stream(mtx, output);
 }
 
-template <typename Matrix, typename Stream>
+template <template <class, class...> class Container, class T, class... P,
+          typename Stream>
 void write_matrix_market_stream(
-    const Matrix& mtx, Stream& output,
+    const Container<T, P...>& mtx, Stream& output,
     typename std::enable_if<
-        Morpheus::is_dense_vector_format_container_v<Matrix>>::type* =
-        nullptr) {
-  using ValueType = typename Matrix::value_type;
+        is_dynamic_matrix_format_container_v<Container<T, P...>> &&
+        has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
+  if (mtx.active_index() != Morpheus::COO_FORMAT) {
+    throw Morpheus::RuntimeException(
+        "write_matrix_market_stream: The active state of a DynamicMatrix must "
+        "be set to Morpheus::COO_FORMAT before writing a MatrixMarket stream!");
+  }
+  Morpheus::CooMatrix<T, P...> coo = mtx;
+  Impl::write_coordinate_stream(coo, output);
+}
 
-  if (std::is_floating_point_v<ValueType> || std::is_integral_v<ValueType>) {
+template <template <class, class...> class Container, class T, class... P,
+          typename Stream>
+void write_matrix_market_stream(
+    const Container<T, P...>& vec, Stream& output,
+    typename std::enable_if<
+        is_dense_vector_format_container_v<Container<T, P...>> &&
+        has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
+  if (std::is_floating_point_v<T> || std::is_integral_v<T>) {
     output << "%%MatrixMarket matrix array real general\n";
   } else {
-    // output << "%%MatrixMarket matrix array complex general\n";
     throw Morpheus::NotImplementedException("complex type is not supported.");
   }
 
-  output << "\t" << mtx.size() << "\t1\n";
+  output << vec.size() << "\t1\n";
 
-  for (size_t i = 0; i < mtx.size(); i++) {
-    write_value(output, mtx[i]);
+  for (size_t i = 0; i < vec.size(); i++) {
+    Impl::write_value(output, vec[i]);
     output << "\n";
   }
 }
 
-template <typename Matrix, typename Stream>
+template <template <class, class...> class Container, class T, class... P,
+          typename Stream>
 void write_matrix_market_stream(
-    const Matrix& mtx, Stream& output,
+    const Container<T, P...>& mtx, Stream& output,
     typename std::enable_if<
-        Morpheus::is_dense_matrix_format_container_v<Matrix>>::type* =
-        nullptr) {
-  using ValueType = typename Matrix::value_type;
-
-  if (std::is_floating_point_v<ValueType> || std::is_integral_v<ValueType>) {
+        is_dense_matrix_format_container_v<Container<T, P...>> &&
+        has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
+  if (std::is_floating_point_v<T> || std::is_integral_v<T>) {
     output << "%%MatrixMarket matrix array real general\n";
   } else {
-    // output << "%%MatrixMarket matrix array complex general\n";
     throw Morpheus::NotImplementedException("complex type is not supported.");
   }
 
-  output << "\t" << mtx.nrows() << "\t" << mtx.ncols() << "\n";
+  output << mtx.nrows() << "\t" << mtx.ncols() << "\n";
 
-  for (size_t j = 0; j < mtx.nrows(); j++) {
-    for (size_t i = 0; i < mtx.ncols(); i++) {
-      write_value(output, mtx(i, j));
+  for (size_t i = 0; i < (size_t)mtx.nrows(); i++) {
+    for (size_t j = 0; j < (size_t)mtx.ncols(); j++) {
+      Impl::write_value(output, mtx(i, j));
       output << "\n";
     }
   }

@@ -29,29 +29,32 @@
 namespace Morpheus {
 namespace IO {
 
-template <typename Matrix, typename Stream>
-void read_matrix_market_stream(Matrix& mtx, Stream& input) {
-  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix> ||
-                    Morpheus::is_dynamic_matrix_format_container_v<Matrix> ||
-                    Morpheus::is_dense_matrix_format_container_v<Matrix> ||
-                    Morpheus::is_dense_vector_format_container_v<Matrix>,
-                "Matrix must be either a CooMatrix, DynamicMatrix, DenseMatrix "
-                "or DenseVector container");
-  static_assert(Morpheus::has_host_memory_space_v<Matrix>,
-                "Matrix must reside in HostSpace");
-  Morpheus::IO::Impl::read_matrix_market_stream(mtx, input);
+template <typename Container, typename Stream>
+void read_matrix_market_stream(Container& container, Stream& input) {
+  static_assert(
+      Morpheus::is_coo_matrix_format_container_v<Container> ||
+          Morpheus::is_dynamic_matrix_format_container_v<Container> ||
+          Morpheus::is_dense_matrix_format_container_v<Container> ||
+          Morpheus::is_dense_vector_format_container_v<Container>,
+      "Container must be either a CooMatrix, DynamicMatrix, DenseMatrix "
+      "or DenseVector container");
+  static_assert(Morpheus::has_host_memory_space_v<Container>,
+                "Container must reside in HostSpace");
+  Morpheus::IO::Impl::read_matrix_market_stream(container, input);
 }
 
-template <typename Matrix>
-void read_matrix_market_file(Matrix& mtx, const std::string& filename) {
-  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix> ||
-                    Morpheus::is_dynamic_matrix_format_container_v<Matrix> ||
-                    Morpheus::is_dense_matrix_format_container_v<Matrix> ||
-                    Morpheus::is_dense_vector_format_container_v<Matrix>,
-                "Matrix must be either a CooMatrix, DynamicMatrix, DenseMatrix "
-                "or DenseVector container");
-  static_assert(Morpheus::has_host_memory_space_v<Matrix>,
-                "Matrix must reside in HostSpace");
+template <typename Container>
+void read_matrix_market_file(Container& container,
+                             const std::string& filename) {
+  static_assert(
+      Morpheus::is_coo_matrix_format_container_v<Container> ||
+          Morpheus::is_dynamic_matrix_format_container_v<Container> ||
+          Morpheus::is_dense_matrix_format_container_v<Container> ||
+          Morpheus::is_dense_vector_format_container_v<Container>,
+      "Container must be either a CooMatrix, DynamicMatrix, DenseMatrix "
+      "or DenseVector container");
+  static_assert(Morpheus::has_host_memory_space_v<Container>,
+                "Container must reside in HostSpace");
   std::ifstream file(filename.c_str());
 
   if (!file)
@@ -67,27 +70,38 @@ void read_matrix_market_file(Matrix& mtx, const std::string& filename) {
   file.rdbuf()->sgetn(&buffer[0], buffer.size());
   file_string.write(&buffer[0], buffer.size());
 
-  Morpheus::IO::read_matrix_market_stream(mtx, file_string);
+  Morpheus::IO::read_matrix_market_stream(container, file_string);
 #else
-  Morpheus::IO::read_matrix_market_stream(mtx, file);
+  Morpheus::IO::read_matrix_market_stream(container, file);
 #endif
 }
 
-template <typename Matrix, typename Stream>
-void write_matrix_market_stream(const Matrix& mtx, Stream& output) {
-  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix>,
-                "Matrix must be a CooMatrix container");
-  static_assert(Morpheus::has_host_memory_space_v<Matrix>,
-                "Matrix must reside in HostSpace");
-  Morpheus::IO::Impl::write_matrix_market_stream(mtx, output);
+template <typename Container, typename Stream>
+void write_matrix_market_stream(const Container& container, Stream& output) {
+  static_assert(
+      Morpheus::is_coo_matrix_format_container_v<Container> ||
+          Morpheus::is_dynamic_matrix_format_container_v<Container> ||
+          Morpheus::is_dense_matrix_format_container_v<Container> ||
+          Morpheus::is_dense_vector_format_container_v<Container>,
+      "Container must be either a CooMatrix, DynamicMatrix, DenseMatrix "
+      "or DenseVector container");
+  static_assert(Morpheus::has_host_memory_space_v<Container>,
+                "Container must reside in HostSpace");
+  Morpheus::IO::Impl::write_matrix_market_stream(container, output);
 }
 
-template <typename Matrix>
-void write_matrix_market_file(const Matrix& mtx, const std::string& filename) {
-  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix>,
-                "Matrix must be a CooMatrix container");
-  static_assert(Morpheus::has_host_memory_space_v<Matrix>,
-                "Matrix must reside in HostSpace");
+template <typename Container>
+void write_matrix_market_file(const Container& container,
+                              const std::string& filename) {
+  static_assert(
+      Morpheus::is_coo_matrix_format_container_v<Container> ||
+          Morpheus::is_dynamic_matrix_format_container_v<Container> ||
+          Morpheus::is_dense_matrix_format_container_v<Container> ||
+          Morpheus::is_dense_vector_format_container_v<Container>,
+      "Container must be either a CooMatrix, DynamicMatrix, DenseMatrix "
+      "or DenseVector container");
+  static_assert(Morpheus::has_host_memory_space_v<Container>,
+                "Container must reside in HostSpace");
   std::ofstream file(filename.c_str());
 
   if (!file)
@@ -98,11 +112,11 @@ void write_matrix_market_file(const Matrix& mtx, const std::string& filename) {
   // WAR OSX-specific issue using rdbuf
   std::stringstream file_string(std::stringstream::in | std::stringstream::out);
 
-  Morpheus::IO::write_matrix_market_stream(mtx, file_string);
+  Morpheus::IO::write_matrix_market_stream(container, file_string);
 
   file.rdbuf()->sputn(file_string.str().c_str(), file_string.str().size());
 #else
-  Morpheus::IO::write_matrix_market_stream(mtx, file);
+  Morpheus::IO::write_matrix_market_stream(container, file);
 #endif
 }
 }  // namespace IO
