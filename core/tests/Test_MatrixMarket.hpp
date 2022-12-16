@@ -34,6 +34,8 @@
 #include <iostream>
 #include <filesystem>
 
+#include <sys/stat.h>
+
 namespace Test {
 
 std::string get_mm_test_path() {
@@ -42,11 +44,12 @@ std::string get_mm_test_path() {
 }
 
 void create_mm_out_path() {
-  std::filesystem::path mmpath("mm_output");
+  // std::filesystem::path mmpath("mm_output");
 
-  if (!std::filesystem::exists(mmpath)) {
-    std::filesystem::create_directories(mmpath);
-  }
+  // if (!std::filesystem::exists(mmpath)) {
+  //   std::filesystem::create_directories(mmpath);
+  // }
+  mkdir("mm_output", 0777);
 }
 
 std::string get_mm_out_path() { return "mm_output"; }
