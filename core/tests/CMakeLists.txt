@@ -16,21 +16,51 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
 
     foreach(
       Name
-      # ContainerFactory ContainerTraits Convert_Dynamic Convert
-      # CooMatrix_Binary CooMatrix_CompatibleBinary
-      # CooMatrix_CompatibleDynamicBinary CooMatrix Copy DenseMatrix_Binary
-      # DenseMatrix_CompatibleBinary DenseMatrix CsrMatrix_Binary
-      # CsrMatrix_CompatibleBinary CsrMatrix_CompatibleDynamicBinary CsrMatrix
-      # CustomBackend DenseVector_Binary DenseVector_CompatibleBinary
-      # DenseVector DiaMatrix_Binary DiaMatrix_CompatibleBinary
-      # DiaMatrix_CompatibleDynamicBinary DiaMatrix Dot DynamicMatrix_Binary
-      # DynamicMatrix_CompatibleBinary DynamicMatrix_CompatibleConcreteBinary
-      # DynamicMatrix FormatTags FormatTraits GenericBackend MatrixBase
+      ContainerFactory
+      ContainerTraits
+      Convert_Dynamic
+      Convert
+      CooMatrix_Binary
+      CooMatrix_CompatibleBinary
+      CooMatrix_CompatibleDynamicBinary
+      CooMatrix
+      Copy
+      DenseMatrix_Binary
+      DenseMatrix_CompatibleBinary
+      DenseMatrix
+      CsrMatrix_Binary
+      CsrMatrix_CompatibleBinary
+      CsrMatrix_CompatibleDynamicBinary
+      CsrMatrix
+      CustomBackend
+      DenseVector_Binary
+      DenseVector_CompatibleBinary
+      DenseVector
+      DiaMatrix_Binary
+      DiaMatrix_CompatibleBinary
+      DiaMatrix_CompatibleDynamicBinary
+      DiaMatrix
+      Dot
+      DynamicMatrix_Binary
+      DynamicMatrix_CompatibleBinary
+      DynamicMatrix_CompatibleConcreteBinary
+      DynamicMatrix
+      FormatTags
+      FormatTraits
+      GenericBackend
+      MatrixBase
       MatrixMarket
-      # MatrixOperations_Dynamic MatrixOperations Metaprogramming
-      # MirrorContainers Multiply_Dynamic Multiply Reduce Spaces SpaceTraits
-      # TypeTraits WAXPBY
-    )
+      MatrixOperations_Dynamic
+      MatrixOperations
+      Metaprogramming
+      MirrorContainers
+      Multiply_Dynamic
+      Multiply
+      Reduce
+      Spaces
+      SpaceTraits
+      TypeTraits
+      WAXPBY)
       set(file ${testdir}/Test_${Tag}_${Name}.cpp)
       # Write to a temporary intermediate file and call configure_file to avoid
       # updating timestamps triggering unnecessary rebuilds on subsequent cmake
