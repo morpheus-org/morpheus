@@ -245,15 +245,17 @@ void read_coordinate_stream(Morpheus::CooMatrix<ValueType, Properties...>& coo,
     coo = general;
   }  // if (banner.symmetry != "general")
 
+#if defined(MORPHEUS_ENABLE_SERIAL)
   // sort indices by (row,column)
   Morpheus::sort_by_row_and_column<Morpheus::Serial>(coo);
+#else
+  Morpheus::sort_by_row_and_column<Morpheus::DefaultHostSpace>(coo);
+#endif
 }
 
 template <typename ValueType, typename... Properties, typename Stream>
 void read_array_stream(Morpheus::DenseMatrix<ValueType, Properties...>& mtx,
                        Stream& input, const matrix_market_banner& banner) {
-  using IndexType =
-      typename Morpheus::DenseMatrix<ValueType, Properties...>::index_type;
   // read file contents line by line
   std::string line;
 
@@ -268,7 +270,7 @@ void read_array_stream(Morpheus::DenseMatrix<ValueType, Properties...>& mtx,
   if (tokens.size() != 2)
     throw Morpheus::IOException("invalid MatrixMarket array format");
 
-  IndexType num_rows, num_cols;
+  size_t num_rows, num_cols;
 
   std::istringstream(tokens[0]) >> num_rows;
   std::istringstream(tokens[1]) >> num_cols;
@@ -277,7 +279,7 @@ void read_array_stream(Morpheus::DenseMatrix<ValueType, Properties...>& mtx,
 
   size_t num_entries      = num_rows * num_cols;
   size_t num_entries_read = 0;
-  IndexType nrows = 0, ncols = 0;
+  size_t nrows = 0, ncols = 0;
 
   // read file contents
   if (banner.type == "pattern") {
@@ -293,7 +295,7 @@ void read_array_stream(Morpheus::DenseMatrix<ValueType, Properties...>& mtx,
 
       num_entries_read++;
       ncols++;
-      if (num_entries_read % ncols == 0) {
+      if (ncols % num_cols == 0) {
         nrows++;
         ncols = 0;
       }
@@ -313,7 +315,6 @@ void read_array_stream(Morpheus::DenseMatrix<ValueType, Properties...>& mtx,
         "only general array symmetric MatrixMarket format is supported");
 
   mtx = dense;
-  // Morpheus::copy(dense, mtx);
 }
 
 template <template <class, class...> class Container, class T, class... P,
@@ -321,7 +322,7 @@ template <template <class, class...> class Container, class T, class... P,
 void read_matrix_market_stream(
     Container<T, P...>& mtx, Stream& input,
     typename std::enable_if<
-        is_sparse_matrix_container_v<Container<T, P...>> &&
+        is_coo_matrix_format_container_v<Container<T, P...>> &&
         has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
   // read banner
   matrix_market_banner banner;
@@ -330,30 +331,87 @@ void read_matrix_market_stream(
   if (banner.storage == "coordinate") {
     Morpheus::CooMatrix<T, P...> temp;
     read_coordinate_stream(temp, input, banner);
-    Morpheus::convert<Morpheus::Serial>(temp, mtx);
-  } else  // banner.storage == "array"
-  {
-    Morpheus::DenseMatrix<T, P...> temp;
-    read_array_stream(temp, input, banner);
-    Morpheus::convert<Morpheus::Serial>(temp, mtx);
+    mtx = temp;
+  } else {
+    throw Morpheus::IOException(
+        "only coordinate storage format is supported for reading a "
+        "MatrixMarket file into CooMatrix container");
   }
 }
 
-template <typename Vector, typename Stream>
+template <template <class, class...> class Container, class T, class... P,
+          typename Stream>
 void read_matrix_market_stream(
-    Vector& vec, Stream& input,
+    Container<T, P...>& mtx, Stream& input,
     typename std::enable_if<
-        Morpheus::is_dense_vector_format_container_v<Vector>>::type* =
-        nullptr) {
-  // array1d case
-  using ValueType = typename Vector::value_type;
-  using Space     = Morpheus::DefaultHostExecutionSpace;
+        is_dynamic_matrix_format_container_v<Container<T, P...>> &&
+        has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
+  // read banner
+  matrix_market_banner banner;
+  read_matrix_market_banner(banner, input);
 
-  Morpheus::DenseMatrix<ValueType, Space> temp;
+  if (banner.storage == "coordinate") {
+    if (mtx.active_index() != Morpheus::COO_FORMAT) {
+      throw Morpheus::RuntimeException(
+          "read_matrix_market_stream: The active state of a DynamicMatrix must "
+          "be set to Morpheus::COO_FORMAT before reading a MatrixMarket "
+          "stream!");
+    }
 
-  Morpheus::IO::read_matrix_market_stream(temp, input);
+    Morpheus::CooMatrix<T, P...> temp;
+    read_coordinate_stream(temp, input, banner);
+    mtx = temp;
+  } else {
+    throw Morpheus::IOException(
+        "only coordinate storage format is supported for reading a "
+        "MatrixMarket file into CooMatrix container");
+  }
+}
 
-  Morpheus::copy(temp, vec);
+template <template <class, class...> class Container, class T, class... P,
+          typename Stream>
+void read_matrix_market_stream(
+    Container<T, P...>& container, Stream& input,
+    typename std::enable_if<
+        is_dense_matrix_format_container_v<Container<T, P...>> &&
+        has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
+  // read banner
+  matrix_market_banner banner;
+  read_matrix_market_banner(banner, input);
+
+  if (banner.storage == "array") {
+    Morpheus::DenseMatrix<T, P...> temp;
+    Impl::read_array_stream(temp, input, banner);
+
+    container = temp;
+  } else {
+    throw Morpheus::IOException(
+        "only coordinate storage format is supported for reading a "
+        "MatrixMarket file into DenseMatrix container");
+  }
+}
+
+template <template <class, class...> class Container, class T, class... P,
+          typename Stream>
+void read_matrix_market_stream(
+    Container<T, P...>& container, Stream& input,
+    typename std::enable_if<
+        is_dense_vector_format_container_v<Container<T, P...>> &&
+        has_host_memory_space_v<Container<T, P...>>>::type* = nullptr) {
+  // read banner
+  matrix_market_banner banner;
+  read_matrix_market_banner(banner, input);
+
+  if (banner.storage == "array") {
+    Morpheus::DenseMatrix<T, P...> temp;
+    Impl::read_array_stream(temp, input, banner);
+
+    Morpheus::convert<Morpheus::Serial>(temp, container);
+  } else {
+    throw Morpheus::IOException(
+        "only coordinate storage format is supported for reading a "
+        "MatrixMarket file into DenseVector container");
+  }
 }
 
 template <typename Stream, typename ScalarType>

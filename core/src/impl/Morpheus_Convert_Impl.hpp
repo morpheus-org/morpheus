@@ -63,15 +63,15 @@ namespace Impl {
 
 // convert src -> coo_matrix -> dst
 template <typename ExecSpace, typename SourceType, typename DestinationType>
-void convert(
-    const SourceType& src, DestinationType& dst,
-    typename std::enable_if_t<
-        is_matrix_container_v<SourceType> && is_container_v<DestinationType> &&
-        !is_dynamic_matrix_format_container_v<SourceType> &&
-        !is_dynamic_matrix_format_container_v<DestinationType> &&
-        !is_coo_matrix_format_container_v<SourceType> &&
-        !is_coo_matrix_format_container_v<DestinationType> &&
-        !has_same_format_v<SourceType, DestinationType>>* = nullptr) {
+void convert(const SourceType& src, DestinationType& dst,
+             typename std::enable_if_t<
+                 is_matrix_container_v<SourceType> &&
+                 is_matrix_container_v<DestinationType> &&
+                 !is_dynamic_matrix_format_container_v<SourceType> &&
+                 !is_dynamic_matrix_format_container_v<DestinationType> &&
+                 !is_coo_matrix_format_container_v<SourceType> &&
+                 !is_coo_matrix_format_container_v<DestinationType> &&
+                 !has_same_format_v<SourceType, DestinationType>>* = nullptr) {
   using ValueType   = typename SourceType::value_type;
   using IndexType   = typename SourceType::index_type;
   using ArrayLayout = typename SourceType::array_layout;

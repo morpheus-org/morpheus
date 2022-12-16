@@ -1,0 +1,7 @@
+%%MatrixMarket matrix myformat real general
+% Invalid Storage format (myformat)
+2 2 4
+1 1 1.11
+1 2 2.22
+2 1 3.33
+2 2 4.44

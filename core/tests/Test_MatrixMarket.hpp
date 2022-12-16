@@ -26,6 +26,9 @@
 
 #include <Morpheus_Core.hpp>
 #include <utils/Macros_CooMatrix.hpp>
+#include <utils/Macros_DynamicMatrix.hpp>
+#include <utils/Macros_DenseMatrix.hpp>
+#include <utils/Macros_DenseVector.hpp>
 
 #include <string>
 #include <iostream>
@@ -203,6 +206,44 @@ TEST(MatrixMarket, ReadMatrixUnsymmetricRealUnsorted) {
   EXPECT_TRUE(Morpheus::Test::have_same_data(A, Asorted));
 }
 
+TEST(MatrixMarket, ReadMatrixUnsymmetricRealDynamic) {
+  Morpheus::DynamicMatrix<double, Morpheus::HostSpace> A, Asorted;
+
+  Morpheus::CooMatrix<double, Morpheus::HostSpace> Acoo_sorted(2, 2, 4);
+  std::string filename(get_mm_test_path() + "/unsymmetric_real_unsorted.mtx");
+
+  Acoo_sorted.row_indices(0)    = 0;
+  Acoo_sorted.column_indices(0) = 0;
+  Acoo_sorted.values(0)         = 1.11;
+  Acoo_sorted.row_indices(1)    = 0;
+  Acoo_sorted.column_indices(1) = 1;
+  Acoo_sorted.values(1)         = 2.22;
+  Acoo_sorted.row_indices(2)    = 1;
+  Acoo_sorted.column_indices(2) = 0;
+  Acoo_sorted.values(2)         = 3.33;
+  Acoo_sorted.row_indices(3)    = 1;
+  Acoo_sorted.column_indices(3) = 1;
+  Acoo_sorted.values(3)         = 4.44;
+
+  Asorted = Acoo_sorted;
+
+  Morpheus::IO::read_matrix_market_file(A, filename);
+
+  CHECK_DYNAMIC_CONTAINERS(A, Asorted);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(A, Asorted));
+}
+
+TEST(MatrixMarket, ReadMatrixUnsymmetricRealDynamicWrongState) {
+  Morpheus::DynamicMatrix<double, Morpheus::HostSpace> A;
+
+  A.activate(Morpheus::CSR_FORMAT);
+
+  std::string filename(get_mm_test_path() + "/unsymmetric_real_unsorted.mtx");
+
+  EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
+               Morpheus::RuntimeException);
+}
+
 TEST(MatrixMarket, ReadMatrixUnsymmetricFloat) {
   Morpheus::CooMatrix<float, Morpheus::HostSpace> A, Aref(2, 2, 4);
   std::string filename(get_mm_test_path() + "/unsymmetric_real.mtx");
@@ -343,6 +384,147 @@ TEST(MatrixMarket, ReadMatrixUnexpectedEOF) {
 
   EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
                Morpheus::IOException);
+}
+
+TEST(MatrixMarket, ReadMatrixInvalidBanner) {
+  Morpheus::CooMatrix<double, Morpheus::HostSpace> A;
+  std::string filename(get_mm_test_path() + "/mat_invalid_banner.mtx");
+
+  EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
+               Morpheus::IOException);
+}
+
+TEST(MatrixMarket, ReadMatrixInvalidStorageFormat) {
+  Morpheus::CooMatrix<double, Morpheus::HostSpace> A;
+  std::string filename(get_mm_test_path() + "/mat_invalid_storage_format.mtx");
+
+  EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
+               Morpheus::IOException);
+}
+
+TEST(MatrixMarket, ReadMatrixInvalidSymmetry) {
+  Morpheus::CooMatrix<double, Morpheus::HostSpace> A;
+  std::string filename(get_mm_test_path() + "/mat_invalid_symmetry.mtx");
+
+  EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
+               Morpheus::IOException);
+}
+
+TEST(MatrixMarket, ReadMatrixInvalidSize) {
+  Morpheus::CooMatrix<double, Morpheus::HostSpace> A;
+  std::string filename(get_mm_test_path() + "/mat_invalid_size.mtx");
+
+  EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
+               Morpheus::IOException);
+}
+
+TEST(MatrixMarket, ReadArrayUnsymmetricIntegerDenseMatrix) {
+  Morpheus::DenseMatrix<int, Morpheus::HostSpace> A, Aref(2, 2);
+  std::string filename(get_mm_test_path() + "/array_unsymmetric_integer.mtx");
+
+  Aref(0, 0) = 1;
+  Aref(0, 1) = -2;
+  Aref(1, 0) = 3;
+  Aref(1, 1) = -4;
+
+  Morpheus::IO::read_matrix_market_file(A, filename);
+
+  CHECK_DENSE_MATRIX_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(Aref, A));
+}
+
+TEST(MatrixMarket, ReadArrayUnsymmetricIntegerDenseVector) {
+  Morpheus::DenseVector<int, Morpheus::HostSpace> A, Aref(4);
+  std::string filename(get_mm_test_path() + "/vec_unsymmetric_integer.mtx");
+
+  Aref(0) = 1;
+  Aref(1) = -2;
+  Aref(2) = 3;
+  Aref(3) = -4;
+
+  Morpheus::IO::read_matrix_market_file(A, filename);
+
+  CHECK_DENSE_VECTOR_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(Aref, A));
+}
+
+TEST(MatrixMarket, ReadArrayUnsymmetricRealDenseMatrix) {
+  Morpheus::DenseMatrix<double, Morpheus::HostSpace> A, Aref(2, 2);
+  std::string filename(get_mm_test_path() + "/array_unsymmetric_real.mtx");
+
+  Aref(0, 0) = 1.11;
+  Aref(0, 1) = -2.22;
+  Aref(1, 0) = 3.33;
+  Aref(1, 1) = -4.44;
+
+  Morpheus::IO::read_matrix_market_file(A, filename);
+
+  CHECK_DENSE_MATRIX_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(Aref, A));
+}
+
+TEST(MatrixMarket, ReadArrayUnsymmetricRealDenseVector) {
+  Morpheus::DenseVector<double, Morpheus::HostSpace> A, Aref(4);
+  std::string filename(get_mm_test_path() + "/vec_unsymmetric_real.mtx");
+
+  Aref(0) = 1.11;
+  Aref(1) = -2.22;
+  Aref(2) = 3.33;
+  Aref(3) = -4.44;
+
+  Morpheus::IO::read_matrix_market_file(A, filename);
+
+  CHECK_DENSE_VECTOR_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(Aref, A));
+}
+
+TEST(MatrixMarket, ReadArrayInvalidSize) {
+  Morpheus::DenseMatrix<double, Morpheus::HostSpace> A;
+  std::string filename(get_mm_test_path() + "/array_invalid_size.mtx");
+
+  EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
+               Morpheus::IOException);
+}
+
+TEST(MatrixMarket, ReadArrayInvalidTypePattern) {
+  Morpheus::DenseMatrix<double, Morpheus::HostSpace> A;
+  std::string filename(get_mm_test_path() + "/array_invalid_type_pattern.mtx");
+
+  EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
+               Morpheus::NotImplementedException);
+}
+
+TEST(MatrixMarket, ReadArrayInvalidTypeComplex) {
+  Morpheus::DenseMatrix<double, Morpheus::HostSpace> A;
+  std::string filename(get_mm_test_path() + "/array_invalid_type_complex.mtx");
+
+  EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
+               Morpheus::NotImplementedException);
+}
+
+TEST(MatrixMarket, ReadArrayInvalidTypeCustom) {
+  Morpheus::DenseMatrix<double, Morpheus::HostSpace> A;
+  std::string filename(get_mm_test_path() + "/array_invalid_type_custom.mtx");
+
+  EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
+               Morpheus::IOException);
+}
+
+TEST(MatrixMarket, ReadArrayUnexpectedEOF) {
+  Morpheus::DenseMatrix<double, Morpheus::HostSpace> A;
+  std::string filename(get_mm_test_path() + "/array_unexpected_eof.mtx");
+
+  EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
+               Morpheus::IOException);
+}
+
+TEST(MatrixMarket, ReadArrayInvalidSymmetrySymmetric) {
+  Morpheus::DenseMatrix<double, Morpheus::HostSpace> A;
+  std::string filename(get_mm_test_path() +
+                       "/array_invalid_symmetry_symmetric.mtx");
+
+  EXPECT_THROW(Morpheus::IO::read_matrix_market_file(A, filename),
+               Morpheus::NotImplementedException);
 }
 
 }  // namespace Test

@@ -31,8 +31,12 @@ namespace IO {
 
 template <typename Matrix, typename Stream>
 void read_matrix_market_stream(Matrix& mtx, Stream& input) {
-  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix>,
-                "Matrix must be a CooMatrix container");
+  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix> ||
+                    Morpheus::is_dynamic_matrix_format_container_v<Matrix> ||
+                    Morpheus::is_dense_matrix_format_container_v<Matrix> ||
+                    Morpheus::is_dense_vector_format_container_v<Matrix>,
+                "Matrix must be either a CooMatrix, DynamicMatrix, DenseMatrix "
+                "or DenseVector container");
   static_assert(Morpheus::has_host_memory_space_v<Matrix>,
                 "Matrix must reside in HostSpace");
   Morpheus::IO::Impl::read_matrix_market_stream(mtx, input);
@@ -40,8 +44,12 @@ void read_matrix_market_stream(Matrix& mtx, Stream& input) {
 
 template <typename Matrix>
 void read_matrix_market_file(Matrix& mtx, const std::string& filename) {
-  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix>,
-                "Matrix must be a CooMatrix container");
+  static_assert(Morpheus::is_coo_matrix_format_container_v<Matrix> ||
+                    Morpheus::is_dynamic_matrix_format_container_v<Matrix> ||
+                    Morpheus::is_dense_matrix_format_container_v<Matrix> ||
+                    Morpheus::is_dense_vector_format_container_v<Matrix>,
+                "Matrix must be either a CooMatrix, DynamicMatrix, DenseMatrix "
+                "or DenseVector container");
   static_assert(Morpheus::has_host_memory_space_v<Matrix>,
                 "Matrix must reside in HostSpace");
   std::ifstream file(filename.c_str());
