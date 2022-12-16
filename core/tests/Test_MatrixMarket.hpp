@@ -41,13 +41,13 @@ std::string get_mm_test_path() {
   return file_path.substr(0, file_path.rfind("/")) + "/mm_data";
 }
 
-void create_mm_out_path() {
-  std::string mmpath("mm_output");
+// void create_mm_out_path() {
+//   std::string mmpath("mm_output");
 
-  if (!std::filesystem::exists(mmpath)) {
-    std::filesystem::create_directories(mmpath);
-  }
-}
+//   if (!std::filesystem::exists(mmpath)) {
+//     std::filesystem::create_directories(mmpath);
+//   }
+// }
 
 std::string get_mm_out_path() { return "mm_output/"; }
 
@@ -540,7 +540,7 @@ TEST(MatrixMarket, ReadArrayInvalidSymmetrySymmetric) {
 
 TEST(MatrixMarket, WriteMatrixDoubleGeneralCoo) {
   Morpheus::CooMatrix<double, Morpheus::HostSpace> A(2, 2, 4), Aref;
-  create_mm_out_path();
+  // create_mm_out_path();
   std::string filename(get_mm_out_path() + "/coo_double.mtx");
 
   A.row_indices(0)    = 0;
