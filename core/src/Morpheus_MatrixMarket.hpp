@@ -205,6 +205,7 @@ void write_matrix_market_file(const Container& container,
 #else
   Morpheus::IO::write_matrix_market_stream(container, file);
 #endif
+  file.close();
 }
 /*! \}  // end of writers group
  */
