@@ -67,7 +67,9 @@ void demo_perms(fs::perms p) {
             << '\n';
 }
 
-std::string get_mm_out_path() { return std::filesystem::temp_directory_path(); }
+std::string get_mm_out_path() {
+  return std::filesystem::temp_directory_path().string();
+}
 
 TEST(MatrixMarket, ReadMatrixComplex) {
   Morpheus::CooMatrix<double, Morpheus::HostSpace> A;
