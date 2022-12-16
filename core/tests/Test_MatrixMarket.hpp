@@ -42,6 +42,7 @@ std::string get_mm_test_path() {
 }
 
 void create_mm_out_path() {
+  std::cout << "Creating mm out path " << std::endl;
   std::string mmdir(std::filesystem::temp_directory_path());
   std::cout << "MMDIR = " << mmdir << std::endl;
   if (!std::filesystem::exists(mmdir)) {
@@ -556,12 +557,14 @@ TEST(MatrixMarket, ReadArrayInvalidSymmetrySymmetric) {
 }
 
 TEST(MatrixMarket, WriteMatrixDoubleGeneralCoo) {
-  Morpheus::CooMatrix<double, Morpheus::HostSpace> A(2, 2, 4), Aref;
   create_mm_out_path();
   std::string filename(get_mm_out_path() + "/coo_double.mtx");
 
   std::cout << "Created file with permissions: ";
   demo_perms(fs::status(filename).permissions());
+
+  Morpheus::CooMatrix<double, Morpheus::HostSpace> A(2, 2, 4), Aref;
+
   A.row_indices(0)    = 0;
   A.column_indices(0) = 0;
   A.values(0)         = 1.11;
