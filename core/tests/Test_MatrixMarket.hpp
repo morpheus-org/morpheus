@@ -43,14 +43,7 @@ std::string get_mm_test_path() {
   return file_path.substr(0, file_path.rfind("/")) + "/mm_data";
 }
 
-void create_mm_out_path() {
-  // std::filesystem::path mmpath("mm_output");
-
-  // if (!std::filesystem::exists(mmpath)) {
-  //   std::filesystem::create_directories(mmpath);
-  // }
-  mkdir("mm_output", 0777);
-}
+void create_mm_out_path() { mkdir("mm_output", 0777); }
 
 std::string get_mm_out_path() { return "mm_output"; }
 
@@ -566,269 +559,269 @@ TEST(MatrixMarket, WriteMatrixDoubleGeneralCoo) {
   EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
 }
 
-// TEST(MatrixMarket, WriteMatrixFloatGeneralCoo) {
-//   Morpheus::CooMatrix<float, Morpheus::HostSpace> A(2, 2, 4), Aref;
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/coo_float.mtx");
+TEST(MatrixMarket, WriteMatrixFloatGeneralCoo) {
+  Morpheus::CooMatrix<float, Morpheus::HostSpace> A(2, 2, 4), Aref;
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/coo_float.mtx");
 
-//   A.row_indices(0)    = 0;
-//   A.column_indices(0) = 0;
-//   A.values(0)         = 1.11;
-//   A.row_indices(1)    = 0;
-//   A.column_indices(1) = 1;
-//   A.values(1)         = 2.22;
-//   A.row_indices(2)    = 1;
-//   A.column_indices(2) = 0;
-//   A.values(2)         = 3.33;
-//   A.row_indices(3)    = 1;
-//   A.column_indices(3) = 1;
-//   A.values(3)         = 4.44;
+  A.row_indices(0)    = 0;
+  A.column_indices(0) = 0;
+  A.values(0)         = 1.11;
+  A.row_indices(1)    = 0;
+  A.column_indices(1) = 1;
+  A.values(1)         = 2.22;
+  A.row_indices(2)    = 1;
+  A.column_indices(2) = 0;
+  A.values(2)         = 3.33;
+  A.row_indices(3)    = 1;
+  A.column_indices(3) = 1;
+  A.values(3)         = 4.44;
 
-//   Morpheus::IO::write_matrix_market_file(A, filename);
+  Morpheus::IO::write_matrix_market_file(A, filename);
 
-//   Morpheus::IO::read_matrix_market_file(Aref, filename);
-//   CHECK_COO_CONTAINERS(A, Aref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
-// }
+  Morpheus::IO::read_matrix_market_file(Aref, filename);
+  CHECK_COO_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
+}
 
-// TEST(MatrixMarket, WriteMatrixIntGeneralCoo) {
-//   Morpheus::CooMatrix<int, Morpheus::HostSpace> A(2, 2, 4), Aref;
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/coo_int.mtx");
+TEST(MatrixMarket, WriteMatrixIntGeneralCoo) {
+  Morpheus::CooMatrix<int, Morpheus::HostSpace> A(2, 2, 4), Aref;
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/coo_int.mtx");
 
-//   A.row_indices(0)    = 0;
-//   A.column_indices(0) = 0;
-//   A.values(0)         = 1;
-//   A.row_indices(1)    = 0;
-//   A.column_indices(1) = 1;
-//   A.values(1)         = 2;
-//   A.row_indices(2)    = 1;
-//   A.column_indices(2) = 0;
-//   A.values(2)         = 3;
-//   A.row_indices(3)    = 1;
-//   A.column_indices(3) = 1;
-//   A.values(3)         = 4;
+  A.row_indices(0)    = 0;
+  A.column_indices(0) = 0;
+  A.values(0)         = 1;
+  A.row_indices(1)    = 0;
+  A.column_indices(1) = 1;
+  A.values(1)         = 2;
+  A.row_indices(2)    = 1;
+  A.column_indices(2) = 0;
+  A.values(2)         = 3;
+  A.row_indices(3)    = 1;
+  A.column_indices(3) = 1;
+  A.values(3)         = 4;
 
-//   Morpheus::IO::write_matrix_market_file(A, filename);
+  Morpheus::IO::write_matrix_market_file(A, filename);
 
-//   Morpheus::IO::read_matrix_market_file(Aref, filename);
-//   CHECK_COO_CONTAINERS(A, Aref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
-// }
+  Morpheus::IO::read_matrix_market_file(Aref, filename);
+  CHECK_COO_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
+}
 
-// TEST(MatrixMarket, WriteMatrixLongGeneralCoo) {
-//   Morpheus::CooMatrix<long long, Morpheus::HostSpace> A(2, 2, 4), Aref;
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/coo_long.mtx");
+TEST(MatrixMarket, WriteMatrixLongGeneralCoo) {
+  Morpheus::CooMatrix<long long, Morpheus::HostSpace> A(2, 2, 4), Aref;
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/coo_long.mtx");
 
-//   A.row_indices(0)    = 0;
-//   A.column_indices(0) = 0;
-//   A.values(0)         = 1;
-//   A.row_indices(1)    = 0;
-//   A.column_indices(1) = 1;
-//   A.values(1)         = 2;
-//   A.row_indices(2)    = 1;
-//   A.column_indices(2) = 0;
-//   A.values(2)         = 3;
-//   A.row_indices(3)    = 1;
-//   A.column_indices(3) = 1;
-//   A.values(3)         = 4;
+  A.row_indices(0)    = 0;
+  A.column_indices(0) = 0;
+  A.values(0)         = 1;
+  A.row_indices(1)    = 0;
+  A.column_indices(1) = 1;
+  A.values(1)         = 2;
+  A.row_indices(2)    = 1;
+  A.column_indices(2) = 0;
+  A.values(2)         = 3;
+  A.row_indices(3)    = 1;
+  A.column_indices(3) = 1;
+  A.values(3)         = 4;
 
-//   Morpheus::IO::write_matrix_market_file(A, filename);
+  Morpheus::IO::write_matrix_market_file(A, filename);
 
-//   Morpheus::IO::read_matrix_market_file(Aref, filename);
-//   CHECK_COO_CONTAINERS(A, Aref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
-// }
+  Morpheus::IO::read_matrix_market_file(Aref, filename);
+  CHECK_COO_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
+}
 
-// TEST(MatrixMarket, WriteMatrixDynamic) {
-//   Morpheus::DynamicMatrix<double, Morpheus::HostSpace> A, Aref;
-//   Morpheus::CooMatrix<double, Morpheus::HostSpace> Acoo(2, 2, 4);
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/dynamic.mtx");
+TEST(MatrixMarket, WriteMatrixDynamic) {
+  Morpheus::DynamicMatrix<double, Morpheus::HostSpace> A, Aref;
+  Morpheus::CooMatrix<double, Morpheus::HostSpace> Acoo(2, 2, 4);
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/dynamic.mtx");
 
-//   Acoo.row_indices(0)    = 0;
-//   Acoo.column_indices(0) = 0;
-//   Acoo.values(0)         = 1.11;
-//   Acoo.row_indices(1)    = 0;
-//   Acoo.column_indices(1) = 1;
-//   Acoo.values(1)         = 2.22;
-//   Acoo.row_indices(2)    = 1;
-//   Acoo.column_indices(2) = 0;
-//   Acoo.values(2)         = 3.33;
-//   Acoo.row_indices(3)    = 1;
-//   Acoo.column_indices(3) = 1;
-//   Acoo.values(3)         = 4.44;
+  Acoo.row_indices(0)    = 0;
+  Acoo.column_indices(0) = 0;
+  Acoo.values(0)         = 1.11;
+  Acoo.row_indices(1)    = 0;
+  Acoo.column_indices(1) = 1;
+  Acoo.values(1)         = 2.22;
+  Acoo.row_indices(2)    = 1;
+  Acoo.column_indices(2) = 0;
+  Acoo.values(2)         = 3.33;
+  Acoo.row_indices(3)    = 1;
+  Acoo.column_indices(3) = 1;
+  Acoo.values(3)         = 4.44;
 
-//   A = Acoo;
+  A = Acoo;
 
-//   Morpheus::IO::write_matrix_market_file(A, filename);
+  Morpheus::IO::write_matrix_market_file(A, filename);
 
-//   Morpheus::IO::read_matrix_market_file(Aref, filename);
-//   CHECK_DYNAMIC_CONTAINERS(A, Aref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
-// }
+  Morpheus::IO::read_matrix_market_file(Aref, filename);
+  CHECK_DYNAMIC_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
+}
 
-// TEST(MatrixMarket, WriteMatrixDynamicWrongState) {
-//   Morpheus::DynamicMatrix<double, Morpheus::HostSpace> A;
-//   Morpheus::CooMatrix<double, Morpheus::HostSpace> Acoo(2, 2, 4);
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/dynamic.mtx");
+TEST(MatrixMarket, WriteMatrixDynamicWrongState) {
+  Morpheus::DynamicMatrix<double, Morpheus::HostSpace> A;
+  Morpheus::CooMatrix<double, Morpheus::HostSpace> Acoo(2, 2, 4);
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/dynamic.mtx");
 
-//   Acoo.row_indices(0)    = 0;
-//   Acoo.column_indices(0) = 0;
-//   Acoo.values(0)         = 1.11;
-//   Acoo.row_indices(1)    = 0;
-//   Acoo.column_indices(1) = 1;
-//   Acoo.values(1)         = 2.22;
-//   Acoo.row_indices(2)    = 1;
-//   Acoo.column_indices(2) = 0;
-//   Acoo.values(2)         = 3.33;
-//   Acoo.row_indices(3)    = 1;
-//   Acoo.column_indices(3) = 1;
-//   Acoo.values(3)         = 4.44;
+  Acoo.row_indices(0)    = 0;
+  Acoo.column_indices(0) = 0;
+  Acoo.values(0)         = 1.11;
+  Acoo.row_indices(1)    = 0;
+  Acoo.column_indices(1) = 1;
+  Acoo.values(1)         = 2.22;
+  Acoo.row_indices(2)    = 1;
+  Acoo.column_indices(2) = 0;
+  Acoo.values(2)         = 3.33;
+  Acoo.row_indices(3)    = 1;
+  Acoo.column_indices(3) = 1;
+  Acoo.values(3)         = 4.44;
 
-//   A = Acoo;
-//   Morpheus::convert<Morpheus::Serial>(A, Morpheus::CSR_FORMAT);
-//   EXPECT_THROW(Morpheus::IO::write_matrix_market_file(A, filename),
-//                Morpheus::RuntimeException);
-// }
+  A = Acoo;
+  Morpheus::convert<Morpheus::Serial>(A, Morpheus::CSR_FORMAT);
+  EXPECT_THROW(Morpheus::IO::write_matrix_market_file(A, filename),
+               Morpheus::RuntimeException);
+}
 
-// TEST(MatrixMarket, WriteArrayDoubleGeneralVec) {
-//   Morpheus::DenseVector<double, Morpheus::HostSpace> v(4), vref;
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/vec_double.mtx");
+TEST(MatrixMarket, WriteArrayDoubleGeneralVec) {
+  Morpheus::DenseVector<double, Morpheus::HostSpace> v(4), vref;
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/vec_double.mtx");
 
-//   v(0) = 1.11;
-//   v(1) = -2.22;
-//   v(2) = 3.33;
-//   v(3) = -4.44;
+  v(0) = 1.11;
+  v(1) = -2.22;
+  v(2) = 3.33;
+  v(3) = -4.44;
 
-//   Morpheus::IO::write_matrix_market_file(v, filename);
+  Morpheus::IO::write_matrix_market_file(v, filename);
 
-//   Morpheus::IO::read_matrix_market_file(vref, filename);
-//   CHECK_DENSE_VECTOR_CONTAINERS(v, vref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(v, vref));
-// }
+  Morpheus::IO::read_matrix_market_file(vref, filename);
+  CHECK_DENSE_VECTOR_CONTAINERS(v, vref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(v, vref));
+}
 
-// TEST(MatrixMarket, WriteArrayFloatGeneralVec) {
-//   Morpheus::DenseVector<float, Morpheus::HostSpace> v(4), vref;
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/vec_float.mtx");
+TEST(MatrixMarket, WriteArrayFloatGeneralVec) {
+  Morpheus::DenseVector<float, Morpheus::HostSpace> v(4), vref;
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/vec_float.mtx");
 
-//   v(0) = 1.11;
-//   v(1) = -2.22;
-//   v(2) = 3.33;
-//   v(3) = -4.44;
+  v(0) = 1.11;
+  v(1) = -2.22;
+  v(2) = 3.33;
+  v(3) = -4.44;
 
-//   Morpheus::IO::write_matrix_market_file(v, filename);
+  Morpheus::IO::write_matrix_market_file(v, filename);
 
-//   Morpheus::IO::read_matrix_market_file(vref, filename);
-//   CHECK_DENSE_VECTOR_CONTAINERS(v, vref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(v, vref));
-// }
+  Morpheus::IO::read_matrix_market_file(vref, filename);
+  CHECK_DENSE_VECTOR_CONTAINERS(v, vref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(v, vref));
+}
 
-// TEST(MatrixMarket, WriteArrayIntGeneralVec) {
-//   Morpheus::DenseVector<int, Morpheus::HostSpace> v(4), vref;
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/vec_int.mtx");
+TEST(MatrixMarket, WriteArrayIntGeneralVec) {
+  Morpheus::DenseVector<int, Morpheus::HostSpace> v(4), vref;
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/vec_int.mtx");
 
-//   v(0) = 1;
-//   v(1) = -2;
-//   v(2) = 3;
-//   v(3) = -4;
+  v(0) = 1;
+  v(1) = -2;
+  v(2) = 3;
+  v(3) = -4;
 
-//   Morpheus::IO::write_matrix_market_file(v, filename);
+  Morpheus::IO::write_matrix_market_file(v, filename);
 
-//   Morpheus::IO::read_matrix_market_file(vref, filename);
-//   CHECK_DENSE_VECTOR_CONTAINERS(v, vref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(v, vref));
-// }
+  Morpheus::IO::read_matrix_market_file(vref, filename);
+  CHECK_DENSE_VECTOR_CONTAINERS(v, vref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(v, vref));
+}
 
-// TEST(MatrixMarket, WriteArrayLongGeneralVec) {
-//   Morpheus::DenseVector<long long, Morpheus::HostSpace> v(4), vref;
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/vec_long.mtx");
+TEST(MatrixMarket, WriteArrayLongGeneralVec) {
+  Morpheus::DenseVector<long long, Morpheus::HostSpace> v(4), vref;
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/vec_long.mtx");
 
-//   v(0) = 1;
-//   v(1) = -2;
-//   v(2) = 3;
-//   v(3) = -4;
+  v(0) = 1;
+  v(1) = -2;
+  v(2) = 3;
+  v(3) = -4;
 
-//   Morpheus::IO::write_matrix_market_file(v, filename);
+  Morpheus::IO::write_matrix_market_file(v, filename);
 
-//   Morpheus::IO::read_matrix_market_file(vref, filename);
-//   CHECK_DENSE_VECTOR_CONTAINERS(v, vref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(v, vref));
-// }
+  Morpheus::IO::read_matrix_market_file(vref, filename);
+  CHECK_DENSE_VECTOR_CONTAINERS(v, vref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(v, vref));
+}
 
-// TEST(MatrixMarket, WriteArrayDoubleGeneralMat) {
-//   Morpheus::DenseMatrix<double, Morpheus::HostSpace> A(2, 2), Aref;
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/mat_double.mtx");
+TEST(MatrixMarket, WriteArrayDoubleGeneralMat) {
+  Morpheus::DenseMatrix<double, Morpheus::HostSpace> A(2, 2), Aref;
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/mat_double.mtx");
 
-//   A(0, 0) = 1.11;
-//   A(0, 1) = -2.22;
-//   A(1, 0) = 3.33;
-//   A(1, 1) = -4.44;
+  A(0, 0) = 1.11;
+  A(0, 1) = -2.22;
+  A(1, 0) = 3.33;
+  A(1, 1) = -4.44;
 
-//   Morpheus::IO::write_matrix_market_file(A, filename);
+  Morpheus::IO::write_matrix_market_file(A, filename);
 
-//   Morpheus::IO::read_matrix_market_file(Aref, filename);
-//   CHECK_DENSE_MATRIX_CONTAINERS(A, Aref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
-// }
+  Morpheus::IO::read_matrix_market_file(Aref, filename);
+  CHECK_DENSE_MATRIX_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
+}
 
-// TEST(MatrixMarket, WriteArrayFloatGeneralMat) {
-//   Morpheus::DenseMatrix<float, Morpheus::HostSpace> A(2, 2), Aref;
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/mat_float.mtx");
+TEST(MatrixMarket, WriteArrayFloatGeneralMat) {
+  Morpheus::DenseMatrix<float, Morpheus::HostSpace> A(2, 2), Aref;
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/mat_float.mtx");
 
-//   A(0, 0) = 1.11;
-//   A(0, 1) = -2.22;
-//   A(1, 0) = 3.33;
-//   A(1, 1) = -4.44;
+  A(0, 0) = 1.11;
+  A(0, 1) = -2.22;
+  A(1, 0) = 3.33;
+  A(1, 1) = -4.44;
 
-//   Morpheus::IO::write_matrix_market_file(A, filename);
+  Morpheus::IO::write_matrix_market_file(A, filename);
 
-//   Morpheus::IO::read_matrix_market_file(Aref, filename);
-//   CHECK_DENSE_MATRIX_CONTAINERS(A, Aref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
-// }
+  Morpheus::IO::read_matrix_market_file(Aref, filename);
+  CHECK_DENSE_MATRIX_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
+}
 
-// TEST(MatrixMarket, WriteArrayIntGeneralMat) {
-//   Morpheus::DenseMatrix<int, Morpheus::HostSpace> A(2, 2), Aref;
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/mat_int.mtx");
+TEST(MatrixMarket, WriteArrayIntGeneralMat) {
+  Morpheus::DenseMatrix<int, Morpheus::HostSpace> A(2, 2), Aref;
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/mat_int.mtx");
 
-//   A(0, 0) = 1;
-//   A(0, 1) = -2;
-//   A(1, 0) = 3;
-//   A(1, 1) = -4;
+  A(0, 0) = 1;
+  A(0, 1) = -2;
+  A(1, 0) = 3;
+  A(1, 1) = -4;
 
-//   Morpheus::IO::write_matrix_market_file(A, filename);
+  Morpheus::IO::write_matrix_market_file(A, filename);
 
-//   Morpheus::IO::read_matrix_market_file(Aref, filename);
-//   CHECK_DENSE_MATRIX_CONTAINERS(A, Aref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
-// }
+  Morpheus::IO::read_matrix_market_file(Aref, filename);
+  CHECK_DENSE_MATRIX_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
+}
 
-// TEST(MatrixMarket, WriteArrayLongGeneralMat) {
-//   Morpheus::DenseMatrix<long long, Morpheus::HostSpace> A(2, 2), Aref;
-//   create_mm_out_path();
-//   std::string filename(get_mm_out_path() + "/mat_long.mtx");
+TEST(MatrixMarket, WriteArrayLongGeneralMat) {
+  Morpheus::DenseMatrix<long long, Morpheus::HostSpace> A(2, 2), Aref;
+  create_mm_out_path();
+  std::string filename(get_mm_out_path() + "/mat_long.mtx");
 
-//   A(0, 0) = 1;
-//   A(0, 1) = -2;
-//   A(1, 0) = 3;
-//   A(1, 1) = -4;
+  A(0, 0) = 1;
+  A(0, 1) = -2;
+  A(1, 0) = 3;
+  A(1, 1) = -4;
 
-//   Morpheus::IO::write_matrix_market_file(A, filename);
+  Morpheus::IO::write_matrix_market_file(A, filename);
 
-//   Morpheus::IO::read_matrix_market_file(Aref, filename);
-//   CHECK_DENSE_MATRIX_CONTAINERS(A, Aref);
-//   EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
-// }
+  Morpheus::IO::read_matrix_market_file(Aref, filename);
+  CHECK_DENSE_MATRIX_CONTAINERS(A, Aref);
+  EXPECT_TRUE(Morpheus::Test::have_same_data(A, Aref));
+}
 
 }  // namespace Test
 
