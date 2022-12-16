@@ -42,14 +42,14 @@ std::string get_mm_test_path() {
 }
 
 void create_mm_out_path() {
-  std::string mmdir("mm_output");
+  std::string mmdir(std::filesystem::temp_directory_path());
 
   if (!std::filesystem::exists(mmdir)) {
     std::filesystem::create_directories(mmdir);
   }
 }
 
-std::string get_mm_out_path() { return "mm_output/"; }
+std::string get_mm_out_path() { return std::filesystem::temp_directory_path(); }
 
 TEST(MatrixMarket, ReadMatrixComplex) {
   Morpheus::CooMatrix<double, Morpheus::HostSpace> A;
