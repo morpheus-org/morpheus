@@ -43,12 +43,12 @@ std::string get_mm_test_path() {
 
 void create_mm_out_path() {
   std::cout << "Creating mm out path " << std::endl;
-  std::string mmdir(std::filesystem::temp_directory_path().string());
-  std::cout << "MMDIR = " << mmdir << std::endl;
-  if (!std::filesystem::exists(mmdir)) {
-    std::cout << "Creating MMDIR at " << mmdir << std::endl;
-    bool res = std::filesystem::create_directories(mmdir);
-    std::cout << "Creating MMDIR at " << mmdir << "(" << res << ")"
+  auto mmpath = std::filesystem::temp_directory_path();
+  std::cout << "MMDIR = " << mmpath.string() << std::endl;
+  if (!std::filesystem::exists(mmpath)) {
+    std::cout << "Creating MMDIR at " << mmpath.string() << std::endl;
+    bool res = std::filesystem::create_directories(mmpath);
+    std::cout << "Creating MMDIR at " << mmpath.string() << "(" << res << ")"
               << std::endl;
   }
 }
