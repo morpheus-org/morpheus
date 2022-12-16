@@ -28,7 +28,37 @@
 
 namespace Morpheus {
 namespace IO {
+/**
+ * \defgroup io Input-Output Operations
+ * \par Overview
+ * TODO
+ *
+ */
 
+/**
+ * \addtogroup readers Readers
+ * \brief Routines for reading data from file
+ * \ingroup io
+ * \{
+ *
+ */
+
+/**
+ * @brief Reads a MatrixMarket file from a stream.
+ *
+ * @tparam Container Type of the container to store the data
+ * @tparam Stream Type of the stream to read the data from
+ * @param container The container that will hold the data
+ * @param input The input stream
+ *
+ * \note The routine can accept only containers that satisfy the
+ * \p is_coo_matrix_format_container, \p is_dynamic_matrix_format_container,
+ * \p is_dense_matrix_format_container and \p is_dense_vector_format_container
+ * checks.
+ *
+ * \note The routine can only accept containers that reside on Host i.e satisfy
+ * the \p has_host_memory_space check.
+ */
 template <typename Container, typename Stream>
 void read_matrix_market_stream(Container& container, Stream& input) {
   static_assert(
@@ -43,6 +73,21 @@ void read_matrix_market_stream(Container& container, Stream& input) {
   Morpheus::IO::Impl::read_matrix_market_stream(container, input);
 }
 
+/**
+ * @brief Reads a MatrixMarket file from file.
+ *
+ * @tparam Container Type of the container to store the data
+ * @param container The container that will hold the data
+ * @param filename The absolute path to the filename to read the data from
+ *
+ * \note The routine can accept only containers that satisfy the
+ * \p is_coo_matrix_format_container, \p is_dynamic_matrix_format_container,
+ * \p is_dense_matrix_format_container and \p is_dense_vector_format_container
+ * checks.
+ *
+ * \note The routine can only accept containers that reside on Host i.e satisfy
+ * the \p has_host_memory_space check.
+ */
 template <typename Container>
 void read_matrix_market_file(Container& container,
                              const std::string& filename) {
@@ -75,7 +120,33 @@ void read_matrix_market_file(Container& container,
   Morpheus::IO::read_matrix_market_stream(container, file);
 #endif
 }
+/*! \}  // end of readers group
+ */
 
+/**
+ * \addtogroup writers Writers
+ * \brief Routines for writing data to file
+ * \ingroup io
+ * \{
+ *
+ */
+
+/**
+ * @brief Writes a container to a stream in the MatrixMarket file format.
+ *
+ * @tparam Container Type of the container that holds the data
+ * @tparam Stream The type of the stream to write the data
+ * @param container The container that holds the data
+ * @param output The output stream
+ *
+ * \note The routine can accept only containers that satisfy the
+ * \p is_coo_matrix_format_container, \p is_dynamic_matrix_format_container,
+ * \p is_dense_matrix_format_container and \p is_dense_vector_format_container
+ * checks.
+ *
+ * \note The routine can only accept containers that reside on Host i.e satisfy
+ * the \p has_host_memory_space check.
+ */
 template <typename Container, typename Stream>
 void write_matrix_market_stream(const Container& container, Stream& output) {
   static_assert(
@@ -90,6 +161,22 @@ void write_matrix_market_stream(const Container& container, Stream& output) {
   Morpheus::IO::Impl::write_matrix_market_stream(container, output);
 }
 
+/**
+ * @brief Writes a container to a file in the MatrixMarket file format.
+ *
+ * @tparam Container Type of the container that holds the data
+ * @tparam Stream The type of the stream to write the data
+ * @param container The container that holds the data
+ * @param filename The absolute path to the filename to write the data
+ *
+ * \note The routine can accept only containers that satisfy the
+ * \p is_coo_matrix_format_container, \p is_dynamic_matrix_format_container,
+ * \p is_dense_matrix_format_container and \p is_dense_vector_format_container
+ * checks.
+ *
+ * \note The routine can only accept containers that reside on Host i.e satisfy
+ * the \p has_host_memory_space check.
+ */
 template <typename Container>
 void write_matrix_market_file(const Container& container,
                               const std::string& filename) {
@@ -119,6 +206,8 @@ void write_matrix_market_file(const Container& container,
   Morpheus::IO::write_matrix_market_stream(container, file);
 #endif
 }
+/*! \}  // end of writers group
+ */
 }  // namespace IO
 }  // namespace Morpheus
 

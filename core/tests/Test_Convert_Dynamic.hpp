@@ -68,6 +68,9 @@ class ConvertDynamicTypesTest : public ::testing::Test {
   using ValueType  = typename dyn_dev_t::value_type;
   using LayoutType = typename dyn_dev_t::array_layout;
   using SpaceType  = typename dyn_dev_t::backend;
+  using coo_dev_t =
+      Morpheus::CooMatrix<ValueType, IndexType, LayoutType, SpaceType>;
+  using coo_host_t = typename coo_dev_t::HostMirror;
   using csr_dev_t =
       Morpheus::CsrMatrix<ValueType, IndexType, LayoutType, SpaceType>;
   using csr_host_t = typename csr_dev_t::HostMirror;
@@ -223,10 +226,145 @@ TYPED_TEST(ConvertDynamicTypesTest, SparseToDynamic) {
 #endif  // MORPHEUS_ENABLE_OPENMP
 }
 
-// TODO Src and Destination defined by their active index before conversion
-TYPED_TEST(ConvertDynamicTypesTest, DynamicToDynamic) { EXPECT_EQ(1, 1); }
+TYPED_TEST(ConvertDynamicTypesTest, DynamicToDynamic) {
+#if defined(MORPHEUS_ENABLE_SERIAL)
+  if (Morpheus::has_serial_execution_space<TEST_CUSTOM_SPACE>::value) {
+    using src_host_t = typename TestFixture::dyn_host_t;
+    using dst_host_t = typename TestFixture::dyn_host_t;
+    using coo_h_t    = typename TestFixture::coo_host_t;
+    src_host_t src_h = this->con_ref_h;
+    dst_host_t dst_h;
 
-// TODO: In-place conversion using format index.
+    for (int fmt_id = 0; fmt_id < Morpheus::NFORMATS; fmt_id++) {
+      dst_h.activate(fmt_id);
+      Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
+
+      EXPECT_TRUE(dst_h.active_index() == fmt_id);
+      EXPECT_FALSE(Morpheus::Test::is_empty_container(dst_h));
+      EXPECT_FALSE(Morpheus::Test::is_empty_container(src_h));
+      // Convert back to COO to test correctness
+      coo_h_t coo_src_h, coo_dst_h;
+      Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, coo_src_h);
+      Morpheus::convert<TEST_CUSTOM_SPACE>(dst_h, coo_dst_h);
+      EXPECT_TRUE(Morpheus::Test::have_same_data(coo_src_h, coo_dst_h));
+    }
+  }
+#endif
+
+#if defined(MORPHEUS_ENABLE_OPENMP) && defined(MORPHEUS_ENABLE_SERIAL)
+  if (Morpheus::has_openmp_execution_space<TEST_CUSTOM_SPACE>::value) {
+    using src_host_t = typename TestFixture::dyn_host_t;
+    using dst_host_t = typename TestFixture::dyn_host_t;
+    using coo_h_t    = typename TestFixture::coo_host_t;
+    src_host_t src_h = this->con_ref_h;
+    dst_host_t dst_h;
+
+    for (int fmt_id = 0; fmt_id < Morpheus::NFORMATS; fmt_id++) {
+      dst_h.activate(fmt_id);
+      if (src_h.active_index() == dst_h.active_index() ||
+          (src_h.active_index() == Morpheus::CSR_FORMAT &&
+           dst_h.active_index() == Morpheus::COO_FORMAT)) {
+        Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
+
+        EXPECT_TRUE(dst_h.active_index() == fmt_id);
+        EXPECT_FALSE(Morpheus::Test::is_empty_container(dst_h));
+        EXPECT_FALSE(Morpheus::Test::is_empty_container(src_h));
+        // Convert back to COO to test correctness
+        coo_h_t coo_src_h, coo_dst_h;
+
+        Morpheus::convert<Morpheus::Serial>(src_h, coo_src_h);
+        Morpheus::convert<Morpheus::Serial>(dst_h, coo_dst_h);
+        EXPECT_TRUE(Morpheus::Test::have_same_data(coo_src_h, coo_dst_h));
+      } else {
+        EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
+                     Morpheus::NotImplementedException);
+      }
+    }
+  }
+#endif
+
+#if defined(MORPHEUS_ENABLE_CUDA)
+  if (Morpheus::has_cuda_execution_space<TEST_CUSTOM_SPACE>::value) {
+    using src_t = typename TestFixture::dyn_dev_t;
+    using dst_t = typename TestFixture::dyn_dev_t;
+    src_t src   = this->con_ref;
+    dst_t dst;
+    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src, dst),
+                 Morpheus::NotImplementedException);
+  }
+#endif
+
+#if defined(MORPHEUS_ENABLE_HIP)
+  if (Morpheus::has_hip_execution_space<TEST_CUSTOM_SPACE>::value) {
+    using src_t = typename TestFixture::dyn_dev_t;
+    using dst_t = typename TestFixture::dyn_dev_t;
+    src_t src   = this->con_ref;
+    dst_t dst;
+    EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src, dst),
+                 Morpheus::NotImplementedException);
+  }
+#endif
+}
+
+TYPED_TEST(ConvertDynamicTypesTest, DynamicInPlace) {
+#if defined(MORPHEUS_ENABLE_SERIAL)
+  if (Morpheus::has_serial_execution_space<TEST_CUSTOM_SPACE>::value) {
+    using dst_host_t = typename TestFixture::dyn_host_t;
+    using coo_h_t    = typename TestFixture::coo_host_t;
+    dst_host_t dst_h = this->con_ref_h;
+    coo_h_t coo_ref_h;
+    Morpheus::convert<TEST_CUSTOM_SPACE>(this->con_ref_h, coo_ref_h);
+
+    for (int fmt_id = 0; fmt_id < Morpheus::NFORMATS; fmt_id++) {
+      Morpheus::convert<TEST_CUSTOM_SPACE>(dst_h, fmt_id);
+
+      EXPECT_TRUE(dst_h.active_index() == fmt_id);
+      EXPECT_FALSE(Morpheus::Test::is_empty_container(dst_h));
+
+      // Convert back to Concrete to test correctness
+      coo_h_t coo_dst_h;
+      Morpheus::convert<TEST_CUSTOM_SPACE>(dst_h, coo_dst_h);
+      EXPECT_TRUE(Morpheus::Test::have_same_data(coo_ref_h, coo_dst_h));
+    }
+  }
+#endif
+
+  // #if defined(MORPHEUS_ENABLE_OPENMP)
+  //   if (Morpheus::has_openmp_execution_space<TEST_CUSTOM_SPACE>::value) {
+  //     using dst_host_t = typename TestFixture::dyn_host_t;
+  //     using coo_h_t    = typename TestFixture::coo_host_t;
+  //     dst_host_t dst_h = this->con_ref_h;
+  //     coo_h_t coo_ref_h;
+  //     Morpheus::convert<Morpheus::Serial>(this->con_ref_h, coo_ref_h);
+
+  //     for (int fmt_id = 0; fmt_id < Morpheus::NFORMATS; fmt_id++) {
+  //       if (dst_h.active_index() == fmt_id ||
+  //           (dst_h.active_index() == Morpheus::CSR_FORMAT &&
+  //            fmt_id == Morpheus::COO_FORMAT)) {
+  //         Morpheus::convert<TEST_CUSTOM_SPACE>(dst_h, fmt_id);
+
+  //         EXPECT_TRUE(dst_h.active_index() == fmt_id);
+  //         EXPECT_FALSE(Morpheus::Test::is_empty_container(dst_h));
+
+  //         // Convert back to Concrete to test correctness
+  //         coo_h_t coo_dst_h;
+  //         Morpheus::convert<Morpheus::Serial>(dst_h, coo_dst_h);
+  //         EXPECT_TRUE(Morpheus::Test::have_same_data(coo_ref_h, coo_dst_h));
+  //       } else {
+  //         EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(dst_h, fmt_id),
+  //                      Morpheus::NotImplementedException);
+  //       }
+  //     }
+  //   }
+  // #endif
+}
+// TODO: ADD enum status for when conversion fails midway
+// 1) DynamicToProxy
+// 2) ProxyToDynamic
+// 3) Succees
+TYPED_TEST(ConvertDynamicTypesTest, DynamicInPlaceFirstStepFails) {}
+
+TYPED_TEST(ConvertDynamicTypesTest, DynamicInPlaceSecondStepFails) {}
 }  // namespace Test
 
 #endif  // TEST_CORE_TEST_CONVERT_HPP

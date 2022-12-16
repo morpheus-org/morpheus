@@ -24,6 +24,7 @@
 #ifndef MORPHEUS_CONVERT_HPP
 #define MORPHEUS_CONVERT_HPP
 
+#include <Morpheus_Print.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <fwd/Morpheus_Fwd_CooMatrix.hpp>
 
@@ -101,7 +102,6 @@ void convert(SourceType& src, const formats_e index) {
 
     return;
   }
-
   src = dynamic_temp;
 }
 

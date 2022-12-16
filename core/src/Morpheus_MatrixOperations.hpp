@@ -28,15 +28,23 @@
 #include <impl/Dynamic/Morpheus_MatrixOperations_Impl.hpp>
 
 namespace Morpheus {
+/**
+ * \addtogroup operations Operations
+ * \brief Operations for manipulating the various containers.
+ * \ingroup containers
+ * \{
+ *
+ */
 
 /**
- * Updates the main diagonal of the matrix with contents of the diagonal vector.
+ * \brief Updates the main diagonal of the matrix with contents of the diagonal
+ * vector.
  *
- * \tparam ExecSpace
- * \tparam Matrix
- * \tparam Vector
+ * \tparam ExecSpace Execution space to run the algorithm
+ * \tparam Matrix The type of the matrix container
+ * \tparam Vector The type of the vector representing the diagonal
  *
- * \param A The matrix
+ * \param A The matrix to update the diagonal for
  * \param diagonal The matrix diagonal represented as a vector
  *
  * \note The sparsity pattern of the matrix remains unchanged i.e it only
@@ -49,13 +57,13 @@ void update_diagonal(Matrix& A, const Vector& diagonal) {
 }
 
 /**
- * Gets the main diagonal of the matrix and places it in a vector.
+ * \brief Gets the main diagonal of the matrix and places it in a vector.
  *
- * \tparam ExecSpace
- * \tparam Matrix
- * \tparam Vector
+ * \tparam ExecSpace Execution space to run the algorithm
+ * \tparam Matrix The type of the matrix container
+ * \tparam Vector The type of the extracted diagonal
  *
- * \param A The matrix
+ * \param A The matrix to extract the diagonal from
  * \param diagonal The main matrix diagonal represented as a vector
  *
  */
@@ -65,14 +73,14 @@ void get_diagonal(const Matrix& A, Vector& diagonal) {
 }
 
 /**
- * Set a single entry into a matrix.
+ * \brief Set a single entry into a matrix.
  *
- * \tparam ExecSpace
- * \tparam Matrix
- * \tparam IndexType
- * \tparam ValueType
+ * \tparam ExecSpace Execution space to run the algorithm
+ * \tparam Matrix The type of the matrix container
+ * \tparam IndexType The type of the indices of the matrix
+ * \tparam ValueType The type of the values of the matrix
  *
- * \param A The matrix
+ * \param A The matrix to update
  * \param row The row location of the entry
  * \param col The column location of the entry
  * \param value The value to insert
@@ -84,14 +92,14 @@ void set_value(Matrix& A, IndexType row, IndexType col, ValueType value) {
 }
 
 /**
- * Inserts or adds a block of values into a matrix.
+ * \brief Inserts or adds a block of values into a matrix.
  *
- * \tparam ExecSpace
- * \tparam Matrix
- * \tparam IndexVector
- * \tparam ValueVector
+ * \tparam ExecSpace Execution space to run the algorithm
+ * \tparam Matrix The type of the matrix container
+ * \tparam IndexVector The type of the container holding the indices
+ * \tparam ValueVector The type of the container holding the values
  *
- * \param A The matrix
+ * \param A The matrix to update
  * \param m The number of rows
  * \param idxm Row global indices
  * \param n The number of columns
@@ -107,20 +115,21 @@ void set_values(Matrix& A, typename IndexVector::value_type m,
 }
 
 /**
- * Computes the transpose of the given matrix.
+ * \brief Computes the transpose of the given matrix.
  *
- * \tparam ExecSpace
- * \tparam Matrix
- * \tparam TransposeMatrix
+ * \tparam ExecSpace Execution space to run the algorithm
+ * \tparam Matrix The type of the matrix container
+ * \tparam TransposeMatrix The type of the transposed matrix container
  *
- * \param A The matrix
+ * \param A The matrix to transpose
  * \param B The transposed matrix
  */
 template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
 void transpose(const Matrix& A, TransposeMatrix& At) {
   Impl::transpose<ExecSpace>(A, At);
 }
-
+/*! \}  // end of operations group
+ */
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_MATRIXOPERATIONS_HPP
