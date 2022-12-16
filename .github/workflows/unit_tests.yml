@@ -109,10 +109,12 @@ jobs:
         working-directory: builddir
         if: ${{ matrix.backend.tag == 'Serial' }}
         run: |
+          mkdir -p mm_output
           ./core/tests/MorpheusCore_UnitTest_${{ matrix.backend.tag }}
           
       - name: Run OpenMP Tests
         working-directory: builddir
         if: ${{ matrix.backend.tag == 'OpenMP' }}
         run: |
+          mkdir -p mm_output
           export OMP_NUM_THREADS=2 && ./core/tests/MorpheusCore_UnitTest_${{ matrix.backend.tag }} --kokkos-num-threads=2
