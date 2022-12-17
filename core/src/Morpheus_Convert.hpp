@@ -56,6 +56,16 @@ void convert(const SourceType& src, DestinationType& dst) {
 }
 
 /**
+ * @brief Enum values for in-place conversion status
+ *
+ */
+enum conversion_error_e {
+  DYNAMIC_TO_PROXY = 0,  //!< Dynamic to Proxy conversion failed
+  PROXY_TO_DYNAMIC,      //!< Proxy to Dynamic conversion failed
+  CONV_SUCCESS           //!< In-place conversion successful
+};
+
+/**
  * @brief Performs an in-place conversion operation of the DynamicMatrix
  * container to the format indicated by the enum index.
  *
@@ -63,6 +73,7 @@ void convert(const SourceType& src, DestinationType& dst) {
  * @tparam SourceType The type of the source container
  * @param src The source container to convert
  * @param index The enum index of the format to convert to
+ * @return conversion_error_e Error code
  *
  * \note The src container must be a DynamicMatrix for the conversion to take
  * place.
@@ -71,26 +82,36 @@ void convert(const SourceType& src, DestinationType& dst) {
  * CooMatrix container.
  *
  * \note In case the conversion fails internally it throws
- * an error and the state of the input container is maintained.
+ * an error and the state and data of the input container are maintained.
  */
 template <typename ExecSpace, typename SourceType>
-void convert(SourceType& src, const formats_e index) {
+conversion_error_e convert(SourceType& src, const formats_e index) {
   static_assert(Morpheus::is_dynamic_matrix_format_container<SourceType>::value,
                 "Container must be a DynamicMatrix.");
   Morpheus::CooMatrix<
       typename SourceType::value_type, typename SourceType::index_type,
-      typename SourceType::array_layout, typename SourceType::execution_space>
+      typename SourceType::array_layout, typename SourceType::memory_space>
       temp;
 
-  try {
-    Impl::convert<ExecSpace>(src, temp);
-  } catch (...) {
-    std::cout << "Warning: Conversion failed! Active state set to: "
-              << src.active_index() << std::endl;
-
-    return;
+  // No conversion needed
+  if (src.active_index() == index) {
+    return CONV_SUCCESS;
   }
 
+  if (src.active_index() != Morpheus::COO_FORMAT) {
+    try {
+      Impl::convert<ExecSpace>(src, temp);
+    } catch (...) {
+      std::cout << "Warning: Conversion failed! Active state set to: "
+                << src.active_index() << std::endl;
+
+      return DYNAMIC_TO_PROXY;
+    }
+  } else {
+    temp = src;
+  }
+
+  // TODO: If index==COO, shallow copy instead of convert
   SourceType dynamic_temp;
   dynamic_temp.activate(index);
 
@@ -100,9 +121,10 @@ void convert(SourceType& src, const formats_e index) {
     std::cout << "Warning: Conversion failed! Active state set to: "
               << src.active_index() << std::endl;
 
-    return;
+    return PROXY_TO_DYNAMIC;
   }
   src = dynamic_temp;
+  return CONV_SUCCESS;
 }
 
 /**
@@ -113,11 +135,12 @@ void convert(SourceType& src, const formats_e index) {
  * @tparam SourceType The type of the source container
  * @param src The source container to convert
  * @param index The index of the container we will be converting to
+ * @return conversion_error_e Error code
  *
  */
 template <typename ExecSpace, typename SourceType>
-void convert(SourceType& src, const int index) {
-  Morpheus::convert<ExecSpace>(src, static_cast<formats_e>(index));
+conversion_error_e convert(SourceType& src, const int index) {
+  return Morpheus::convert<ExecSpace>(src, static_cast<formats_e>(index));
 }
 /*! \}  // end of conversion group
  */
