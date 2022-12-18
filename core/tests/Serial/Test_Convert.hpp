@@ -21,10 +21,11 @@
  * limitations under the License.
  */
 
-#ifndef TEST_CORE_TEST_CONVERT_HPP
-#define TEST_CORE_TEST_CONVERT_HPP
+#ifndef TEST_CORE_SERIAL_TEST_CONVERT_HPP
+#define TEST_CORE_SERIAL_TEST_CONVERT_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
 #include <utils/Macros_CooMatrix.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
@@ -34,23 +35,23 @@
 
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
-                                               types::convert_types_set>::type;
+                                               types::types_set>::type;
 
 using DenseMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseMatrix<double>,
-                                               types::convert_types_set>::type;
+                                               types::types_set>::type;
 
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
-                                               types::convert_types_set>::type;
+                                               types::types_set>::type;
 
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
-                                               types::convert_types_set>::type;
+                                               types::types_set>::type;
 
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
-                                               types::convert_types_set>::type;
+                                               types::types_set>::type;
 
 using DenseMatrixCooMatrixPairs =
     generate_pair<DenseMatrixTypes, CooMatrixTypes>::type;
@@ -119,7 +120,7 @@ namespace Test {
 
 TYPED_TEST_SUITE(ConvertTypesTest, ConvertTypes);
 
-TYPED_TEST(ConvertTypesTest, Forward) {
+TYPED_TEST(ConvertTypesTest, ForwardSerial) {
   using src_t = typename TestFixture::source_device;
   using dst_t = typename TestFixture::dest_device;
 
@@ -129,54 +130,16 @@ TYPED_TEST(ConvertTypesTest, Forward) {
   src_t src;
   src.resize(this->src_ref);
 
-#if defined(MORPHEUS_ENABLE_SERIAL)
-  if (Morpheus::has_serial_execution_space<TEST_CUSTOM_SPACE>::value) {
-    auto dst_h = Morpheus::create_mirror_container(dst);
-    auto src_h = Morpheus::create_mirror_container(src);
+  auto dst_h = Morpheus::create_mirror_container(dst);
+  auto src_h = Morpheus::create_mirror_container(src);
 
-    Morpheus::copy(this->src_ref_h, src_h);
+  Morpheus::copy(this->src_ref_h, src_h);
 
-    Morpheus::convert<Morpheus::Serial>(src_h, dst_h);
-    Morpheus::Test::have_same_data(dst_h, this->dst_ref_h);
-  }
-#endif
-
-#if defined(MORPHEUS_ENABLE_OPENMP)
-  if (Morpheus::has_openmp_execution_space<TEST_CUSTOM_SPACE>::value) {
-    auto dst_h = Morpheus::create_mirror_container(dst);
-    auto src_h = Morpheus::create_mirror_container(src);
-    Morpheus::copy(this->src_ref_h, src_h);
-
-    if (Morpheus::has_same_format_v<src_t, dst_t>) {
-      Morpheus::convert<Morpheus::OpenMP>(src_h, dst_h);
-      Morpheus::Test::have_same_data(dst_h, this->dst_ref_h);
-    } else if (Morpheus::is_csr_matrix_format_container_v<src_t> &&
-               Morpheus::is_coo_matrix_format_container_v<dst_t>) {
-      Morpheus::convert<Morpheus::OpenMP>(src_h, dst_h);
-      Morpheus::Test::have_same_data(dst_h, this->dst_ref_h);
-    } else {
-      EXPECT_THROW(Morpheus::convert<Morpheus::OpenMP>(src_h, dst_h),
-                   Morpheus::NotImplementedException);
-    }
-  }
-#endif
-
-#if defined(MORPHEUS_ENABLE_CUDA)
-  if (Morpheus::has_cuda_execution_space<TEST_CUSTOM_SPACE>::value) {
-    EXPECT_THROW(Morpheus::convert<Morpheus::Cuda>(src, dst),
-                 Morpheus::NotImplementedException);
-  }
-#endif
-
-#if defined(MORPHEUS_ENABLE_HIP)
-  if (Morpheus::has_hip_execution_space<TEST_CUSTOM_SPACE>::value) {
-    EXPECT_THROW(Morpheus::convert<Morpheus::HIP>(src, dst),
-                 Morpheus::NotImplementedException);
-  }
-#endif
+  Morpheus::convert<Morpheus::Serial>(src_h, dst_h);
+  Morpheus::Test::have_same_data(dst_h, this->dst_ref_h);
 }
 
-TYPED_TEST(ConvertTypesTest, Backward) {
+TYPED_TEST(ConvertTypesTest, BackwardSerial) {
   using src_t = typename TestFixture::dest_device;
   using dst_t = typename TestFixture::source_device;
 
@@ -186,52 +149,14 @@ TYPED_TEST(ConvertTypesTest, Backward) {
   src_t src;
   src.resize(this->dst_ref);
 
-#if defined(MORPHEUS_ENABLE_SERIAL)
-  if (Morpheus::has_serial_execution_space<TEST_CUSTOM_SPACE>::value) {
-    auto dst_h = Morpheus::create_mirror_container(dst);
-    auto src_h = Morpheus::create_mirror_container(src);
-    Morpheus::copy(this->dst_ref_h, src_h);
+  auto dst_h = Morpheus::create_mirror_container(dst);
+  auto src_h = Morpheus::create_mirror_container(src);
+  Morpheus::copy(this->dst_ref_h, src_h);
 
-    Morpheus::convert<Morpheus::Serial>(src_h, dst_h);
-    Morpheus::Test::have_same_data(dst_h, this->src_ref_h);
-  }
-#endif
-
-#if defined(MORPHEUS_ENABLE_OPENMP)
-  if (Morpheus::has_openmp_execution_space<TEST_CUSTOM_SPACE>::value) {
-    auto dst_h = Morpheus::create_mirror_container(dst);
-    auto src_h = Morpheus::create_mirror_container(src);
-    Morpheus::copy(this->dst_ref_h, src_h);
-
-    if (Morpheus::has_same_format_v<src_t, dst_t>) {
-      Morpheus::convert<Morpheus::OpenMP>(src_h, dst_h);
-      Morpheus::Test::have_same_data(dst_h, this->src_ref_h);
-    } else if (Morpheus::is_coo_matrix_format_container_v<src_t> &&
-               Morpheus::is_dense_matrix_format_container_v<dst_t>) {
-      Morpheus::convert<Morpheus::OpenMP>(src_h, dst_h);
-      Morpheus::Test::have_same_data(dst_h, this->src_ref_h);
-    } else {
-      EXPECT_THROW(Morpheus::convert<Morpheus::OpenMP>(src_h, dst_h),
-                   Morpheus::NotImplementedException);
-    }
-  }
-#endif
-
-#if defined(MORPHEUS_ENABLE_CUDA)
-  if (Morpheus::has_cuda_execution_space<TEST_CUSTOM_SPACE>::value) {
-    EXPECT_THROW(Morpheus::convert<Morpheus::Cuda>(src, dst),
-                 Morpheus::NotImplementedException);
-  }
-#endif
-
-#if defined(MORPHEUS_ENABLE_HIP)
-  if (Morpheus::has_hip_execution_space<TEST_CUSTOM_SPACE>::value) {
-    EXPECT_THROW(Morpheus::convert<Morpheus::HIP>(src, dst),
-                 Morpheus::NotImplementedException);
-  }
-#endif
+  Morpheus::convert<Morpheus::Serial>(src_h, dst_h);
+  Morpheus::Test::have_same_data(dst_h, this->src_ref_h);
 }
 
 }  // namespace Test
 
-#endif  // TEST_CORE_TEST_CONVERT_HPP
+#endif  // TEST_CORE_SERIAL_TEST_CONVERT_HPP

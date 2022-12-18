@@ -18,8 +18,6 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       Name
       ContainerFactory
       ContainerTraits
-      Convert_Dynamic
-      Convert
       CooMatrix_Binary
       CooMatrix_CompatibleBinary
       CooMatrix_CompatibleDynamicBinary
@@ -60,13 +58,42 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       Spaces
       SpaceTraits
       TypeTraits
-      WAXPBY)
+      WAXPBY
+      )
       set(file ${testdir}/Test_${Tag}_${Name}.cpp)
       # Write to a temporary intermediate file and call configure_file to avoid
       # updating timestamps triggering unnecessary rebuilds on subsequent cmake
       # runs.
       file(WRITE ${testdir}/dummy.cpp "#include <Test${Tag}_Category.hpp>\n"
                                       "#include <Test_${Name}.hpp>\n")
+      configure_file(${testdir}/dummy.cpp ${file})
+      global_append(${Tag}_SOURCES ${file})
+    endforeach()
+  endif()
+endforeach()
+
+foreach(Tag Serial;OpenMP;Cuda;HIP)
+  string(TOUPPER ${Tag} DEVICE)
+  string(TOLOWER ${Tag} dir)
+
+  if(MORPHEUS_ENABLE_${DEVICE})
+    set(testdir ${CMAKE_CURRENT_BINARY_DIR}/${dir})
+
+    foreach(
+      Name
+      Convert_Dynamic
+      Convert
+      CustomBackend
+      GenericBackend
+      Spaces
+      SpaceTraits
+      )
+      set(file ${testdir}/Test_${Tag}_${Name}.cpp)
+      # Write to a temporary intermediate file and call configure_file to avoid
+      # updating timestamps triggering unnecessary rebuilds on subsequent cmake
+      # runs.
+      file(WRITE ${testdir}/dummy.cpp "#include <Test${Tag}_Category.hpp>\n"
+                                      "#include <${Tag}/Test_${Name}.hpp>\n")
       configure_file(${testdir}/dummy.cpp ${file})
       global_append(${Tag}_SOURCES ${file})
     endforeach()

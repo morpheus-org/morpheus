@@ -202,49 +202,6 @@ TEST(SpacesTest, HostMirror) {
     res = std::is_same<typename mirror::backend, exe>::value;
     EXPECT_EQ(res, 1);
   }
-
-#if defined(MORPHEUS_ENABLE_SERIAL)
-  {
-    if (std::is_same<Morpheus::Serial,
-                     Morpheus::DefaultHostExecutionSpace>::value) {
-      using exe    = Morpheus::Serial;
-      using mirror = Morpheus::HostMirror<exe>;
-      // keep_exe & keep_mem
-      bool res = std::is_same<typename mirror::backend, exe>::value;
-      EXPECT_EQ(res, 1);
-    }
-  }
-
-#endif  // MORPHEUS_ENABLE_SERIAL
-#if defined(MORPHEUS_ENABLE_OPENMP)
-  {
-    using exe    = Morpheus::OpenMP;
-    using mirror = Morpheus::HostMirror<exe>;
-
-    bool res = std::is_same<typename mirror::backend, exe>::value;
-    EXPECT_EQ(res, 1);
-  }
-#endif  // MORPHEUS_ENABLE_OPENMP
-
-#if defined(MORPHEUS_ENABLE_CUDA)
-  {
-    using mirror = Morpheus::HostMirror<Morpheus::Cuda>;
-
-    bool res =
-        std::is_same<typename mirror::backend, Morpheus::HostSpace>::value;
-    EXPECT_EQ(res, 1);
-  }
-#endif  // MORPHEUS_ENABLE_CUDA
-
-#if defined(MORPHEUS_ENABLE_HIP)
-  {
-    using mirror = Morpheus::HostMirror<Morpheus::HIP>;
-
-    bool res =
-        std::is_same<typename mirror::backend, Morpheus::HostSpace>::value;
-    EXPECT_EQ(res, 1);
-  }
-#endif  // MORPHEUS_ENABLE_HIP
 }
 
 #define MORPHEUS_CHECK_BACKEND(REL, SPACE, ref_res)        \
@@ -280,36 +237,6 @@ TEST(SpacesTest, HasBackend) {
     bool backend_results[4] = {0, 1, 1, 1};
     MORPHEUS_CHECK_BACKEND(has_backend, HostSpace, backend_results);
   }
-
-#if defined(MORPHEUS_ENABLE_SERIAL)
-  {
-    bool backend_results[4] = {0, 1, 1, 1};
-    MORPHEUS_CHECK_BACKEND(has_backend, Serial, backend_results);
-  }
-#endif  // MORPHEUS_ENABLE_SERIAL
-
-#if defined(MORPHEUS_ENABLE_OPENMP)
-  {
-    bool backend_results[4] = {0, 1, 1, 1};
-    MORPHEUS_CHECK_BACKEND(has_backend, OpenMP, backend_results);
-  }
-#endif  // MORPHEUS_ENABLE_OPENMP
-
-#if defined(MORPHEUS_ENABLE_CUDA)
-  {
-    bool backend_results[4] = {0, 1, 1, 1};
-    MORPHEUS_CHECK_BACKEND(has_backend, Cuda, backend_results);
-    MORPHEUS_CHECK_BACKEND(has_backend, CudaSpace, backend_results);
-  }
-#endif  // MORPHEUS_ENABLE_CUDA
-
-#if defined(MORPHEUS_ENABLE_HIP)
-  {
-    bool backend_results[4] = {0, 1, 1, 1};
-    MORPHEUS_CHECK_BACKEND(has_backend, HIP, backend_results);
-    MORPHEUS_CHECK_BACKEND(has_backend, HIPSpace, backend_results);
-  }
-#endif  // MORPHEUS_ENABLE_HIP
 }
 
 }  // namespace Test

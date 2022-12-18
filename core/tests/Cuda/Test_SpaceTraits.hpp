@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef TEST_CORE_TEST_SPACETRAITS_HPP
-#define TEST_CORE_TEST_SPACETRAITS_HPP
+#ifndef TEST_CORE_CUDA_TEST_SPACETRAITS_HPP
+#define TEST_CORE_CUDA_TEST_SPACETRAITS_HPP
 
 #include <Morpheus_Core.hpp>
 
@@ -207,26 +207,10 @@ namespace Test {
  * spaces - they have a memory and execution space instead of being one.
  *
  */
-TEST(SpaceTraitsTest, IsMemorySpace) {
-  {
-    bool res = Morpheus::is_memory_space<Impl::TestSpace>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::is_memory_space_v<typename Impl::TestSpace::memory_space>;
-    EXPECT_EQ(res, 0);
-  }
-
-  {  // Built-in type
-    bool res = Morpheus::is_memory_space<int>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::is_memory_space_v<int>;
-    EXPECT_EQ(res, 0);
-  }
-
+TEST(SpaceTraitsTest, IsMemorySpaceCudaSpace) {
   {
     bool ref_results[8] = {1, 0, 0, 0, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(is_memory_space, HostSpace, memory_space, ref_results);
+    MORPHEUS_CHECK_SPACE(is_memory_space, CudaSpace, memory_space, ref_results);
   }
 
   // Check Execution Spaces
@@ -251,43 +235,10 @@ TEST(SpaceTraitsTest, IsMemorySpace) {
  * have a \p memory_space trait.
  *
  */
-TEST(SpaceTraitsTest, HasMemorySpace) {
-  {  // A structure like this meets the requirements of a valid memory space i.e
-    // has a memory_space trait that is the same as it's name BUT this is not
-    // supported as a MemorySpace
-    bool res = Morpheus::has_memory_space<Impl::with_memspace<int>>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::has_memory_space_v<Impl::with_memspace<int>>;
-    EXPECT_EQ(res, 0);
-  }
-
-  {
-    bool res = Morpheus::has_memory_space<Impl::TestSpace>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::has_memory_space_v<typename Impl::TestSpace::memory_space>;
-    EXPECT_EQ(res, 0);
-  }
-
-  {  // Built-in type
-    bool res = Morpheus::has_memory_space<int>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::has_memory_space_v<int>;
-    EXPECT_EQ(res, 0);
-  }
-
+TEST(SpaceTraitsTest, HasMemorySpaceCudaSpace) {
   {
     bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(has_memory_space, HostSpace, memory_space,
-                         ref_results);
-  }
-
-  // Check Execution Spaces
-  {
-    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(has_memory_space, DefaultExecutionSpace, memory_space,
+    MORPHEUS_CHECK_SPACE(has_memory_space, CudaSpace, memory_space,
                          ref_results);
   }
 
@@ -305,41 +256,9 @@ TEST(SpaceTraitsTest, HasMemorySpace) {
  * Kokkos spaces - they have a memory and execution space instead of being one.
  *
  */
-TEST(SpaceTraitsTest, IsExecutionSpace) {
-  {
-    bool result = Morpheus::is_execution_space<int>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::is_execution_space_v<int>;
-    EXPECT_EQ(result, 0);
-  }
-
-  {
-    struct A {};
-    bool result = Morpheus::is_execution_space<A>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::is_execution_space_v<A>;
-    EXPECT_EQ(result, 0);
-  }
-
-  {
-    bool ref_results[8] = {1, 0, 0, 0, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(is_execution_space, DefaultHostExecutionSpace,
-                         execution_space, ref_results);
-  }
-
-  {
-    bool ref_results[8] = {1, 0, 0, 0, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(is_execution_space, DefaultExecutionSpace,
-                         execution_space, ref_results);
-  }
-
-  {
-    bool ref_results[8] = {1, 0, 0, 0, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(is_execution_space, TEST_SPACE, execution_space,
-                         ref_results);
-  }
+TEST(SpaceTraitsTest, IsExecutionSpaceCuda) {
+  bool ref_results[8] = {1, 0, 0, 0, 1, 1, 1, 1};
+  MORPHEUS_CHECK_SPACE(is_execution_space, Cuda, execution_space, ref_results);
 }
 
 /**
@@ -350,41 +269,9 @@ TEST(SpaceTraitsTest, IsExecutionSpace) {
  * space instead of being one.
  *
  */
-TEST(SpaceTraitsTest, HasExecutionSpace) {
-  {
-    bool result = Morpheus::has_execution_space<int>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::has_execution_space_v<int>;
-    EXPECT_EQ(result, 0);
-  }
-
-  {
-    struct A {};
-    bool result = Morpheus::has_execution_space<A>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::has_execution_space_v<A>;
-    EXPECT_EQ(result, 0);
-  }
-
-  {
-    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(has_execution_space, DefaultHostExecutionSpace,
-                         execution_space, ref_results);
-  }
-
-  {
-    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(has_execution_space, DefaultExecutionSpace,
-                         execution_space, ref_results);
-  }
-
-  {
-    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(has_execution_space, TEST_SPACE, execution_space,
-                         ref_results);
-  }
+TEST(SpaceTraitsTest, HasExecutionSpaceCuda) {
+  bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+  MORPHEUS_CHECK_SPACE(has_execution_space, Cuda, execution_space, ref_results);
 }
 
 /**
@@ -393,34 +280,29 @@ TEST(SpaceTraitsTest, HasExecutionSpace) {
  * memory space and be the same.
  *
  */
-TEST(SpaceTraitsTest, IsSameMemorySpace) {
-  {  // Built-in type
-    bool result = Morpheus::is_same_memory_space<int, int>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::is_same_memory_space_v<int, int>;
-    EXPECT_EQ(result, 0);
-  }
-
-  {
-    // Built-in type with valid memory space
-    bool result = Morpheus::is_same_memory_space<int, Kokkos::HostSpace>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::is_same_memory_space_v<int, Kokkos::HostSpace>;
-    EXPECT_EQ(result, 0);
-  }
-
+TEST(SpaceTraitsTest, IsSameMemorySpaceCudaSpace) {
   {
     bool ref_results[8] = {1, 0, 0, 0, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE_SAME_NAMESPACE(is_same_memory_space, HostSpace,
-                                        HostSpace, memory_space, ref_results);
+    MORPHEUS_CHECK_SPACE_SAME_NAMESPACE(is_same_memory_space, CudaSpace,
+                                        CudaSpace, memory_space, ref_results);
   }
 
   {
     bool ref_results[12] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_SPACE_DIFF_NAMESPACE(is_same_memory_space, CudaSpace,
+                                        CudaSpace, memory_space, ref_results);
+  }
+
+  {
+    bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    MORPHEUS_CHECK_SPACE_SAME_NAMESPACE(is_same_memory_space, HostSpace,
+                                        CudaSpace, memory_space, ref_results);
+  }
+
+  {
+    bool ref_results[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     MORPHEUS_CHECK_SPACE_DIFF_NAMESPACE(is_same_memory_space, HostSpace,
-                                        HostSpace, memory_space, ref_results);
+                                        CudaSpace, memory_space, ref_results);
   }
 
   // Execution Space
@@ -444,35 +326,29 @@ TEST(SpaceTraitsTest, IsSameMemorySpace) {
  * \p memory_space trait and the \p is_same_memory_space must be satisfied.
  *
  */
-TEST(SpaceTraitsTest, HasSameMemorySpace) {
-  {  // Built-in type
-    bool result = Morpheus::has_same_memory_space<int, int>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::has_same_memory_space_v<int, int>;
-    EXPECT_EQ(result, 0);
-  }
-
-  {
-    // Built-in type with valid memory space
-    bool result =
-        Morpheus::has_same_memory_space<int, Kokkos::HostSpace>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::has_same_memory_space_v<int, Kokkos::HostSpace>;
-    EXPECT_EQ(result, 0);
-  }
-
+TEST(SpaceTraitsTest, HasSameMemorySpaceCudaSpace) {
   {
     bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE_SAME_NAMESPACE(has_same_memory_space, HostSpace,
-                                        HostSpace, memory_space, ref_results);
+    MORPHEUS_CHECK_SPACE_SAME_NAMESPACE(has_same_memory_space, CudaSpace,
+                                        CudaSpace, memory_space, ref_results);
   }
 
   {
     bool ref_results[12] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_SPACE_DIFF_NAMESPACE(has_same_memory_space, CudaSpace,
+                                        CudaSpace, memory_space, ref_results);
+  }
+
+  {
+    bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    MORPHEUS_CHECK_SPACE_SAME_NAMESPACE(has_same_memory_space, HostSpace,
+                                        CudaSpace, memory_space, ref_results);
+  }
+
+  {
+    bool ref_results[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     MORPHEUS_CHECK_SPACE_DIFF_NAMESPACE(has_same_memory_space, HostSpace,
-                                        HostSpace, memory_space, ref_results);
+                                        CudaSpace, memory_space, ref_results);
   }
 
   // Execution Space
@@ -495,29 +371,10 @@ TEST(SpaceTraitsTest, HasSameMemorySpace) {
  * supported Host memory spaces.
  *
  */
-TEST(SpaceTraitsTest, IsHostMemorySpace) {
-  {
-    bool res = Morpheus::is_host_memory_space<Impl::TestSpace>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::is_host_memory_space<
-        typename Impl::TestSpace::memory_space>::value;
-    EXPECT_EQ(res, 0);
-  }
-
-  {  // Built-in type
-    bool res = Morpheus::is_host_memory_space<int>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::is_host_memory_space_v<int>;
-    EXPECT_EQ(res, 0);
-  }
-
-  {
-    bool ref_results[8] = {1, 0, 0, 0, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(is_host_memory_space, HostSpace, memory_space,
-                         ref_results);
-  }
+TEST(SpaceTraitsTest, IsHostMemorySpaceCudaSpace) {
+  bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  MORPHEUS_CHECK_SPACE(is_host_memory_space, CudaSpace, memory_space,
+                       ref_results);
 }
 
 /**
@@ -526,29 +383,10 @@ TEST(SpaceTraitsTest, IsHostMemorySpace) {
  * supported Host memory spaces.
  *
  */
-TEST(SpaceTraitsTest, HasHostMemorySpace) {
-  {
-    bool res = Morpheus::has_host_memory_space<Impl::TestSpace>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::has_host_memory_space_v<
-        typename Impl::TestSpace::memory_space>;
-    EXPECT_EQ(res, 0);
-  }
-
-  {  // Built-in type
-    bool res = Morpheus::has_host_memory_space<int>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::has_host_memory_space_v<int>;
-    EXPECT_EQ(res, 0);
-  }
-
-  {
-    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(has_host_memory_space, HostSpace, memory_space,
-                         ref_results);
-  }
+TEST(SpaceTraitsTest, HasHostMemorySpaceCudaSpace) {
+  bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  MORPHEUS_CHECK_SPACE(has_host_memory_space, CudaSpace, memory_space,
+                       ref_results);
 }
 
 /**
@@ -557,29 +395,10 @@ TEST(SpaceTraitsTest, HasHostMemorySpace) {
  * the supported Host execution spaces.
  *
  */
-TEST(SpaceTraitsTest, IsHostExecutionSpace) {
-  {
-    bool res = Morpheus::is_host_execution_space<int>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::is_host_execution_space_v<int>;
-    EXPECT_EQ(res, 0);
-  }
-
-  {
-    struct A {};
-    bool res = Morpheus::is_host_execution_space<A>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::is_host_execution_space_v<A>;
-    EXPECT_EQ(res, 0);
-  }
-
-  {
-    bool ref_results[8] = {1, 0, 0, 0, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(is_host_execution_space, DefaultHostExecutionSpace,
-                         execution_space, ref_results);
-  }
+TEST(SpaceTraitsTest, IsHostExecutionSpaceCuda) {
+  bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  MORPHEUS_CHECK_SPACE(is_host_execution_space, Cuda, execution_space,
+                       ref_results);
 }
 
 /**
@@ -588,29 +407,10 @@ TEST(SpaceTraitsTest, IsHostExecutionSpace) {
  * the supported Host execution spaces.
  *
  */
-TEST(SpaceTraitsTest, HasHostExecutionSpace) {
-  {
-    bool res = Morpheus::has_host_execution_space<int>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::has_host_execution_space_v<int>;
-    EXPECT_EQ(res, 0);
-  }
-
-  {
-    struct A {};
-    bool res = Morpheus::has_host_execution_space<A>::value;
-    EXPECT_EQ(res, 0);
-
-    res = Morpheus::has_host_execution_space_v<A>;
-    EXPECT_EQ(res, 0);
-  }
-
-  {
-    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(has_host_execution_space, DefaultHostExecutionSpace,
-                         execution_space, ref_results);
-  }
+TEST(SpaceTraitsTest, HasHostExecutionSpaceCuda) {
+  bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  MORPHEUS_CHECK_SPACE(has_host_execution_space, Cuda, execution_space,
+                       ref_results);
 }
 
 #if defined(MORPHEUS_ENABLE_SERIAL)
@@ -620,23 +420,10 @@ TEST(SpaceTraitsTest, HasHostExecutionSpace) {
  * a Serial execution space.
  *
  */
-TEST(SpaceTraitsTest, IsSerialExecutionSpace) {
-  {
-    bool result = Morpheus::is_serial_execution_space<int>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::is_serial_execution_space_v<int>;
-    EXPECT_EQ(result, 0);
-  }
-
-  {
-    struct A {};
-    bool result = Morpheus::is_serial_execution_space<A>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::is_serial_execution_space_v<A>;
-    EXPECT_EQ(result, 0);
-  }
+TEST(SpaceTraitsTest, IsSerialExecutionSpaceCuda) {
+  bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  MORPHEUS_CHECK_SPACE(is_serial_execution_space, Cuda, execution_space,
+                       ref_results);
 }
 
 /**
@@ -645,23 +432,10 @@ TEST(SpaceTraitsTest, IsSerialExecutionSpace) {
  * a Serial execution space.
  *
  */
-TEST(SpaceTraitsTest, HasSerialExecutionSpace) {
-  {
-    bool result = Morpheus::has_serial_execution_space<int>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::has_serial_execution_space_v<int>;
-    EXPECT_EQ(result, 0);
-  }
-
-  {
-    struct A {};
-    bool result = Morpheus::has_serial_execution_space<A>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::has_serial_execution_space_v<A>;
-    EXPECT_EQ(result, 0);
-  }
+TEST(SpaceTraitsTest, HasSerialExecutionSpaceCuda) {
+  bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  MORPHEUS_CHECK_SPACE(has_serial_execution_space, Cuda, execution_space,
+                       ref_results);
 }
 #endif  // MORPHEUS_ENABLE_SERIAL
 
@@ -672,23 +446,10 @@ TEST(SpaceTraitsTest, HasSerialExecutionSpace) {
  * a OpenMP execution space.
  *
  */
-TEST(SpaceTraitsTest, IsOpenMPExecutionSpace) {
-  {
-    bool result = Morpheus::is_openmp_execution_space<int>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::is_openmp_execution_space_v<int>;
-    EXPECT_EQ(result, 0);
-  }
-
-  {
-    struct A {};
-    bool result = Morpheus::is_openmp_execution_space<A>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::is_openmp_execution_space_v<A>;
-    EXPECT_EQ(result, 0);
-  }
+TEST(SpaceTraitsTest, IsOpenMPExecutionSpaceCuda) {
+  bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  MORPHEUS_CHECK_SPACE(is_openmp_execution_space, Cuda, execution_space,
+                       ref_results);
 }
 
 /**
@@ -697,34 +458,20 @@ TEST(SpaceTraitsTest, IsOpenMPExecutionSpace) {
  * a OpenMP execution space.
  *
  */
-TEST(SpaceTraitsTest, HasOpenMPExecutionSpace) {
-  {
-    bool result = Morpheus::has_openmp_execution_space<int>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::has_openmp_execution_space_v<int>;
-    EXPECT_EQ(result, 0);
-  }
-
-  {
-    struct A {};
-    bool result = Morpheus::has_openmp_execution_space<A>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::has_openmp_execution_space_v<A>;
-    EXPECT_EQ(result, 0);
-  }
+TEST(SpaceTraitsTest, HasOpenMPExecutionSpaceCuda) {
+  bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  MORPHEUS_CHECK_SPACE(has_openmp_execution_space, Cuda, execution_space,
+                       ref_results);
 }
 #endif  // MORPHEUS_ENABLE_OPENMP
 
-#if defined(MORPHEUS_ENABLE_CUDA)
 /**
  * @brief The \p is_cuda_execution_space checks if the passed type is a
  * valid Cuda execution space. For the check to be valid, the type must be
  * a Cuda execution space.
  *
  */
-TEST(SpaceTraitsTest, IsCudaExecutionSpace) {
+TEST(SpaceTraitsTest, IsCudaExecutionSpaceCuda) {
   {
     bool result = Morpheus::is_cuda_execution_space<int>::value;
     EXPECT_EQ(result, 0);
@@ -742,10 +489,32 @@ TEST(SpaceTraitsTest, IsCudaExecutionSpace) {
     EXPECT_EQ(result, 0);
   }
 
+#if defined(MORPHEUS_ENABLE_SERIAL)
+  {
+    bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    MORPHEUS_CHECK_SPACE(is_cuda_execution_space, Serial, execution_space,
+                         ref_results);
+  }
+#endif
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+  {
+    bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    MORPHEUS_CHECK_SPACE(is_cuda_execution_space, OpenMP, execution_space,
+                         ref_results);
+  }
+#endif
+
   {
     bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     MORPHEUS_CHECK_SPACE(is_cuda_execution_space, DefaultHostExecutionSpace,
                          execution_space, ref_results);
+  }
+
+  {
+    bool ref_results[8] = {1, 0, 0, 0, 1, 1, 1, 1};
+    MORPHEUS_CHECK_SPACE(is_cuda_execution_space, Cuda, execution_space,
+                         ref_results);
   }
 }
 
@@ -755,7 +524,7 @@ TEST(SpaceTraitsTest, IsCudaExecutionSpace) {
  * a Cuda execution space.
  *
  */
-TEST(SpaceTraitsTest, HasCudaExecutionSpace) {
+TEST(SpaceTraitsTest, HasCudaExecutionSpaceCuda) {
   {
     bool result = Morpheus::has_cuda_execution_space<int>::value;
     EXPECT_EQ(result, 0);
@@ -772,60 +541,35 @@ TEST(SpaceTraitsTest, HasCudaExecutionSpace) {
     result = Morpheus::has_cuda_execution_space_v<A>;
     EXPECT_EQ(result, 0);
   }
-}
-#endif  // MORPHEUS_ENABLE_CUDA
 
-#if defined(MORPHEUS_ENABLE_HIP)
-/**
- * @brief The \p is_hip_execution_space checks if the passed type is a
- * valid HIP execution space. For the check to be valid, the type must be
- * a HIP execution space.
- *
- */
-TEST(SpaceTraitsTest, IsHIPExecutionSpace) {
+#if defined(MORPHEUS_ENABLE_SERIAL)
   {
-    bool result = Morpheus::is_hip_execution_space<int>::value;
-    EXPECT_EQ(result, 0);
+    bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    MORPHEUS_CHECK_SPACE(has_cuda_execution_space, Serial, execution_space,
+                         ref_results);
+  }
+#endif
 
-    result = Morpheus::is_hip_execution_space_v<int>;
-    EXPECT_EQ(result, 0);
+#if defined(MORPHEUS_ENABLE_OPENMP)
+  {
+    bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    MORPHEUS_CHECK_SPACE(has_cuda_execution_space, OpenMP, execution_space,
+                         ref_results);
+  }
+#endif
+
+  {
+    bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    MORPHEUS_CHECK_SPACE(has_cuda_execution_space, DefaultHostExecutionSpace,
+                         execution_space, ref_results);
   }
 
   {
-    struct A {};
-    bool result = Morpheus::is_hip_execution_space<A>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::is_hip_execution_space_v<A>;
-    EXPECT_EQ(result, 0);
-  }
-}
-
-/**
- * @brief The \p has_hip_execution_space checks if the passed type has a
- * valid HIP execution space. For the check to be valid, the type must hold
- * a HIP execution space.
- *
- */
-TEST(SpaceTraitsTest, HasHIPExecutionSpace) {
-  {
-    bool result = Morpheus::has_hip_execution_space<int>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::has_hip_execution_space_v<int>;
-    EXPECT_EQ(result, 0);
-  }
-
-  {
-    struct A {};
-    bool result = Morpheus::has_hip_execution_space<A>::value;
-    EXPECT_EQ(result, 0);
-
-    result = Morpheus::has_hip_execution_space_v<A>;
-    EXPECT_EQ(result, 0);
+    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+    MORPHEUS_CHECK_SPACE(has_cuda_execution_space, Cuda, execution_space,
+                         ref_results);
   }
 }
-#endif  // MORPHEUS_ENABLE_HIP
 
 #define MORPHEUS_CHECK_ACCESS_SINGLE_SPACE_NAMESPACE(                          \
     REL, NAMESPACE, SPACE, MEMSPACE, _ref_res, res_offset)                     \
@@ -866,11 +610,29 @@ TEST(SpaceTraitsTest, HasHIPExecutionSpace) {
         REL, Morpheus::Generic, SPACE, MEMSPACE, ref_res, 12);                 \
   }
 
-TEST(SpaceTraitsTest, HasAccessSingle) {
+TEST(SpaceTraitsTest, HasAccessSingleCudaSpace) {
+#if defined(MORPHEUS_ENABLE_SERIAL)
+  {
+    bool ref_results[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    MORPHEUS_CHECK_ACCESS_SINGLE_SPACE("", Serial, CudaSpace, ref_results);
+  }
+#endif  // MORPHEUS_ENABLE_SERIAL
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+  {
+    bool ref_results[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    MORPHEUS_CHECK_ACCESS_SINGLE_SPACE("", OpenMP, CudaSpace, ref_results);
+  }
+#endif  // MORPHEUS_ENABLE_OPENMP
+
+  {
+    bool ref_results[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    MORPHEUS_CHECK_ACCESS_SINGLE_SPACE("", Cuda, HostSpace, ref_results);
+  }
+
   {
     bool ref_results[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_ACCESS_SINGLE_SPACE("", DefaultHostExecutionSpace, HostSpace,
-                                       ref_results);
+    MORPHEUS_CHECK_ACCESS_SINGLE_SPACE("", Cuda, CudaSpace, ref_results);
   }
 }
 
@@ -917,11 +679,29 @@ TEST(SpaceTraitsTest, HasAccessSingle) {
  * memory space and the execution space must be able to access them.
  *
  */
-TEST(SpaceTraitsTest, HasAccessMulti) {
+TEST(SpaceTraitsTest, HasAccessMultiCudaSpace) {
+#if defined(MORPHEUS_ENABLE_SERIAL)
   {
-    bool ref_results[12] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_ACCESS_MULTI_SPACE("", DefaultHostExecutionSpace, HostSpace,
-                                      ref_results);
+    bool ref_results[12] = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0};
+    MORPHEUS_CHECK_ACCESS_MULTI_SPACE("", Serial, CudaSpace, ref_results);
+  }
+#endif  // MORPHEUS_ENABLE_SERIAL
+
+#if defined(MORPHEUS_ENABLE_OPENMP)
+  {
+    bool ref_results[12] = {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0};
+    MORPHEUS_CHECK_ACCESS_MULTI_SPACE("", OpenMP, CudaSpace, ref_results);
+  }
+#endif  // MORPHEUS_ENABLE_OPENMP
+
+  {
+    bool ref_results[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    MORPHEUS_CHECK_ACCESS_MULTI_SPACE("", Cuda, HostSpace, ref_results);
+  }
+
+  {
+    bool ref_results[12] = {0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1};
+    MORPHEUS_CHECK_ACCESS_MULTI_SPACE("", Cuda, CudaSpace, ref_results);
   }
 }
 
@@ -955,49 +735,27 @@ TEST(SpaceTraitsTest, HasAccessMulti) {
     EXPECT_EQ(_res, ref_res[5]);                                           \
   }
 
-TEST(SpaceTraitsTest, IsSpace) {
-  {
-    bool result = Morpheus::is_space<int>::value;
-    EXPECT_EQ(result, 0);
+TEST(SpaceTraitsTest, IsSpaceCuda) {
+  bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+  MORPHEUS_CHECK_SPACE(is_space, Cuda, execution_space, ref_results);
+  MORPHEUS_CHECK_SPACE(is_space, Cuda, memory_space, ref_results);
+  MORPHEUS_CHECK_SPACE(is_space, Cuda, device_type, ref_results);
 
-    result = Morpheus::is_space_v<int>;
-    EXPECT_EQ(result, 0);
-  }
+  bool backend_results[6] = {1, 1, 1, 1, 1, 1};
+  MORPHEUS_CHECK_BACKEND(is_space, Cuda, backend, backend_results);
+}
 
-  {
-    struct A {};
-    bool result = Morpheus::is_space<A>::value;
-    EXPECT_EQ(result, 0);
+TEST(SpaceTraitsTest, IsSpaceCudaSpace) {
+  bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
 
-    result = Morpheus::is_space_v<A>;
-    EXPECT_EQ(result, 0);
-  }
+  MORPHEUS_CHECK_SPACE(is_space, CudaSpace, execution_space, ref_results);
+  MORPHEUS_CHECK_SPACE(is_space, CudaSpace, memory_space, ref_results);
+  MORPHEUS_CHECK_SPACE(is_space, CudaSpace, device_type, ref_results);
 
-  {
-    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(is_space, HostSpace, execution_space, ref_results);
-    MORPHEUS_CHECK_SPACE(is_space, HostSpace, memory_space, ref_results);
-    MORPHEUS_CHECK_SPACE(is_space, HostSpace, device_type, ref_results);
-
-    bool backend_results[6] = {1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_BACKEND(is_space, HostSpace, backend, backend_results);
-  }
-
-  {
-    bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_SPACE(is_space, DefaultHostExecutionSpace, execution_space,
-                         ref_results);
-    MORPHEUS_CHECK_SPACE(is_space, DefaultHostExecutionSpace, memory_space,
-                         ref_results);
-    MORPHEUS_CHECK_SPACE(is_space, DefaultHostExecutionSpace, device_type,
-                         ref_results);
-
-    bool backend_results[6] = {1, 1, 1, 1, 1, 1};
-    MORPHEUS_CHECK_BACKEND(is_space, DefaultHostExecutionSpace, backend,
-                           backend_results);
-  }
+  bool backend_results[6] = {1, 1, 1, 1, 1, 1};
+  MORPHEUS_CHECK_BACKEND(is_space, CudaSpace, backend, backend_results);
 }
 
 }  // namespace Test
 
-#endif  // TEST_CORE_TEST_SPACETRAITS_HPP
+#endif  // TEST_CORE_CUDA_TEST_SPACETRAITS_HPP

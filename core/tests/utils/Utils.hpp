@@ -46,6 +46,19 @@ using types_set = typename Morpheus::cross_product<
         index_tlist, typename Morpheus::cross_product<
                          layout_tlist, space_tlist>::type>::type>::type;
 
+using convert_value_tlist = Morpheus::TypeList<double, int>;
+using convert_index_tlist = Morpheus::TypeList<long long>;
+using convert_layout_tlist =
+    Morpheus::TypeList<Kokkos::LayoutRight, Kokkos::LayoutLeft>;
+using convert_space_tlist = Morpheus::TypeList<TEST_CUSTOM_SPACE>;
+// Generate all unary combinations
+using convert_types_set = typename Morpheus::cross_product<
+    convert_value_tlist,
+    typename Morpheus::cross_product<
+        convert_index_tlist,
+        typename Morpheus::cross_product<
+            convert_layout_tlist, convert_space_tlist>::type>::type>::type;
+
 // Generate compatible unary combinations
 using compatible_value_tlist = Morpheus::TypeList<double>;
 using compatible_index_tlist = Morpheus::TypeList<int, Morpheus::Default>;

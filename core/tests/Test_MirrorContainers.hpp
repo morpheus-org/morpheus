@@ -166,7 +166,8 @@ TYPED_TEST(ContainerTypesUnaryTest, MirrorContainer_NewSpace) {
   using Container     = typename TestFixture::device;
   using HostContainer = typename TestFixture::host;
 
-  using space        = TEST_CUSTOM_SPACE;
+  // using space        = TEST_CUSTOM_SPACE;
+  using space        = Morpheus::DefaultExecutionSpace;
   using value_type   = typename Container::non_const_value_type;
   using index_type   = typename Container::non_const_index_type;
   using array_layout = typename Container::array_layout;
@@ -179,17 +180,14 @@ TYPED_TEST(ContainerTypesUnaryTest, MirrorContainer_NewSpace) {
 
   if (Morpheus::has_same_memory_space_v<Container, HostContainer>) {
     // Check mirror container same type as HostMirror
-    bool res = std::is_same_v<decltype(c), HostContainer>;
+    bool res = std::is_same_v<decltype(c), Container>;
     EXPECT_EQ(res, 1);
 
     // new container should have same data as device
     bool same_data = Morpheus::Test::have_same_data(c, this->Aref);
     EXPECT_EQ(same_data, 1);
   } else {
-    bool res =
-        std::is_same_v<decltype(c), decltype(Morpheus::Test::create_container<
-                                             Container, value_type, index_type,
-                                             array_layout, space>())>;
+    bool res = std::is_same_v<decltype(c), HostContainer>;
     EXPECT_EQ(res, 1);
 
     // new allocation

@@ -113,10 +113,11 @@ void getNumBlocksAndThreads(
     printf("n is too large, please choose a smaller number!\n");
   }
 
-  if (blocks > prop.maxGridSize[0]) {
+  if (blocks > (IndexType)prop.maxGridSize[0]) {
     printf(
-        "Grid size <%d> exceeds the device capability <%d>, set block size as "
-        "%d (original %d)\n",
+        "Grid size <%lld> exceeds the device capability <%lld>, set block size "
+        "as "
+        "%lld (original %lld)\n",
         blocks, prop.maxGridSize[0], threads * 2, threads);
 
     blocks /= 2;

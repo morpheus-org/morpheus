@@ -92,44 +92,6 @@ TEST(GenericBackendTest, IsGenericBackend) {
     bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
     MORPHEUS_CHECK_GENERIC_BACKEND(HostSpace, ref_results);
   }
-
-#if defined(MORPHEUS_ENABLE_SERIAL)
-  {
-    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
-    MORPHEUS_CHECK_GENERIC_BACKEND(Serial, ref_results);
-  }
-#endif
-
-#if defined(MORPHEUS_ENABLE_OPENMP)
-  {
-    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
-    MORPHEUS_CHECK_GENERIC_BACKEND(OpenMP, ref_results);
-  }
-#endif
-
-#if defined(MORPHEUS_ENABLE_CUDA)
-  {
-    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
-    MORPHEUS_CHECK_GENERIC_BACKEND(Cuda, ref_results);
-  }
-
-  {
-    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
-    MORPHEUS_CHECK_GENERIC_BACKEND(CudaSpace, ref_results);
-  }
-#endif
-
-#if defined(MORPHEUS_ENABLE_HIP)
-  {
-    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
-    MORPHEUS_CHECK_GENERIC_BACKEND(HIP, ref_results);
-  }
-
-  {
-    bool ref_results[7] = {1, 0, 0, 1, 0, 0, 1};
-    MORPHEUS_CHECK_GENERIC_BACKEND(HIPSpace, ref_results);
-  }
-#endif
 }
 
 }  // namespace Test
