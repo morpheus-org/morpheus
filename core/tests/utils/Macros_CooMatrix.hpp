@@ -60,13 +60,15 @@
  * data.
  *
  */
-#define VALIDATE_COO_CONTAINER(A, Aref, nnnz, type)           \
-  {                                                           \
-    for (type n = 0; n < nnnz; n++) {                         \
-      EXPECT_EQ(A.row_indices(n), Aref.row_indices(n));       \
-      EXPECT_EQ(A.column_indices(n), Aref.column_indices(n)); \
-      EXPECT_EQ(A.values(n), Aref.values(n));                 \
-    }                                                         \
+#define VALIDATE_COO_CONTAINER(A, Aref, nnnz)                       \
+  {                                                                 \
+    using container_type      = decltype(A);                        \
+    using container_size_type = typename container_type::size_type; \
+    for (container_size_type n = 0; n < nnnz; n++) {                \
+      EXPECT_EQ(A.row_indices(n), Aref.row_indices(n));             \
+      EXPECT_EQ(A.column_indices(n), Aref.column_indices(n));       \
+      EXPECT_EQ(A.values(n), Aref.values(n));                       \
+    }                                                               \
   }
 
 namespace Morpheus {
@@ -165,13 +167,13 @@ bool is_empty_container(
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<Container>>* = nullptr) {
   using value_type = typename Container::value_type;
-  using index_type = typename Container::index_type;
+  using size_type  = typename Container::size_type;
 
   typename Container::HostMirror ch;
   ch.resize(c);
   Morpheus::copy(c, ch);
 
-  for (index_type n = 0; n < c.nnnz(); n++) {
+  for (size_type n = 0; n < c.nnnz(); n++) {
     if (ch.values(n) != (value_type)0.0) {
       return false;
     }
@@ -194,7 +196,7 @@ bool have_same_data(
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<Container1> &&
         Morpheus::is_coo_matrix_format_container_v<Container2>>* = nullptr) {
-  using index_type = typename Container1::index_type;
+  using size_type = typename Container1::size_type;
 
   if (!is_same_size(c1, c2)) return false;
 
@@ -206,7 +208,7 @@ bool have_same_data(
   c2_h.resize(c2);
   Morpheus::copy(c2, c2_h);
 
-  for (index_type i = 0; i < c1_h.nnnz(); i++) {
+  for (size_type i = 0; i < c1_h.nnnz(); i++) {
     if (c1_h.row_indices(i) != c2_h.row_indices(i)) return false;
     if (c1_h.column_indices(i) != c2_h.column_indices(i)) return false;
     if (c1_h.values(i) != c2_h.values(i)) return false;

@@ -34,10 +34,10 @@ namespace Morpheus {
 namespace Impl {
 namespace Kernels {
 
-template <typename ValueType, typename IndexType>
-__global__ void copy_by_key_kernel(IndexType n, const IndexType* keys,
+template <typename ValueType, typename IndexType, typename SizeType>
+__global__ void copy_by_key_kernel(SizeType n, const IndexType* keys,
                                    const ValueType* src, ValueType* dst) {
-  const IndexType tid = blockDim.x * blockIdx.x + threadIdx.x;
+  const SizeType tid = blockDim.x * blockIdx.x + threadIdx.x;
   if (tid > n) return;
 
   dst[tid] = src[keys[tid]];

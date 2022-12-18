@@ -88,10 +88,10 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   using HostMatrix        = typename TestFixture::host;
   using DynamicMatrix     = typename TestFixture::dynamic_device;
   using DynamicHostMatrix = typename TestFixture::dynamic_host;
-  using index_type        = typename Matrix::index_type;
+  using size_type         = typename Matrix::size_type;
   using value_type        = typename Matrix::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the reference CsrMatrix
   DynamicMatrix A(this->Aref);
   DynamicHostMatrix Ah(this->Ahref);
@@ -112,10 +112,10 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   Bh.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  for (index_type n = 0; n < nrows + 1; n++) {
+  for (size_type n = 0; n < nrows + 1; n++) {
     EXPECT_EQ(Bh.row_offsets(n), Ch.row_offsets(n));
   }
-  for (index_type n = 0; n < nnnz; n++) {
+  for (size_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(Bh.column_indices(n), Ch.column_indices(n));
     EXPECT_EQ(Bh.values(n), Ch.values(n));
   }
@@ -130,10 +130,10 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   // Send other vector back to host for check
   HostMatrix Ct(nrows, ncols, nnnz);
   Morpheus::copy(C, Ct);
-  for (index_type n = 0; n < nrows + 1; n++) {
+  for (size_type n = 0; n < nrows + 1; n++) {
     EXPECT_EQ(Bh.row_offsets(n), Ct.row_offsets(n));
   }
-  for (index_type n = 0; n < nnnz; n++) {
+  for (size_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(Bh.column_indices(n), Ct.column_indices(n));
     EXPECT_EQ(Bh.values(n), Ct.values(n));
   }
@@ -176,10 +176,10 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   using HostMatrix        = typename TestFixture::host;
   using DynamicMatrix     = typename TestFixture::dynamic_device;
   using DynamicHostMatrix = typename TestFixture::dynamic_host;
-  using index_type        = typename Matrix::index_type;
+  using size_type         = typename Matrix::size_type;
   using value_type        = typename Matrix::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the reference CsrMatrix
   DynamicMatrix A(this->Aref);
   DynamicHostMatrix Ah(this->Ahref);
@@ -200,10 +200,10 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   Bh.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  for (index_type n = 0; n < nrows + 1; n++) {
+  for (size_type n = 0; n < nrows + 1; n++) {
     EXPECT_EQ(Bh.row_offsets(n), Ch.row_offsets(n));
   }
-  for (index_type n = 0; n < nnnz; n++) {
+  for (size_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(Bh.column_indices(n), Ch.column_indices(n));
     EXPECT_EQ(Bh.values(n), Ch.values(n));
   }
@@ -218,10 +218,10 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   // Send other vector back to host for check
   HostMatrix Ct(nrows, ncols, nnnz);
   Morpheus::copy(C, Ct);
-  for (index_type n = 0; n < nrows + 1; n++) {
+  for (size_type n = 0; n < nrows + 1; n++) {
     EXPECT_EQ(Bh.row_offsets(n), Ct.row_offsets(n));
   }
-  for (index_type n = 0; n < nnnz; n++) {
+  for (size_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(Bh.column_indices(n), Ct.column_indices(n));
     EXPECT_EQ(Bh.values(n), Ct.values(n));
   }

@@ -45,12 +45,12 @@ void update_diagonal(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
-  using index_type = typename Matrix::index_type;
+  using size_type = typename Matrix::size_type;
 
 // Note: Assumes only a single entry exists for every diagonal element.
 // i.e a single threads will update a particular non-zero on the diagonal
 #pragma omp parallel for
-  for (index_type n = 0; n < A.nnnz(); n++) {
+  for (size_type n = 0; n < A.nnnz(); n++) {
     if (A.row_indices(n) == A.column_indices(n)) {
       A.values(n) = diagonal[A.column_indices(n)];
     }
@@ -69,9 +69,9 @@ void get_diagonal(
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
 }
 
-template <typename ExecSpace, typename Matrix, typename IndexType,
+template <typename ExecSpace, typename Matrix, typename SizeType,
           typename ValueType>
-void set_value(Matrix&, IndexType, IndexType, ValueType,
+void set_value(Matrix&, SizeType, SizeType, ValueType,
                typename std::enable_if_t<
                    Morpheus::is_coo_matrix_format_container_v<Matrix> &&
                    Morpheus::has_custom_backend_v<ExecSpace> &&

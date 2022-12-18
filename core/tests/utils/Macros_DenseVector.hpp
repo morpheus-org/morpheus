@@ -51,11 +51,13 @@
  * same data.
  *
  */
-#define VALIDATE_DENSE_VECTOR_CONTAINER(v1, v2, size, type) \
-  {                                                         \
-    for (type n = 0; n < size; n++) {                       \
-      EXPECT_EQ(v1[n], v2[n]);                              \
-    }                                                       \
+#define VALIDATE_DENSE_VECTOR_CONTAINER(v1, v2, size)               \
+  {                                                                 \
+    using container_type      = decltype(v1);                       \
+    using container_size_type = typename container_type::size_type; \
+    for (container_type n = 0; n < size; n++) {                     \
+      EXPECT_EQ(v1[n], v2[n]);                                      \
+    }                                                               \
   }
 
 namespace Morpheus {
@@ -66,9 +68,9 @@ void reset_small_container(
     typename std::enable_if_t<Morpheus::is_vector_container_v<Container>>* =
         nullptr) {
   using value_type = typename Container::value_type;
-  using index_type = typename Container::index_type;
+  using size_type  = typename Container::size_type;
 
-  for (index_type i = 0; i < (index_type)c.size(); i++) {
+  for (size_type i = 0; i < c.size(); i++) {
     c[i] = (value_type)1.11 * (value_type)i;
   }
 }
@@ -97,9 +99,9 @@ void update_small_container(
         nullptr) {
   using value_type = typename Container::value_type;
   using value_type = typename Container::value_type;
-  using index_type = typename Container::index_type;
+  using size_type  = typename Container::size_type;
 
-  for (index_type i = 0; i < (index_type)c.size(); i++) {
+  for (size_type i = 0; i < c.size(); i++) {
     c[i] = (value_type)-1.11 * (value_type)i;
   }
 }
@@ -131,13 +133,13 @@ bool is_empty_container(
     typename std::enable_if_t<Morpheus::is_vector_container_v<Container>>* =
         nullptr) {
   using value_type = typename Container::value_type;
-  using index_type = typename Container::index_type;
+  using size_type  = typename Container::size_type;
 
   typename Container::HostMirror ch;
   ch.resize(c);
   Morpheus::copy(c, ch);
 
-  for (index_type i = 0; i < (index_type)c.size(); i++) {
+  for (size_type i = 0; i < c.size(); i++) {
     if (ch[i] != (value_type)0.0) {
       return false;
     }
@@ -161,7 +163,7 @@ bool have_same_data(
     typename std::enable_if_t<Morpheus::is_vector_container_v<Container1> &&
                               Morpheus::is_vector_container_v<Container2>>* =
         nullptr) {
-  using index_type = typename Container1::index_type;
+  using size_type = typename Container1::size_type;
 
   if (!is_same_size(c1, c2)) return false;
 
@@ -173,7 +175,7 @@ bool have_same_data(
   c2_h.resize(c2);
   Morpheus::copy(c2, c2_h);
 
-  for (index_type i = 0; i < (index_type)c1_h.size(); i++) {
+  for (size_type i = 0; i < c1_h.size(); i++) {
     if (c1_h[i] != c2_h[i]) {
       return false;
     }

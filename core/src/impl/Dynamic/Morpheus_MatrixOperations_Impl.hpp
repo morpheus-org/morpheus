@@ -55,10 +55,10 @@ inline void get_diagonal(
       A.const_formats());
 }
 
-template <typename ExecSpace, typename Matrix, typename IndexType,
+template <typename ExecSpace, typename Matrix, typename SizeType,
           typename ValueType>
 inline void set_value(
-    Matrix& A, IndexType row, IndexType col, ValueType value,
+    Matrix& A, SizeType row, SizeType col, ValueType value,
     typename std::enable_if<
         Morpheus::is_dynamic_matrix_format_container<Matrix>::value>::type* =
         nullptr) {

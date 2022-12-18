@@ -98,6 +98,9 @@ struct ContainerTraits {
   /*! @brief The type of indices held by the container
    */
   using index_type = IndexType;
+  /*! @brief The size type of the container
+   */
+  using size_type = size_t;
   /*! @brief The non-const type of indices held by the container
    */
   using non_const_index_type = typename std::remove_const<IndexType>::type;

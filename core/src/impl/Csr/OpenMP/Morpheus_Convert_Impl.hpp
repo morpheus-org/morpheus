@@ -46,23 +46,23 @@ void convert(
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using index_type = typename SourceType::index_type;
+  using size_type = typename SourceType::size_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
 // element-wise copy of indices and values
 #pragma omp parallel for
-  for (index_type n = 0; n < src.nrows() + 1; n++) {
+  for (size_type n = 0; n < src.nrows() + 1; n++) {
     dst.row_offsets(n) = src.crow_offsets(n);
   }
 
 #pragma omp parallel for
-  for (index_type n = 0; n < src.nnnz(); n++) {
+  for (size_type n = 0; n < src.nnnz(); n++) {
     dst.column_indices(n) = src.ccolumn_indices(n);
   }
 
 #pragma omp parallel for
-  for (index_type n = 0; n < src.nnnz(); n++) {
+  for (size_type n = 0; n < src.nnnz(); n++) {
     dst.values(n) = src.cvalues(n);
   }
 }
@@ -77,13 +77,14 @@ void convert(
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
+  using size_type  = typename SourceType::size_type;
   using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
 // expand compressed indices
 #pragma omp parallel for
-  for (index_type i = 0; i < src.nrows(); i++) {
+  for (size_type i = 0; i < src.nrows(); i++) {
     for (index_type jj = src.crow_offsets(i); jj < src.crow_offsets(i + 1);
          jj++) {
       dst.row_indices(jj) = i;
@@ -91,12 +92,12 @@ void convert(
   }
 
 #pragma omp parallel for
-  for (index_type n = 0; n < src.nnnz(); n++) {
+  for (size_type n = 0; n < src.nnnz(); n++) {
     dst.column_indices(n) = src.ccolumn_indices(n);
   }
 
 #pragma omp parallel for
-  for (index_type n = 0; n < src.nnnz(); n++) {
+  for (size_type n = 0; n < src.nnnz(); n++) {
     dst.values(n) = src.cvalues(n);
   }
 }

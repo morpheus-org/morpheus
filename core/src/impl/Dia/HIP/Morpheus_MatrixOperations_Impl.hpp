@@ -48,20 +48,21 @@ void update_diagonal(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_hip_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
+  using size_type  = typename Matrix::size_type;
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
-  const size_t BLOCK_SIZE = 256;
-  const size_t MAX_BLOCKS = max_active_blocks(
-      Kernels::update_dia_diagonal_kernel<value_type, index_type>, BLOCK_SIZE,
-      (size_t)sizeof(index_type) * BLOCK_SIZE);
-  const size_t NUM_BLOCKS =
-      std::min<size_t>(MAX_BLOCKS, DIVIDE_INTO(A.nrows(), BLOCK_SIZE));
+  const size_type BLOCK_SIZE = 256;
+  const size_type MAX_BLOCKS = max_active_blocks(
+      Kernels::update_dia_diagonal_kernel<value_type, index_type, size_type>,
+      BLOCK_SIZE, 0);
+  const size_type NUM_BLOCKS =
+      std::min<size_type>(MAX_BLOCKS, DIVIDE_INTO(A.nrows(), BLOCK_SIZE));
 
-  const index_type num_diagonals = A.cvalues().ncols();
-  const index_type pitch         = A.cvalues().nrows();
+  const size_type num_diagonals = A.cvalues().ncols();
+  const size_type pitch         = A.cvalues().nrows();
 
-  Kernels::update_dia_diagonal_kernel<value_type, index_type>
+  Kernels::update_dia_diagonal_kernel<value_type, index_type, size_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), A.ncols(), num_diagonals,
                                       pitch, A.diagonal_offsets().data(),
                                       A.values().data(), diagonal.data());
@@ -82,9 +83,9 @@ void get_diagonal(
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
 }
 
-template <typename ExecSpace, typename Matrix, typename IndexType,
+template <typename ExecSpace, typename Matrix, typename SizeType,
           typename ValueType>
-void set_value(Matrix&, IndexType, IndexType, ValueType,
+void set_value(Matrix&, SizeType, SizeType, ValueType,
                typename std::enable_if_t<
                    Morpheus::is_dia_matrix_format_container_v<Matrix> &&
                    Morpheus::has_custom_backend_v<ExecSpace> &&

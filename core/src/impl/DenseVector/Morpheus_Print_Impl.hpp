@@ -37,10 +37,10 @@ void print(
     const Printable& p, Stream& s,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Printable>>* = nullptr) {
-  // using index_type = typename Printable::index_type;
+  using size_type = typename Printable::size_type;
   s << "<" << p.size() << "> with " << p.size() << " entries\n";
 
-  for (size_t n = 0; n < p.size(); n++) {
+  for (size_type n = 0; n < p.size(); n++) {
     s << " " << std::setw(14) << n;
     s << " " << std::setprecision(12) << std::setw(12) << "(" << p[n] << ")\n";
   }

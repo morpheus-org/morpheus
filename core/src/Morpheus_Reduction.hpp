@@ -45,7 +45,7 @@ namespace Morpheus {
  */
 template <typename ExecSpace, typename Vector>
 typename Vector::value_type reduce(const Vector& in,
-                                   typename Vector::index_type size) {
+                                   typename Vector::size_type size) {
   static_assert(is_dense_vector_format_container_v<Vector>,
                 "in must be a DenseVector container");
   return Impl::reduce<ExecSpace>(in, size);

@@ -46,20 +46,20 @@ void convert(
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using index_type = typename SourceType::index_type;
+  using size_type = typename SourceType::size_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz(),
              src.cdiagonal_offsets().size());
 
 // element-wise copy of indices and values
 #pragma omp parallel for
-  for (index_type n = 0; n < (index_type)src.cdiagonal_offsets().size(); n++) {
+  for (size_type n = 0; n < (size_type)src.cdiagonal_offsets().size(); n++) {
     dst.diagonal_offsets(n) = src.cdiagonal_offsets(n);
   }
 
 #pragma omp parallel for
-  for (index_type j = 0; j < src.cvalues().ncols(); j++) {
-    for (index_type i = 0; i < src.cvalues().nrows(); i++) {
+  for (size_type j = 0; j < src.cvalues().ncols(); j++) {
+    for (size_type i = 0; i < src.cvalues().nrows(); i++) {
       dst.values(i, j) = src.cvalues(i, j);
     }
   }

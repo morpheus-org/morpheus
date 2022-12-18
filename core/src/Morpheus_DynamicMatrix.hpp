@@ -115,7 +115,7 @@ class DynamicMatrix
   using value_type = typename traits::value_type;
   /*! The non-constant type of the values held by the container */
   using non_const_value_type = typename traits::non_const_value_type;
-  using size_type            = typename traits::index_type;
+  using size_type            = typename traits::size_type;
   /*! The type of the indices held by the container - can be const */
   using index_type = typename traits::index_type;
   /*! The non-constant type of the indices held by the container */
@@ -275,8 +275,8 @@ class DynamicMatrix
   }
 
   // template <typename... Args>
-  // inline void resize(const index_type m, const index_type n,
-  //                    const index_type nnz, Args &&... args) {
+  // inline void resize(const size_type m, const size_type n,
+  //                    const size_type nnz, Args &&... args) {
   //   base::resize(m, n, nnz);
   //   auto f = std::bind(Impl::any_type_resize<ValueType, Properties...>(),
   //                      std::placeholders::_1, m, n, nnz,

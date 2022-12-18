@@ -46,13 +46,13 @@ void convert(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>* =
         nullptr) {
-  using index_type = typename SourceType::index_type;
+  using size_type = typename SourceType::size_type;
 
   MORPHEUS_ASSERT(dst.size() >= src.size(),
                   "Destination vector must be of equal or larger size to the "
                   "source vector");
 
-  for (index_type i = 0; i < (index_type)src.size(); i++) {
+  for (size_type i = 0; i < src.size(); i++) {
     dst[i] = src[i];
   }
 }

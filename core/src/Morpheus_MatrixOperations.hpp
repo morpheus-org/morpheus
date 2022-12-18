@@ -85,9 +85,9 @@ void get_diagonal(const Matrix& A, Vector& diagonal) {
  * \param col The column location of the entry
  * \param value The value to insert
  */
-template <typename ExecSpace, typename Matrix, typename IndexType,
+template <typename ExecSpace, typename Matrix, typename SizeType,
           typename ValueType>
-void set_value(Matrix& A, IndexType row, IndexType col, ValueType value) {
+void set_value(Matrix& A, SizeType row, SizeType col, ValueType value) {
   Impl::set_value(A, row, col, value);
 }
 

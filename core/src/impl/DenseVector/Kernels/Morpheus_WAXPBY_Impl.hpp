@@ -34,12 +34,12 @@ namespace Morpheus {
 namespace Impl {
 namespace Kernels {
 
-template <typename ValueType1, typename ValueType2, typename ValueType3,
-          typename IndexType>
-__global__ void waxpby_kernel(IndexType n, ValueType1 alpha,
-                              const ValueType1* x, ValueType2 beta,
-                              const ValueType2* y, ValueType3* w) {
-  const IndexType tid = blockDim.x * blockIdx.x + threadIdx.x;
+template <typename SizeType, typename ValueType1, typename ValueType2,
+          typename ValueType3>
+__global__ void waxpby_kernel(SizeType n, ValueType1 alpha, const ValueType1* x,
+                              ValueType2 beta, const ValueType2* y,
+                              ValueType3* w) {
+  const SizeType tid = blockDim.x * blockIdx.x + threadIdx.x;
   if (tid > n) return;
 
   if (alpha == 1.0) {

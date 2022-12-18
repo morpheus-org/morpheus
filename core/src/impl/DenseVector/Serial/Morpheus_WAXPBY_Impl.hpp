@@ -39,7 +39,8 @@ namespace Impl {
 template <typename ExecSpace, typename Vector1, typename Vector2,
           typename Vector3>
 inline void waxpby(
-    const size_t n, const typename Vector1::value_type alpha, const Vector1& x,
+    const typename Vector1::size_type n,
+    const typename Vector1::value_type alpha, const Vector1& x,
     const typename Vector2::value_type beta, const Vector2& y, Vector3& w,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
@@ -49,16 +50,18 @@ inline void waxpby(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2, Vector3>>* =
         nullptr) {
+  using size_type = typename Vector1::size_type;
+
   assert(x.size() >= n);
   assert(y.size() >= n);
   assert(w.size() >= n);
 
   if (alpha == 1.0) {
-    for (size_t i = 0; i < n; i++) w[i] = x[i] + beta * y[i];
+    for (size_type i = 0; i < n; i++) w[i] = x[i] + beta * y[i];
   } else if (beta == 1.0) {
-    for (size_t i = 0; i < n; i++) w[i] = alpha * x[i] + y[i];
+    for (size_type i = 0; i < n; i++) w[i] = alpha * x[i] + y[i];
   } else {
-    for (size_t i = 0; i < n; i++) w[i] = alpha * x[i] + beta * y[i];
+    for (size_type i = 0; i < n; i++) w[i] = alpha * x[i] + beta * y[i];
   }
 }
 

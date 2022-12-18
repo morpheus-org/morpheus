@@ -39,18 +39,18 @@ namespace Impl {
 // arrays. http://en.wikipedia.org/wiki/Kahan_summation_algorithm
 template <typename ExecSpace, typename Vector>
 typename Vector::value_type reduce(
-    const Vector& in, typename Vector::index_type size,
+    const Vector& in, typename Vector::size_type size,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using value_type = typename Vector::value_type;
-  using index_type = typename Vector::index_type;
+  using size_type  = typename Vector::size_type;
   value_type sum   = in[0];
   value_type c     = (value_type)0.0;
 
-  for (index_type i = 1; i < size; i++) {
+  for (size_type i = 1; i < size; i++) {
     value_type y = in[i] - c;
     value_type t = sum + y;
     c            = (t - sum) - y;

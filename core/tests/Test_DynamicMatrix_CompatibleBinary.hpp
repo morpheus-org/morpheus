@@ -50,6 +50,7 @@ class CompatibleDynamicMatrixBinaryTest : public ::testing::Test {
   using device2 = typename type2::type;
   using host2   = typename type2::type::HostMirror;
 
+  using SizeType  = typename device1::size_type;
   using IndexType = typename device1::index_type;
   using ValueType = typename device1::value_type;
   using DevLayout = typename device1::array_layout;
@@ -97,7 +98,7 @@ class CompatibleDynamicMatrixBinaryTest : public ::testing::Test {
     CHECK_DYNAMIC_SIZES(Aref_dyn, 3, 3, 4, 1);
   }
 
-  IndexType nrows, ncols, nnnz;
+  SizeType nrows, ncols, nnnz;
 
   device1 Aref_dyn;
   host1 Aref_dyn_h;
@@ -121,7 +122,6 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
            ConstructionFromDynamicMatrixHost) {
   using HostMatrix1 = typename TestFixture::host1;
   using HostMatrix2 = typename TestFixture::host2;
-  using index_type  = typename HostMatrix2::index_type;
 
   // Two containers aliasing the same matrix - same properties
   HostMatrix1 A1_h(this->Aref_dyn_h);
@@ -142,9 +142,9 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CooHost B1t_h = B1_h;
-  VALIDATE_COO_CONTAINER(B1t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(B1t_h, this->Aref_coo_h, this->nnnz);
   typename TestFixture::CooHost B2t_h = B2_h;
-  VALIDATE_COO_CONTAINER(B2t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(B2t_h, this->Aref_coo_h, this->nnnz);
 
   this->switch_csr();
   A1_h = this->Aref_dyn_h;
@@ -165,18 +165,15 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CsrHost C1t_h = C1_h;
-  VALIDATE_CSR_CONTAINER(C1t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(C1t_h, this->Aref_csr_h, this->nrows, this->nnnz);
   typename TestFixture::CsrHost C2t_h = C2_h;
-  VALIDATE_CSR_CONTAINER(C2t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(C2t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
            ConstructionFromDynamicMatrixDevice) {
-  using Matrix1    = typename TestFixture::device1;
-  using Matrix2    = typename TestFixture::device2;
-  using index_type = typename Matrix2::index_type;
+  using Matrix1 = typename TestFixture::device1;
+  using Matrix2 = typename TestFixture::device2;
 
   // Two containers aliasing the same matrix - same properties
   Matrix1 A1(this->Aref_dyn);
@@ -200,12 +197,12 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
   typename TestFixture::CooDev B1t = B1;
   typename TestFixture::CooHost B1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B1t, B1t_h);
-  VALIDATE_COO_CONTAINER(B1t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(B1t_h, this->Aref_coo_h, this->nnnz);
 
   typename TestFixture::CooDev B2t = B2;
   typename TestFixture::CooHost B2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B2t, B2t_h);
-  VALIDATE_COO_CONTAINER(B2t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(B2t_h, this->Aref_coo_h, this->nnnz);
 
   this->switch_csr();
   A1 = this->Aref_dyn;
@@ -229,21 +226,18 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
   typename TestFixture::CsrDev C1t = C1;
   typename TestFixture::CsrHost C1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(C1t, C1t_h);
-  VALIDATE_CSR_CONTAINER(C1t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(C1t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 
   typename TestFixture::CsrDev C2t = C2;
   typename TestFixture::CsrHost C2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(C2t, C2t_h);
-  VALIDATE_CSR_CONTAINER(C2t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(C2t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
            CopyAssignmentFromDynamicMatrixHost) {
   using HostMatrix1 = typename TestFixture::host1;
   using HostMatrix2 = typename TestFixture::host2;
-  using index_type  = typename HostMatrix2::index_type;
 
   // Two containers aliasing the same matrix - same properties
   HostMatrix1 A1_h(this->Aref_dyn_h);
@@ -264,9 +258,9 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CooHost B1t_h = B1_h;
-  VALIDATE_COO_CONTAINER(B1t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(B1t_h, this->Aref_coo_h, this->nnnz);
   typename TestFixture::CooHost B2t_h = B2_h;
-  VALIDATE_COO_CONTAINER(B2t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(B2t_h, this->Aref_coo_h, this->nnnz);
 
   this->switch_csr();
   A1_h = this->Aref_dyn_h;
@@ -287,18 +281,15 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CsrHost C1t_h = C1_h;
-  VALIDATE_CSR_CONTAINER(C1t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(C1t_h, this->Aref_csr_h, this->nrows, this->nnnz);
   typename TestFixture::CsrHost C2t_h = C2_h;
-  VALIDATE_CSR_CONTAINER(C2t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(C2t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
            CopyAssignmentFromDynamicMatrixDevice) {
-  using Matrix1    = typename TestFixture::device1;
-  using Matrix2    = typename TestFixture::device2;
-  using index_type = typename Matrix2::index_type;
+  using Matrix1 = typename TestFixture::device1;
+  using Matrix2 = typename TestFixture::device2;
 
   // Two containers aliasing the same matrix - same properties
   Matrix1 A1(this->Aref_dyn);
@@ -322,12 +313,12 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
   typename TestFixture::CooDev B1t = B1;
   typename TestFixture::CooHost B1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B1t, B1t_h);
-  VALIDATE_COO_CONTAINER(B1t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(B1t_h, this->Aref_coo_h, this->nnnz);
 
   typename TestFixture::CooDev B2t = B2;
   typename TestFixture::CooHost B2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B2t, B2t_h);
-  VALIDATE_COO_CONTAINER(B2t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(B2t_h, this->Aref_coo_h, this->nnnz);
 
   this->switch_csr();
   A1 = this->Aref_dyn;
@@ -351,14 +342,12 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
   typename TestFixture::CsrDev C1t = C1;
   typename TestFixture::CsrHost C1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(C1t, C1t_h);
-  VALIDATE_CSR_CONTAINER(C1t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(C1t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 
   typename TestFixture::CsrDev C2t = C2;
   typename TestFixture::CsrHost C2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(C2t, C2t_h);
-  VALIDATE_CSR_CONTAINER(C2t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(C2t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 }  // namespace Test

@@ -75,10 +75,10 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromCsrMatrix) {
   using HostMatrix1 = typename TestFixture::host1;
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
-  using index_type  = typename Matrix1::index_type;
+  using size_type   = typename Matrix1::size_type;
   using value_type2 = typename Matrix2::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
   Matrix2 A(nrows, ncols, nnnz, this->Aref.row_offsets(),
             this->Aref.column_indices(), this->Aref.values());
@@ -88,7 +88,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromCsrMatrix) {
   CHECK_CSR_SIZES(Ah, nrows, ncols, nnnz);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_CSR_CONTAINER(Ah, this->Ahref, nrows, nnnz, index_type);
+  VALIDATE_CSR_CONTAINER(Ah, this->Ahref, nrows, nnnz);
 
   // Default copy construction
   HostMatrix1 Bh(Ah);
@@ -100,7 +100,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromCsrMatrix) {
   Ah.values(3)         = (value_type2)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_CSR_CONTAINER(Bh, Ah, nrows, nnnz, index_type);
+  VALIDATE_CSR_CONTAINER(Bh, Ah, nrows, nnnz);
 
   // Now check device Matrix
   Matrix1 B(A);
@@ -110,7 +110,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromCsrMatrix) {
   // Send other vector back to host for check
   HostMatrix1 Bt(nrows, ncols, nnnz);
   Morpheus::copy(B, Bt);
-  VALIDATE_CSR_CONTAINER(Bt, Ah, nrows, nnnz, index_type);
+  VALIDATE_CSR_CONTAINER(Bt, Ah, nrows, nnnz);
 }
 
 TYPED_TEST(CompatibleCsrMatrixBinaryTest, CopyAssignmentFromCsrMatrix) {
@@ -118,10 +118,10 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, CopyAssignmentFromCsrMatrix) {
   using HostMatrix1 = typename TestFixture::host1;
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
-  using index_type  = typename Matrix1::index_type;
+  using size_type   = typename Matrix1::size_type;
   using value_type2 = typename Matrix2::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
   Matrix2 A(nrows, ncols, nnnz, this->Aref.row_offsets(),
             this->Aref.column_indices(), this->Aref.values());
@@ -131,7 +131,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, CopyAssignmentFromCsrMatrix) {
   CHECK_CSR_SIZES(Ah, nrows, ncols, nnnz);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_CSR_CONTAINER(Ah, this->Ahref, nrows, nnnz, index_type);
+  VALIDATE_CSR_CONTAINER(Ah, this->Ahref, nrows, nnnz);
 
   // Default copy asssignment
   HostMatrix1 Bh = Ah;
@@ -143,7 +143,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, CopyAssignmentFromCsrMatrix) {
   Ah.values(3)         = (value_type2)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_CSR_CONTAINER(Bh, Ah, nrows, nnnz, index_type);
+  VALIDATE_CSR_CONTAINER(Bh, Ah, nrows, nnnz);
 
   // Now check device Matrix
   Matrix1 B = A;
@@ -153,7 +153,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, CopyAssignmentFromCsrMatrix) {
   // Send other vector back to host for check
   HostMatrix1 Bt(nrows, ncols, nnnz);
   Morpheus::copy(B, Bt);
-  VALIDATE_CSR_CONTAINER(Bt, Ah, nrows, nnnz, index_type);
+  VALIDATE_CSR_CONTAINER(Bt, Ah, nrows, nnnz);
 }
 
 /**
@@ -163,10 +163,10 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, CopyAssignmentFromCsrMatrix) {
 TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromDenseVector) {
   using Matrix     = typename TestFixture::device2;
   using HostMatrix = typename TestFixture::host2;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_offsets(),
            this->Aref.column_indices(), this->Aref.values());
@@ -176,12 +176,12 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromDenseVector) {
   CHECK_CSR_SIZES(Ah, nrows, ncols, nnnz);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_CSR_CONTAINER(Ah, this->Ahref, nrows, nnnz, index_type);
+  VALIDATE_CSR_CONTAINER(Ah, this->Ahref, nrows, nnnz);
 
   HostMatrix Ah_test(nrows, ncols, nnnz);
   Morpheus::copy(A, Ah_test);
 
-  VALIDATE_CSR_CONTAINER(Ah, Ah_test, nrows, nnnz, index_type);
+  VALIDATE_CSR_CONTAINER(Ah, Ah_test, nrows, nnnz);
 
   Ah.row_offsets(2) = 2;
   EXPECT_NE(Ah.row_offsets(2), Ah_test.row_offsets(2));

@@ -34,17 +34,17 @@ namespace Impl {
 
 template <typename ExecSpace, typename Vector>
 typename Vector::value_type reduce(
-    const Vector& in, typename Vector::index_type size,
+    const Vector& in, typename Vector::size_type size,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
-  using IndexType       = Kokkos::IndexType<typename Vector::index_type>;
+  using size_type       = typename Vector::size_type;
+  using IndexType       = Kokkos::IndexType<size_type>;
   using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
   using ValueArray      = typename Vector::value_array_type;
   using value_type      = typename Vector::non_const_value_type;
-  using index_type      = typename Vector::index_type;
 
   const ValueArray in_view = in.const_view();
   range_policy policy(0, size);
@@ -52,7 +52,7 @@ typename Vector::value_type reduce(
   value_type result = value_type(0);
   Kokkos::parallel_reduce(
       "reduce", policy,
-      KOKKOS_LAMBDA(const index_type& i, value_type& lsum) {
+      KOKKOS_LAMBDA(const size_type& i, value_type& lsum) {
         lsum += in_view[i];
       },
       result);

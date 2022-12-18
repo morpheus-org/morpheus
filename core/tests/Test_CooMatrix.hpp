@@ -110,9 +110,9 @@ TYPED_TEST(CooMatrixUnaryTest, FormatIndex) {
 TYPED_TEST(CooMatrixUnaryTest, ReferenceByIndex) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_indices(),
            this->Aref.column_indices(), this->Aref.values());
@@ -122,9 +122,9 @@ TYPED_TEST(CooMatrixUnaryTest, ReferenceByIndex) {
   CHECK_COO_SIZES(Ah, nrows, ncols, nnnz)
   Morpheus::copy(A, Ah);
 
-  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz);
 
-  for (index_type n = 0; n < nnnz; n++) {
+  for (size_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(Ah.crow_indices(n), this->Ahref.row_indices(n));
     EXPECT_EQ(Ah.ccolumn_indices(n), this->Ahref.column_indices(n));
     EXPECT_EQ(Ah.cvalues(n), this->Ahref.values(n));
@@ -134,13 +134,13 @@ TYPED_TEST(CooMatrixUnaryTest, ReferenceByIndex) {
 TYPED_TEST(CooMatrixUnaryTest, Reference) {
   using Matrix                = typename TestFixture::device;
   using HostMatrix            = typename TestFixture::host;
-  using index_type            = typename Matrix::index_type;
+  using size_type             = typename Matrix::size_type;
   using index_array_type      = typename Matrix::index_array_type;
   using value_array_type      = typename Matrix::value_array_type;
   using host_index_array_type = typename index_array_type::HostMirror;
   using host_value_array_type = typename value_array_type::HostMirror;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_indices(),
            this->Aref.column_indices(), this->Aref.values());
@@ -161,7 +161,7 @@ TYPED_TEST(CooMatrixUnaryTest, Reference) {
   host_value_array_type vals_h(nnnz, 0);
   Morpheus::copy(vals, vals_h);
 
-  for (index_type n = 0; n < nnnz; n++) {
+  for (size_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(rind_h[n], this->Ahref.row_indices(n));
     EXPECT_EQ(cind_h[n], this->Ahref.column_indices(n));
     EXPECT_EQ(vals_h[n], this->Ahref.values(n));
@@ -171,13 +171,13 @@ TYPED_TEST(CooMatrixUnaryTest, Reference) {
 TYPED_TEST(CooMatrixUnaryTest, ConstReference) {
   using Matrix                = typename TestFixture::device;
   using HostMatrix            = typename TestFixture::host;
-  using index_type            = typename Matrix::index_type;
+  using size_type             = typename Matrix::size_type;
   using index_array_type      = typename Matrix::index_array_type;
   using value_array_type      = typename Matrix::value_array_type;
   using host_index_array_type = typename index_array_type::HostMirror;
   using host_value_array_type = typename value_array_type::HostMirror;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_indices(),
            this->Aref.column_indices(), this->Aref.values());
@@ -193,7 +193,7 @@ TYPED_TEST(CooMatrixUnaryTest, ConstReference) {
   host_value_array_type vals_test(nnnz, 0);
   Morpheus::copy(vals, vals_test);
 
-  for (index_type n = 0; n < nnnz; n++) {
+  for (size_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(rind_test[n], this->Ahref.row_indices(n));
     EXPECT_EQ(cind_test[n], this->Ahref.column_indices(n));
     EXPECT_EQ(vals_test[n], this->Ahref.values(n));
@@ -207,7 +207,7 @@ TYPED_TEST(CooMatrixUnaryTest, ConstReference) {
   const host_index_array_type cind_h = Ah.ccolumn_indices();
   const host_value_array_type vals_h = Ah.cvalues();
 
-  for (index_type n = 0; n < nnnz; n++) {
+  for (size_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(rind_h[n], this->Ahref.row_indices(n));
     EXPECT_EQ(cind_h[n], this->Ahref.column_indices(n));
     EXPECT_EQ(vals_h[n], this->Ahref.values(n));
@@ -223,10 +223,10 @@ TYPED_TEST(CooMatrixUnaryTest, ConstReference) {
 TYPED_TEST(CooMatrixUnaryTest, DefaultCopyAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_indices(),
            this->Aref.column_indices(), this->Aref.values());
@@ -236,7 +236,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyAssignment) {
   CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz);
 
   // Default copy asssignment
   HostMatrix Bh = Ah;
@@ -248,7 +248,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyAssignment) {
   Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_COO_CONTAINER(Bh, Ah, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bh, Ah, nnnz);
 
   // Now check device Matrix
   Matrix B = A;
@@ -258,7 +258,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyAssignment) {
   // Send other vector back to host for check
   HostMatrix Bt(nrows, ncols, nnnz);
   Morpheus::copy(B, Bt);
-  VALIDATE_COO_CONTAINER(Bt, Ah, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bt, Ah, nnnz);
 }
 
 /**
@@ -270,10 +270,10 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyAssignment) {
 TYPED_TEST(CooMatrixUnaryTest, DefaultCopyConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_indices(),
            this->Aref.column_indices(), this->Aref.values());
@@ -283,7 +283,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyConstructor) {
   CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz);
 
   // Default copy asssignment
   HostMatrix Bh(Ah);
@@ -295,7 +295,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyConstructor) {
   Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_COO_CONTAINER(Bh, Ah, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bh, Ah, nnnz);
 
   // Now check device Matrix
   Matrix B(A);
@@ -305,7 +305,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyConstructor) {
   // Send other vector back to host for check
   HostMatrix Bt(nrows, ncols, nnnz);
   Morpheus::copy(B, Bt);
-  VALIDATE_COO_CONTAINER(Bt, Ah, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bt, Ah, nnnz);
 }
 
 /**
@@ -317,10 +317,10 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultCopyConstructor) {
 TYPED_TEST(CooMatrixUnaryTest, DefaultMoveAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_indices(),
            this->Aref.column_indices(), this->Aref.values());
@@ -330,7 +330,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveAssignment) {
   CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz);
 
   // Default copy asssignment
   HostMatrix Bh = std::move(Ah);
@@ -342,7 +342,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveAssignment) {
   Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_COO_CONTAINER(Bh, Ah, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bh, Ah, nnnz);
 
   // Now check device Matrix
   Matrix B = std::move(A);
@@ -352,7 +352,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveAssignment) {
   // Send other vector back to host for check
   HostMatrix Bt(nrows, ncols, nnnz);
   Morpheus::copy(B, Bt);
-  VALIDATE_COO_CONTAINER(Bt, Ah, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bt, Ah, nnnz);
 }
 
 /**
@@ -364,10 +364,10 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveAssignment) {
 TYPED_TEST(CooMatrixUnaryTest, DefaultMoveConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_indices(),
            this->Aref.column_indices(), this->Aref.values());
@@ -377,7 +377,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveConstructor) {
   CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz);
 
   // Default copy asssignment
   HostMatrix Bh(std::move(Ah));
@@ -389,7 +389,7 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveConstructor) {
   Ah.values(3)         = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_COO_CONTAINER(Bh, Ah, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bh, Ah, nnnz);
 
   // Now check device Matrix
   Matrix B(std::move(A));
@@ -399,22 +399,22 @@ TYPED_TEST(CooMatrixUnaryTest, DefaultMoveConstructor) {
   // Send other vector back to host for check
   HostMatrix Bt(nrows, ncols, nnnz);
   Morpheus::copy(B, Bt);
-  VALIDATE_COO_CONTAINER(Bt, Ah, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bt, Ah, nnnz);
 }
 
 TYPED_TEST(CooMatrixUnaryTest, ConstructionFromShape) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
   HostMatrix Ah(nrows, ncols, nnnz);
   CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
 
-  for (index_type n = 0; n < nnnz; n++) {
-    EXPECT_EQ(Ah.row_indices(n), (index_type)0);
-    EXPECT_EQ(Ah.column_indices(n), (index_type)0);
+  for (size_type n = 0; n < nnnz; n++) {
+    EXPECT_EQ(Ah.row_indices(n), 0);
+    EXPECT_EQ(Ah.column_indices(n), 0);
     EXPECT_EQ(Ah.values(n), (value_type)0);
   }
 
@@ -429,7 +429,7 @@ TYPED_TEST(CooMatrixUnaryTest, ConstructionFromShape) {
   CHECK_COO_SIZES(Ah_test, nrows, ncols, nnnz)
   Morpheus::copy(A, Ah_test);
 
-  VALIDATE_COO_CONTAINER(Ah_test, Ah, nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Ah_test, Ah, nnnz);
 }
 
 // /**
@@ -441,12 +441,12 @@ TYPED_TEST(CooMatrixUnaryTest, ConstructionFromShape) {
 TYPED_TEST(CooMatrixUnaryTest, Resize) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
-  index_type large_nrows = 500, large_ncols = 400, large_nnnz = 640;
-  index_type small_nrows = 2, small_ncols = 3, small_nnnz = 2;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type large_nrows = 500, large_ncols = 400, large_nnnz = 640;
+  size_type small_nrows = 2, small_ncols = 3, small_nnnz = 2;
 
   Matrix A(nrows, ncols, nnnz);
   Morpheus::copy(this->Ahref, A);
@@ -459,8 +459,8 @@ TYPED_TEST(CooMatrixUnaryTest, Resize) {
   CHECK_COO_SIZES(Ah, large_nrows, large_ncols, large_nnnz);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz, index_type);
-  for (index_type n = nnnz; n < Ah.nnnz(); n++) {
+  VALIDATE_COO_CONTAINER(Ah, this->Ahref, nnnz);
+  for (size_type n = nnnz; n < Ah.nnnz(); n++) {
     EXPECT_EQ(Ah.row_indices(n), 0);
     EXPECT_EQ(Ah.column_indices(n), 0);
     EXPECT_EQ(Ah.values(n), 0);
@@ -480,7 +480,7 @@ TYPED_TEST(CooMatrixUnaryTest, Resize) {
   EXPECT_NE(Ah.column_indices(1), Ahref_test.column_indices(1));
   EXPECT_NE(Ah.values(0), Ahref_test.values(0));
 
-  for (index_type n = nnnz; n < Ah.nnnz(); n++) {
+  for (size_type n = nnnz; n < Ah.nnnz(); n++) {
     EXPECT_EQ(Ah.row_indices(n), 0);
     EXPECT_EQ(Ah.column_indices(n), 0);
     EXPECT_EQ(Ah.values(n), 0);
@@ -498,7 +498,7 @@ TYPED_TEST(CooMatrixUnaryTest, Resize) {
   Ah.values(0)         = (value_type)1.11;
   Morpheus::copy(Ah, A);
 
-  VALIDATE_COO_CONTAINER(Ah, Ahref_test, Ah.nnnz(), index_type);
+  VALIDATE_COO_CONTAINER(Ah, Ahref_test, Ah.nnnz());
 }
 
 TYPED_TEST(CooMatrixUnaryTest, SortByRow) {

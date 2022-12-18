@@ -74,7 +74,7 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
   //!< The traits associated with the particular container
   using traits = ContainerTraits<Container, ValueType, Properties...>;
   //!< The type of the indices held by the container
-  using index_type = typename traits::index_type;
+  using size_type = typename traits::size_type;
   /**
    * @brief Default constructor
    *
@@ -90,7 +90,7 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
    * @param num_cols Number of columns of the matrix.
    * @param num_entries Number of non-zero values in the matrix.
    */
-  MatrixBase(index_type rows, index_type cols, index_type entries = 0)
+  MatrixBase(size_type rows, size_type cols, size_type entries = 0)
       : _m(rows),
         _n(cols),
         _nnz(entries),
@@ -105,7 +105,7 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
    * @param num_cols Number of columns of resized matrix.
    * @param num_entries Number of non-zero entries in resized matrix.
    */
-  void resize(index_type rows, index_type cols, index_type entries) {
+  void resize(size_type rows, size_type cols, size_type entries) {
     _m   = rows;
     _n   = cols;
     _nnz = entries;
@@ -114,44 +114,44 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
   /**
    * @brief Number of rows of the matrix
    *
-   * @return index_type
+   * @return size_type
    */
-  inline index_type nrows() const { return _m; }
+  inline size_type nrows() const { return _m; }
 
   /**
    * @brief Number of columns of the matrix
    *
-   * @return index_type
+   * @return size_type
    */
-  inline index_type ncols() const { return _n; }
+  inline size_type ncols() const { return _n; }
 
   /**
    * @brief Number of non-zeros of the matrix
    *
-   * @return index_type
+   * @return size_type
    */
-  inline index_type nnnz() const { return _nnz; }
+  inline size_type nnnz() const { return _nnz; }
 
   /**
    * @brief Set the number of rows of the matrix
    *
    * @param rows Number of rows
    */
-  inline void set_nrows(const index_type rows) { _m = rows; }
+  inline void set_nrows(const size_type rows) { _m = rows; }
 
   /**
    * @brief Set the number of columns of the matrix
    *
    * @param rows Number of columns
    */
-  inline void set_ncols(const index_type cols) { _n = cols; }
+  inline void set_ncols(const size_type cols) { _n = cols; }
 
   /**
    * @brief Set the number of non-zeros of the matrix
    *
    * @param rows Number of non-zeros
    */
-  inline void set_nnnz(const index_type nnz) { _nnz = nnz; }
+  inline void set_nnnz(const size_type nnz) { _nnz = nnz; }
 
   /**
    * @brief The specialized structure of the matrix e.g Symmetric
@@ -182,7 +182,7 @@ class MatrixBase : public ContainerTraits<Container, ValueType, Properties...> {
   inline void set_options(MatrixOptions op) { _options = op; }
 
  private:
-  index_type _m, _n, _nnz;
+  size_type _m, _n, _nnz;
   MatrixStructure _structure;
   MatrixOptions _options;
 };

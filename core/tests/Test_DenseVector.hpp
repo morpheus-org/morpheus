@@ -78,6 +78,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultConstruction) {
 TYPED_TEST(DenseVectorUnaryTest, DefaultCopyAssignment) {
   using Vector     = typename TestFixture::device;
   using HostVector = typename TestFixture::host;
+  using size_type  = typename Vector::size_type;
   using value_type = typename Vector::value_type;
 
   auto size = 10;
@@ -93,7 +94,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyAssignment) {
   xh[4] = (value_type)-4.33;
   xh[9] = (value_type)-9.44;
 
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], yh[i]);
   }
 
@@ -105,7 +106,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyAssignment) {
   // Send other vector back to host for check
   HostVector yt(y.size(), 0);
   Morpheus::copy(y, yt);
-  for (size_t i = 0; i < y.size(); i++) {
+  for (size_type i = 0; i < y.size(); i++) {
     EXPECT_EQ(yt[i], xh[i]);
   }
 }
@@ -119,6 +120,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyAssignment) {
 TYPED_TEST(DenseVectorUnaryTest, DefaultCopyConstructor) {
   using Vector     = typename TestFixture::device;
   using HostVector = typename TestFixture::host;
+  using size_type  = typename Vector::size_type;
   using value_type = typename Vector::value_type;
 
   auto size = 10;
@@ -134,7 +136,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyConstructor) {
   xh[4] = (value_type)-4.33;
   xh[9] = (value_type)-9.44;
 
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], yh[i]);
   }
 
@@ -146,7 +148,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyConstructor) {
   // Send other vector back to host for check
   HostVector yt(y.size(), 0);
   Morpheus::copy(y, yt);
-  for (size_t i = 0; i < y.size(); i++) {
+  for (size_type i = 0; i < y.size(); i++) {
     EXPECT_EQ(yt[i], xh[i]);
   }
 }
@@ -160,6 +162,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultCopyConstructor) {
 TYPED_TEST(DenseVectorUnaryTest, DefaultMoveAssignment) {
   using Vector     = typename TestFixture::device;
   using HostVector = typename TestFixture::host;
+  using size_type  = typename Vector::size_type;
   using value_type = typename Vector::value_type;
 
   auto size = 10;
@@ -175,7 +178,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveAssignment) {
   xh[4] = (value_type)-4.33;
   xh[9] = (value_type)-9.44;
 
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], yh[i]);
   }
 
@@ -187,7 +190,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveAssignment) {
   // Send other vector back to host for check
   HostVector yt(y.size(), 0);
   Morpheus::copy(y, yt);
-  for (size_t i = 0; i < y.size(); i++) {
+  for (size_type i = 0; i < y.size(); i++) {
     EXPECT_EQ(yt[i], xh[i]);
   }
 }
@@ -201,6 +204,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveAssignment) {
 TYPED_TEST(DenseVectorUnaryTest, DefaultMoveConstructor) {
   using Vector     = typename TestFixture::device;
   using HostVector = typename TestFixture::host;
+  using size_type  = typename Vector::size_type;
   using value_type = typename Vector::value_type;
 
   auto size = 10;
@@ -217,7 +221,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveConstructor) {
   xh[9] = (value_type)-9.44;
 
   yh[0] = 0;
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], yh[i]);
   }
 
@@ -229,7 +233,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveConstructor) {
   // Send other vector back to host for check
   HostVector yt(y.size(), 0);
   Morpheus::copy(y, yt);
-  for (size_t i = 0; i < y.size(); i++) {
+  for (size_type i = 0; i < y.size(); i++) {
     EXPECT_EQ(yt[i], xh[i]);
   }
 }
@@ -242,6 +246,7 @@ TYPED_TEST(DenseVectorUnaryTest, DefaultMoveConstructor) {
 TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
   using Vector     = typename TestFixture::device;
   using HostVector = typename TestFixture::host;
+  using size_type  = typename Vector::size_type;
   using value_type = typename Vector::value_type;
 
   auto size      = 100;
@@ -255,7 +260,7 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
 
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < x.size(); i++) {
+  for (size_type i = 0; i < x.size(); i++) {
     EXPECT_EQ(xh.data()[i], val);
   }
 }
@@ -268,6 +273,7 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstructionDefaultVal) {
 TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
   using Vector     = typename TestFixture::device;
   using HostVector = typename TestFixture::host;
+  using size_type  = typename Vector::size_type;
   using value_type = typename Vector::value_type;
 
   auto size      = 100;
@@ -281,7 +287,7 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
 
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < x.size(); i++) {
+  for (size_type i = 0; i < x.size(); i++) {
     EXPECT_EQ(xh.data()[i], val);
   }
 }
@@ -291,19 +297,19 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
 //  *
 //  */
 // TYPED_TEST(DenseVectorUnaryTest, PointerConstruction) {
-//   // DenseVector(index_type n, value_type val)
+//   // DenseVector(size_type n, value_type val)
 //   using Vector     = typename TestFixture::device;
 //   using HostVector = typename TestFixture::host;
-//   using index_type = typename Vector::index_type;
+//   using size_type = typename Vector::size_type;
 //   using value_type = typename Vector::value_type;
 
-//   index_type size = 10000;
+//   size_type size = 10000;
 //   value_type val  = 15;
 
 //   // Vector x(size, val);
 
 //   value_type* xptr = (value_type*)malloc(size * sizeof(value_type));
-//   for (index_type i = 0; i < size; i++) {
+//   for (size_type i = 0; i < size; i++) {
 //     xptr[i] = (value_type)i;
 //   }
 
@@ -312,13 +318,13 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
 //     EXPECT_EQ(xh.size(), size);
 
 //     // Update contents of the vector
-//     for (index_type i = 0; i < size; i++) {
+//     for (size_type i = 0; i < size; i++) {
 //       xh[i] = val;
 //     }
 //   }
 
 //   // xptr allocation should still exist here with the updated values
-//   for (index_type i = 0; i < size; i++) {
+//   for (size_type i = 0; i < size; i++) {
 //     EXPECT_EQ(xptr[i], val);
 //   }
 
@@ -328,6 +334,7 @@ TYPED_TEST(DenseVectorUnaryTest, NormalConstruction) {
 TYPED_TEST(DenseVectorUnaryTest, RandomConstruction) {
   using Vector     = typename TestFixture::device;
   using HostVector = typename TestFixture::host;
+  using size_type  = typename Vector::size_type;
   using value_type = typename Vector::value_type;
 
   auto size            = 10000;
@@ -345,14 +352,14 @@ TYPED_TEST(DenseVectorUnaryTest, RandomConstruction) {
 
   // Check if empty
   int nzeros = 0;
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     if (xh[i] == 0.0) {
       nzeros++;
     }
   }
   EXPECT_LT(nzeros, xh.size());
 
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_GE(xh[i], low_bound);
     EXPECT_LT(xh[i], high_bound);
   }
@@ -361,6 +368,7 @@ TYPED_TEST(DenseVectorUnaryTest, RandomConstruction) {
 TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   using Vector     = typename TestFixture::device;
   using HostVector = typename TestFixture::host;
+  using size_type  = typename Vector::size_type;
   using value_type = typename Vector::value_type;
 
   auto size = 10000;
@@ -376,10 +384,10 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < 100; i++) {
+  for (size_type i = 0; i < 100; i++) {
     EXPECT_EQ(xh[i], (value_type)35.22);
   }
-  for (size_t i = 100; i < xh.size(); i++) {
+  for (size_type i = 100; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -387,10 +395,10 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < 1000; i++) {
+  for (size_type i = 0; i < 1000; i++) {
     EXPECT_EQ(xh[i], (value_type)20.33);
   }
-  for (size_t i = 1000; i < xh.size(); i++) {
+  for (size_type i = 1000; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -398,13 +406,13 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < 80; i++) {
+  for (size_type i = 0; i < 80; i++) {
     EXPECT_EQ(xh[i], (value_type)-30.11);
   }
-  for (size_t i = 80; i < 1000; i++) {
+  for (size_type i = 80; i < 1000; i++) {
     EXPECT_EQ(xh[i], (value_type)20.33);
   }
-  for (size_t i = 1000; i < xh.size(); i++) {
+  for (size_type i = 1000; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -412,7 +420,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], (value_type)-1.111);
   }
 }
@@ -420,6 +428,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
 // TYPED_TEST(DenseVectorUnaryTest, AssignResize) {
 //   using Vector     = typename TestFixture::device;
 //   using HostVector = typename TestFixture::host;
+//   using size_type  = typename Vector::size_type;
 //   using value_type = typename Vector::value_type;
 
 //   auto size = 10000;
@@ -433,7 +442,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
 //   EXPECT_EQ(xh.size(), x.size());
 //   Morpheus::copy(x, xh);
 
-//   for (size_t i = 0; i < xh.size(); i++) {
+//   for (size_type i = 0; i < xh.size(); i++) {
 //     EXPECT_EQ(xh[i], (value_type)10.111);
 //   }
 // }
@@ -441,6 +450,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignNoResize) {
 TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   using Vector     = typename TestFixture::device;
   using HostVector = typename TestFixture::host;
+  using size_type  = typename Vector::size_type;
 
   auto size               = 10000;
   unsigned long long seed = 5374857;
@@ -457,11 +467,11 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < 100; i++) {
+  for (size_type i = 0; i < 100; i++) {
     EXPECT_GE(xh[i], 10);
     EXPECT_LT(xh[i], 30);
   }
-  for (size_t i = 100; i < xh.size(); i++) {
+  for (size_type i = 100; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -470,11 +480,11 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < 1000; i++) {
+  for (size_type i = 0; i < 1000; i++) {
     EXPECT_GE(xh[i], 40);
     EXPECT_LT(xh[i], 50);
   }
-  for (size_t i = 1000; i < xh.size(); i++) {
+  for (size_type i = 1000; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -482,15 +492,15 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < 80; i++) {
+  for (size_type i = 0; i < 80; i++) {
     EXPECT_GE(xh[i], -4);
     EXPECT_LT(xh[i], 5);
   }
-  for (size_t i = 80; i < 1000; i++) {
+  for (size_type i = 80; i < 1000; i++) {
     EXPECT_GE(xh[i], 40);
     EXPECT_LT(xh[i], 50);
   }
-  for (size_t i = 1000; i < xh.size(); i++) {
+  for (size_type i = 1000; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 
@@ -498,7 +508,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
   EXPECT_EQ(x.size(), size);
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_GE(xh[i], 60);
     EXPECT_LT(xh[i], 70);
   }
@@ -507,6 +517,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
 // TYPED_TEST(DenseVectorUnaryTest, AssignRandomResize) {
 //   using Vector     = typename TestFixture::device;
 //   using HostVector = typename TestFixture::host;
+//   using size_type  = typename Vector::size_type;
 
 //   auto size = 10000, seed = 5374857;
 //   Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
@@ -520,7 +531,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
 //   EXPECT_EQ(xh.size(), x.size());
 //   Morpheus::copy(x, xh);
 
-//   for (size_t i = 0; i < xh.size(); i++) {
+//   for (size_type i = 0; i < xh.size(); i++) {
 //     EXPECT_GE(xh[i], 30);
 //     EXPECT_LT(xh[i], 40);
 //   }
@@ -529,6 +540,7 @@ TYPED_TEST(DenseVectorUnaryTest, AssignRandomNoResize) {
 TYPED_TEST(DenseVectorUnaryTest, Resize) {
   using Vector     = typename TestFixture::device;
   using HostVector = typename TestFixture::host;
+  using size_type  = typename Vector::size_type;
   using value_type = typename Vector::value_type;
 
   auto original_size            = 1000;
@@ -539,7 +551,7 @@ TYPED_TEST(DenseVectorUnaryTest, Resize) {
   EXPECT_EQ(x.size(), original_size);
   EXPECT_EQ(xh.size(), original_size);
 
-  size_t smaller_size = 100;
+  size_type smaller_size = 100;
   x.resize(smaller_size);
   EXPECT_EQ(x.size(), smaller_size);
 
@@ -548,7 +560,7 @@ TYPED_TEST(DenseVectorUnaryTest, Resize) {
 
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], original_val);
   }
 
@@ -561,10 +573,10 @@ TYPED_TEST(DenseVectorUnaryTest, Resize) {
 
   Morpheus::copy(x, xh);
   // Values from smaller_size onwards should be set to zero
-  for (size_t i = 0; i < smaller_size; i++) {
+  for (size_type i = 0; i < smaller_size; i++) {
     EXPECT_EQ(xh[i], original_val);
   }
-  for (size_t i = smaller_size; i < xh.size(); i++) {
+  for (size_type i = smaller_size; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], 0.0);
   }
 }
@@ -572,6 +584,7 @@ TYPED_TEST(DenseVectorUnaryTest, Resize) {
 TYPED_TEST(DenseVectorUnaryTest, ResizeVal) {
   using Vector     = typename TestFixture::device;
   using HostVector = typename TestFixture::host;
+  using size_type  = typename Vector::size_type;
   using value_type = typename Vector::value_type;
 
   auto original_size            = 1000;
@@ -593,7 +606,7 @@ TYPED_TEST(DenseVectorUnaryTest, ResizeVal) {
 
   Morpheus::copy(x, xh);
 
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], smaller_val);
   }
 
@@ -607,7 +620,7 @@ TYPED_TEST(DenseVectorUnaryTest, ResizeVal) {
 
   Morpheus::copy(x, xh);
   // Values from smaller_size onwards should be set to zero
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], larger_val);
   }
 }
@@ -615,6 +628,7 @@ TYPED_TEST(DenseVectorUnaryTest, ResizeVal) {
 TYPED_TEST(DenseVectorUnaryTest, ElementAccess) {
   using Vector              = typename TestFixture::device;
   using HostVector          = typename TestFixture::host;
+  using size_type           = typename Vector::size_type;
   using value_type          = typename Vector::value_type;
   using value_array_pointer = typename Vector::value_array_pointer;
 
@@ -632,7 +646,7 @@ TYPED_TEST(DenseVectorUnaryTest, ElementAccess) {
   xptr[2]  = (value_type)2.22;
   xptr[15] = (value_type)15.15;
   // Values from smaller_size onwards should be set to zero
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], xh(i));
     if (i == 2) {
       EXPECT_EQ(xptr[i], (value_type)2.22);

@@ -44,18 +44,19 @@ inline void multiply(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
-  using index_type       = typename Matrix::index_type;
-  using value_type       = typename Matrix::value_type;
-  const index_type ndiag = A.cdiagonal_offsets().size();
+  using size_type       = typename Matrix::size_type;
+  using index_type      = typename Matrix::index_type;
+  using value_type      = typename Matrix::value_type;
+  const size_type ndiag = A.cdiagonal_offsets().size();
 
 #pragma omp parallel for
-  for (index_type row = 0; row < A.nrows(); row++) {
+  for (size_type row = 0; row < A.nrows(); row++) {
     value_type sum = init ? value_type(0) : y[row];
 
-    for (index_type n = 0; n < ndiag; n++) {
+    for (size_type n = 0; n < ndiag; n++) {
       const index_type col = row + A.cdiagonal_offsets(n);
 
-      if (col >= 0 && col < A.ncols()) {
+      if (col >= 0 && col < (index_type)A.ncols()) {
         sum += A.cvalues(row, n) * x[col];
       }
     }

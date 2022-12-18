@@ -37,24 +37,24 @@ namespace Impl {
 
 template <typename ExecSpace, typename Vector1, typename Vector2>
 inline typename Vector2::value_type dot(
-    typename Vector1::index_type n, const Vector1& x, const Vector2& y,
+    typename Vector1::size_type n, const Vector1& x, const Vector2& y,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
-  using index_type = typename Vector1::index_type;
+  using size_type  = typename Vector1::size_type;
   using value_type = typename Vector1::non_const_value_type;
 
   value_type result = value_type(0);
 
   if (y.data() == x.data()) {
 #pragma omp parallel for reduction(+ : result)
-    for (index_type i = 0; i < n; i++) result += x[i] * x[i];
+    for (size_type i = 0; i < n; i++) result += x[i] * x[i];
   } else {
 #pragma omp parallel for reduction(+ : result)
-    for (index_type i = 0; i < n; i++) result += x[i] * y[i];
+    for (size_type i = 0; i < n; i++) result += x[i] * y[i];
   }
 
   return result;

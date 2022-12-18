@@ -48,14 +48,15 @@ inline void multiply(
         Morpheus::has_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  const size_t BLOCK_SIZE = 256;
-  const size_t MAX_BLOCKS = max_active_blocks(
-      Kernels::spmv_dia_kernel<index_type, value_type, BLOCK_SIZE>, BLOCK_SIZE,
-      (size_t)sizeof(index_type) * BLOCK_SIZE);
-  const size_t NUM_BLOCKS =
-      std::min<size_t>(MAX_BLOCKS, DIVIDE_INTO(A.nrows(), BLOCK_SIZE));
+  const size_type BLOCK_SIZE = 256;
+  const size_type MAX_BLOCKS = max_active_blocks(
+      Kernels::spmv_dia_kernel<size_type, index_type, value_type, BLOCK_SIZE>,
+      BLOCK_SIZE, (size_type)sizeof(index_type) * BLOCK_SIZE);
+  const size_type NUM_BLOCKS =
+      std::min<size_type>(MAX_BLOCKS, DIVIDE_INTO(A.nrows(), BLOCK_SIZE));
 
   const index_type* D     = A.cdiagonal_offsets().data();
   const value_type* V     = A.cvalues().data();
@@ -74,7 +75,7 @@ inline void multiply(
     y.assign(y.size(), 0);
   }
 
-  Kernels::spmv_dia_kernel<index_type, value_type, BLOCK_SIZE>
+  Kernels::spmv_dia_kernel<size_type, index_type, value_type, BLOCK_SIZE>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), A.ncols(), num_diagonals,
                                       pitch, D, V, x_ptr, y_ptr);
 

@@ -33,15 +33,15 @@ namespace Impl {
 
 namespace Kernels {
 // One thread per row
-template <typename IndexType, typename ValueType>
-__global__ void spmv_csr_scalar_kernel(const IndexType nrows,
+template <typename SizeType, typename IndexType, typename ValueType>
+__global__ void spmv_csr_scalar_kernel(const SizeType nrows,
                                        const IndexType* Ap, const IndexType* Aj,
                                        const ValueType* Ax, const ValueType* x,
                                        ValueType* y) {
-  const IndexType thread_id = blockDim.x * blockIdx.x + threadIdx.x;
-  const IndexType grid_size = gridDim.x * blockDim.x;
+  const SizeType thread_id = blockDim.x * blockIdx.x + threadIdx.x;
+  const SizeType grid_size = gridDim.x * blockDim.x;
 
-  for (IndexType row = thread_id; row < nrows; row += grid_size) {
+  for (SizeType row = thread_id; row < nrows; row += grid_size) {
     const IndexType row_start = Ap[row];
     const IndexType row_end   = Ap[row + 1];
 
@@ -72,9 +72,9 @@ __global__ void spmv_csr_scalar_kernel(const IndexType nrows,
 //
 //  Note: THREADS_PER_VECTOR must be one of [2,4,8,16,32]
 
-template <typename IndexType, typename ValueType, size_t VECTORS_PER_BLOCK,
-          size_t THREADS_PER_VECTOR>
-__global__ void spmv_csr_vector_kernel(const IndexType nrows,
+template <typename SizeType, typename IndexType, typename ValueType,
+          size_t VECTORS_PER_BLOCK, size_t THREADS_PER_VECTOR>
+__global__ void spmv_csr_vector_kernel(const SizeType nrows,
                                        const IndexType* Ap, const IndexType* Aj,
                                        const ValueType* Ax, const ValueType* x,
                                        ValueType* y) {
@@ -83,20 +83,20 @@ __global__ void spmv_csr_vector_kernel(const IndexType nrows,
             THREADS_PER_VECTOR / 2];  // padded to avoid reduction conditionals
   __shared__ volatile IndexType ptrs[VECTORS_PER_BLOCK][2];
 
-  const IndexType THREADS_PER_BLOCK = VECTORS_PER_BLOCK * THREADS_PER_VECTOR;
+  const SizeType THREADS_PER_BLOCK = VECTORS_PER_BLOCK * THREADS_PER_VECTOR;
 
-  const IndexType thread_id =
+  const SizeType thread_id =
       THREADS_PER_BLOCK * blockIdx.x + threadIdx.x;  // global thread index
-  const IndexType thread_lane =
+  const SizeType thread_lane =
       threadIdx.x & (THREADS_PER_VECTOR - 1);  // thread index within the vector
-  const IndexType vector_id =
+  const SizeType vector_id =
       thread_id / THREADS_PER_VECTOR;  // global vector index
-  const IndexType vector_lane =
+  const SizeType vector_lane =
       threadIdx.x / THREADS_PER_VECTOR;  // vector index within the block
-  const IndexType num_vectors =
+  const SizeType num_vectors =
       VECTORS_PER_BLOCK * gridDim.x;  // total number of active vectors
 
-  for (IndexType row = vector_id; row < nrows; row += num_vectors) {
+  for (SizeType row = vector_id; row < nrows; row += num_vectors) {
     // use two threads to fetch Ap[row] and Ap[row+1]
     // this is considerably faster than the straightforward version
     if (thread_lane < 2) ptrs[vector_lane][thread_lane] = Ap[row + thread_lane];

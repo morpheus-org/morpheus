@@ -49,7 +49,7 @@ class DiaMatrixBinaryTest : public ::testing::Test {
   using device2 = typename type2::type;  // DiaMatrix
   using host2   = typename type2::type::HostMirror;
 
-  using IndexType = typename device1::index_type;
+  using IndexType = typename device1::size_type;
 
   DiaMatrixBinaryTest()
       : nrows(3),
@@ -84,7 +84,7 @@ TYPED_TEST(DiaMatrixBinaryTest, ResizeFromDiaMatrix) {
   using Matrix1     = typename TestFixture::device1;
   using HostMatrix1 = typename TestFixture::host1;
   using Matrix2     = typename TestFixture::device2;
-  using index_type  = typename Matrix1::index_type;
+  using size_type   = typename Matrix1::size_type;
   using value_type  = typename Matrix1::value_type;
 
   Matrix1 A(this->nrows, this->ncols, this->nnnz, this->ndiag);
@@ -93,8 +93,8 @@ TYPED_TEST(DiaMatrixBinaryTest, ResizeFromDiaMatrix) {
   Morpheus::copy(this->Ahref, A);
 
   // Resize to larger shape and non-zeros
-  index_type large_nrows = 500, large_ncols = 500, large_nnnz = 640,
-             large_ndiag = 110;
+  size_type large_nrows = 500, large_ncols = 500, large_nnnz = 640,
+            large_ndiag = 110;
   Matrix2 Alarge(large_nrows, large_ncols, large_nnnz, large_ndiag);
   A.resize(Alarge);
   CHECK_DIA_CONTAINERS(Alarge, A);
@@ -104,21 +104,21 @@ TYPED_TEST(DiaMatrixBinaryTest, ResizeFromDiaMatrix) {
                   this->nalign);
 
   Morpheus::copy(A, Ah);
-  for (index_type n = 0; n < this->ndiag; n++) {
+  for (size_type n = 0; n < this->ndiag; n++) {
     EXPECT_EQ(Ah.diagonal_offsets(n), this->Ahref.diagonal_offsets(n));
   }
-  for (index_type i = 0; i < this->Ahref.values().nrows(); i++) {
-    for (index_type j = 0; j < this->Ahref.values().ncols(); j++) {
+  for (size_type i = 0; i < this->Ahref.values().nrows(); i++) {
+    for (size_type j = 0; j < this->Ahref.values().ncols(); j++) {
       EXPECT_EQ(Ah.values(i, j), this->Ahref.values(i, j));
     }
   }
 
-  for (index_type n = this->ndiag; n < Ah.ndiags(); n++) {
+  for (size_type n = this->ndiag; n < Ah.ndiags(); n++) {
     EXPECT_EQ(Ah.diagonal_offsets(n), 0);
   }
-  for (index_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
+  for (size_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
        i++) {
-    for (index_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
+    for (size_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
          j++) {
       EXPECT_EQ(Ah.values(i, j), 0);
     }
@@ -136,19 +136,19 @@ TYPED_TEST(DiaMatrixBinaryTest, ResizeFromDiaMatrix) {
   EXPECT_NE(Ah.diagonal_offsets(1), Ahref_test.diagonal_offsets(1));
   EXPECT_NE(Ah.values(0, 1), Ahref_test.values(0, 1));
 
-  for (index_type n = this->ndiag; n < Ah.ndiags(); n++) {
+  for (size_type n = this->ndiag; n < Ah.ndiags(); n++) {
     EXPECT_EQ(Ah.diagonal_offsets(n), 0);
   }
-  for (index_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
+  for (size_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
        i++) {
-    for (index_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
+    for (size_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
          j++) {
       EXPECT_EQ(Ah.values(i, j), 0);
     }
   }
 
   // Resize to smaller shape and non-zeros
-  index_type small_nrows = 2, small_ncols = 2, small_nnnz = 2, small_ndiag = 2;
+  size_type small_nrows = 2, small_ncols = 2, small_nnnz = 2, small_ndiag = 2;
   Matrix2 Asmall(small_nrows, small_ncols, small_nnnz, small_ndiag);
   A.resize(Asmall);
   CHECK_DIA_CONTAINERS(Asmall, A);
@@ -160,7 +160,7 @@ TYPED_TEST(DiaMatrixBinaryTest, ResizeFromDiaMatrix) {
   Ah.values(0, 1)        = (value_type)1.11;
   Morpheus::copy(Ah, A);
 
-  VALIDATE_DIA_CONTAINER(Ah, Ahref_test, index_type);
+  VALIDATE_DIA_CONTAINER(Ah, Ahref_test);
 }
 
 /**
@@ -174,7 +174,7 @@ TYPED_TEST(DiaMatrixBinaryTest, AllocateFromDiaMatrix) {
   using HostMatrix1 = typename TestFixture::host1;
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
-  using index_type  = typename Matrix1::index_type;
+  using size_type   = typename Matrix1::size_type;
   using value_type1 = typename Matrix1::value_type;
   using value_type2 = typename Matrix2::value_type;
 
@@ -198,11 +198,11 @@ TYPED_TEST(DiaMatrixBinaryTest, AllocateFromDiaMatrix) {
   Ah.diagonal_offsets(1) = 1;
   Ah.values(0, 1)        = (value_type1)-1.11;
 
-  for (index_type n = 0; n < Bh.ndiags(); n++) {
+  for (size_type n = 0; n < Bh.ndiags(); n++) {
     EXPECT_EQ(Bh.diagonal_offsets(n), 0);
   }
-  for (index_type i = 0; i < Bh.values().nrows(); i++) {
-    for (index_type j = 0; j < Bh.values().ncols(); j++) {
+  for (size_type i = 0; i < Bh.values().nrows(); i++) {
+    for (size_type j = 0; j < Bh.values().ncols(); j++) {
       EXPECT_EQ(Bh.values(i, j), 0);
     }
   }
@@ -218,11 +218,11 @@ TYPED_TEST(DiaMatrixBinaryTest, AllocateFromDiaMatrix) {
   CHECK_DIA_CONTAINERS(A, B);
   Morpheus::copy(B, Bh);
 
-  for (index_type n = 0; n < Bh.ndiags(); n++) {
+  for (size_type n = 0; n < Bh.ndiags(); n++) {
     EXPECT_EQ(Bh.diagonal_offsets(n), 0);
   }
-  for (index_type i = 0; i < Bh.values().nrows(); i++) {
-    for (index_type j = 0; j < Bh.values().ncols(); j++) {
+  for (size_type i = 0; i < Bh.values().nrows(); i++) {
+    for (size_type j = 0; j < Bh.values().ncols(); j++) {
       EXPECT_EQ(Bh.values(i, j), 0);
     }
   }

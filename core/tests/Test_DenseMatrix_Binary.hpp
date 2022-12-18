@@ -69,9 +69,9 @@ TYPED_TEST(DenseMatrixBinaryTest, Allocate) {
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
   using value_type  = typename Matrix1::value_type;
-  using index_type  = typename Matrix1::index_type;
+  using size_type   = typename Matrix1::size_type;
 
-  index_type N0 = 10, N1 = 15;
+  size_type N0 = 10, N1 = 15;
   Matrix1 A(N0, N1, (value_type)5.22);
   EXPECT_EQ(A.nrows(), N0);
   EXPECT_EQ(A.ncols(), N1);
@@ -94,8 +94,8 @@ TYPED_TEST(DenseMatrixBinaryTest, Allocate) {
   EXPECT_EQ(Bh.ncols(), Ah.ncols());
   EXPECT_EQ(Bh.nnnz(), Ah.nnnz());
   EXPECT_EQ(Bh.view().size(), Ah.view().size());
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
+  for (size_type i = 0; i < Ah.nrows(); i++) {
+    for (size_type j = 0; j < Ah.ncols(); j++) {
       EXPECT_EQ(Bh(i, j), (value_type)0);
     }
   }
@@ -116,8 +116,8 @@ TYPED_TEST(DenseMatrixBinaryTest, Allocate) {
   EXPECT_EQ(B.ncols(), Bh.ncols());
   EXPECT_EQ(B.nnnz(), Bh.nnnz());
   EXPECT_EQ(B.view().size(), Bh.view().size());
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
+  for (size_type i = 0; i < Ah.nrows(); i++) {
+    for (size_type j = 0; j < Ah.ncols(); j++) {
       EXPECT_EQ(Bh(i, j), (value_type)0);
     }
   }

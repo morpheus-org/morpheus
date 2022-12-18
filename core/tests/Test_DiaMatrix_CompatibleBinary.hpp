@@ -49,7 +49,7 @@ class CompatibleDiaMatrixBinaryTest : public ::testing::Test {
   using device2 = typename type2::type;  // DiaMatrix
   using host2   = typename type2::type::HostMirror;
 
-  using IndexType = typename device1::index_type;
+  using SizeType = typename device1::size_type;
 
   CompatibleDiaMatrixBinaryTest()
       : nrows(3),
@@ -67,7 +67,7 @@ class CompatibleDiaMatrixBinaryTest : public ::testing::Test {
     Morpheus::copy(Ahref, Aref);
   }
 
-  IndexType nrows, ncols, nnnz, ndiag, nalign;
+  SizeType nrows, ncols, nnnz, ndiag, nalign;
   device1 Aref;
   host1 Ahref;
 };
@@ -85,8 +85,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDiaMatrix) {
   using HostMatrix1 = typename TestFixture::host1;
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
-  using index_type  = typename Matrix1::index_type;
-  using value_type  = typename Matrix2::index_type;
+  using value_type  = typename Matrix2::value_type;
 
   // Build matrix from the device vectors
   Matrix2 A(this->nrows, this->ncols, this->nnnz, this->Aref.diagonal_offsets(),
@@ -99,7 +98,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDiaMatrix) {
                   this->nalign);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_DIA_CONTAINER(Ah, this->Ahref, index_type);
+  VALIDATE_DIA_CONTAINER(Ah, this->Ahref);
 
   // Default copy construction
   HostMatrix1 Bh(Ah);
@@ -110,7 +109,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDiaMatrix) {
   Ah.values(1, 2)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bh, Ah);
 
   // Now check device Matrix
   Matrix1 B(A);
@@ -121,7 +120,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDiaMatrix) {
   HostMatrix1 Bt(this->nrows, this->ncols, this->nnnz, this->ndiag,
                  this->nalign);
   Morpheus::copy(B, Bt);
-  VALIDATE_DIA_CONTAINER(Bt, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bt, Ah);
 }
 
 TYPED_TEST(CompatibleDiaMatrixBinaryTest, CopyAssignmentFromDiaMatrix) {
@@ -129,8 +128,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, CopyAssignmentFromDiaMatrix) {
   using HostMatrix1 = typename TestFixture::host1;
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
-  using index_type  = typename Matrix1::index_type;
-  using value_type  = typename Matrix2::index_type;
+  using value_type  = typename Matrix2::value_type;
 
   // Build matrix from the device vectors
   Matrix2 A(this->nrows, this->ncols, this->nnnz, this->Aref.diagonal_offsets(),
@@ -143,7 +141,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, CopyAssignmentFromDiaMatrix) {
                   this->nalign);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_DIA_CONTAINER(Ah, this->Ahref, index_type);
+  VALIDATE_DIA_CONTAINER(Ah, this->Ahref);
 
   // Default copy construction
   HostMatrix1 Bh = Ah;
@@ -154,7 +152,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, CopyAssignmentFromDiaMatrix) {
   Ah.values(1, 2)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bh, Ah);
 
   // Now check device Matrix
   Matrix1 B = A;
@@ -165,7 +163,7 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, CopyAssignmentFromDiaMatrix) {
   HostMatrix1 Bt(this->nrows, this->ncols, this->nnnz, this->ndiag,
                  this->nalign);
   Morpheus::copy(B, Bt);
-  VALIDATE_DIA_CONTAINER(Bt, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bt, Ah);
 }
 
 /**
@@ -176,7 +174,6 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, CopyAssignmentFromDiaMatrix) {
 TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDenseVector) {
   using Matrix     = typename TestFixture::device2;
   using HostMatrix = typename TestFixture::host2;
-  using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
   // Build matrix from the device vectors
@@ -190,13 +187,13 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDenseVector) {
                   this->nalign);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_DIA_CONTAINER(Ah, this->Ahref, index_type);
+  VALIDATE_DIA_CONTAINER(Ah, this->Ahref);
 
   HostMatrix Ah_test(this->nrows, this->ncols, this->nnnz, this->ndiag,
                      this->nalign);
   Morpheus::copy(A, Ah_test);
 
-  VALIDATE_DIA_CONTAINER(Ah, Ah_test, index_type);
+  VALIDATE_DIA_CONTAINER(Ah, Ah_test);
 
   Ah.diagonal_offsets(2) = 2;
   EXPECT_NE(Ah.diagonal_offsets(2), Ah_test.diagonal_offsets(2));

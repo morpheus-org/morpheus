@@ -47,12 +47,13 @@ void copy_by_key(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, KeyType, SourceType,
                                DestinationType>>* = nullptr) {
+  using size_type = typename KeyType::size_type;
   MORPHEUS_ASSERT(keys.size() <= src.size(),
                   "Size of keys must be smaller or equal to src size.");
   MORPHEUS_ASSERT(keys.size() <= dst.size(),
                   "Size of keys must be smaller or equal to dst size.");
 
-  for (size_t i = 0; i < keys.size(); i++) {
+  for (size_type i = 0; i < keys.size(); i++) {
     dst[i] = src[keys[i]];
   }
 }

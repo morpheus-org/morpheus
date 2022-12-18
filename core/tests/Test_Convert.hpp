@@ -96,7 +96,6 @@ class ConvertTypesTest : public ::testing::Test {
   using source_host   = typename source_t::type::HostMirror;
   using dest_device   = typename dest_t::type;
   using dest_host     = typename dest_t::type::HostMirror;
-  using IndexType     = typename source_device::index_type;
   using ValueType     = typename source_device::value_type;
 
   void SetUp() override {

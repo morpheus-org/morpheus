@@ -48,7 +48,7 @@ namespace Morpheus {
  *
  */
 template <typename ExecSpace, typename Vector1, typename Vector2>
-inline typename Vector2::value_type dot(typename Vector1::index_type n,
+inline typename Vector2::value_type dot(typename Vector1::size_type n,
                                         const Vector1& x, const Vector2& y) {
   static_assert(is_dense_vector_format_container_v<Vector1>,
                 "x must be a DenseVector container");

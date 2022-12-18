@@ -69,6 +69,7 @@ class MatrixOperationsTypesTest : public ::testing::Test {
   using mat_host_t        = typename mat_container_t::type::HostMirror;
   using vec_dev_t         = typename vec_container_t::type;
   using vec_host_t        = typename vec_container_t::type::HostMirror;
+  using SizeType          = typename mat_dev_t::size_type;
   using ValueType         = typename mat_dev_t::value_type;
   using IndexType         = typename mat_dev_t::index_type;
   using ArrayLayout       = typename mat_dev_t::array_layout;
@@ -86,7 +87,8 @@ class MatrixOperationsTypesTest : public ::testing::Test {
 
     ContainersClass() : A(), ref_diag() {}
 
-    ContainersClass(size_t nrows, size_t ncols, std::vector<int>& diag_indexes)
+    ContainersClass(SizeType nrows, SizeType ncols,
+                    std::vector<int>& diag_indexes)
         : A(), ref_diag(ncols, 0) {
       // Generate the diagonal matrix
       diag_generator generator(nrows, ncols, diag_indexes);
@@ -95,7 +97,7 @@ class MatrixOperationsTypesTest : public ::testing::Test {
       Adense = generator.generate();
       generator.generate(Acoo);
 
-      for (size_t i = 0; i < (size_t)Adense.ncols(); i++) {
+      for (SizeType i = 0; i < Adense.ncols(); i++) {
         ref_diag(i) = Adense(i, i);
       }
 
@@ -110,19 +112,19 @@ class MatrixOperationsTypesTest : public ::testing::Test {
   };
 
   static const int samples = 3;
-  size_t nrows[samples]    = {10, 100, 1000};
-  size_t ncols[samples]    = {10, 100, 1000};
+  SizeType nrows[samples]  = {10, 100, 1000};
+  SizeType ncols[samples]  = {10, 100, 1000};
 
   ContainersClass containers[samples];
 
   void SetUp() override {
-    for (size_t i = 0; i < samples; i++) {
+    for (SizeType i = 0; i < samples; i++) {
       int diag_freq = 5;
       int ndiags    = ((nrows[i] - 1) / diag_freq) * 2 + 1;
       std::vector<int> diags(ndiags, 0);
 
-      diags[0]          = 0;
-      size_t diag_count = 1;
+      diags[0]            = 0;
+      SizeType diag_count = 1;
       for (int nd = 1; nd < (int)nrows[i]; nd++) {
         if (nd % diag_freq == 0) {
           diags[diag_count]     = nd;
@@ -142,15 +144,15 @@ namespace Test {
 TYPED_TEST_SUITE(MatrixOperationsTypesTest, MatrixOperationsTypes);
 
 TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalCustom) {
-  using vec_t      = typename TestFixture::vec_dev_t;
-  using vec_h_t    = typename TestFixture::vec_host_t;
-  using mat_t      = typename TestFixture::mat_dev_t;
-  using mat_h_t    = typename TestFixture::mat_host_t;
-  using index_type = typename TestFixture::IndexType;
+  using vec_t     = typename TestFixture::vec_dev_t;
+  using vec_h_t   = typename TestFixture::vec_host_t;
+  using mat_t     = typename TestFixture::mat_dev_t;
+  using mat_h_t   = typename TestFixture::mat_host_t;
+  using size_type = typename TestFixture::SizeType;
   using dense_mat_h_t =
       typename TestFixture::ContainersClass::diag_generator::DenseMatrix;
 
-  for (index_type i = 0; i < this->samples; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
     vec_t new_diag(c.A.nrows(), 1);
@@ -166,7 +168,7 @@ TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalCustom) {
     Morpheus::convert<Morpheus::Serial>(Ah, Adense);
     vec_h_t diag(Adense.nrows(), 0);
 
-    for (size_t row = 0; row < (size_t)Adense.nrows(); row++) {
+    for (size_type row = 0; row < Adense.nrows(); row++) {
       diag[row] = Adense(row, row);
     }
 
@@ -174,7 +176,7 @@ TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalCustom) {
     Morpheus::copy(new_diag, new_diag_h);
 
     EXPECT_FALSE(Morpheus::Test::is_empty_container(diag));
-    for (size_t idx = 0; idx < diag.size(); idx++) {
+    for (size_type idx = 0; idx < diag.size(); idx++) {
       if (c.ref_diag[idx] == 0) {
         EXPECT_EQ(diag[idx], c.ref_diag[idx]);
       } else {
@@ -185,15 +187,15 @@ TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalCustom) {
 }
 
 TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalGeneric) {
-  using vec_t      = typename TestFixture::vec_dev_t;
-  using vec_h_t    = typename TestFixture::vec_host_t;
-  using mat_t      = typename TestFixture::mat_dev_t;
-  using mat_h_t    = typename TestFixture::mat_host_t;
-  using index_type = typename TestFixture::IndexType;
+  using vec_t     = typename TestFixture::vec_dev_t;
+  using vec_h_t   = typename TestFixture::vec_host_t;
+  using mat_t     = typename TestFixture::mat_dev_t;
+  using mat_h_t   = typename TestFixture::mat_host_t;
+  using size_type = typename TestFixture::SizeType;
   using dense_mat_h_t =
       typename TestFixture::ContainersClass::diag_generator::DenseMatrix;
 
-  for (index_type i = 0; i < this->samples; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
     vec_t new_diag(c.A.nrows(), 1);
@@ -209,7 +211,7 @@ TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalGeneric) {
     Morpheus::convert<Morpheus::Serial>(Ah, Adense);
     vec_h_t diag(Adense.nrows(), 0);
 
-    for (size_t row = 0; row < (size_t)Adense.nrows(); row++) {
+    for (size_type row = 0; row < Adense.nrows(); row++) {
       diag[row] = Adense(row, row);
     }
 
@@ -217,7 +219,7 @@ TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalGeneric) {
     Morpheus::copy(new_diag, new_diag_h);
 
     EXPECT_FALSE(Morpheus::Test::is_empty_container(diag));
-    for (size_t idx = 0; idx < diag.size(); idx++) {
+    for (size_type idx = 0; idx < diag.size(); idx++) {
       if (c.ref_diag[idx] == 0) {
         EXPECT_EQ(diag[idx], c.ref_diag[idx]);
       } else {

@@ -37,7 +37,8 @@ namespace Impl {
 template <typename ExecSpace, typename Vector1, typename Vector2,
           typename Vector3>
 inline void waxpby(
-    const size_t n, const typename Vector1::value_type alpha, const Vector1& x,
+    const typename Vector1::size_type n,
+    const typename Vector1::value_type alpha, const Vector1& x,
     const typename Vector2::value_type beta, const Vector2& y, Vector3& w,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
@@ -47,7 +48,8 @@ inline void waxpby(
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2, Vector3>>* =
         nullptr) {
   using execution_space = typename ExecSpace::execution_space;
-  using range_policy    = Kokkos::RangePolicy<size_t, execution_space>;
+  using size_type       = typename Vector1::size_type;
+  using range_policy    = Kokkos::RangePolicy<size_type, execution_space>;
 
   assert(x.size() >= n);
   assert(y.size() >= n);
@@ -60,17 +62,17 @@ inline void waxpby(
 
   if (alpha == 1.0) {
     Kokkos::parallel_for(
-        "waxpby_alpha", policy, KOKKOS_LAMBDA(const size_t& i) {
+        "waxpby_alpha", policy, KOKKOS_LAMBDA(const size_type& i) {
           w_view[i] = x_view[i] + beta * y_view[i];
         });
   } else if (beta == 1.0) {
     Kokkos::parallel_for(
-        "waxpby_beta", policy, KOKKOS_LAMBDA(const size_t& i) {
+        "waxpby_beta", policy, KOKKOS_LAMBDA(const size_type& i) {
           w_view[i] = alpha * x_view[i] + y_view[i];
         });
   } else {
     Kokkos::parallel_for(
-        "waxpby", policy, KOKKOS_LAMBDA(const size_t& i) {
+        "waxpby", policy, KOKKOS_LAMBDA(const size_type& i) {
           w_view[i] = alpha * x_view[i] + beta * y_view[i];
         });
   }

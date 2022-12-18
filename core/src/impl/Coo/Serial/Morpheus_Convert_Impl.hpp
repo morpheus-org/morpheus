@@ -45,20 +45,20 @@ void convert(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using index_type = typename SourceType::index_type;
+  using size_type = typename SourceType::size_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
 
   // element-wise copy of indices and values
-  for (index_type n = 0; n < src.nnnz(); n++) {
+  for (size_type n = 0; n < src.nnnz(); n++) {
     dst.row_indices(n) = src.crow_indices(n);
   }
 
-  for (index_type n = 0; n < src.nnnz(); n++) {
+  for (size_type n = 0; n < src.nnnz(); n++) {
     dst.column_indices(n) = src.ccolumn_indices(n);
   }
 
-  for (index_type n = 0; n < src.nnnz(); n++) {
+  for (size_type n = 0; n < src.nnnz(); n++) {
     dst.values(n) = src.cvalues(n);
   }
 }

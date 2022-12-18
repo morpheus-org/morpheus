@@ -93,6 +93,7 @@ class DenseVector
   using value_type = typename traits::value_type;
   /*! The non-constant type of the values held by the container */
   using non_const_value_type = typename traits::non_const_value_type;
+  using size_type            = typename traits::size_type;
   /*! The type of the indices held by the container - can be const */
   using index_type = typename traits::index_type;
   /*! The non-constant type of the indices held by the container */
@@ -154,8 +155,8 @@ class DenseVector
    * @param n Size of the DenseVector
    * @param val Value at which the elements of the DenseVector will be set to
    */
-  inline DenseVector(const size_t n, value_type val = 0)
-      : _size(n), _values("vector", size_t(n)) {
+  inline DenseVector(const size_type n, value_type val = 0)
+      : _size(n), _values("vector", n) {
     assign(n, val);
   }
 
@@ -168,7 +169,7 @@ class DenseVector
    * @param ptr Pointer value
    */
   template <typename ValuePtr>
-  DenseVector(const size_t n, ValuePtr ptr,
+  DenseVector(const size_type n, ValuePtr ptr,
               typename std::enable_if<std::is_pointer<ValuePtr>::value>::type* =
                   nullptr)
       : _size(n), _values(ptr, n) {
@@ -188,7 +189,7 @@ class DenseVector
    * @param range_high Upper bound value to assign - excluded
    */
   template <typename Generator>
-  inline DenseVector(const size_t n, Generator rand_pool,
+  inline DenseVector(const size_type n, Generator rand_pool,
                      const value_type range_low, const value_type range_high)
       : _size(n), _values("vector", n) {
     Kokkos::fill_random(_values, rand_pool, range_low, range_high);
@@ -249,8 +250,8 @@ class DenseVector
    * @param n Number of elements to assign
    * @param val Value to assign
    */
-  inline void assign(const size_t n, const value_type val) {
-    using range_policy = Kokkos::RangePolicy<size_t, execution_space>;
+  inline void assign(const size_type n, const value_type val) {
+    using range_policy = Kokkos::RangePolicy<size_type, execution_space>;
 
     range_policy policy(0, n);
     Impl::set_functor<value_array_type, value_type> f(_values, val);
@@ -268,9 +269,9 @@ class DenseVector
    * @param range_high Upper bound value to assign
    */
   template <typename Generator>
-  inline void assign(const size_t n, Generator rand_pool,
+  inline void assign(const size_type n, Generator rand_pool,
                      const value_type range_low, const value_type range_high) {
-    auto vals = Kokkos::subview(_values, std::make_pair((size_t)0, n));
+    auto vals = Kokkos::subview(_values, std::make_pair(size_type(0), n));
     Kokkos::fill_random(vals, rand_pool, range_low, range_high);
   }
 
@@ -281,7 +282,7 @@ class DenseVector
    * @return Element at index \p i
    */
   MORPHEUS_FORCEINLINE_FUNCTION value_array_reference
-  operator()(const size_t i) const {
+  operator()(const size_type i) const {
     return _values(i);
   }
 
@@ -292,7 +293,7 @@ class DenseVector
    * @return Element at index \p i
    */
   MORPHEUS_FORCEINLINE_FUNCTION value_array_reference
-  operator[](const size_t i) const {
+  operator[](const size_type i) const {
     return _values(i);
   }
 
@@ -301,7 +302,7 @@ class DenseVector
    *
    * @return Integer representing the size of the container
    */
-  inline size_t size() const { return _size; }
+  inline size_type size() const { return _size; }
 
   /**
    * @brief Returns a pointer to the data at the beginning of the container
@@ -330,8 +331,8 @@ class DenseVector
    *
    * @param n New size of the container
    */
-  inline void resize(const size_t n) {
-    Kokkos::resize(_values, size_t(n));
+  inline void resize(const size_type n) {
+    Kokkos::resize(_values, n);
     _size = n;
   }
 
@@ -342,7 +343,7 @@ class DenseVector
    *
    * @param n New size of the container
    */
-  inline void resize(const size_t n, const value_type val) {
+  inline void resize(const size_type n, const value_type val) {
     resize(n);
     assign(n, val);
   }
@@ -361,7 +362,7 @@ class DenseVector
   }
 
  private:
-  size_t _size;
+  size_type _size;
   value_array_type _values;
 };
 

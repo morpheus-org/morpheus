@@ -48,13 +48,14 @@ void update_diagonal(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_hip_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
+  using size_type  = typename Matrix::size_type;
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
-  const size_t BLOCK_SIZE = 256;
-  const size_t NUM_BLOCKS = (A.nnnz() + BLOCK_SIZE - 1) / BLOCK_SIZE;
+  const size_type BLOCK_SIZE = 256;
+  const size_type NUM_BLOCKS = (A.nnnz() + BLOCK_SIZE - 1) / BLOCK_SIZE;
 
-  Kernels::update_coo_diagonal_kernel<value_type, index_type>
+  Kernels::update_coo_diagonal_kernel<value_type, index_type, size_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nnnz(), A.row_indices().data(),
                                       A.column_indices().data(),
                                       A.values().data(), diagonal.data());
@@ -76,9 +77,9 @@ void get_diagonal(
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
 }
 
-template <typename ExecSpace, typename Matrix, typename IndexType,
+template <typename ExecSpace, typename Matrix, typename SizeType,
           typename ValueType>
-void set_value(Matrix&, IndexType, IndexType, ValueType,
+void set_value(Matrix&, SizeType, SizeType, ValueType,
                typename std::enable_if_t<
                    Morpheus::is_coo_matrix_format_container_v<Matrix> &&
                    Morpheus::has_custom_backend_v<ExecSpace> &&

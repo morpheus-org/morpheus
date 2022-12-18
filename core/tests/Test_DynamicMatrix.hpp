@@ -40,6 +40,7 @@ class DynamicMatrixUnaryTest : public ::testing::Test {
   using type      = UnaryContainer;
   using device    = typename UnaryContainer::type;
   using host      = typename UnaryContainer::type::HostMirror;
+  using SizeType  = typename device::size_type;
   using IndexType = typename device::index_type;
   using ValueType = typename device::value_type;
   using DevLayout = typename device::array_layout;
@@ -87,7 +88,7 @@ class DynamicMatrixUnaryTest : public ::testing::Test {
     CHECK_DYNAMIC_SIZES(Aref_dyn, 3, 3, 4, 1);
   }
 
-  IndexType nrows, ncols, nnnz;
+  SizeType nrows, ncols, nnnz;
 
   device Aref_dyn;
   host Aref_dyn_h;
@@ -226,7 +227,6 @@ TYPED_TEST(DynamicMatrixUnaryTest, ActiveIndex) {
  */
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentHost) {
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename HostMatrix::index_type;
   using value_type = typename HostMatrix::value_type;
 
   HostMatrix A1_h = this->Aref_dyn_h;
@@ -241,9 +241,9 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentHost) {
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CooHost Bt_h = A1_h;
-  VALIDATE_COO_CONTAINER(Bt_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bt_h, this->Aref_coo_h, this->nnnz);
   typename TestFixture::CooHost Ct_h = A2_h;
-  VALIDATE_COO_CONTAINER(Ct_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Ct_h, this->Aref_coo_h, this->nnnz);
 
   // Test A1_h, A2_h with Csr
   this->switch_csr();
@@ -259,11 +259,9 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentHost) {
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CsrHost Dt_h = A1_h;
-  VALIDATE_CSR_CONTAINER(Dt_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(Dt_h, this->Aref_csr_h, this->nrows, this->nnnz);
   typename TestFixture::CsrHost Et_h = A2_h;
-  VALIDATE_CSR_CONTAINER(Et_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(Et_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 /**
@@ -274,7 +272,6 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentHost) {
  */
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentDevice) {
   using Matrix     = typename TestFixture::device;
-  using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
   Matrix A1 = this->Aref_dyn;
@@ -292,12 +289,12 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentDevice) {
   typename TestFixture::CooDev A1t = A1;
   typename TestFixture::CooHost A1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(A1t, A1t_h);
-  VALIDATE_COO_CONTAINER(A1t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(A1t_h, this->Aref_coo_h, this->nnnz);
 
   typename TestFixture::CooDev A2t = A2;
   typename TestFixture::CooHost A2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(A2t, A2t_h);
-  VALIDATE_COO_CONTAINER(A2t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(A2t_h, this->Aref_coo_h, this->nnnz);
 
   // Test A1, A2 with Csr
   this->switch_csr();
@@ -316,14 +313,12 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentDevice) {
   typename TestFixture::CsrDev B1t = A1;
   typename TestFixture::CsrHost B1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B1t, B1t_h);
-  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 
   typename TestFixture::CsrDev B2t = A2;
   typename TestFixture::CsrHost B2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B2t, B2t_h);
-  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 /**
@@ -334,7 +329,6 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentDevice) {
  */
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorHost) {
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename HostMatrix::index_type;
   using value_type = typename HostMatrix::value_type;
 
   HostMatrix A1_h(this->Aref_dyn_h);
@@ -349,9 +343,9 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorHost) {
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CooHost Bt_h = A1_h;
-  VALIDATE_COO_CONTAINER(Bt_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bt_h, this->Aref_coo_h, this->nnnz);
   typename TestFixture::CooHost Ct_h = A2_h;
-  VALIDATE_COO_CONTAINER(Ct_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Ct_h, this->Aref_coo_h, this->nnnz);
 
   // Test A1_h, A2_h with Csr
   this->switch_csr();
@@ -367,11 +361,9 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorHost) {
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CsrHost B1t_h = B1_h;
-  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz);
   typename TestFixture::CsrHost B2t_h = B2_h;
-  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 /**
@@ -382,7 +374,6 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorHost) {
  */
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorDevice) {
   using Matrix     = typename TestFixture::device;
-  using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
   Matrix A1(this->Aref_dyn);
@@ -400,12 +391,12 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorDevice) {
   typename TestFixture::CooDev A1t = A1;
   typename TestFixture::CooHost A1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(A1t, A1t_h);
-  VALIDATE_COO_CONTAINER(A1t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(A1t_h, this->Aref_coo_h, this->nnnz);
 
   typename TestFixture::CooDev A2t = A2;
   typename TestFixture::CooHost A2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(A2t, A2t_h);
-  VALIDATE_COO_CONTAINER(A2t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(A2t_h, this->Aref_coo_h, this->nnnz);
 
   // Test A1, A2 with Csr
   this->switch_csr();
@@ -424,14 +415,12 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorDevice) {
   typename TestFixture::CsrDev B1t = B1;
   typename TestFixture::CsrHost B1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B1t, B1t_h);
-  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 
   typename TestFixture::CsrDev B2t = B2;
   typename TestFixture::CsrHost B2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B2t, B2t_h);
-  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 /**
@@ -442,7 +431,6 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorDevice) {
  */
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentHost) {
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename HostMatrix::index_type;
   using value_type = typename HostMatrix::value_type;
 
   HostMatrix A1_h = std::move(this->Aref_dyn_h);
@@ -457,9 +445,9 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentHost) {
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CooHost Bt_h = A1_h;
-  VALIDATE_COO_CONTAINER(Bt_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bt_h, this->Aref_coo_h, this->nnnz);
   typename TestFixture::CooHost Ct_h = A2_h;
-  VALIDATE_COO_CONTAINER(Ct_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Ct_h, this->Aref_coo_h, this->nnnz);
 
   // Test A1_h, A2_h with Csr
   this->switch_csr();
@@ -475,11 +463,9 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentHost) {
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CsrHost Dt_h = A1_h;
-  VALIDATE_CSR_CONTAINER(Dt_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(Dt_h, this->Aref_csr_h, this->nrows, this->nnnz);
   typename TestFixture::CsrHost Et_h = A2_h;
-  VALIDATE_CSR_CONTAINER(Et_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(Et_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 /**
@@ -490,7 +476,6 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentHost) {
  */
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentDevice) {
   using Matrix     = typename TestFixture::device;
-  using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
   Matrix A1 = std::move(this->Aref_dyn);
@@ -508,12 +493,12 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentDevice) {
   typename TestFixture::CooDev A1t = A1;
   typename TestFixture::CooHost A1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(A1t, A1t_h);
-  VALIDATE_COO_CONTAINER(A1t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(A1t_h, this->Aref_coo_h, this->nnnz);
 
   typename TestFixture::CooDev A2t = A2;
   typename TestFixture::CooHost A2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(A2t, A2t_h);
-  VALIDATE_COO_CONTAINER(A2t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(A2t_h, this->Aref_coo_h, this->nnnz);
 
   // Test A1, A2 with Csr
   this->switch_csr();
@@ -532,14 +517,12 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentDevice) {
   typename TestFixture::CsrDev B1t = A1;
   typename TestFixture::CsrHost B1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B1t, B1t_h);
-  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 
   typename TestFixture::CsrDev B2t = A2;
   typename TestFixture::CsrHost B2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B2t, B2t_h);
-  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 /**
@@ -550,7 +533,6 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentDevice) {
  */
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorHost) {
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename HostMatrix::index_type;
   using value_type = typename HostMatrix::value_type;
 
   HostMatrix A1_h(std::move(this->Aref_dyn_h));
@@ -565,9 +547,9 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorHost) {
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CooHost Bt_h = A1_h;
-  VALIDATE_COO_CONTAINER(Bt_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Bt_h, this->Aref_coo_h, this->nnnz);
   typename TestFixture::CooHost Ct_h = A2_h;
-  VALIDATE_COO_CONTAINER(Ct_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(Ct_h, this->Aref_coo_h, this->nnnz);
 
   // Test A1_h, A2_h with Csr
   this->switch_csr();
@@ -583,11 +565,9 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorHost) {
 
   // Extract active state of both Dynamic containers to check
   typename TestFixture::CsrHost B1t_h = B1_h;
-  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz);
   typename TestFixture::CsrHost B2t_h = B2_h;
-  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 /**
@@ -598,7 +578,6 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorHost) {
  */
 TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorDevice) {
   using Matrix     = typename TestFixture::device;
-  using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
   Matrix A1(std::move(this->Aref_dyn));
@@ -616,12 +595,12 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorDevice) {
   typename TestFixture::CooDev A1t = A1;
   typename TestFixture::CooHost A1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(A1t, A1t_h);
-  VALIDATE_COO_CONTAINER(A1t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(A1t_h, this->Aref_coo_h, this->nnnz);
 
   typename TestFixture::CooDev A2t = A2;
   typename TestFixture::CooHost A2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(A2t, A2t_h);
-  VALIDATE_COO_CONTAINER(A2t_h, this->Aref_coo_h, this->nnnz, index_type);
+  VALIDATE_COO_CONTAINER(A2t_h, this->Aref_coo_h, this->nnnz);
 
   // Test A1, A2 with Csr
   this->switch_csr();
@@ -640,14 +619,12 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorDevice) {
   typename TestFixture::CsrDev B1t = B1;
   typename TestFixture::CsrHost B1t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B1t, B1t_h);
-  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B1t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 
   typename TestFixture::CsrDev B2t = B2;
   typename TestFixture::CsrHost B2t_h(this->nrows, this->ncols, this->nnnz);
   Morpheus::copy(B2t, B2t_h);
-  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz,
-                         index_type);
+  VALIDATE_CSR_CONTAINER(B2t_h, this->Aref_csr_h, this->nrows, this->nnnz);
 }
 
 /**

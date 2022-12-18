@@ -65,11 +65,12 @@ inline void multiply(
 template <typename Matrix, typename Vector>
 void __spmv_csr_scalar(const Matrix& A, const Vector& x, Vector& y,
                        const bool init) {
+  using size_type  = typename Matrix::size_type;
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
-  const size_t BLOCK_SIZE = 256;
-  const size_t NUM_BLOCKS = (A.nrows() + BLOCK_SIZE - 1) / BLOCK_SIZE;
+  const size_type BLOCK_SIZE = 256;
+  const size_type NUM_BLOCKS = Impl::ceil_div<size_type>(A.nrows(), BLOCK_SIZE);
 
   const index_type* I = A.crow_offsets().data();
   const index_type* J = A.ccolumn_indices().data();
@@ -82,7 +83,8 @@ void __spmv_csr_scalar(const Matrix& A, const Vector& x, Vector& y,
     y.assign(y.size(), 0);
   }
 
-  Morpheus::Impl::Kernels::spmv_csr_scalar_kernel<index_type, value_type>
+  Morpheus::Impl::Kernels::spmv_csr_scalar_kernel<size_type, index_type,
+                                                  value_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), I, J, V, x_ptr, y_ptr);
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
   getLastCudaError("spmv_csr_scalar_kernel: Kernel execution failed");
@@ -92,6 +94,7 @@ void __spmv_csr_scalar(const Matrix& A, const Vector& x, Vector& y,
 template <size_t THREADS_PER_VECTOR, typename Matrix, typename Vector>
 void __spmv_csr_vector_dispatch(const Matrix& A, const Vector& x, Vector& y,
                                 const bool init) {
+  using size_type  = typename Matrix::size_type;
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
@@ -102,23 +105,23 @@ void __spmv_csr_vector_dispatch(const Matrix& A, const Vector& x, Vector& y,
   const value_type* x_ptr = x.data();
   value_type* y_ptr       = y.data();
 
-  const size_t THREADS_PER_BLOCK = 128;
-  const size_t VECTORS_PER_BLOCK = THREADS_PER_BLOCK / THREADS_PER_VECTOR;
+  const size_type THREADS_PER_BLOCK = 128;
+  const size_type VECTORS_PER_BLOCK = THREADS_PER_BLOCK / THREADS_PER_VECTOR;
 
   if (init) {
     y.assign(y.size(), 0);
   }
 
-  const size_t MAX_BLOCKS = max_active_blocks(
-      Kernels::spmv_csr_vector_kernel<index_type, value_type, VECTORS_PER_BLOCK,
-                                      THREADS_PER_VECTOR>,
-      THREADS_PER_BLOCK, (size_t)0);
+  const size_type MAX_BLOCKS = max_active_blocks(
+      Kernels::spmv_csr_vector_kernel<size_type, index_type, value_type,
+                                      VECTORS_PER_BLOCK, THREADS_PER_VECTOR>,
+      THREADS_PER_BLOCK, 0);
 
-  const size_t NUM_BLOCKS =
-      std::min<size_t>(MAX_BLOCKS, DIVIDE_INTO(A.nrows(), VECTORS_PER_BLOCK));
+  const size_type NUM_BLOCKS = std::min<size_type>(
+      MAX_BLOCKS, Impl::ceil_div<size_type>(A.nrows(), VECTORS_PER_BLOCK));
 
-  Kernels::spmv_csr_vector_kernel<index_type, value_type, VECTORS_PER_BLOCK,
-                                  THREADS_PER_VECTOR>
+  Kernels::spmv_csr_vector_kernel<size_type, index_type, value_type,
+                                  VECTORS_PER_BLOCK, THREADS_PER_VECTOR>
       <<<NUM_BLOCKS, THREADS_PER_BLOCK, 0>>>(A.nrows(), I, J, V, x_ptr, y_ptr);
 
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
@@ -129,9 +132,9 @@ void __spmv_csr_vector_dispatch(const Matrix& A, const Vector& x, Vector& y,
 template <typename Matrix, typename Vector>
 void __spmv_csr_vector(const Matrix& A, const Vector& x, Vector& y,
                        const bool init) {
-  using index_type = typename Matrix::index_type;
+  using size_type = typename Matrix::size_type;
 
-  const index_type nnz_per_row = A.nnnz() / A.nrows();
+  const size_type nnz_per_row = A.nnnz() / A.nrows();
 
   if (nnz_per_row <= 2) {
     __spmv_csr_vector_dispatch<2>(A, x, y, init);

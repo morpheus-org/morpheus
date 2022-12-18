@@ -46,16 +46,15 @@ void convert(
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using index_type = typename SourceType::index_type;
+  using size_type = typename SourceType::size_type;
 
   MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
                   "Destination matrix must have equal or larger shape to the "
                   "source matrix");
 
-  index_type i, j;
-#pragma omp parallel for private(j) collapse(2)
-  for (i = 0; i < src.nrows(); i++) {
-    for (j = 0; j < src.ncols(); j++) {
+#pragma omp parallel for collapse(2)
+  for (size_type i = 0; i < src.nrows(); i++) {
+    for (size_type j = 0; j < src.ncols(); j++) {
       dst(i, j) = src(i, j);
     }
   }
@@ -71,16 +70,15 @@ void convert(
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using index_type = typename SourceType::index_type;
+  using size_type = typename SourceType::size_type;
 
   dst.resize(src.nrows() * src.ncols());
 
-  index_type i, j;
-#pragma omp parallel for private(j) collapse(2)
-  for (i = 0; i < src.nrows(); i++) {
-    for (j = 0; j < src.ncols(); j++) {
-      index_type idx = i * src.ncols() + j;
-      dst(idx)       = src(i, j);
+#pragma omp parallel for collapse(2)
+  for (size_type i = 0; i < src.nrows(); i++) {
+    for (size_type j = 0; j < src.ncols(); j++) {
+      size_type idx = i * src.ncols() + j;
+      dst(idx)      = src(i, j);
     }
   }
 }
@@ -108,15 +106,15 @@ void convert(
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using index_type = typename SourceType::index_type;
+  using size_type = typename SourceType::size_type;
 
   dst.resize(src.nrows(), src.ncols());
 
 #pragma omp parallel for
-  for (index_type n = 0; n < src.nnnz(); n++) {
-    index_type i = src.crow_indices(n);
-    index_type j = src.ccolumn_indices(n);
-    dst(i, j)    = src.cvalues(n);
+  for (size_type n = 0; n < src.nnnz(); n++) {
+    size_type i = src.crow_indices(n);
+    size_type j = src.ccolumn_indices(n);
+    dst(i, j)   = src.cvalues(n);
   }
 }
 

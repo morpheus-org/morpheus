@@ -31,15 +31,15 @@ namespace Morpheus {
 namespace Impl {
 
 namespace Kernels {
-template <typename ValueType, typename IndexType>
-__global__ void update_csr_diagonal_kernel(const IndexType nrows,
+template <typename ValueType, typename IndexType, typename SizeType>
+__global__ void update_csr_diagonal_kernel(const SizeType nrows,
                                            const IndexType* Ap,
                                            const IndexType* Aj, ValueType* Ax,
                                            const ValueType* diagonal) {
-  const IndexType thread_id = blockDim.x * blockIdx.x + threadIdx.x;
-  const IndexType grid_size = gridDim.x * blockDim.x;
+  const SizeType thread_id = blockDim.x * blockIdx.x + threadIdx.x;
+  const SizeType grid_size = gridDim.x * blockDim.x;
 
-  for (IndexType row = thread_id; row < nrows; row += grid_size) {
+  for (SizeType row = thread_id; row < nrows; row += grid_size) {
     const IndexType row_start = Ap[row];
     const IndexType row_end   = Ap[row + 1];
 

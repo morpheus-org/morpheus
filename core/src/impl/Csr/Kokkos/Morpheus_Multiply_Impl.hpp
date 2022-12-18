@@ -41,7 +41,8 @@ inline void multiply(
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using execution_space   = typename ExecSpace::execution_space;
-  using policy_index_type = Kokkos::IndexType<typename Matrix::index_type>;
+  using size_type         = typename Matrix::size_type;
+  using policy_index_type = Kokkos::IndexType<size_type>;
   using range_policy = Kokkos::RangePolicy<policy_index_type, execution_space>;
   using value_array  = typename Matrix::value_array_type::value_array_type;
   using index_array  = typename Matrix::index_array_type::value_array_type;
@@ -56,7 +57,7 @@ inline void multiply(
   range_policy policy(0, A.nrows());
 
   Kokkos::parallel_for(
-      policy, KOKKOS_LAMBDA(const index_type i) {
+      policy, KOKKOS_LAMBDA(const size_type i) {
         value_type sum = init ? value_type(0) : y_view[i];
         for (index_type jj = row_offsets[i]; jj < row_offsets[i + 1]; jj++) {
           sum += values[jj] * x_view[column_indices[jj]];

@@ -55,10 +55,10 @@ void copy(const SourceType& src, DestinationType& dst,
 
 template <typename SourceType, typename DestinationType>
 void copy(const SourceType& src, DestinationType& dst,
-          const typename SourceType::index_type src_begin,
-          const typename SourceType::index_type src_end,
-          const typename DestinationType::index_type dst_begin,
-          const typename DestinationType::index_type dst_end,
+          const typename SourceType::size_type src_begin,
+          const typename SourceType::size_type src_end,
+          const typename DestinationType::size_type dst_begin,
+          const typename DestinationType::size_type dst_end,
           typename std::enable_if_t<
               Morpheus::is_dense_vector_format_container_v<SourceType> &&
               Morpheus::is_dense_vector_format_container_v<DestinationType>>* =

@@ -40,7 +40,7 @@ struct any_type_resize
                                        Properties...> {
   using traits =
       Morpheus::ContainerTraits<any_type_resize, ValueType, Properties...>;
-  using index_type  = typename traits::index_type;
+  using size_type   = typename traits::size_type;
   using value_type  = typename traits::value_type;
   using result_type = void;
 
@@ -48,7 +48,7 @@ struct any_type_resize
   template <typename... Args>
   result_type operator()(
       typename CooMatrix<ValueType, Properties...>::type &mat,
-      const index_type nrows, const index_type ncols, const index_type nnnz) {
+      const size_type nrows, const size_type ncols, const size_type nnnz) {
     mat.resize(nrows, ncols, nnnz);
   }
 
@@ -56,7 +56,7 @@ struct any_type_resize
   template <typename... Args>
   result_type operator()(
       typename CsrMatrix<ValueType, Properties...>::type &mat,
-      const index_type nrows, const index_type ncols, const index_type nnnz) {
+      const size_type nrows, const size_type ncols, const size_type nnnz) {
     mat.resize(nrows, ncols, nnnz);
   }
 
@@ -64,8 +64,8 @@ struct any_type_resize
   template <typename... Args>
   result_type operator()(
       typename DiaMatrix<ValueType, Properties...>::type &mat,
-      const index_type nrows, const index_type ncols, const index_type nnnz,
-      const index_type ndiag, const index_type alignment = 32) {
+      const size_type nrows, const size_type ncols, const size_type nnnz,
+      const size_type ndiag, const size_type alignment = 32) {
     mat.resize(nrows, ncols, nnnz, ndiag, alignment);
   }
 

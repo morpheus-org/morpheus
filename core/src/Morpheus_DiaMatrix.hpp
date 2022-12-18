@@ -108,6 +108,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
   using value_type = typename traits::value_type;
   /*! The non-constant type of the values held by the container */
   using non_const_value_type = typename traits::non_const_value_type;
+  using size_type            = typename traits::size_type;
   /*! The type of the indices held by the container - can be const */
   using index_type = typename traits::index_type;
   /*! The non-constant type of the indices held by the container */
@@ -128,7 +129,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
 
   /*! The type of \p DenseVector that holds the index_type data */
   using index_array_type =
-      Morpheus::DenseVector<index_type, index_type, array_layout, backend,
+      Morpheus::DenseVector<index_type, size_type, array_layout, backend,
                             memory_traits>;
   using const_index_array_type = const index_array_type;
   using index_array_pointer    = typename index_array_type::value_array_pointer;
@@ -138,7 +139,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
 
   /*! The type of \p DenseMatrix that holds the value_type data */
   using value_array_type =
-      Morpheus::DenseMatrix<value_type, index_type, array_layout, backend,
+      Morpheus::DenseMatrix<value_type, size_type, array_layout, backend,
                             memory_traits>;
   using const_value_array_type = const value_array_type;
   using value_array_pointer    = typename value_array_type::value_array_pointer;
@@ -188,14 +189,14 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
    * @param num_diagonals Number of occupied diagonals
    * @param alignment Amount of padding used to align the data (default=32)
    */
-  inline DiaMatrix(const index_type num_rows, const index_type num_cols,
-                   const index_type num_entries, const index_type num_diagonals,
-                   const index_type alignment = 32)
+  inline DiaMatrix(const size_type num_rows, const size_type num_cols,
+                   const size_type num_entries, const size_type num_diagonals,
+                   const size_type alignment = 32)
       : base(num_rows, num_cols, num_entries),
         _ndiags(num_diagonals),
         _alignment(alignment),
         _diagonal_offsets(num_diagonals) {
-    _values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
+    _values.resize(Impl::get_pad_size<size_type>(num_rows, alignment),
                    num_diagonals);
   }
 
@@ -216,8 +217,8 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
    */
   template <typename ValueArray, typename IndexArray>
   explicit inline DiaMatrix(
-      const index_type num_rows, const index_type num_cols,
-      const index_type num_entries, const IndexArray &diag_offsets,
+      const size_type num_rows, const size_type num_cols,
+      const size_type num_entries, const IndexArray &diag_offsets,
       const ValueArray &vals,
       typename std::enable_if<
           is_dense_matrix_format_container<ValueArray>::value &&
@@ -238,10 +239,9 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
   // Construct from raw pointers
   template <typename ValuePtr, typename IndexPtr>
   explicit inline DiaMatrix(
-      const index_type num_rows, const index_type num_cols,
-      const index_type num_entries, IndexPtr diag_offsets_ptr,
-      ValuePtr vals_ptr, const index_type num_diagonals,
-      const index_type alignment = 32,
+      const size_type num_rows, const size_type num_cols,
+      const size_type num_entries, IndexPtr diag_offsets_ptr, ValuePtr vals_ptr,
+      const size_type num_diagonals, const size_type alignment = 32,
       typename std::enable_if<
           (std::is_pointer<ValuePtr>::value &&
            is_same_value_type<value_type, ValuePtr>::value &&
@@ -251,7 +251,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
            memory_traits::is_unmanaged)>::type * = nullptr)
       : base(num_rows, num_cols, num_entries),
         _diagonal_offsets(num_diagonals, diag_offsets_ptr),
-        _values(Impl::get_pad_size<index_type>(num_rows, alignment),
+        _values(Impl::get_pad_size<size_type>(num_rows, alignment),
                 num_diagonals, vals_ptr) {}
 
   /**
@@ -385,10 +385,9 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
    * @param num_diagonals Number of occupied diagonals in resized matrix.
    * @param alignment Amount of padding used to align the data (default=32)
    */
-  inline void resize(const index_type num_rows, const index_type num_cols,
-                     const index_type num_entries,
-                     const index_type num_diagonals,
-                     const index_type alignment = 32) {
+  inline void resize(const size_type num_rows, const size_type num_cols,
+                     const size_type num_entries, const size_type num_diagonals,
+                     const size_type alignment = 32) {
     base::resize(num_rows, num_cols, num_entries);
     _ndiags    = num_diagonals;
     _alignment = alignment;
@@ -399,7 +398,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
     }
 
     _diagonal_offsets.resize(num_diagonals);
-    _values.resize(Impl::get_pad_size<index_type>(num_rows, alignment),
+    _values.resize(Impl::get_pad_size<size_type>(num_rows, alignment),
                    num_diagonals);
   }
 
@@ -453,7 +452,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
    * @return Diagonal offset at index \p n
    */
   MORPHEUS_FORCEINLINE_FUNCTION index_array_reference
-  diagonal_offsets(index_type n) {
+  diagonal_offsets(size_type n) {
     return _diagonal_offsets(n);
   }
 
@@ -464,8 +463,8 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
    * @param j Column index of the value to extract
    * @return Value of the element at index \p n
    */
-  MORPHEUS_FORCEINLINE_FUNCTION value_array_reference values(index_type i,
-                                                             index_type j) {
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_reference values(size_type i,
+                                                             size_type j) {
     return _values(i, j);
   }
 
@@ -477,7 +476,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
    * @return Diagonal offset at index \p n
    */
   MORPHEUS_FORCEINLINE_FUNCTION const_index_array_reference
-  cdiagonal_offsets(index_type n) const {
+  cdiagonal_offsets(size_type n) const {
     return _diagonal_offsets(n);
   }
 
@@ -490,7 +489,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
    * @return Value of the element at index \p n
    */
   MORPHEUS_FORCEINLINE_FUNCTION const_value_array_reference
-  cvalues(index_type i, index_type j) const {
+  cvalues(size_type i, size_type j) const {
     return _values(i, j);
   }
 
@@ -532,16 +531,16 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
   /**
    * @brief Returns the number of occupied diagonals of the matrix.
    *
-   * @return index_type Number of occupied diagonals
+   * @return size_type Number of occupied diagonals
    */
-  MORPHEUS_FORCEINLINE_FUNCTION index_type ndiags() const { return _ndiags; }
+  MORPHEUS_FORCEINLINE_FUNCTION size_type ndiags() const { return _ndiags; }
 
   /**
    * @brief Returns the amount of padding used to align the data.
    *
-   * @return index_type Amount of padding used to align the data
+   * @return size_type Amount of padding used to align the data
    */
-  MORPHEUS_FORCEINLINE_FUNCTION index_type alignment() const {
+  MORPHEUS_FORCEINLINE_FUNCTION size_type alignment() const {
     return _alignment;
   }
 
@@ -550,8 +549,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
    *
    * @param num_diagonals number of new diagonals
    */
-  MORPHEUS_FORCEINLINE_FUNCTION void set_ndiags(
-      const index_type num_diagonals) {
+  MORPHEUS_FORCEINLINE_FUNCTION void set_ndiags(const size_type num_diagonals) {
     _ndiags = num_diagonals;
   }
 
@@ -560,12 +558,12 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
    *
    * @param alignment New amount of padding.
    */
-  MORPHEUS_FORCEINLINE_FUNCTION void set_alignment(const index_type alignment) {
+  MORPHEUS_FORCEINLINE_FUNCTION void set_alignment(const size_type alignment) {
     _alignment = alignment;
   }
 
  private:
-  index_type _ndiags, _alignment;
+  size_type _ndiags, _alignment;
   index_array_type _diagonal_offsets;
   value_array_type _values;
   static constexpr formats_e _id = Morpheus::DIA_FORMAT;

@@ -53,7 +53,7 @@ class CompatibleDiaMatrixDynamicTest : public ::testing::Test {
   using dynamic_device = typename dynamic::type;  // DynamicMatrix
   using dynamic_host   = typename dynamic::type::HostMirror;
 
-  using IndexType = typename device::index_type;
+  using SizeType = typename device::size_type;
 
   CompatibleDiaMatrixDynamicTest()
       : nrows(3),
@@ -71,7 +71,7 @@ class CompatibleDiaMatrixDynamicTest : public ::testing::Test {
     Morpheus::copy(Ahref, Aref);
   }
 
-  IndexType nrows, ncols, nnnz, ndiag, nalign;
+  SizeType nrows, ncols, nnnz, ndiag, nalign;
   device Aref;
   host Ahref;
 };
@@ -98,7 +98,7 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
   using HostMatrix        = typename TestFixture::host;
   using DynamicMatrix     = typename TestFixture::dynamic_device;
   using DynamicHostMatrix = typename TestFixture::dynamic_host;
-  using index_type        = typename Matrix::index_type;
+  using size_type         = typename Matrix::size_type;
   using value_type        = typename Matrix::value_type;
 
   // Build matrix from the reference DiaMatrix
@@ -120,11 +120,11 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
   Bh.values(1, 2)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  for (index_type n = 0; n < Bh.ndiags(); n++) {
+  for (size_type n = 0; n < Bh.ndiags(); n++) {
     EXPECT_EQ(Bh.diagonal_offsets(n), Ch.diagonal_offsets(n));
   }
-  for (index_type i = 0; i < Bh.values().nrows(); i++) {
-    for (index_type j = 0; j < Bh.values().ncols(); j++) {
+  for (size_type i = 0; i < Bh.values().nrows(); i++) {
+    for (size_type j = 0; j < Bh.values().ncols(); j++) {
       EXPECT_EQ(Bh.values(i, j), Ch.values(i, j));
     }
   }
@@ -139,11 +139,11 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
   // Send other vector back to host for check
   HostMatrix Ct(this->nrows, this->ncols, this->nnnz, this->ndiag);
   Morpheus::copy(C, Ct);
-  for (index_type n = 0; n < Bh.ndiags(); n++) {
+  for (size_type n = 0; n < Bh.ndiags(); n++) {
     EXPECT_EQ(Bh.diagonal_offsets(n), Ct.diagonal_offsets(n));
   }
-  for (index_type i = 0; i < Bh.values().nrows(); i++) {
-    for (index_type j = 0; j < Bh.values().ncols(); j++) {
+  for (size_type i = 0; i < Bh.values().nrows(); i++) {
+    for (size_type j = 0; j < Bh.values().ncols(); j++) {
       EXPECT_EQ(Bh.values(i, j), Ct.values(i, j));
     }
   }
@@ -186,7 +186,7 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
   using HostMatrix        = typename TestFixture::host;
   using DynamicMatrix     = typename TestFixture::dynamic_device;
   using DynamicHostMatrix = typename TestFixture::dynamic_host;
-  using index_type        = typename Matrix::index_type;
+  using size_type         = typename Matrix::size_type;
   using value_type        = typename Matrix::value_type;
 
   // Build matrix from the reference DiaMatrix
@@ -208,11 +208,11 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
   Bh.values(1, 2)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  for (index_type n = 0; n < Bh.ndiags(); n++) {
+  for (size_type n = 0; n < Bh.ndiags(); n++) {
     EXPECT_EQ(Bh.diagonal_offsets(n), Ch.diagonal_offsets(n));
   }
-  for (index_type i = 0; i < Bh.values().nrows(); i++) {
-    for (index_type j = 0; j < Bh.values().ncols(); j++) {
+  for (size_type i = 0; i < Bh.values().nrows(); i++) {
+    for (size_type j = 0; j < Bh.values().ncols(); j++) {
       EXPECT_EQ(Bh.values(i, j), Ch.values(i, j));
     }
   }
@@ -227,11 +227,11 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
   // Send other vector back to host for check
   HostMatrix Ct(this->nrows, this->ncols, this->nnnz, this->ndiag);
   Morpheus::copy(C, Ct);
-  for (index_type n = 0; n < Bh.ndiags(); n++) {
+  for (size_type n = 0; n < Bh.ndiags(); n++) {
     EXPECT_EQ(Bh.diagonal_offsets(n), Ct.diagonal_offsets(n));
   }
-  for (index_type i = 0; i < Bh.values().nrows(); i++) {
-    for (index_type j = 0; j < Bh.values().ncols(); j++) {
+  for (size_type i = 0; i < Bh.values().nrows(); i++) {
+    for (size_type j = 0; j < Bh.values().ncols(); j++) {
       EXPECT_EQ(Bh.values(i, j), Ct.values(i, j));
     }
   }

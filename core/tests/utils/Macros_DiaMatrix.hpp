@@ -87,16 +87,18 @@
  * data.
  *
  */
-#define VALIDATE_DIA_CONTAINER(A, Aref, type)                     \
-  {                                                               \
-    for (type n = 0; n < A.ndiags(); n++) {                       \
-      EXPECT_EQ(A.diagonal_offsets(n), Aref.diagonal_offsets(n)); \
-    }                                                             \
-    for (type i = 0; i < A.values().nrows(); i++) {               \
-      for (type j = 0; j < A.values().ncols(); j++) {             \
-        EXPECT_EQ(A.values(i, j), Aref.values(i, j));             \
-      }                                                           \
-    }                                                             \
+#define VALIDATE_DIA_CONTAINER(A, Aref)                              \
+  {                                                                  \
+    using container_type      = decltype(A);                         \
+    using container_size_type = typename container_type::size_type;  \
+    for (container_size_type n = 0; n < A.ndiags(); n++) {           \
+      EXPECT_EQ(A.diagonal_offsets(n), Aref.diagonal_offsets(n));    \
+    }                                                                \
+    for (container_size_type i = 0; i < A.values().nrows(); i++) {   \
+      for (container_size_type j = 0; j < A.values().ncols(); j++) { \
+        EXPECT_EQ(A.values(i, j), Aref.values(i, j));                \
+      }                                                              \
+    }                                                                \
   }
 
 namespace Morpheus {
@@ -215,14 +217,14 @@ bool is_empty_container(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
   using value_type = typename Container::value_type;
-  using index_type = typename Container::index_type;
+  using size_type  = typename Container::size_type;
 
   typename Container::HostMirror ch;
   ch.resize(c);
   Morpheus::copy(c, ch);
 
-  for (index_type i = 0; i < c.values().nrows(); i++) {
-    for (index_type j = 0; j < c.values().ncols(); j++) {
+  for (size_type i = 0; i < c.values().nrows(); i++) {
+    for (size_type j = 0; j < c.values().ncols(); j++) {
       if (ch.values(i, j) != (value_type)0.0) {
         return false;
       }
@@ -246,7 +248,7 @@ bool have_same_data(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Container1> &&
         Morpheus::is_dia_matrix_format_container_v<Container2>>* = nullptr) {
-  using index_type = typename Container1::index_type;
+  using size_type = typename Container1::size_type;
 
   if (!is_same_size(c1, c2)) return false;
 
@@ -258,12 +260,12 @@ bool have_same_data(
   c2_h.resize(c2);
   Morpheus::copy(c2, c2_h);
 
-  for (index_type i = 0; i < c1_h.ndiags(); i++) {
+  for (size_type i = 0; i < c1_h.ndiags(); i++) {
     if (c1_h.diagonal_offsets(i) != c2_h.diagonal_offsets(i)) return false;
   }
 
-  for (index_type i = 0; i < c1_h.values().nrows(); i++) {
-    for (index_type j = 0; j < c1_h.values().ncols(); j++) {
+  for (size_type i = 0; i < c1_h.values().nrows(); i++) {
+    for (size_type j = 0; j < c1_h.values().ncols(); j++) {
       if (c1_h.values(i, j) != c2_h.values(i, j)) {
         return false;
       }

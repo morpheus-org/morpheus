@@ -35,6 +35,8 @@
 
 #include <impl/DenseVector/Morpheus_Copy_Impl.hpp>
 
+#include <limits>
+
 namespace Morpheus {
 namespace Impl {
 
@@ -46,10 +48,12 @@ typename Vector::value_type find_max_element(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
-  using index_type = typename Vector::index_type;
-  index_type max   = 0;
+  using value_type = typename Vector::value_type;
+  using size_type  = typename Vector::size_type;
 
-  for (size_t i = 0; i < vec.size(); i++) {
+  value_type max = std::numeric_limits<value_type>::min();
+
+  for (size_type i = 0; i < vec.size(); i++) {
     if (vec[i] > max) max = vec[i];
   }
 
@@ -66,6 +70,8 @@ void counting_sort_by_key(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
+  using size_type1 = typename Vector1::size_type;
+  using size_type2 = typename Vector2::size_type;
   if (min < 0)
     throw Morpheus::InvalidInputException(
         "counting_sort_by_key min element less than 0");
@@ -81,21 +87,22 @@ void counting_sort_by_key(
   if (min > 0) min = 0;
 
   // compute the number of bins
-  size_t size = max - min;
+  size_type1 size = max - min;
 
   // allocate temporary arrays
-  Vector1 counts(size + 2, 0), temp_keys(keys.size()), temp_vals(vals.size());
+  Vector1 counts(size + 2, 0), temp_keys(keys.size());
+  Vector2 temp_vals(vals.size());
   Impl::copy(keys, temp_keys);
   Impl::copy(vals, temp_vals);
 
   // count the number of occurences of each key
-  for (size_t i = 0; i < keys.size(); i++) counts[keys[i] + 1]++;
+  for (size_type1 i = 0; i < keys.size(); i++) counts[keys[i] + 1]++;
 
   // scan the sum of each bin
-  for (size_t i = 0; i < size; i++) counts[i + 1] += counts[i];
+  for (size_type1 i = 0; i < size; i++) counts[i + 1] += counts[i];
 
   // generate output in sorted order
-  for (size_t i = 0; i < keys.size(); i++) {
+  for (size_type2 i = 0; i < keys.size(); i++) {
     keys[counts[temp_keys[i]]]   = temp_keys[i];
     vals[counts[temp_keys[i]]++] = temp_vals[i];
   }
@@ -113,13 +120,14 @@ void sort_by_row_and_column(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
   using index_type  = typename Matrix::index_type;
+  using size_type   = typename Matrix::size_type;
   using index_array = typename Matrix::index_array_type;
   using value_array = typename Matrix::value_array_type;
 
-  index_type N = mat.row_indices().size();
+  size_type N = mat.row_indices().size();
 
   index_array permutation(N);
-  for (index_type i = 0; i < N; i++) permutation[i] = i;
+  for (size_type i = 0; i < N; i++) permutation[i] = i;
 
   index_type minr = min_row;
   index_type maxr = max_row;
@@ -164,12 +172,14 @@ bool is_sorted(Matrix& mat,
                    Morpheus::has_custom_backend_v<ExecSpace> &&
                    Morpheus::has_serial_execution_space_v<ExecSpace> &&
                    Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
+  using size_type = typename Matrix::size_type;
+
   if (mat.row_indices().size() != mat.column_indices().size()) {
     throw Morpheus::RuntimeException(
         "Sizes of row and column indeces do not match.");
   }
 
-  for (size_t i = 0; i < (size_t)mat.nnnz() - 1; i++) {
+  for (size_type i = 0; i < mat.nnnz() - 1; i++) {
     if ((mat.row_indices(i) > mat.row_indices(i + 1)) ||
         (mat.row_indices(i) == mat.row_indices(i + 1) &&
          mat.column_indices(i) > mat.column_indices(i + 1)))

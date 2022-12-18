@@ -40,11 +40,12 @@
 namespace Morpheus {
 namespace Impl {
 
-template <typename ExecSpace, typename Vector1, typename Vector2,
-          typename Vector3>
+template <typename ExecSpace, typename SizeType, typename Vector1,
+          typename Vector2, typename Vector3>
 inline void waxpby(
-    const size_t n, const typename Vector1::value_type alpha, const Vector1& x,
-    const typename Vector2::value_type beta, const Vector2& y, Vector3& w,
+    const SizeType n, const typename Vector1::value_type alpha,
+    const Vector1& x, const typename Vector2::value_type beta, const Vector2& y,
+    Vector3& w,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
@@ -57,12 +58,12 @@ inline void waxpby(
   assert(y.size() >= n);
   assert(w.size() >= n);
 
-  const size_t BLOCK_SIZE = 256;
-  const size_t NUM_BLOCKS = Impl::ceil_div(n, BLOCK_SIZE);
+  const SizeType BLOCK_SIZE = 256;
+  const SizeType NUM_BLOCKS = Impl::ceil_div(n, BLOCK_SIZE);
 
-  Kernels::waxpby_kernel<typename Vector1::value_type,
+  Kernels::waxpby_kernel<SizeType, typename Vector1::value_type,
                          typename Vector2::value_type,
-                         typename Vector3::value_type, size_t>
+                         typename Vector3::value_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(n, alpha, x.data(), beta, y.data(),
                                       w.data());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)

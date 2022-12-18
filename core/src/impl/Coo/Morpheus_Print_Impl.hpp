@@ -38,10 +38,10 @@ void print(const Printable& p, Stream& s,
            typename std::enable_if<
                Morpheus::is_coo_matrix_format_container_v<Printable>>::type* =
                nullptr) {
-  using index_type = typename Printable::index_type;
+  using size_type = typename Printable::size_type;
   print_matrix_header(p, s);
 
-  for (index_type n = 0; n < p.nnnz(); n++) {
+  for (size_type n = 0; n < p.nnnz(); n++) {
     s << " " << std::setw(14) << p.crow_indices(n);
     s << " " << std::setw(14) << p.ccolumn_indices(n);
     s << " " << std::setprecision(12) << std::setw(12) << "(" << p.cvalues(n)

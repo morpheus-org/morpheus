@@ -45,14 +45,14 @@ void convert(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using index_type = typename SourceType::index_type;
+  using size_type = typename SourceType::size_type;
 
   MORPHEUS_ASSERT((dst.nrows() >= src.nrows()) && (dst.ncols() >= src.ncols()),
                   "Destination matrix must have equal or larger shape to the "
                   "source matrix");
 
-  for (index_type i = 0; i < src.nrows(); i++) {
-    for (index_type j = 0; j < src.ncols(); j++) {
+  for (size_type i = 0; i < src.nrows(); i++) {
+    for (size_type j = 0; j < src.ncols(); j++) {
       dst(i, j) = src(i, j);
     }
   }
@@ -68,14 +68,14 @@ void convert(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using index_type = typename SourceType::index_type;
+  using size_type = typename SourceType::size_type;
 
   dst.resize(src.nrows() * src.ncols());
 
-  for (index_type i = 0; i < src.nrows(); i++) {
-    for (index_type j = 0; j < src.ncols(); j++) {
-      index_type idx = i * src.ncols() + j;
-      dst(idx)       = src(i, j);
+  for (size_type i = 0; i < src.nrows(); i++) {
+    for (size_type j = 0; j < src.ncols(); j++) {
+      size_type idx = i * src.ncols() + j;
+      dst(idx)      = src(i, j);
     }
   }
 }
@@ -90,21 +90,21 @@ void convert(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using index_type = typename SourceType::index_type;
+  using size_type  = typename SourceType::size_type;
   using value_type = typename SourceType::value_type;
 
   // Count non-zeros
-  index_type nnz = 0;
-  for (index_type i = 0; i < src.nrows(); i++) {
-    for (index_type j = 0; j < src.ncols(); j++) {
+  size_type nnz = 0;
+  for (size_type i = 0; i < src.nrows(); i++) {
+    for (size_type j = 0; j < src.ncols(); j++) {
       if (src(i, j) != value_type(0)) nnz = nnz + 1;
     }
   }
 
   dst.resize(src.nrows(), src.ncols(), nnz);
 
-  for (index_type i = 0, n = 0; i < src.nrows(); i++) {
-    for (index_type j = 0; j < src.ncols(); j++) {
+  for (size_type i = 0, n = 0; i < src.nrows(); i++) {
+    for (size_type j = 0; j < src.ncols(); j++) {
       if (src(i, j) != value_type(0)) {
         dst.row_indices(n)    = i;
         dst.column_indices(n) = j;
@@ -125,14 +125,14 @@ void convert(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using index_type = typename SourceType::index_type;
+  using size_type = typename SourceType::size_type;
 
   dst.resize(src.nrows(), src.ncols());
 
-  for (index_type n = 0; n < src.nnnz(); n++) {
-    index_type i = src.crow_indices(n);
-    index_type j = src.ccolumn_indices(n);
-    dst(i, j)    = src.cvalues(n);
+  for (size_type n = 0; n < src.nnnz(); n++) {
+    size_type i = src.crow_indices(n);
+    size_type j = src.ccolumn_indices(n);
+    dst(i, j)   = src.cvalues(n);
   }
 }
 

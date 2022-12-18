@@ -47,19 +47,20 @@ namespace Impl {
 
 template <typename ExecSpace, typename Vector1, typename Vector2>
 typename Vector2::value_type dot(
-    const typename Vector1::index_type n, const Vector1& x, const Vector2& y,
+    const typename Vector1::size_type n, const Vector1& x, const Vector2& y,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_hip_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
-  using index_type = typename Vector1::index_type;
+  using size_type  = typename Vector1::size_type;
   using value_type = typename Vector1::non_const_value_type;
 
   value_type local_result;
 
 #ifdef MORPHEUS_ENABLE_TPL_HIPBLAS
+  using index_type = typename Vector1::index_type;
   hipblasdotspace.init();
   hipblasdotspace.allocate<value_type>(1);
   index_type incx = 1, incy = 1;
@@ -71,7 +72,7 @@ typename Vector2::value_type dot(
 #else
   hipdotspace.allocate<value_type>(n);
 
-  Kernels::dot_kernel_part1<256, value_type, index_type>
+  Kernels::dot_kernel_part1<256, value_type, size_type>
       <<<256, 256>>>(n, x.data(), y.data(), hipdotspace.data<value_type>());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
   getLastHIPError("dot: Kernel execution failed");

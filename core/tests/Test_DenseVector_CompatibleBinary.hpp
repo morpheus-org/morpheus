@@ -67,6 +67,7 @@ TYPED_TEST(CompatibleDenseVectorBinaryTest, ShallowCopyConstructor) {
   using HostVector1 = typename TestFixture::host1;
   using Vector2     = typename TestFixture::device2;
   using HostVector2 = typename TestFixture::host2;
+  using size_type   = typename Vector1::size_type;
   using value_type  = typename Vector1::value_type;
 
   auto size = 10;
@@ -82,7 +83,7 @@ TYPED_TEST(CompatibleDenseVectorBinaryTest, ShallowCopyConstructor) {
   xh[4] = (value_type)-4.33;
   xh[9] = (value_type)-9.44;
 
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], yh[i]);
   }
 
@@ -94,7 +95,7 @@ TYPED_TEST(CompatibleDenseVectorBinaryTest, ShallowCopyConstructor) {
   // Send other vector back to host for check
   HostVector2 yt(y.size(), 0);
   Morpheus::copy(y, yt);
-  for (size_t i = 0; i < y.size(); i++) {
+  for (size_type i = 0; i < y.size(); i++) {
     EXPECT_EQ(yt[i], xh[i]);
   }
 }
@@ -110,6 +111,7 @@ TYPED_TEST(CompatibleDenseVectorBinaryTest, ShallowCopyAssignment) {
   using HostVector1 = typename TestFixture::host1;
   using Vector2     = typename TestFixture::device2;
   using HostVector2 = typename TestFixture::host2;
+  using size_type   = typename Vector1::size_type;
   using value_type  = typename Vector1::value_type;
 
   auto size = 10;
@@ -125,7 +127,7 @@ TYPED_TEST(CompatibleDenseVectorBinaryTest, ShallowCopyAssignment) {
   xh[4] = (value_type)-4.33;
   xh[9] = (value_type)-9.44;
 
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(xh[i], yh[i]);
   }
 
@@ -137,7 +139,7 @@ TYPED_TEST(CompatibleDenseVectorBinaryTest, ShallowCopyAssignment) {
   // Send other vector back to host for check
   HostVector2 yt(y.size(), 0);
   Morpheus::copy(y, yt);
-  for (size_t i = 0; i < y.size(); i++) {
+  for (size_type i = 0; i < y.size(); i++) {
     EXPECT_EQ(yt[i], xh[i]);
   }
 }

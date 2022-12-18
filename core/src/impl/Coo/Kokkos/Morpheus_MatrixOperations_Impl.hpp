@@ -42,12 +42,12 @@ void update_diagonal(
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
-  using index_type      = typename Matrix::index_type;
+  using size_type       = typename Matrix::size_type;
   using value_array     = typename Matrix::value_array_type::value_array_type;
   using index_array     = typename Matrix::index_array_type::value_array_type;
 
   using range_policy =
-      Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
+      Kokkos::RangePolicy<Kokkos::IndexType<size_type>, execution_space>;
 
   value_array values              = A.values().view();
   index_array column_indices      = A.column_indices().view();
@@ -57,7 +57,7 @@ void update_diagonal(
   range_policy policy(0, A.nnnz());
 
   Kokkos::parallel_for(
-      policy, KOKKOS_LAMBDA(const index_type i) {
+      policy, KOKKOS_LAMBDA(const size_type i) {
         if (row_indices[i] == column_indices[i])
           values[i] = diagonal_view[column_indices[i]];
       });
@@ -74,9 +74,9 @@ void get_diagonal(
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
 }
 
-template <typename ExecSpace, typename Matrix, typename IndexType,
+template <typename ExecSpace, typename Matrix, typename SizeType,
           typename ValueType>
-void set_value(Matrix&, IndexType, IndexType, ValueType,
+void set_value(Matrix&, SizeType, SizeType, ValueType,
                typename std::enable_if_t<
                    Morpheus::is_coo_matrix_format_container_v<Matrix> &&
                    Morpheus::has_generic_backend_v<ExecSpace> &&

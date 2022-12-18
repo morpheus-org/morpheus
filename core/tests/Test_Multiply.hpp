@@ -80,6 +80,7 @@ class MultiplyTypesTest : public ::testing::Test {
   using vec2_dev_t        = typename vec2_container_t::type;
   using vec2_host_t       = typename vec2_container_t::type::HostMirror;
   using ValueType         = typename mat_dev_t::value_type;
+  using SizeType          = typename mat_dev_t::size_type;
   using IndexType         = typename mat_dev_t::index_type;
   using ArrayLayout       = typename mat_dev_t::array_layout;
   using Backend           = typename mat_dev_t::backend;
@@ -96,7 +97,8 @@ class MultiplyTypesTest : public ::testing::Test {
     vec2_dev_t y;
     ContainersClass() : A(), x(), y() {}
 
-    ContainersClass(size_t nrows, size_t ncols, std::vector<int>& diag_indexes)
+    ContainersClass(SizeType nrows, SizeType ncols,
+                    std::vector<int>& diag_indexes)
         : A(), x(ncols, 0), y(nrows, 0) {
       // Generate the diagonal matrix
       diag_generator generator(nrows, ncols, diag_indexes);
@@ -124,8 +126,8 @@ class MultiplyTypesTest : public ::testing::Test {
       auto yh = Morpheus::create_mirror_container(y);
       yh.assign(yh.size(), 0);
 
-      for (size_t i = 0; i < nrows; i++) {
-        for (size_t j = 0; j < ncols; j++) {
+      for (SizeType i = 0; i < nrows; i++) {
+        for (SizeType j = 0; j < ncols; j++) {
           yh(i) += Adense(i, j) * xh(j);
         }
       }
@@ -133,20 +135,20 @@ class MultiplyTypesTest : public ::testing::Test {
     }
   };
 
-  static const int samples = 3;
-  size_t nrows[samples]    = {10, 100, 1000};
-  size_t ncols[samples]    = {10, 100, 1000};
+  static const SizeType samples = 3;
+  SizeType nrows[samples]       = {10, 100, 1000};
+  SizeType ncols[samples]       = {10, 100, 1000};
 
   ContainersClass containers[samples];
 
   void SetUp() override {
-    for (size_t i = 0; i < samples; i++) {
+    for (SizeType i = 0; i < samples; i++) {
       int diag_freq = 5;
       int ndiags    = ((nrows[i] - 1) / diag_freq) * 2 + 1;
       std::vector<int> diags(ndiags, 0);
 
-      diags[0]          = 0;
-      size_t diag_count = 1;
+      diags[0]            = 0;
+      SizeType diag_count = 1;
       for (int nd = 1; nd < (int)nrows[i]; nd++) {
         if (nd % diag_freq == 0) {
           diags[diag_count]     = nd;
@@ -166,10 +168,10 @@ namespace Test {
 TYPED_TEST_SUITE(MultiplyTypesTest, MultiplyTypes);
 
 TYPED_TEST(MultiplyTypesTest, MultiplyCustomInit) {
-  using vec2_t     = typename TestFixture::vec2_dev_t;
-  using index_type = typename TestFixture::IndexType;
+  using vec2_t    = typename TestFixture::vec2_dev_t;
+  using size_type = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < this->samples; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
     // Set to 1 to check if it will be initialized to 0
@@ -182,10 +184,10 @@ TYPED_TEST(MultiplyTypesTest, MultiplyCustomInit) {
 }
 
 TYPED_TEST(MultiplyTypesTest, MultiplyGenericInit) {
-  using vec2_t     = typename TestFixture::vec2_dev_t;
-  using index_type = typename TestFixture::IndexType;
+  using vec2_t    = typename TestFixture::vec2_dev_t;
+  using size_type = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < this->samples; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
     // Set to 1 to check if it will be initialized to 0
@@ -198,10 +200,10 @@ TYPED_TEST(MultiplyTypesTest, MultiplyGenericInit) {
 }
 
 TYPED_TEST(MultiplyTypesTest, MultiplyCustom) {
-  using vec2_t     = typename TestFixture::vec2_dev_t;
-  using index_type = typename TestFixture::IndexType;
+  using vec2_t    = typename TestFixture::vec2_dev_t;
+  using size_type = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < this->samples; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
     vec2_t y(c.y.size(), 1);
@@ -214,7 +216,7 @@ TYPED_TEST(MultiplyTypesTest, MultiplyCustom) {
     Morpheus::copy(y, yh);
     auto cyh = Morpheus::create_mirror_container(c.y);
     Morpheus::copy(c.y, cyh);
-    for (size_t n = 0; n < cyh.size(); n++) {
+    for (size_type n = 0; n < cyh.size(); n++) {
       cyh(n) += 1;
     }
     EXPECT_TRUE(Morpheus::Test::have_approx_same_data(yh, cyh));
@@ -222,10 +224,10 @@ TYPED_TEST(MultiplyTypesTest, MultiplyCustom) {
 }
 
 TYPED_TEST(MultiplyTypesTest, MultiplyGeneric) {
-  using vec2_t     = typename TestFixture::vec2_dev_t;
-  using index_type = typename TestFixture::IndexType;
+  using vec2_t    = typename TestFixture::vec2_dev_t;
+  using size_type = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < this->samples; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
     vec2_t y(c.y.size(), 1);
@@ -238,7 +240,7 @@ TYPED_TEST(MultiplyTypesTest, MultiplyGeneric) {
     Morpheus::copy(y, yh);
     auto cyh = Morpheus::create_mirror_container(c.y);
     Morpheus::copy(c.y, cyh);
-    for (size_t n = 0; n < cyh.size(); n++) {
+    for (size_type n = 0; n < cyh.size(); n++) {
       cyh(n) += 1;
     }
     EXPECT_TRUE(Morpheus::Test::have_approx_same_data(yh, cyh));

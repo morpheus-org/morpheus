@@ -75,6 +75,13 @@ TYPED_TEST(ContainerTraitsUnaryTest, TestIndexType) {
   }
 }
 
+TYPED_TEST(ContainerTraitsUnaryTest, TestSizeType) {
+  using traits       = typename TestFixture::container_traits;
+  using default_size = size_t;
+
+  EXPECT_TRUE((std::is_same<typename traits::size_type, default_size>::value));
+}
+
 TYPED_TEST(ContainerTraitsUnaryTest, TestBackend) {
   using traits = typename TestFixture::container_traits;
   using unary  = typename TestFixture::type;

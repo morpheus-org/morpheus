@@ -100,21 +100,22 @@ __device__ __forceinline__ int warpReduceSum<int>(unsigned int mask,
 }
 #endif
 
-template <typename ValueType, unsigned int blockSize, bool nIsPow2>
+template <typename SizeType, typename ValueType, unsigned int blockSize,
+          bool nIsPow2>
 __global__ void reduce_kernel(const ValueType *__restrict__ g_idata,
-                              ValueType *__restrict__ g_odata, unsigned int n) {
+                              ValueType *__restrict__ g_odata, SizeType n) {
   ValueType *sdata = SharedMemory<ValueType>();
 
   // perform first level of reduction,
   // reading from global memory, writing to shared memory
-  unsigned int tid      = threadIdx.x;
-  unsigned int gridSize = blockSize * gridDim.x;
+  SizeType tid      = threadIdx.x;
+  SizeType gridSize = blockSize * gridDim.x;
   // unsigned int maskLength = (blockSize & 31);  // 31 = WARP_SIZE-1
   // maskLength              = (maskLength > 0) ? (32 - maskLength) :
   // maskLength;
-  unsigned int maskLength = (blockSize & (WARP_SIZE - 1));  // 31 = WARP_SIZE-1
+  SizeType maskLength = (blockSize & (WARP_SIZE - 1));  // 31 = WARP_SIZE-1
   maskLength = (maskLength > 0) ? (WARP_SIZE - maskLength) : maskLength;
-  const unsigned int mask = (BIT_MASK) >> maskLength;
+  const SizeType mask = (BIT_MASK) >> maskLength;
 
   ValueType mySum = 0;
 
@@ -122,8 +123,8 @@ __global__ void reduce_kernel(const ValueType *__restrict__ g_idata,
   // number of active thread blocks (via gridDim).  More blocks will result
   // in a larger gridSize and therefore fewer elements per thread
   if (nIsPow2) {
-    unsigned int i = blockIdx.x * blockSize * 2 + threadIdx.x;
-    gridSize       = gridSize << 1;
+    SizeType i = blockIdx.x * blockSize * 2 + threadIdx.x;
+    gridSize   = gridSize << 1;
 
     while (i < n) {
       mySum += g_idata[i];
@@ -135,7 +136,7 @@ __global__ void reduce_kernel(const ValueType *__restrict__ g_idata,
       i += gridSize;
     }
   } else {
-    unsigned int i = blockIdx.x * blockSize + threadIdx.x;
+    SizeType i = blockIdx.x * blockSize + threadIdx.x;
     while (i < n) {
       mySum += g_idata[i];
       i += gridSize;
@@ -153,9 +154,9 @@ __global__ void reduce_kernel(const ValueType *__restrict__ g_idata,
 
   __syncthreads();
 
-  const unsigned int shmem_extent =
+  const SizeType shmem_extent =
       (blockSize / WARP_SIZE) > 0 ? (blockSize / WARP_SIZE) : 1;
-  const unsigned int ballot_result = BALLOT(mask, tid < shmem_extent);
+  const SizeType ballot_result = BALLOT(mask, tid < shmem_extent);
   if (tid < shmem_extent) {
     mySum = sdata[tid];
     // Reduce final warp using shuffle or reduce_add if T==int & CUDA_ARCH ==

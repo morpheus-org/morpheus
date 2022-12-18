@@ -65,6 +65,7 @@ inline void multiply(
 template <typename Matrix, typename Vector>
 void __spmv_coo_serial(const Matrix& A, const Vector& x, Vector& y,
                        const bool init) {
+  using size_type     = typename Matrix::size_type;
   using index_type    = typename Matrix::index_type;
   using value_type    = typename Matrix::value_type;
   const index_type* I = A.crow_indices().data();
@@ -78,7 +79,7 @@ void __spmv_coo_serial(const Matrix& A, const Vector& x, Vector& y,
     y.assign(y.size(), 0);
   }
 
-  Kernels::spmv_coo_serial_kernel<index_type, value_type>
+  Kernels::spmv_coo_serial_kernel<size_type, index_type, value_type>
       <<<1, 1>>>(A.nnnz(), I, J, V, x_ptr, y_ptr);
 
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
@@ -103,6 +104,7 @@ void __spmv_coo_serial(const Matrix& A, const Vector& x, Vector& y,
 template <typename Matrix, typename Vector>
 void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
                      const bool init) {
+  using size_type  = typename Matrix::size_type;
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
@@ -113,41 +115,42 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
   if (A.nnnz() == 0) {
     // empty matrix
     return;
-  } else if (A.nnnz() < static_cast<index_type>(WARP_SIZE)) {
+  } else if (A.nnnz() < static_cast<size_type>(WARP_SIZE)) {
     // small matrix
-    Kernels::spmv_coo_serial_kernel<index_type, value_type><<<1, 1, 0>>>(
-        A.nnnz(), A.crow_indices().data(), A.ccolumn_indices().data(),
-        A.cvalues().data(), x.data(), y.data());
+    Kernels::spmv_coo_serial_kernel<size_type, index_type, value_type>
+        <<<1, 1, 0>>>(A.nnnz(), A.crow_indices().data(),
+                      A.ccolumn_indices().data(), A.cvalues().data(), x.data(),
+                      y.data());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
     getLastHIPError("spmv_coo_serial_kernel: Kernel execution failed");
 #endif
     return;
   }
 
-  const size_t BLOCK_SIZE = 256;
-  const size_t MAX_BLOCKS = max_active_blocks(
+  const size_type BLOCK_SIZE = 256;
+  const size_type MAX_BLOCKS = max_active_blocks(
       Kernels::spmv_coo_flat_kernel<index_type, value_type, BLOCK_SIZE>,
-      BLOCK_SIZE, (size_t)0);
-  const size_t WARPS_PER_BLOCK = BLOCK_SIZE / WARP_SIZE;
+      BLOCK_SIZE, 0);
+  const size_type WARPS_PER_BLOCK = BLOCK_SIZE / WARP_SIZE;
 
-  const size_t num_units  = A.nnnz() / WARP_SIZE;
-  const size_t num_warps  = std::min(num_units, WARPS_PER_BLOCK * MAX_BLOCKS);
-  const size_t num_blocks = DIVIDE_INTO(num_warps, WARPS_PER_BLOCK);
-  const size_t num_iters  = DIVIDE_INTO(num_units, num_warps);
+  const size_type num_units = A.nnnz() / WARP_SIZE;
+  const size_type num_warps = std::min(num_units, WARPS_PER_BLOCK * MAX_BLOCKS);
+  const size_type num_blocks = DIVIDE_INTO(num_warps, WARPS_PER_BLOCK);
+  const size_type num_iters  = DIVIDE_INTO(num_units, num_warps);
 
-  const index_type interval_size = WARP_SIZE * num_iters;
+  const size_type interval_size = WARP_SIZE * num_iters;
 
-  const index_type tail =
+  const size_type tail =
       num_units * WARP_SIZE;  // do the last few nonzeros separately (fewer
                               // than WARP_SIZE elements)
 
-  const unsigned int active_warps =
+  const size_type active_warps =
       (interval_size == 0) ? 0 : DIVIDE_INTO(tail, interval_size);
 
   typename Matrix::index_array_type temp_rows(active_warps, 0);
   typename Matrix::value_array_type temp_vals(active_warps, 0);
 
-  Kernels::spmv_coo_flat_kernel<index_type, value_type, BLOCK_SIZE>
+  Kernels::spmv_coo_flat_kernel<size_type, index_type, value_type, BLOCK_SIZE>
       <<<num_blocks, BLOCK_SIZE, 0>>>(
           tail, interval_size, A.crow_indices().data(),
           A.ccolumn_indices().data(), A.cvalues().data(), x.data(), y.data(),
@@ -156,14 +159,14 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
   getLastHIPError("spmv_coo_flat_kernel: Kernel execution failed");
 #endif
 
-  Kernels::spmv_coo_reduce_update_kernel<index_type, value_type, BLOCK_SIZE>
-      <<<1, BLOCK_SIZE, 0>>>(active_warps, temp_rows.data(), temp_vals.data(),
-                             y.data());
+  Kernels::spmv_coo_reduce_update_kernel<size_type, index_type, value_type,
+                                         BLOCK_SIZE><<<1, BLOCK_SIZE, 0>>>(
+      active_warps, temp_rows.data(), temp_vals.data(), y.data());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
   getLastHIPError("spmv_coo_reduce_kernel: Kernel execution failed");
 #endif
 
-  Kernels::spmv_coo_serial_kernel<index_type, value_type>
+  Kernels::spmv_coo_serial_kernel<size_type, index_type, value_type>
       <<<1, 1, 0>>>(A.nnnz() - tail, A.crow_indices().data() + tail,
                     A.ccolumn_indices().data() + tail,
                     A.cvalues().data() + tail, x.data(), y.data());

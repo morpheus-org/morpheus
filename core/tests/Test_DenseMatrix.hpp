@@ -83,7 +83,7 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultCopyAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using value_type = typename Matrix::value_type;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
   auto nrows = 10, ncols = 15;
   Matrix A(nrows, ncols, (value_type)5.22);
@@ -102,8 +102,8 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultCopyAssignment) {
   Ah(4, 5) = (value_type)-4.33;
   Ah(9, 5) = (value_type)-9.44;
 
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
+  for (size_type i = 0; i < Ah.nrows(); i++) {
+    for (size_type j = 0; j < Ah.ncols(); j++) {
       EXPECT_EQ(Ah(i, j), Bh(i, j));
     }
   }
@@ -118,8 +118,8 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultCopyAssignment) {
   // Send other Matrix back to host for check
   HostMatrix Bt(B.nrows(), B.ncols(), 0);
   Morpheus::copy(B, Bt);
-  for (index_type i = 0; i < Bh.nrows(); i++) {
-    for (index_type j = 0; j < Bh.ncols(); j++) {
+  for (size_type i = 0; i < Bh.nrows(); i++) {
+    for (size_type j = 0; j < Bh.ncols(); j++) {
       EXPECT_EQ(Bt(i, j), Bh(i, j));
     }
   }
@@ -135,7 +135,7 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultCopyConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using value_type = typename Matrix::value_type;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
   auto nrows = 10, ncols = 15;
   Matrix A(nrows, ncols, (value_type)5.22);
@@ -154,8 +154,8 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultCopyConstructor) {
   Ah(4, 5) = (value_type)-4.33;
   Ah(9, 5) = (value_type)-9.44;
 
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
+  for (size_type i = 0; i < Ah.nrows(); i++) {
+    for (size_type j = 0; j < Ah.ncols(); j++) {
       EXPECT_EQ(Ah(i, j), Bh(i, j));
     }
   }
@@ -170,8 +170,8 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultCopyConstructor) {
   // Send other Matrix back to host for check
   HostMatrix Bt(B.nrows(), B.ncols(), 0);
   Morpheus::copy(B, Bt);
-  for (index_type i = 0; i < Bh.nrows(); i++) {
-    for (index_type j = 0; j < Bh.ncols(); j++) {
+  for (size_type i = 0; i < Bh.nrows(); i++) {
+    for (size_type j = 0; j < Bh.ncols(); j++) {
       EXPECT_EQ(Bt(i, j), Bh(i, j));
     }
   }
@@ -187,7 +187,7 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultMoveAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using value_type = typename Matrix::value_type;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
   auto nrows = 10, ncols = 15;
   Matrix A(nrows, ncols, (value_type)5.22);
@@ -206,8 +206,8 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultMoveAssignment) {
   Ah(4, 5) = (value_type)-4.33;
   Ah(9, 5) = (value_type)-9.44;
 
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
+  for (size_type i = 0; i < Ah.nrows(); i++) {
+    for (size_type j = 0; j < Ah.ncols(); j++) {
       EXPECT_EQ(Ah(i, j), Bh(i, j));
     }
   }
@@ -222,8 +222,8 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultMoveAssignment) {
   // Send other Matrix back to host for check
   HostMatrix Bt(B.nrows(), B.ncols(), 0);
   Morpheus::copy(B, Bt);
-  for (index_type i = 0; i < Bh.nrows(); i++) {
-    for (index_type j = 0; j < Bh.ncols(); j++) {
+  for (size_type i = 0; i < Bh.nrows(); i++) {
+    for (size_type j = 0; j < Bh.ncols(); j++) {
       EXPECT_EQ(Bt(i, j), Bh(i, j));
     }
   }
@@ -239,7 +239,7 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultMoveConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using value_type = typename Matrix::value_type;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
   auto nrows = 10, ncols = 15;
   Matrix A(nrows, ncols, (value_type)5.22);
@@ -258,8 +258,8 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultMoveConstructor) {
   Ah(4, 5) = (value_type)-4.33;
   Ah(9, 5) = (value_type)-9.44;
 
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
+  for (size_type i = 0; i < Ah.nrows(); i++) {
+    for (size_type j = 0; j < Ah.ncols(); j++) {
       EXPECT_EQ(Ah(i, j), Bh(i, j));
     }
   }
@@ -274,8 +274,8 @@ TYPED_TEST(DenseMatrixUnaryTest, DefaultMoveConstructor) {
   // Send other Matrix back to host for check
   HostMatrix Bt(B.nrows(), B.ncols(), 0);
   Morpheus::copy(B, Bt);
-  for (index_type i = 0; i < Bh.nrows(); i++) {
-    for (index_type j = 0; j < Bh.ncols(); j++) {
+  for (size_type i = 0; i < Bh.nrows(); i++) {
+    for (size_type j = 0; j < Bh.ncols(); j++) {
       EXPECT_EQ(Bt(i, j), Bh(i, j));
     }
   }
@@ -290,9 +290,9 @@ TYPED_TEST(DenseMatrixUnaryTest, NormalConstructionDefaultVal) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using value_type = typename Matrix::value_type;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
-  index_type num_rows = 10, num_cols = 15;
+  size_type num_rows = 10, num_cols = 15;
   value_type val = (value_type)0;
 
   Matrix A(num_rows, num_cols);
@@ -307,8 +307,8 @@ TYPED_TEST(DenseMatrixUnaryTest, NormalConstructionDefaultVal) {
 
   Morpheus::copy(A, Ah);
 
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
+  for (size_type i = 0; i < Ah.nrows(); i++) {
+    for (size_type j = 0; j < Ah.ncols(); j++) {
       EXPECT_EQ(Ah.view()(i, j), val);
     }
   }
@@ -323,9 +323,9 @@ TYPED_TEST(DenseMatrixUnaryTest, NormalConstruction) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using value_type = typename Matrix::value_type;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
-  index_type num_rows = 10, num_cols = 15;
+  size_type num_rows = 10, num_cols = 15;
   value_type val = (value_type)15.22;
 
   Matrix A(num_rows, num_cols, val);
@@ -340,8 +340,8 @@ TYPED_TEST(DenseMatrixUnaryTest, NormalConstruction) {
 
   Morpheus::copy(A, Ah);
 
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
+  for (size_type i = 0; i < Ah.nrows(); i++) {
+    for (size_type j = 0; j < Ah.ncols(); j++) {
       EXPECT_EQ(Ah.view()(i, j), val);
     }
   }
@@ -357,9 +357,9 @@ TYPED_TEST(DenseMatrixUnaryTest, Assign) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
   using value_type = typename Matrix::value_type;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
-  index_type nrows = 1000, ncols = 1500;
+  size_type nrows = 1000, ncols = 1500;
 
   Matrix A(nrows, ncols, 0);
   HostMatrix Ah(nrows, ncols, 0);
@@ -381,14 +381,14 @@ TYPED_TEST(DenseMatrixUnaryTest, Assign) {
   EXPECT_EQ(Ah.nnnz(), nrows * ncols);
   Morpheus::copy(A, Ah);
 
-  for (index_type i = 0; i < 100; i++) {
-    for (index_type j = 0; j < 150; j++) {
+  for (size_type i = 0; i < 100; i++) {
+    for (size_type j = 0; j < 150; j++) {
       EXPECT_EQ(Ah(i, j), (value_type)20.33);
     }
   }
 
-  for (index_type i = 100; i < A.nrows(); i++) {
-    for (index_type j = 150; j < A.ncols(); j++) {
+  for (size_type i = 100; i < A.nrows(); i++) {
+    for (size_type j = 150; j < A.ncols(); j++) {
       EXPECT_EQ(Ah(i, j), (value_type)0);
     }
   }
@@ -396,20 +396,20 @@ TYPED_TEST(DenseMatrixUnaryTest, Assign) {
   A.assign(70, 80, (value_type)-30.11);
   Morpheus::copy(A, Ah);
 
-  for (index_type i = 0; i < 70; i++) {
-    for (index_type j = 0; j < 80; j++) {
+  for (size_type i = 0; i < 70; i++) {
+    for (size_type j = 0; j < 80; j++) {
       EXPECT_EQ(Ah(i, j), (value_type)-30.11);
     }
   }
 
-  for (index_type i = 70; i < 100; i++) {
-    for (index_type j = 80; j < 150; j++) {
+  for (size_type i = 70; i < 100; i++) {
+    for (size_type j = 80; j < 150; j++) {
       EXPECT_EQ(Ah(i, j), (value_type)20.33);
     }
   }
 
-  for (index_type i = 100; i < A.nrows(); i++) {
-    for (index_type j = 150; j < A.ncols(); j++) {
+  for (size_type i = 100; i < A.nrows(); i++) {
+    for (size_type j = 150; j < A.ncols(); j++) {
       EXPECT_EQ(Ah(i, j), (value_type)0);
     }
   }
@@ -418,9 +418,9 @@ TYPED_TEST(DenseMatrixUnaryTest, Assign) {
 TYPED_TEST(DenseMatrixUnaryTest, Resize) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
-  index_type nrows = 1000, ncols = 1500;
+  size_type nrows = 1000, ncols = 1500;
 
   Matrix A(nrows, ncols, 0);
   HostMatrix Ah(nrows, ncols, 0);
@@ -442,8 +442,8 @@ TYPED_TEST(DenseMatrixUnaryTest, Resize) {
   EXPECT_EQ(Ah.nnnz(), 100 * 150);
   Morpheus::copy(A, Ah);
 
-  for (index_type i = 0; i < A.nrows(); i++) {
-    for (index_type j = 0; j < A.ncols(); j++) {
+  for (size_type i = 0; i < A.nrows(); i++) {
+    for (size_type j = 0; j < A.ncols(); j++) {
       EXPECT_EQ(Ah(i, j), 0);
     }
   }
@@ -458,8 +458,8 @@ TYPED_TEST(DenseMatrixUnaryTest, Resize) {
   EXPECT_EQ(Ah.nnnz(), 70 * 80);
   Morpheus::copy(A, Ah);
 
-  for (index_type i = 0; i < A.nrows(); i++) {
-    for (index_type j = 0; j < A.ncols(); j++) {
+  for (size_type i = 0; i < A.nrows(); i++) {
+    for (size_type j = 0; j < A.ncols(); j++) {
       EXPECT_EQ(Ah(i, j), 0);
     }
   }
@@ -476,8 +476,8 @@ TYPED_TEST(DenseMatrixUnaryTest, Resize) {
 
   Morpheus::copy(A, Ah);
 
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
+  for (size_type i = 0; i < Ah.nrows(); i++) {
+    for (size_type j = 0; j < Ah.ncols(); j++) {
       EXPECT_EQ(Ah(i, j), 0);
     }
   }

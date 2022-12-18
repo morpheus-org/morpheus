@@ -35,9 +35,9 @@ class TestContainer
       Morpheus::ContainerTraits<TestContainer, ValueType, Properties...>;
   using type = typename traits::type;
   using base = Morpheus::MatrixBase<TestContainer, ValueType, Properties...>;
-  using index_type = typename traits::index_type;
+  using size_type = typename traits::size_type;
 
-  TestContainer(index_type n, index_type m, index_type nnz) : base(n, m, nnz) {}
+  TestContainer(size_type n, size_type m, size_type nnz) : base(n, m, nnz) {}
 };
 
 using MatrixBaseTypes =
@@ -106,10 +106,10 @@ TYPED_TEST(MatrixBaseTest, DefaultConstruct) {
  *
  */
 TYPED_TEST(MatrixBaseTest, ConstructFromShape) {
-  using Base       = typename TestFixture::base;
-  using index_type = typename Base::index_type;
+  using Base      = typename TestFixture::base;
+  using size_type = typename Base::size_type;
 
-  index_type nrows = 3, ncols = 5, nnnz = 4;
+  size_type nrows = 3, ncols = 5, nnnz = 4;
   {
     Morpheus::MatrixStructure str = Morpheus::MATSTR_NONE;
     Morpheus::MatrixOptions opt   = Morpheus::MATOPT_NONE;
@@ -145,10 +145,10 @@ TYPED_TEST(MatrixBaseTest, ConstructFromShape) {
  *
  */
 TYPED_TEST(MatrixBaseTest, ResizeFromShape) {
-  using Base       = typename TestFixture::base;
-  using index_type = typename Base::index_type;
+  using Base      = typename TestFixture::base;
+  using size_type = typename Base::size_type;
 
-  index_type nrows = 3, ncols = 5, nnnz = 4;
+  size_type nrows = 3, ncols = 5, nnnz = 4;
 
   Base M;
 
@@ -164,10 +164,10 @@ TYPED_TEST(MatrixBaseTest, ResizeFromShape) {
  *
  */
 TYPED_TEST(MatrixBaseTest, CheckSetters) {
-  using Base       = typename TestFixture::base;
-  using index_type = typename Base::index_type;
+  using Base      = typename TestFixture::base;
+  using size_type = typename Base::size_type;
 
-  index_type nrows = 3, ncols = 5, nnnz = 4;
+  size_type nrows = 3, ncols = 5, nnnz = 4;
   Morpheus::MatrixStructure str = Morpheus::MATSTR_SYMMETRIC;
   Morpheus::MatrixOptions opt   = Morpheus::MATOPT_SHORT_ROWS;
 

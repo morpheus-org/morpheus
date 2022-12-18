@@ -68,9 +68,9 @@ TYPED_TEST(CompatibleDenseMatrixBinaryTest, ShallowCopyConstructor) {
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
   using value_type  = typename Matrix1::value_type;
-  using index_type  = typename Matrix1::index_type;
+  using size_type   = typename Matrix1::size_type;
 
-  index_type N0 = 10, N1 = 15;
+  size_type N0 = 10, N1 = 15;
   Matrix1 A(N0, N1, (value_type)5.22);
   EXPECT_EQ(A.nrows(), N0);
   EXPECT_EQ(A.ncols(), N1);
@@ -87,8 +87,8 @@ TYPED_TEST(CompatibleDenseMatrixBinaryTest, ShallowCopyConstructor) {
   Ah(4, 5) = (value_type)-4.33;
   Ah(9, 5) = (value_type)-9.44;
 
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
+  for (size_type i = 0; i < Ah.nrows(); i++) {
+    for (size_type j = 0; j < Ah.ncols(); j++) {
       EXPECT_EQ(Ah(i, j), Bh(i, j));
     }
   }
@@ -103,8 +103,8 @@ TYPED_TEST(CompatibleDenseMatrixBinaryTest, ShallowCopyConstructor) {
   // Send other vector back to host for check
   HostMatrix2 Bt(B.nrows(), B.ncols(), 0);
   Morpheus::copy(B, Bt);
-  for (index_type i = 0; i < Bh.nrows(); i++) {
-    for (index_type j = 0; j < Bh.ncols(); j++) {
+  for (size_type i = 0; i < Bh.nrows(); i++) {
+    for (size_type j = 0; j < Bh.ncols(); j++) {
       EXPECT_EQ(Bt(i, j), Bh(i, j));
     }
   }
@@ -122,9 +122,9 @@ TYPED_TEST(CompatibleDenseMatrixBinaryTest, ShallowCopyAssignment) {
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
   using value_type  = typename Matrix1::value_type;
-  using index_type  = typename Matrix1::index_type;
+  using size_type   = typename Matrix1::size_type;
 
-  index_type N0 = 10, N1 = 15;
+  size_type N0 = 10, N1 = 15;
   Matrix1 A(N0, N1, (value_type)5.22);
   EXPECT_EQ(A.nrows(), N0);
   EXPECT_EQ(A.ncols(), N1);
@@ -141,8 +141,8 @@ TYPED_TEST(CompatibleDenseMatrixBinaryTest, ShallowCopyAssignment) {
   Ah(4, 5) = (value_type)-4.33;
   Ah(9, 5) = (value_type)-9.44;
 
-  for (index_type i = 0; i < Ah.nrows(); i++) {
-    for (index_type j = 0; j < Ah.ncols(); j++) {
+  for (size_type i = 0; i < Ah.nrows(); i++) {
+    for (size_type j = 0; j < Ah.ncols(); j++) {
       EXPECT_EQ(Ah(i, j), Bh(i, j));
     }
   }
@@ -157,8 +157,8 @@ TYPED_TEST(CompatibleDenseMatrixBinaryTest, ShallowCopyAssignment) {
   // Send other vector back to host for check
   HostMatrix2 Bt(B.nrows(), B.ncols(), 0);
   Morpheus::copy(B, Bt);
-  for (index_type i = 0; i < Bh.nrows(); i++) {
-    for (index_type j = 0; j < Bh.ncols(); j++) {
+  for (size_type i = 0; i < Bh.nrows(); i++) {
+    for (size_type j = 0; j < Bh.ncols(); j++) {
       EXPECT_EQ(Bt(i, j), Bh(i, j));
     }
   }

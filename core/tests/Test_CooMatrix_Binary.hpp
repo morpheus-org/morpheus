@@ -74,12 +74,12 @@ TYPED_TEST(CooMatrixBinaryTest, ResizeFromCooMatrix) {
   using Matrix1     = typename TestFixture::device1;
   using HostMatrix1 = typename TestFixture::host1;
   using Matrix2     = typename TestFixture::device2;
-  using index_type  = typename Matrix1::index_type;
+  using size_type   = typename Matrix1::size_type;
   using value_type  = typename Matrix1::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
-  index_type large_nrows = 500, large_ncols = 400, large_nnnz = 640;
-  index_type small_nrows = 2, small_ncols = 3, small_nnnz = 2;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type large_nrows = 500, large_ncols = 400, large_nnnz = 640;
+  size_type small_nrows = 2, small_ncols = 3, small_nnnz = 2;
 
   Matrix1 A(nrows, ncols, nnnz);
   CHECK_COO_SIZES(A, nrows, ncols, nnnz);
@@ -94,13 +94,13 @@ TYPED_TEST(CooMatrixBinaryTest, ResizeFromCooMatrix) {
   CHECK_COO_SIZES(Ah, large_nrows, large_ncols, large_nnnz);
 
   Morpheus::copy(A, Ah);
-  for (index_type n = 0; n < nnnz; n++) {
+  for (size_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(Ah.row_indices(n), this->Ahref.row_indices(n));
     EXPECT_EQ(Ah.column_indices(n), this->Ahref.column_indices(n));
     EXPECT_EQ(Ah.values(n), this->Ahref.values(n));
   }
 
-  for (index_type n = nnnz; n < Ah.nnnz(); n++) {
+  for (size_type n = nnnz; n < Ah.nnnz(); n++) {
     EXPECT_EQ(Ah.row_indices(n), 0);
     EXPECT_EQ(Ah.column_indices(n), 0);
     EXPECT_EQ(Ah.values(n), 0);
@@ -120,7 +120,7 @@ TYPED_TEST(CooMatrixBinaryTest, ResizeFromCooMatrix) {
   EXPECT_NE(Ah.column_indices(1), Ahref_test.column_indices(1));
   EXPECT_NE(Ah.values(0), Ahref_test.values(0));
 
-  for (index_type n = nnnz; n < Ah.nnnz(); n++) {
+  for (size_type n = nnnz; n < Ah.nnnz(); n++) {
     EXPECT_EQ(Ah.row_indices(n), 0);
     EXPECT_EQ(Ah.column_indices(n), 0);
     EXPECT_EQ(Ah.values(n), 0);
@@ -138,7 +138,7 @@ TYPED_TEST(CooMatrixBinaryTest, ResizeFromCooMatrix) {
   Ah.values(0)         = (value_type)1.11;
 
   Morpheus::copy(Ah, A);
-  for (index_type n = 0; n < Ah.nnnz(); n++) {
+  for (size_type n = 0; n < Ah.nnnz(); n++) {
     EXPECT_EQ(Ah.row_indices(n), Ahref_test.row_indices(n));
     EXPECT_EQ(Ah.column_indices(n), Ahref_test.column_indices(n));
     EXPECT_EQ(Ah.values(n), Ahref_test.values(n));
@@ -156,11 +156,11 @@ TYPED_TEST(CooMatrixBinaryTest, AllocateFromCooMatrix) {
   using HostMatrix1 = typename TestFixture::host1;
   using Matrix2     = typename TestFixture::device2;
   using HostMatrix2 = typename TestFixture::host2;
-  using index_type  = typename Matrix1::index_type;
+  using size_type   = typename Matrix1::size_type;
   using value_type1 = typename Matrix1::value_type;
   using value_type2 = typename Matrix2::value_type;
 
-  index_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = 3, ncols = 3, nnnz = 4;
 
   HostMatrix1 Ah(nrows, ncols, nnnz);
   CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
@@ -181,7 +181,7 @@ TYPED_TEST(CooMatrixBinaryTest, AllocateFromCooMatrix) {
   Ah.column_indices(1) = 1;
   Ah.values(3)         = (value_type1)-3.33;
 
-  for (index_type n = 0; n < nnnz; n++) {
+  for (size_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(Bh.row_indices(n), 0);
     EXPECT_EQ(Bh.column_indices(n), 0);
     EXPECT_EQ(Bh.values(n), 0);
@@ -199,7 +199,7 @@ TYPED_TEST(CooMatrixBinaryTest, AllocateFromCooMatrix) {
   CHECK_COO_CONTAINERS(A, B);
   Morpheus::copy(B, Bh);
 
-  for (index_type n = 0; n < nnnz; n++) {
+  for (size_type n = 0; n < nnnz; n++) {
     EXPECT_EQ(Bh.row_indices(n), 0);
     EXPECT_EQ(Bh.column_indices(n), 0);
     EXPECT_EQ(Bh.values(n), 0);

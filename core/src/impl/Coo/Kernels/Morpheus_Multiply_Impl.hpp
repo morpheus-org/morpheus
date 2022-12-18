@@ -41,11 +41,11 @@ __device__ void segreduce_block(const IndexType* idx, ValueType* val);
 // This is incredibly slow, so it is only useful for testing purposes,
 // *extremely* small matrices, or a few elements at the end of a
 // larger matrix
-template <typename IndexType, typename ValueType>
-__global__ void spmv_coo_serial_kernel(const IndexType nnnz, const IndexType* I,
+template <typename SizeType, typename IndexType, typename ValueType>
+__global__ void spmv_coo_serial_kernel(const SizeType nnnz, const IndexType* I,
                                        const IndexType* J, const ValueType* V,
                                        const ValueType* x, ValueType* y) {
-  for (IndexType n = 0; n < nnnz; n++) {
+  for (SizeType n = 0; n < nnnz; n++) {
     y[I[n]] += V[n] * x[J[n]];
   }
 }
@@ -122,33 +122,34 @@ __global__ void spmv_coo_serial_kernel(const IndexType nnnz, const IndexType* I,
 //  The carry values at the end of each interval are written to arrays
 //  temp_rows and temp_vals, which are processed by a second kernel.
 //
-template <typename IndexType, typename ValueType, size_t BLOCK_SIZE>
+template <typename SizeType, typename IndexType, typename ValueType,
+          size_t BLOCK_SIZE>
 __launch_bounds__(BLOCK_SIZE, 1) __global__
-    void spmv_coo_flat_kernel(const IndexType nnnz,
-                              const IndexType interval_size, const IndexType* I,
-                              const IndexType* J, const ValueType* V,
-                              const ValueType* x, ValueType* y,
-                              IndexType* temp_rows, ValueType* temp_vals) {
-  const IndexType MID_LANE  = WARP_SIZE / 2;
-  const IndexType LAST_LANE = WARP_SIZE - 1;
+    void spmv_coo_flat_kernel(const SizeType nnnz, const SizeType interval_size,
+                              const IndexType* I, const IndexType* J,
+                              const ValueType* V, const ValueType* x,
+                              ValueType* y, IndexType* temp_rows,
+                              ValueType* temp_vals) {
+  const SizeType MID_LANE  = WARP_SIZE / 2;
+  const SizeType LAST_LANE = WARP_SIZE - 1;
 
   __shared__ volatile IndexType
       rows[(WARP_SIZE + MID_LANE) * (BLOCK_SIZE / WARP_SIZE)];
   __shared__ volatile ValueType vals[BLOCK_SIZE];
 
-  const IndexType thread_id =
+  const SizeType thread_id =
       BLOCK_SIZE * blockIdx.x + threadIdx.x;  // global thread index
-  const IndexType thread_lane =
+  const SizeType thread_lane =
       threadIdx.x & (WARP_SIZE - 1);  // thread index within the warp
-  const IndexType warp_id = thread_id / WARP_SIZE;  // global warp index
+  const SizeType warp_id = thread_id / WARP_SIZE;  // global warp index
 
-  const IndexType interval_begin =
+  const SizeType interval_begin =
       warp_id * interval_size;  // warp's offset into I,J,V
-  const IndexType interval_end = Morpheus::Impl::min(
+  const SizeType interval_end = Morpheus::Impl::min(
       interval_begin + interval_size, nnnz);  // end of warps's work
 
-  const IndexType idx = MID_LANE * (threadIdx.x / WARP_SIZE + 1) +
-                        threadIdx.x;  // thread's index into padded rows array
+  const SizeType idx = MID_LANE * (threadIdx.x / WARP_SIZE + 1) +
+                       threadIdx.x;  // thread's index into padded rows array
 
   rows[idx - MID_LANE] = -1;  // fill padding with invalid row index
 
@@ -161,7 +162,7 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
     vals[threadIdx.x] = ValueType(0);
   }
 
-  for (IndexType n = interval_begin + thread_lane; n < interval_end;
+  for (SizeType n = interval_begin + thread_lane; n < interval_end;
        n += WARP_SIZE) {
     IndexType row = I[n];            // row index (i)
     ValueType val = V[n] * x[J[n]];  // A(i,j) * x(j)
@@ -211,16 +212,17 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
 }
 
 // The second level of the segmented reduction operation
-template <typename IndexType, typename ValueType, size_t BLOCK_SIZE>
+template <typename SizeType, typename IndexType, typename ValueType,
+          size_t BLOCK_SIZE>
 __launch_bounds__(BLOCK_SIZE, 1) __global__
-    void spmv_coo_reduce_update_kernel(const size_t num_warps,
+    void spmv_coo_reduce_update_kernel(const SizeType num_warps,
                                        const IndexType* temp_rows,
                                        const ValueType* temp_vals,
                                        ValueType* y) {
   __shared__ IndexType rows[BLOCK_SIZE + 1];
   __shared__ ValueType vals[BLOCK_SIZE + 1];
 
-  const IndexType end = num_warps - (num_warps & (BLOCK_SIZE - 1));
+  const SizeType end = num_warps - (num_warps & (BLOCK_SIZE - 1));
 
   if (threadIdx.x == 0) {
     rows[BLOCK_SIZE] = (IndexType)-1;
@@ -229,7 +231,7 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
 
   __syncthreads();
 
-  IndexType i = threadIdx.x;
+  SizeType i = threadIdx.x;
 
   while (i < end) {
     // do full blocks

@@ -50,7 +50,7 @@ class WAXPBYTypesTest : public ::testing::Test {
   using src2_host_t      = typename src2_container_t::type::HostMirror;
   using dst_dev_t        = typename dst_container_t::type;
   using dst_host_t       = typename dst_container_t::type::HostMirror;
-  using IndexType        = size_t;
+  using SizeType         = typename src1_dev_t::size_type;
   using ValueType1       = typename src1_dev_t::value_type;
   using ValueType2       = typename src2_dev_t::value_type;
   using ValueType3       = typename dst_dev_t::value_type;
@@ -59,11 +59,11 @@ class WAXPBYTypesTest : public ::testing::Test {
     src1_dev_t x;
     src2_dev_t y;
     dst_dev_t w;
-    IndexType size;
+    SizeType size;
     ValueType1 alpha;
     ValueType2 beta;
 
-    vectors(IndexType _size, ValueType1 _alpha, ValueType2 _beta)
+    vectors(SizeType _size, ValueType1 _alpha, ValueType2 _beta)
         : x(_size, 0),
           y(_size, 0),
           w(_size, 0),
@@ -72,7 +72,7 @@ class WAXPBYTypesTest : public ::testing::Test {
           beta(_beta) {}
   };
 
-  IndexType sizes[3]   = {50, 5000, 50000};
+  SizeType sizes[3]    = {50, 5000, 50000};
   ValueType1 alphas[3] = {(ValueType1)2.15, (ValueType1)2.15, (ValueType1)2.15};
   ValueType2 betas[3]  = {(ValueType2)-3.2, (ValueType2)-3.2, (ValueType2)-3.2};
 
@@ -81,7 +81,7 @@ class WAXPBYTypesTest : public ::testing::Test {
                             vectors(sizes[2], alphas[2], betas[2])};
 
   void SetUp() override {
-    for (size_t i = 0; i < 3; i++) {
+    for (SizeType i = 0; i < 3; i++) {
       local_setup(&vecs[i]);
     }
   }
@@ -92,7 +92,7 @@ class WAXPBYTypesTest : public ::testing::Test {
     src2_host_t yh_(vec->size, 0);
     dst_host_t wh_(vec->size, 0);
 
-    for (IndexType i = 0; i < vec->size; i++) {
+    for (SizeType i = 0; i < vec->size; i++) {
       xh_(i) = -5.0 + (((ValueType1)rand() / RAND_MAX) * (5.0 - (-5.0)));
       yh_(i) = -2.0 + (((ValueType2)rand() / RAND_MAX) * (2.0 - (-2.0)));
       wh_(i) = vec->alpha * xh_(i) + vec->beta * yh_(i);
@@ -109,10 +109,10 @@ namespace Test {
 TYPED_TEST_SUITE(WAXPBYTypesTest, WAXPBYTypes);
 
 TYPED_TEST(WAXPBYTypesTest, WAXPBYCustom) {
-  using dst_t      = typename TestFixture::dst_dev_t;
-  using index_type = typename TestFixture::IndexType;
+  using dst_t     = typename TestFixture::dst_dev_t;
+  using size_type = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < 3; i++) {
     auto v = this->vecs[i];
 
     dst_t w(v.size, 0);
@@ -124,10 +124,10 @@ TYPED_TEST(WAXPBYTypesTest, WAXPBYCustom) {
 }
 
 TYPED_TEST(WAXPBYTypesTest, WAXPBYGeneric) {
-  using dst_t      = typename TestFixture::dst_dev_t;
-  using index_type = typename TestFixture::IndexType;
+  using dst_t     = typename TestFixture::dst_dev_t;
+  using size_type = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < 3; i++) {
     auto v = this->vecs[i];
 
     dst_t w(v.size, 0);

@@ -45,17 +45,19 @@ void update_diagonal(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
+  using size_type  = typename Matrix::size_type;
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
-  const index_type ndiag = A.values().ncols();
+  const size_type ndiag = A.values().ncols();
 
 #pragma omp parallel for
-  for (index_type row = 0; row < A.nrows(); row++) {
-    for (index_type n = 0; n < ndiag; n++) {
+  for (size_type row = 0; row < A.nrows(); row++) {
+    for (size_type n = 0; n < ndiag; n++) {
       const index_type col = row + A.diagonal_offsets(n);
 
-      if ((col >= 0 && col < A.ncols()) && (col == row)) {
+      if ((col >= 0 && col < (index_type)A.ncols()) &&
+          (col == (index_type)row)) {
         A.values(row, n) =
             (A.values(row, n) == value_type(0)) ? 0 : diagonal[col];
       }
@@ -75,9 +77,9 @@ void get_diagonal(
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
 }
 
-template <typename ExecSpace, typename Matrix, typename IndexType,
+template <typename ExecSpace, typename Matrix, typename SizeType,
           typename ValueType>
-void set_value(Matrix&, IndexType, IndexType, ValueType,
+void set_value(Matrix&, SizeType, SizeType, ValueType,
                typename std::enable_if_t<
                    Morpheus::is_dia_matrix_format_container_v<Matrix> &&
                    Morpheus::has_custom_backend_v<ExecSpace> &&

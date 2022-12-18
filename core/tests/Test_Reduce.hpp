@@ -41,20 +41,20 @@ class ReduceTypesTest : public ::testing::Test {
   using dev_t  = typename UnaryContainer::type;
   using host_t = typename UnaryContainer::type::HostMirror;
 
-  using IndexType = typename dev_t::index_type;
+  using SizeType  = typename dev_t::size_type;
   using ValueType = typename dev_t::value_type;
 
   struct vector {
     dev_t data;
-    IndexType size;
+    SizeType size;
     ValueType reduction;
 
-    vector(IndexType _vec_size, IndexType _reduction_size)
+    vector(SizeType _vec_size, SizeType _reduction_size)
         : data(_vec_size, 0), size(_reduction_size), reduction((ValueType)0) {}
   };
 
-  IndexType vec_sizes[6] = {50, 50, 5000, 5000, 50000, 50000};
-  IndexType red_sizes[6] = {50, 25, 5000, 1000, 50000, 100};
+  SizeType vec_sizes[6] = {50, 50, 5000, 5000, 50000, 50000};
+  SizeType red_sizes[6] = {50, 25, 5000, 1000, 50000, 100};
 
   struct vector vecs[6] = {
       vector(vec_sizes[0], red_sizes[0]), vector(vec_sizes[1], red_sizes[1]),
@@ -62,7 +62,7 @@ class ReduceTypesTest : public ::testing::Test {
       vector(vec_sizes[4], red_sizes[4]), vector(vec_sizes[5], red_sizes[5])};
 
   void SetUp() override {
-    for (size_t i = 0; i < 6; i++) {
+    for (SizeType i = 0; i < 6; i++) {
       local_setup(&vecs[i]);
     }
   }
@@ -71,12 +71,12 @@ class ReduceTypesTest : public ::testing::Test {
   void local_setup(struct vector* vec) {
     host_t data_h(vec->data.size(), 0);
 
-    for (size_t i = 0; i < vec->data.size(); i++) {
+    for (SizeType i = 0; i < vec->data.size(); i++) {
       data_h(i) = i + (ValueType)1.5;
     }
 
     vec->reduction = 0;
-    for (IndexType i = 0; i < vec->size; i++) {
+    for (SizeType i = 0; i < vec->size; i++) {
       vec->reduction += data_h(i);
     }
 
@@ -103,9 +103,9 @@ TYPED_TEST_SUITE(ReduceTypesTest, ReduceTypes);
 
 TYPED_TEST(ReduceTypesTest, ReduceCustom) {
   using value_type = typename TestFixture::ValueType;
-  using index_type = typename TestFixture::IndexType;
+  using size_type  = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < 6; i++) {
+  for (size_type i = 0; i < 6; i++) {
     auto v = this->vecs[i];
 
     auto result = Morpheus::reduce<TEST_CUSTOM_SPACE>(v.data, v.size);
@@ -115,9 +115,9 @@ TYPED_TEST(ReduceTypesTest, ReduceCustom) {
 
 TYPED_TEST(ReduceTypesTest, ReduceGeneric) {
   using value_type = typename TestFixture::ValueType;
-  using index_type = typename TestFixture::IndexType;
+  using size_type  = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < 6; i++) {
+  for (size_type i = 0; i < 6; i++) {
     auto v = this->vecs[i];
 
     auto result = Morpheus::reduce<TEST_GENERIC_SPACE>(v.data, v.size);

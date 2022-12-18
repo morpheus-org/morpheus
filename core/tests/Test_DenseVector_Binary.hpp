@@ -68,6 +68,7 @@ TYPED_TEST(DenseVectorBinaryTest, Allocate) {
   using HostVector1 = typename TestFixture::host1;
   using Vector2     = typename TestFixture::device2;
   using HostVector2 = typename TestFixture::host2;
+  using size_type   = typename Vector1::size_type;
   using value_type  = typename Vector1::value_type;
 
   auto size = 10;
@@ -87,7 +88,7 @@ TYPED_TEST(DenseVectorBinaryTest, Allocate) {
 
   EXPECT_EQ(yh.size(), xh.size());
   EXPECT_EQ(yh.view().size(), xh.view().size());
-  for (size_t i = 0; i < xh.size(); i++) {
+  for (size_type i = 0; i < xh.size(); i++) {
     EXPECT_EQ(yh[i], (value_type)0);
   }
 
@@ -103,7 +104,7 @@ TYPED_TEST(DenseVectorBinaryTest, Allocate) {
 
   EXPECT_EQ(y.size(), yh.size());
   EXPECT_EQ(y.view().size(), yh.view().size());
-  for (size_t i = 0; i < yh.size(); i++) {
+  for (size_type i = 0; i < yh.size(); i++) {
     EXPECT_EQ(yh[i], (value_type)0);
   }
 }

@@ -44,16 +44,16 @@ inline void multiply(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
   if (init) {
-    for (index_type n = 0; n < A.nrows(); n++) {
+    for (size_type n = 0; n < A.nrows(); n++) {
       y[n] = value_type(0);
     }
   }
 
-  for (index_type n = 0; n < A.nnnz(); n++) {
+  for (size_type n = 0; n < A.nnnz(); n++) {
     y[A.crow_indices(n)] += A.cvalues(n) * x[A.ccolumn_indices(n)];
   }
 }

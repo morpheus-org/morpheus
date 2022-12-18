@@ -34,18 +34,18 @@ namespace Impl {
 
 template <typename ExecSpace, typename Vector1, typename Vector2>
 inline typename Vector2::value_type dot(
-    typename Vector1::index_type n, const Vector1& x, const Vector2& y,
+    typename Vector1::size_type n, const Vector1& x, const Vector2& y,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Vector1, Vector2>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
-  using IndexType       = Kokkos::IndexType<typename Vector1::index_type>;
+  using IndexType       = Kokkos::IndexType<typename Vector1::size_type>;
   using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
   using ValueArray      = typename Vector1::value_array_type;
   using value_type      = typename Vector2::non_const_value_type;
-  using index_type      = typename Vector1::index_type;
+  using size_type       = typename Vector1::size_type;
 
   const ValueArray x_view = x.const_view(), y_view = y.const_view();
   range_policy policy(0, n);
@@ -55,14 +55,14 @@ inline typename Vector2::value_type dot(
   if (y.data() == x.data()) {
     Kokkos::parallel_reduce(
         "dot_same_data", policy,
-        KOKKOS_LAMBDA(const index_type& i, value_type& lsum) {
+        KOKKOS_LAMBDA(const size_type& i, value_type& lsum) {
           lsum += x_view[i] * x_view[i];
         },
         result);
   } else {
     Kokkos::parallel_reduce(
         "dot", policy,
-        KOKKOS_LAMBDA(const index_type& i, value_type& lsum) {
+        KOKKOS_LAMBDA(const size_type& i, value_type& lsum) {
           lsum += x_view[i] * y_view[i];
         },
         result);

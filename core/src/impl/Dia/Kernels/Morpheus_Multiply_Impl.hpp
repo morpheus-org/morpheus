@@ -34,22 +34,23 @@ namespace Morpheus {
 namespace Impl {
 namespace Kernels {
 
-template <typename IndexType, typename ValueType, size_t BLOCK_SIZE>
+template <typename SizeType, typename IndexType, typename ValueType,
+          size_t BLOCK_SIZE>
 __launch_bounds__(BLOCK_SIZE, 1) __global__
-    void spmv_dia_kernel(const IndexType num_rows, const IndexType num_cols,
-                         const IndexType num_diagonals, const IndexType pitch,
+    void spmv_dia_kernel(const SizeType num_rows, const SizeType num_cols,
+                         const SizeType num_diagonals, const SizeType pitch,
                          const IndexType* diagonal_offsets,
                          const ValueType* values, const ValueType* x,
                          ValueType* y) {
   __shared__ IndexType offsets[BLOCK_SIZE];
 
-  const IndexType thread_id = BLOCK_SIZE * blockIdx.x + threadIdx.x;
-  const IndexType grid_size = BLOCK_SIZE * gridDim.x;
+  const SizeType thread_id = BLOCK_SIZE * blockIdx.x + threadIdx.x;
+  const SizeType grid_size = BLOCK_SIZE * gridDim.x;
 
-  for (IndexType base = 0; base < num_diagonals; base += BLOCK_SIZE) {
+  for (SizeType base = 0; base < num_diagonals; base += BLOCK_SIZE) {
     // read a chunk of the diagonal offsets into shared memory
-    const IndexType chunk_size =
-        Morpheus::Impl::min(IndexType(BLOCK_SIZE), num_diagonals - base);
+    const SizeType chunk_size =
+        Morpheus::Impl::min(SizeType(BLOCK_SIZE), num_diagonals - base);
 
     if (threadIdx.x < chunk_size)
       offsets[threadIdx.x] = diagonal_offsets[base + threadIdx.x];
@@ -57,16 +58,16 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
     __syncthreads();
 
     // process chunk
-    for (IndexType row = thread_id; row < num_rows; row += grid_size) {
+    for (SizeType row = thread_id; row < num_rows; row += grid_size) {
       ValueType sum = ValueType(0);
 
       // index into values array
-      IndexType idx = row + pitch * base;
+      SizeType idx = row + pitch * base;
 
-      for (IndexType n = 0; n < chunk_size; n++) {
+      for (SizeType n = 0; n < chunk_size; n++) {
         const IndexType col = row + offsets[n];
 
-        if (col >= 0 && col < num_cols) {
+        if (col >= 0 && col < (IndexType)num_cols) {
           const ValueType A_ij = values[idx];
           sum += A_ij * x[col];
         }

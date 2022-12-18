@@ -47,18 +47,18 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename Vector1, typename Vector2>
-typename Vector2::value_type dot_ref(const typename Vector1::index_type n,
+typename Vector2::value_type dot_ref(const typename Vector1::size_type n,
                                      const Vector1& x, const Vector2& y);
-template <typename IndexType>
-double dot_cublas(const IndexType n, const double* x, int incx, const double* y,
+template <typename SizeType>
+double dot_cublas(const SizeType n, const double* x, int incx, const double* y,
                   int incy);
-template <typename IndexType>
-double dot_cublas(const IndexType n, const float* x, int incx, const float* y,
+template <typename SizeType>
+double dot_cublas(const SizeType n, const float* x, int incx, const float* y,
                   int incy);
 
 template <typename ExecSpace, typename Vector1, typename Vector2>
 typename Vector2::value_type dot(
-    const typename Vector1::index_type n, const Vector1& x, const Vector2& y,
+    const typename Vector1::size_type n, const Vector1& x, const Vector2& y,
     typename std::enable_if_t<
         Morpheus::is_dense_vector_format_container_v<Vector1> &&
         Morpheus::is_dense_vector_format_container_v<Vector2> &&
@@ -87,8 +87,8 @@ typename Vector2::value_type dot(
   return local_result;
 }
 
-template <typename IndexType>
-double dot_cublas(const IndexType n, const double* x, int incx, const double* y,
+template <typename SizeType>
+double dot_cublas(const SizeType n, const double* x, int incx, const double* y,
                   int incy) {
   double lres = 0;
   cublasdotspace.init();
@@ -102,8 +102,8 @@ double dot_cublas(const IndexType n, const double* x, int incx, const double* y,
   return lres;
 }
 
-template <typename IndexType>
-float dot_cublas(const IndexType n, const float* x, int incx, const float* y,
+template <typename SizeType>
+float dot_cublas(const SizeType n, const float* x, int incx, const float* y,
                  int incy) {
   float lres = 0;
   cublasdotspace.init();
@@ -118,15 +118,15 @@ float dot_cublas(const IndexType n, const float* x, int incx, const float* y,
 }
 
 template <typename Vector1, typename Vector2>
-typename Vector2::value_type dot_ref(const typename Vector1::index_type n,
+typename Vector2::value_type dot_ref(const typename Vector1::size_type n,
                                      const Vector1& x, const Vector2& y) {
-  using index_type = typename Vector1::index_type;
+  using size_type  = typename Vector1::size_type;
   using value_type = typename Vector2::value_type;
 
   value_type lres = 0;
   cudotspace.allocate<value_type>(n);
 
-  Kernels::dot_kernel_part1<256, value_type, index_type>
+  Kernels::dot_kernel_part1<256, value_type, size_type>
       <<<256, 256>>>(n, x.data(), y.data(), cudotspace.data<value_type>());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
   getLastCudaError("dot: Kernel execution failed");

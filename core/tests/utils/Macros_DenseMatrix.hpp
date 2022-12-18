@@ -56,13 +56,15 @@
  * same data.
  *
  */
-#define VALIDATE_DENSE_MATRIX_CONTAINER(A, Aref, nrows, ncols, type) \
-  {                                                                  \
-    for (type i = 0; i < nrows; i++) {                               \
-      for (type j = 0; j < ncols; j++) {                             \
-        EXPECT_EQ(A(i, j), Aref(i, j));                              \
-      }                                                              \
-    }                                                                \
+#define VALIDATE_DENSE_MATRIX_CONTAINER(A, Aref, nrows, ncols)      \
+  {                                                                 \
+    using container_type      = decltype(A);                        \
+    using container_size_type = typename container_type::size_type; \
+    for (container_size_type i = 0; i < nrows; i++) {               \
+      for (type j = 0; j < ncols; j++) {                            \
+        EXPECT_EQ(A(i, j), Aref(i, j));                             \
+      }                                                             \
+    }                                                               \
   }
 
 namespace Morpheus {
@@ -155,14 +157,14 @@ bool is_empty_container(
     typename std::enable_if_t<
         Morpheus::is_dense_matrix_format_container_v<Container>>* = nullptr) {
   using value_type = typename Container::value_type;
-  using index_type = typename Container::index_type;
+  using size_type  = typename Container::size_type;
 
   typename Container::HostMirror ch;
   ch.resize(c);
   Morpheus::copy(c, ch);
 
-  for (index_type i = 0; i < c.nrows(); i++) {
-    for (index_type j = 0; j < c.ncols(); j++) {
+  for (size_type i = 0; i < c.nrows(); i++) {
+    for (size_type j = 0; j < c.ncols(); j++) {
       if (ch(i, j) != (value_type)0.0) {
         return false;
       }
@@ -187,7 +189,7 @@ bool have_same_data(
     typename std::enable_if_t<
         Morpheus::is_dense_matrix_format_container_v<Container1> &&
         Morpheus::is_dense_matrix_format_container_v<Container2>>* = nullptr) {
-  using index_type = typename Container1::index_type;
+  using size_type = typename Container1::size_type;
 
   if (!is_same_size(c1, c2)) return false;
 
@@ -199,8 +201,8 @@ bool have_same_data(
   c2_h.resize(c2);
   Morpheus::copy(c2, c2_h);
 
-  for (index_type i = 0; i < c1_h.nrows(); i++) {
-    for (index_type j = 0; j < c1_h.ncols(); j++) {
+  for (size_type i = 0; i < c1_h.nrows(); i++) {
+    for (size_type j = 0; j < c1_h.ncols(); j++) {
       if (c1_h(i, j) != c2_h(i, j)) {
         return false;
       }

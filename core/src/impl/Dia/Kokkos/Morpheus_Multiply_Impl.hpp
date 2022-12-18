@@ -43,6 +43,7 @@ inline void multiply(
   using execution_space  = typename ExecSpace::execution_space;
   using value_array_type = typename Matrix::value_array_type::value_array_type;
   using index_array_type = typename Matrix::index_array_type::value_array_type;
+  using size_type        = typename Matrix::size_type;
   using index_type       = typename Matrix::index_type;
   using value_type       = typename Matrix::value_type;
   using member_type = typename Kokkos::TeamPolicy<execution_space>::member_type;
@@ -51,7 +52,7 @@ inline void multiply(
   const typename Vector::value_array_type x_view = x.const_view();
   const index_array_type diagonal_offsets  = A.cdiagonal_offsets().const_view();
   typename Vector::value_array_type y_view = y.view();
-  index_type ndiag = A.cdiagonal_offsets().size(), ncols = A.ncols();
+  size_type ndiag = A.cdiagonal_offsets().size(), ncols = A.ncols();
 
   const Kokkos::TeamPolicy<execution_space> policy(A.nrows(), Kokkos::AUTO,
                                                    Kokkos::AUTO);
@@ -63,10 +64,10 @@ inline void multiply(
         value_type sum = init ? value_type(0) : y_view[row];
         Kokkos::parallel_reduce(
             Kokkos::TeamThreadRange(team_member, ndiag),
-            [=](const int& n, value_type& lsum) {
+            [=](const size_type& n, value_type& lsum) {
               const index_type col = row + diagonal_offsets[n];
 
-              if (col >= 0 && col < ncols) {
+              if (col >= 0 && col < (index_type)ncols) {
                 lsum += values(row, n) * x_view[col];
               }
             },
@@ -82,32 +83,33 @@ inline void multiply(
 //         Morpheus::is_dia_matrix_format_container_v<Matrix> &&
 //         Morpheus::is_dense_vector_format_container_v<Vector> &&
 //         Morpheus::has_generic_backend_v<ExecSpace> &&
-//         Morpheus::has_access_v<ExecSpace, Matrix,
-//                                Vector>>* = nullptr) {
+//         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
+//   using execution_space  = typename ExecSpace::execution_space;
 //   using value_array_type = typename
 //   Matrix::value_array_type::value_array_type; using index_array_type =
-//   typename Matrix::index_array_type::value_array_type; using index_type =
-//   typename Matrix::index_type; using value_type       = typename
-//   Matrix::value_type; using range_policy =
-//       Kokkos::RangePolicy<Kokkos::IndexType<index_type>, ExecSpace>;
+//   typename Matrix::index_array_type::value_array_type; using size_type =
+//   typename Matrix::size_type; using index_type       = typename
+//   Matrix::index_type; using value_type       = typename Matrix::value_type;
+//   using range_policy =
+//       Kokkos::RangePolicy<Kokkos::IndexType<size_type>, execution_space>;
 
-//   const value_array_type values                   = A.cvalues().const_view();
+//   const value_array_type values                  = A.cvalues().const_view();
 //   const typename Vector::value_array_type x_view = x.const_view();
 //   const index_array_type diagonal_offsets =
 //   A.cdiagonal_offsets().const_view(); typename Vector2::value_array_type
-//   y_view = y.view(); index_type ndiag = A.cvalues().ncols(), ncols =
+//   y_view = y.view(); size_type ndiag = A.cvalues().ncols(), ncols =
 //   A.ncols();
 
 //   range_policy policy(0, A.nrows());
 
 //   Kokkos::parallel_for(
-//       policy, KOKKOS_LAMBDA(const index_type row) {
+//       policy, KOKKOS_LAMBDA(const size_type row) {
 //         value_type sum = y_view[row];
 
-//         for (index_type n = 0; n < ndiag; n++) {
+//         for (size_type n = 0; n < ndiag; n++) {
 //           const index_type col = row + diagonal_offsets[n];
 
-//           if (col >= 0 && col < ncols) {
+//           if (col >= 0 && col < (index_type)ncols) {
 //             sum += values(row, n) * x_view[col];
 //           }
 //         }

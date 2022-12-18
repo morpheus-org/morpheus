@@ -45,25 +45,27 @@ void update_diagonal(
   using value_array_type = typename Matrix::value_array_type::value_array_type;
   using index_array_type = typename Matrix::index_array_type::value_array_type;
   using array_type       = typename Vector::value_array_type;
+  using size_type        = typename Matrix::size_type;
   using index_type       = typename Matrix::index_type;
   using value_type       = typename Matrix::value_type;
   using range_policy =
-      Kokkos::RangePolicy<Kokkos::IndexType<index_type>, execution_space>;
+      Kokkos::RangePolicy<Kokkos::IndexType<size_type>, execution_space>;
 
   value_array_type values           = A.values().view();
   index_array_type diagonal_offsets = A.diagonal_offsets().view();
   const array_type diagonal_view    = diagonal.const_view();
 
-  index_type ndiag = A.values().ncols(), ncols = A.ncols();
+  size_type ndiag = A.values().ncols(), ncols = A.ncols();
 
   range_policy policy(0, A.nrows());
 
   Kokkos::parallel_for(
-      policy, KOKKOS_LAMBDA(const index_type row) {
-        for (index_type n = 0; n < ndiag; n++) {
+      policy, KOKKOS_LAMBDA(const size_type row) {
+        for (size_type n = 0; n < ndiag; n++) {
           const index_type col = row + diagonal_offsets[n];
 
-          if ((col >= 0 && col < ncols) && (col == row)) {
+          if ((col >= 0 && col < (index_type)ncols) &&
+              (col == (index_type)row)) {
             values(row, n) =
                 (values(row, n) == value_type(0)) ? 0 : diagonal_view[col];
           }
@@ -82,9 +84,9 @@ void get_diagonal(
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
 }
 
-template <typename ExecSpace, typename Matrix, typename IndexType,
+template <typename ExecSpace, typename Matrix, typename SizeType,
           typename ValueType>
-void set_value(Matrix&, IndexType, IndexType, ValueType,
+void set_value(Matrix&, SizeType, SizeType, ValueType,
                typename std::enable_if_t<
                    Morpheus::is_dia_matrix_format_container_v<Matrix> &&
                    Morpheus::has_generic_backend_v<ExecSpace> &&

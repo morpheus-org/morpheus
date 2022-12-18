@@ -42,8 +42,9 @@ class DiagonalMatrixGenerator {
   using SparseMatrix =
       typename Morpheus::CooMatrix<ValueType, IndexType, ArrayLayout,
                                    Space>::HostMirror;
+  using size_type = typename SparseMatrix::size_type;
 
-  DiagonalMatrixGenerator(size_t num_rows, size_t num_cols,
+  DiagonalMatrixGenerator(size_type num_rows, size_type num_cols,
                           std::vector<int>& diag_indexes)
       : nrows(num_rows),
         ncols(num_cols),
@@ -53,7 +54,7 @@ class DiagonalMatrixGenerator {
   DenseMatrix& generate() {
     for (int i = 0; i < (int)nrows; i++) {
       for (int j = 0; j < (int)ncols; j++) {
-        for (int d = 0; d < (int)diags.size(); d++) {
+        for (size_type d = 0; d < diags.size(); d++) {
           if (abs(j - i) == abs((int)diags[d])) {
             dense_mat(i, j) =
                 -1.0 + (((ValueType)rand() / RAND_MAX) * (1.0 - (-1.0)));
@@ -71,7 +72,7 @@ class DiagonalMatrixGenerator {
     Morpheus::convert<Morpheus::Serial>(dense_mat, mat);
   }
 
-  size_t nrows, ncols;
+  size_type nrows, ncols;
   std::vector<int> diags;
   DenseMatrix dense_mat;
 };
@@ -86,8 +87,9 @@ class SparseDiagonalMatrixGenerator {
   using SparseMatrix =
       typename Morpheus::CooMatrix<ValueType, IndexType, ArrayLayout,
                                    Space>::HostMirror;
+  using size_type = typename SparseMatrix::size_type;
 
-  SparseDiagonalMatrixGenerator(size_t num_rows, size_t num_cols,
+  SparseDiagonalMatrixGenerator(size_type num_rows, size_type num_cols,
                                 std::vector<int>& diag_indexes)
       : nrows(num_rows),
         ncols(num_cols),
@@ -97,7 +99,7 @@ class SparseDiagonalMatrixGenerator {
   DenseMatrix& generate() {
     for (int i = 0; i < (int)nrows; i++) {
       for (int j = 0; j < (int)ncols; j++) {
-        for (int d = 0; d < (int)diags.size(); d++) {
+        for (size_type d = 0; d < diags.size(); d++) {
           if (abs(j - i) == abs((int)diags[d])) {
             // If main diagonal, add an entry every five rows
             if ((diags[d] == 0 && i % 5) || (diags[d] != 0)) {
@@ -118,7 +120,7 @@ class SparseDiagonalMatrixGenerator {
     Morpheus::convert<Morpheus::Serial>(dense_mat, mat);
   }
 
-  size_t nrows, ncols;
+  size_type nrows, ncols;
   std::vector<int> diags;
   DenseMatrix dense_mat;
 };

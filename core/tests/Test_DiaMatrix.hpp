@@ -37,10 +37,10 @@ using DiaMatrixUnary = to_gtest_types<DiaMatrixTypes>::type;
 template <typename UnaryContainer>
 class DiaMatrixUnaryTest : public ::testing::Test {
  public:
-  using type      = UnaryContainer;
-  using device    = typename UnaryContainer::type;
-  using host      = typename UnaryContainer::type::HostMirror;
-  using IndexType = typename device::index_type;
+  using type     = UnaryContainer;
+  using device   = typename UnaryContainer::type;
+  using host     = typename UnaryContainer::type::HostMirror;
+  using SizeType = typename device::size_type;
 
   DiaMatrixUnaryTest()
       : nrows(3),
@@ -58,7 +58,7 @@ class DiaMatrixUnaryTest : public ::testing::Test {
     Morpheus::copy(Ahref, Aref);
   }
 
-  IndexType nrows, ncols, nnnz, ndiag, nalign;
+  SizeType nrows, ncols, nnnz, ndiag, nalign;
   device Aref;
   host Ahref;
 };
@@ -117,7 +117,7 @@ TYPED_TEST(DiaMatrixUnaryTest, FormatIndex) {
 TYPED_TEST(DiaMatrixUnaryTest, ReferenceByIndex) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
   // Build matrix from the device vectors
   Matrix A(this->nrows, this->ncols, this->nnnz, this->Aref.diagonal_offsets(),
@@ -130,14 +130,14 @@ TYPED_TEST(DiaMatrixUnaryTest, ReferenceByIndex) {
                   this->nalign);
   Morpheus::copy(A, Ah);
 
-  VALIDATE_DIA_CONTAINER(Ah, this->Ahref, index_type);
+  VALIDATE_DIA_CONTAINER(Ah, this->Ahref);
 
-  for (index_type n = 0; n < this->ndiag; n++) {
+  for (size_type n = 0; n < this->ndiag; n++) {
     EXPECT_EQ(Ah.cdiagonal_offsets(n), this->Ahref.diagonal_offsets(n));
   }
 
-  for (index_type i = 0; i < A.values().nrows(); i++) {
-    for (index_type j = 0; j < A.values().ncols(); j++) {
+  for (size_type i = 0; i < A.values().nrows(); i++) {
+    for (size_type j = 0; j < A.values().ncols(); j++) {
       EXPECT_EQ(Ah.cvalues(i, j), this->Ahref.values(i, j));
     }
   }
@@ -146,7 +146,7 @@ TYPED_TEST(DiaMatrixUnaryTest, ReferenceByIndex) {
 TYPED_TEST(DiaMatrixUnaryTest, Reference) {
   using Matrix                = typename TestFixture::device;
   using HostMatrix            = typename TestFixture::host;
-  using index_type            = typename Matrix::index_type;
+  using size_type             = typename Matrix::size_type;
   using index_array_type      = typename Matrix::index_array_type;
   using value_array_type      = typename Matrix::value_array_type;
   using host_index_array_type = typename index_array_type::HostMirror;
@@ -171,12 +171,12 @@ TYPED_TEST(DiaMatrixUnaryTest, Reference) {
   host_value_array_type vals_h(A.values().nrows(), A.values().ncols(), 0);
   Morpheus::copy(vals, vals_h);
 
-  for (index_type n = 0; n < A.ndiags(); n++) {
+  for (size_type n = 0; n < A.ndiags(); n++) {
     EXPECT_EQ(doff_h[n], this->Ahref.diagonal_offsets(n));
   }
 
-  for (index_type i = 0; i < A.values().nrows(); i++) {
-    for (index_type j = 0; j < A.values().ncols(); j++) {
+  for (size_type i = 0; i < A.values().nrows(); i++) {
+    for (size_type j = 0; j < A.values().ncols(); j++) {
       EXPECT_EQ(vals_h(i, j), this->Ahref.values(i, j));
     }
   }
@@ -185,7 +185,7 @@ TYPED_TEST(DiaMatrixUnaryTest, Reference) {
 TYPED_TEST(DiaMatrixUnaryTest, ConstReference) {
   using Matrix                = typename TestFixture::device;
   using HostMatrix            = typename TestFixture::host;
-  using index_type            = typename Matrix::index_type;
+  using size_type             = typename Matrix::size_type;
   using index_array_type      = typename Matrix::index_array_type;
   using value_array_type      = typename Matrix::value_array_type;
   using host_index_array_type = typename index_array_type::HostMirror;
@@ -203,11 +203,11 @@ TYPED_TEST(DiaMatrixUnaryTest, ConstReference) {
   host_value_array_type vals_test(A.values().nrows(), A.values().ncols(), 0);
   Morpheus::copy(vals, vals_test);
 
-  for (index_type n = 0; n < A.ndiags(); n++) {
+  for (size_type n = 0; n < A.ndiags(); n++) {
     EXPECT_EQ(doff_test[n], this->Ahref.diagonal_offsets(n));
   }
-  for (index_type i = 0; i < A.values().nrows(); i++) {
-    for (index_type j = 0; j < A.values().ncols(); j++) {
+  for (size_type i = 0; i < A.values().nrows(); i++) {
+    for (size_type j = 0; j < A.values().ncols(); j++) {
       EXPECT_EQ(vals_test(i, j), this->Ahref.values(i, j));
     }
   }
@@ -221,11 +221,11 @@ TYPED_TEST(DiaMatrixUnaryTest, ConstReference) {
   const host_index_array_type doff_h = Ah.cdiagonal_offsets();
   const host_value_array_type vals_h = Ah.cvalues();
 
-  for (index_type n = 0; n < Ah.ndiags(); n++) {
+  for (size_type n = 0; n < Ah.ndiags(); n++) {
     EXPECT_EQ(doff_h[n], this->Ahref.diagonal_offsets(n));
   }
-  for (index_type i = 0; i < Ah.values().nrows(); i++) {
-    for (index_type j = 0; j < Ah.values().ncols(); j++) {
+  for (size_type i = 0; i < Ah.values().nrows(); i++) {
+    for (size_type j = 0; j < Ah.values().ncols(); j++) {
       EXPECT_EQ(vals_h(i, j), this->Ahref.values(i, j));
     }
   }
@@ -240,7 +240,6 @@ TYPED_TEST(DiaMatrixUnaryTest, ConstReference) {
 TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
   // Build matrix from the device vectors
@@ -254,7 +253,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyAssignment) {
                   this->nalign);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_DIA_CONTAINER(Ah, this->Ahref, index_type);
+  VALIDATE_DIA_CONTAINER(Ah, this->Ahref);
 
   // Default copy asssignment
   HostMatrix Bh = Ah;
@@ -265,7 +264,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyAssignment) {
   Ah.values(0, 1)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bh, Ah);
 
   // Now check device Matrix
   Matrix B = A;
@@ -276,7 +275,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyAssignment) {
   HostMatrix Bt(this->nrows, this->ncols, this->nnnz, this->ndiag,
                 this->nalign);
   Morpheus::copy(B, Bt);
-  VALIDATE_DIA_CONTAINER(Bt, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bt, Ah);
 }
 
 /**
@@ -288,7 +287,6 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyAssignment) {
 TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
   // Build matrix from the device vectors
@@ -302,7 +300,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyConstructor) {
                   this->nalign);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_DIA_CONTAINER(Ah, this->Ahref, index_type);
+  VALIDATE_DIA_CONTAINER(Ah, this->Ahref);
 
   // Default copy asssignment
   HostMatrix Bh(Ah);
@@ -313,7 +311,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyConstructor) {
   Ah.values(0, 1)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bh, Ah);
 
   // Now check device Matrix
   Matrix B(A);
@@ -324,7 +322,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyConstructor) {
   HostMatrix Bt(this->nrows, this->ncols, this->nnnz, this->ndiag,
                 this->nalign);
   Morpheus::copy(B, Bt);
-  VALIDATE_DIA_CONTAINER(Bt, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bt, Ah);
 }
 
 /**
@@ -336,7 +334,6 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultCopyConstructor) {
 TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveAssignment) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
   // Build matrix from the device vectors
@@ -350,7 +347,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveAssignment) {
                   this->nalign);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_DIA_CONTAINER(Ah, this->Ahref, index_type);
+  VALIDATE_DIA_CONTAINER(Ah, this->Ahref);
 
   // Default copy asssignment
   HostMatrix Bh = std::move(Ah);
@@ -361,7 +358,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveAssignment) {
   Ah.values(0, 1)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bh, Ah);
 
   // Now check device Matrix
   Matrix B = std::move(A);
@@ -372,7 +369,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveAssignment) {
   HostMatrix Bt(this->nrows, this->ncols, this->nnnz, this->ndiag,
                 this->nalign);
   Morpheus::copy(B, Bt);
-  VALIDATE_DIA_CONTAINER(Bt, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bt, Ah);
 }
 
 /**
@@ -384,7 +381,6 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveAssignment) {
 TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveConstructor) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
   // Build matrix from the device vectors
@@ -398,7 +394,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveConstructor) {
                   this->nalign);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_DIA_CONTAINER(Ah, this->Ahref, index_type);
+  VALIDATE_DIA_CONTAINER(Ah, this->Ahref);
 
   // Default copy asssignment
   HostMatrix Bh(std::move(Ah));
@@ -409,7 +405,7 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveConstructor) {
   Ah.values(0, 1)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
-  VALIDATE_DIA_CONTAINER(Bh, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bh, Ah);
 
   // Now check device Matrix
   Matrix B(std::move(A));
@@ -420,24 +416,24 @@ TYPED_TEST(DiaMatrixUnaryTest, DefaultMoveConstructor) {
   HostMatrix Bt(this->nrows, this->ncols, this->nnnz, this->ndiag,
                 this->nalign);
   Morpheus::copy(B, Bt);
-  VALIDATE_DIA_CONTAINER(Bt, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Bt, Ah);
 }
 
 TYPED_TEST(DiaMatrixUnaryTest, ConstructionFromShapeDefault) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
   HostMatrix Ah(this->nrows, this->ncols, this->nnnz, this->ndiag);
   CHECK_DIA_SIZES(Ah, this->nrows, this->ncols, this->nnnz, this->ndiag,
                   this->nalign);
 
-  for (index_type n = 0; n < Ah.ndiags(); n++) {
-    EXPECT_EQ(Ah.diagonal_offsets(n), (index_type)0);
+  for (size_type n = 0; n < Ah.ndiags(); n++) {
+    EXPECT_EQ(Ah.diagonal_offsets(n), 0);
   }
-  for (index_type i = 0; i < Ah.values().nrows(); i++) {
-    for (index_type j = 0; j < Ah.values().ncols(); j++) {
+  for (size_type i = 0; i < Ah.values().nrows(); i++) {
+    for (size_type j = 0; j < Ah.values().ncols(); j++) {
       EXPECT_EQ(Ah.values(i, j), (value_type)0);
     }
   }
@@ -455,15 +451,15 @@ TYPED_TEST(DiaMatrixUnaryTest, ConstructionFromShapeDefault) {
                   this->nalign)
   Morpheus::copy(A, Ah_test);
 
-  VALIDATE_DIA_CONTAINER(Ah_test, Ah, index_type);
+  VALIDATE_DIA_CONTAINER(Ah_test, Ah);
 }
 
 TYPED_TEST(DiaMatrixUnaryTest, ConstructionFromShape) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
-  index_type _nalign = 127;
+  size_type _nalign = 127;
 
   HostMatrix Ah(this->nrows, this->ncols, this->nnnz, this->ndiag, _nalign);
   CHECK_DIA_SIZES(Ah, this->nrows, this->ncols, this->nnnz, this->ndiag,
@@ -471,7 +467,7 @@ TYPED_TEST(DiaMatrixUnaryTest, ConstructionFromShape) {
   Matrix A(this->nrows, this->ncols, this->nnnz, this->ndiag, _nalign);
   CHECK_DIA_SIZES(A, this->nrows, this->ncols, this->nnnz, this->ndiag, _nalign)
 
-  index_type _nalign1 = 512;
+  size_type _nalign1 = 512;
 
   HostMatrix Ah1(this->nrows, this->ncols, this->nnnz, this->ndiag, _nalign1);
   CHECK_DIA_SIZES(Ah1, this->nrows, this->ncols, this->nnnz, this->ndiag,
@@ -480,7 +476,7 @@ TYPED_TEST(DiaMatrixUnaryTest, ConstructionFromShape) {
   CHECK_DIA_SIZES(A1, this->nrows, this->ncols, this->nnnz, this->ndiag,
                   _nalign1)
 
-  index_type _nalign2 = 333;
+  size_type _nalign2 = 333;
 
   HostMatrix Ah2(this->nrows, this->ncols, this->nnnz, this->ndiag, _nalign2);
   CHECK_DIA_SIZES(Ah2, this->nrows, this->ncols, this->nnnz, this->ndiag,
@@ -499,12 +495,12 @@ TYPED_TEST(DiaMatrixUnaryTest, ConstructionFromShape) {
 TYPED_TEST(DiaMatrixUnaryTest, ResizeDefault) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  index_type large_nrows = 500, large_ncols = 500, large_nnnz = 640,
-             large_ndiag = 110;
-  index_type small_nrows = 2, small_ncols = 2, small_nnnz = 2, small_ndiag = 2;
+  size_type large_nrows = 500, large_ncols = 500, large_nnnz = 640,
+            large_ndiag = 110;
+  size_type small_nrows = 2, small_ncols = 2, small_nnnz = 2, small_ndiag = 2;
 
   Matrix A(this->nrows, this->ncols, this->nnnz, this->ndiag);
   Morpheus::copy(this->Ahref, A);
@@ -519,13 +515,13 @@ TYPED_TEST(DiaMatrixUnaryTest, ResizeDefault) {
                   this->nalign);
 
   Morpheus::copy(A, Ah);
-  VALIDATE_DIA_CONTAINER(this->Ahref, Ah, index_type);
-  for (index_type n = this->ndiag; n < Ah.ndiags(); n++) {
+  VALIDATE_DIA_CONTAINER(this->Ahref, Ah);
+  for (size_type n = this->ndiag; n < Ah.ndiags(); n++) {
     EXPECT_EQ(Ah.diagonal_offsets(n), 0);
   }
-  for (index_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
+  for (size_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
        i++) {
-    for (index_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
+    for (size_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
          j++) {
       EXPECT_EQ(Ah.values(i, j), 0);
     }
@@ -543,12 +539,12 @@ TYPED_TEST(DiaMatrixUnaryTest, ResizeDefault) {
   EXPECT_NE(Ah.diagonal_offsets(1), Ahref_test.diagonal_offsets(1));
   EXPECT_NE(Ah.values(0, 1), Ahref_test.values(0, 1));
 
-  for (index_type n = this->ndiag; n < Ah.ndiags(); n++) {
+  for (size_type n = this->ndiag; n < Ah.ndiags(); n++) {
     EXPECT_EQ(Ah.diagonal_offsets(n), 0);
   }
-  for (index_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
+  for (size_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
        i++) {
-    for (index_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
+    for (size_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
          j++) {
       EXPECT_EQ(Ah.values(i, j), 0);
     }
@@ -567,15 +563,15 @@ TYPED_TEST(DiaMatrixUnaryTest, ResizeDefault) {
   Ah.values(0, 1)        = (value_type)1.11;
   Morpheus::copy(Ah, A);
 
-  VALIDATE_DIA_CONTAINER(Ah, Ahref_test, index_type);
+  VALIDATE_DIA_CONTAINER(Ah, Ahref_test);
 }
 
 TYPED_TEST(DiaMatrixUnaryTest, Resize) {
   using Matrix     = typename TestFixture::device;
   using HostMatrix = typename TestFixture::host;
-  using index_type = typename Matrix::index_type;
+  using size_type  = typename Matrix::size_type;
 
-  index_type _nalign = 127;
+  size_type _nalign = 127;
   HostMatrix Ah;
   CHECK_DIA_EMPTY(Ah);
   Ah.resize(this->nrows, this->ncols, this->nnnz, this->ndiag, _nalign);
@@ -588,8 +584,8 @@ TYPED_TEST(DiaMatrixUnaryTest, Resize) {
   CHECK_DIA_SIZES(A, this->nrows, this->ncols, this->nnnz, this->ndiag,
                   _nalign);
 
-  index_type large_nrows = 500, large_ncols = 500, large_nnnz = 640,
-             large_ndiag = 110, _nalign1 = 512;
+  size_type large_nrows = 500, large_ncols = 500, large_nnnz = 640,
+            large_ndiag = 110, _nalign1 = 512;
 
   HostMatrix Ah1(large_nrows, large_ncols, large_nnnz, large_ndiag, _nalign1);
   CHECK_DIA_SIZES(Ah1, large_nrows, large_ncols, large_nnnz, large_ndiag,
@@ -599,8 +595,8 @@ TYPED_TEST(DiaMatrixUnaryTest, Resize) {
   CHECK_DIA_SIZES(A1, large_nrows, large_ncols, large_nnnz, large_ndiag,
                   _nalign1);
 
-  index_type small_nrows = 2, small_ncols = 2, small_nnnz = 2, small_ndiag = 2,
-             _nalign2 = 333;
+  size_type small_nrows = 2, small_ncols = 2, small_nnnz = 2, small_ndiag = 2,
+            _nalign2 = 333;
 
   HostMatrix Ah2(small_nrows, small_ncols, small_nnnz, small_ndiag, _nalign2);
   CHECK_DIA_SIZES(Ah2, small_nrows, small_ncols, small_nnnz, small_ndiag,
@@ -612,15 +608,15 @@ TYPED_TEST(DiaMatrixUnaryTest, Resize) {
 }
 
 TYPED_TEST(DiaMatrixUnaryTest, ResizeTolerance) {
-  using Matrix     = typename TestFixture::device;
-  using index_type = typename Matrix::index_type;
+  using Matrix    = typename TestFixture::device;
+  using size_type = typename Matrix::size_type;
 
   Matrix A;
   CHECK_DIA_EMPTY(A);
 
   // Size above 100M entries
   A.resize(10e6, this->ncols, 60e6, 15);
-  CHECK_DIA_SIZES(A, index_type(10e6), this->ncols, index_type(60e6), 15,
+  CHECK_DIA_SIZES(A, size_type(10e6), this->ncols, size_type(60e6), 15,
                   this->nalign);
 
   // Fill ratio above 10
@@ -630,7 +626,7 @@ TYPED_TEST(DiaMatrixUnaryTest, ResizeTolerance) {
   CHECK_DIA_SIZES(A, 100, 100, 10, 50, this->nalign);
 
   // Both Size and Fill ratio above 100M and 10 respectively
-  EXPECT_THROW(A.resize(10e6, this->ncols, 1000, 15),
+  EXPECT_THROW(A.resize(size_type(10e6), this->ncols, 1000, 15),
                Morpheus::FormatConversionException);
 }
 

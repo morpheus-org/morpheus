@@ -55,6 +55,7 @@ inline void multiply(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
+  using size_type  = typename Matrix::size_type;
   using value_type = typename Vector::value_type;
   using index_type = typename Matrix::index_type;
 
@@ -62,9 +63,9 @@ inline void multiply(
     y.assign(y.size(), 0);
   }
 
-  const size_t nrows            = A.nrows();
-  const size_t nnnz             = A.nnnz();
-  const index_type sentinel_row = nrows + 1;
+  const size_type nrows        = A.nrows();
+  const size_type nnnz         = A.nnnz();
+  const size_type sentinel_row = nrows + 1;
 
   index_type* rind = A.crow_indices().data();
   index_type* cind = A.ccolumn_indices().data();
@@ -74,19 +75,20 @@ inline void multiply(
 
 #pragma omp parallel
   {
-    const size_t num_threads     = omp_get_num_threads();
-    const size_t work_per_thread = Impl::ceil_div<size_t>(nnnz, num_threads);
-    const size_t thread_id       = omp_get_thread_num();
-    const size_t begin           = work_per_thread * thread_id;
-    const size_t end             = std::min(begin + work_per_thread, nnnz);
-    size_t n                     = begin;
+    const size_type num_threads = omp_get_num_threads();
+    const size_type work_per_thread =
+        Impl::ceil_div<size_type>(nnnz, num_threads);
+    const size_type thread_id = omp_get_thread_num();
+    const size_type begin     = work_per_thread * thread_id;
+    const size_type end       = std::min(begin + work_per_thread, nnnz);
+    size_type n               = begin;
 
     if (begin < end) {
       const index_type first = begin > 0 ? rind[begin - 1] : sentinel_row;
       const index_type last  = end < nnnz ? rind[end] : sentinel_row;
 
       // handle row overlap with previous thread
-      if (first != sentinel_row) {
+      if (first != (index_type)sentinel_row) {
         value_type partial_sum = value_type(0);
         for (; n < end && rind[n] == first; n++) {
           partial_sum += Aval[n] * xval[cind[n]];
@@ -100,7 +102,7 @@ inline void multiply(
       }
 
       // handle row overlap with following thread
-      if (last != sentinel_row) {
+      if (last != (index_type)sentinel_row) {
         value_type partial_sum = value_type(0);
         for (; n < end; n++) {
           partial_sum += Aval[n] * xval[cind[n]];

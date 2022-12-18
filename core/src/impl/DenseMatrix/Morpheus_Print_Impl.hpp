@@ -38,11 +38,11 @@ void print(const Printable& p, Stream& s,
            typename std::enable_if<
                Morpheus::is_dense_matrix_format_container_v<Printable>>::type* =
                nullptr) {
-  using index_type = typename Printable::index_type;
+  using size_type = typename Printable::size_type;
   print_matrix_header(p, s);
 
-  for (index_type i = 0; i < p.nrows(); i++) {
-    for (index_type j = 0; j < p.ncols(); j++) {
+  for (size_type i = 0; i < p.nrows(); i++) {
+    for (size_type j = 0; j < p.ncols(); j++) {
       s << " " << std::setw(14) << i;
       s << " " << std::setw(14) << j;
       s << " " << std::setprecision(12) << std::setw(12) << "(" << p(i, j)

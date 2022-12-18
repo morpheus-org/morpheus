@@ -85,7 +85,7 @@ class DenseMatrix : public MatrixBase<DenseMatrix, ValueType, Properties...> {
   using value_type = typename traits::value_type;
   /*! The non-constant type of the values held by the container */
   using non_const_value_type = typename traits::non_const_value_type;
-  using size_type            = typename traits::index_type;
+  using size_type            = typename traits::size_type;
   /*! The type of the indices held by the container - can be const */
   using index_type = typename traits::index_type;
   /*! The non-constant type of the indices held by the container */
@@ -148,7 +148,7 @@ class DenseMatrix : public MatrixBase<DenseMatrix, ValueType, Properties...> {
    * @param num_cols Number of columns
    * @param val Value at which the elements of the DenseMatrix will be set to
    */
-  inline DenseMatrix(const index_type num_rows, const index_type num_cols,
+  inline DenseMatrix(const size_type num_rows, const size_type num_cols,
                      const value_type val = 0)
       : base(num_rows, num_cols, num_rows * num_cols),
         _values("matrix", size_t(num_rows), size_t(num_cols)) {
@@ -166,7 +166,7 @@ class DenseMatrix : public MatrixBase<DenseMatrix, ValueType, Properties...> {
    */
   template <typename ValuePtr>
   explicit DenseMatrix(
-      const index_type num_rows, const index_type num_cols, ValuePtr ptr,
+      const size_type num_rows, const size_type num_cols, ValuePtr ptr,
       typename std::enable_if<std::is_pointer<ValuePtr>::value &&
                               is_same_value_type<value_type, ValuePtr>::value &&
                               memory_traits::is_unmanaged>::type * = nullptr)
@@ -245,13 +245,13 @@ class DenseMatrix : public MatrixBase<DenseMatrix, ValueType, Properties...> {
    * @param num_cols Number of columns
    * @param val Value to assign
    */
-  inline void assign(index_type num_rows, index_type num_cols,
+  inline void assign(size_type num_rows, size_type num_cols,
                      const value_type val) {
-    using range_policy = Kokkos::RangePolicy<index_type, execution_space>;
+    using range_policy = Kokkos::RangePolicy<size_type, execution_space>;
 
     range_policy policy(0, num_rows);
-    Impl::set_functor<value_array_type, value_type, index_type> f(_values, val,
-                                                                  num_cols);
+    Impl::set_functor<value_array_type, value_type, size_type> f(_values, val,
+                                                                 num_cols);
     Kokkos::parallel_for("Morpheus::DenseMatrix::assign", policy, f);
   }
 
@@ -262,7 +262,7 @@ class DenseMatrix : public MatrixBase<DenseMatrix, ValueType, Properties...> {
    * @param num_rows Number of new rows
    * @param num_cols Number of new columns
    */
-  inline void resize(index_type num_rows, index_type num_cols) {
+  inline void resize(size_type num_rows, size_type num_cols) {
     base::resize(num_rows, num_cols, num_rows * num_cols);
     Kokkos::resize(_values, size_t(num_rows), size_t(num_cols));
   }
@@ -302,7 +302,7 @@ class DenseMatrix : public MatrixBase<DenseMatrix, ValueType, Properties...> {
    * @return Element at index (i,j)
    */
   MORPHEUS_FORCEINLINE_FUNCTION value_array_reference
-  operator()(index_type i, index_type j) const {
+  operator()(size_type i, size_type j) const {
     return _values(i, j);
   }
 

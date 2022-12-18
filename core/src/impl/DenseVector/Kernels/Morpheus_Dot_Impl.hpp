@@ -34,24 +34,24 @@ namespace Morpheus {
 namespace Impl {
 namespace Kernels {
 
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename SizeType>
 __global__ void dot_kernel(IndexType n, const ValueType* x, const ValueType* y,
-                           ValueType* res) {
-  const IndexType tid = blockDim.x * blockIdx.x + threadIdx.x;
+                           SizeType* res) {
+  const SizeType tid = blockDim.x * blockIdx.x + threadIdx.x;
   if (tid > n) return;
 
   res[tid] = x[tid] * y[tid];
 }
 
-template <unsigned int BLOCKSIZE, typename ValueType, typename IndexType>
+template <unsigned int BLOCKSIZE, typename ValueType, typename SizeType>
 __launch_bounds__(BLOCKSIZE) __global__
-    void dot_kernel_part1(IndexType n, const ValueType* x, const ValueType* y,
+    void dot_kernel_part1(SizeType n, const ValueType* x, const ValueType* y,
                           ValueType* workspace) {
-  IndexType gid = blockIdx.x * BLOCKSIZE + threadIdx.x;
-  IndexType inc = gridDim.x * BLOCKSIZE;
+  SizeType gid = blockIdx.x * BLOCKSIZE + threadIdx.x;
+  SizeType inc = gridDim.x * BLOCKSIZE;
 
   ValueType sum = 0.0;
-  for (IndexType idx = gid; idx < n; idx += inc) {
+  for (SizeType idx = gid; idx < n; idx += inc) {
     sum += y[idx] * x[idx];
   }
 
@@ -108,17 +108,17 @@ __launch_bounds__(BLOCKSIZE) __global__
   }
 }
 
-template <typename ValueType, typename IndexType>
-__global__ void DOT_D_ini(IndexType n, ValueType* x, ValueType* y,
+template <typename ValueType, typename SizeType>
+__global__ void DOT_D_ini(SizeType n, ValueType* x, ValueType* y,
                           ValueType* valpha) {
   extern __shared__ ValueType vtmp[];
   // Each thread loads two elements from each chunk
   // from global to shared memory
-  IndexType tid             = threadIdx.x;
-  IndexType NumBlk          = gridDim.x;   // = 256
-  IndexType BlkSize         = blockDim.x;  // = 192
-  IndexType Chunk           = 2 * NumBlk * BlkSize;
-  IndexType i               = blockIdx.x * (2 * BlkSize) + tid;
+  SizeType tid              = threadIdx.x;
+  SizeType NumBlk           = gridDim.x;   // = 256
+  SizeType BlkSize          = blockDim.x;  // = 192
+  SizeType Chunk            = 2 * NumBlk * BlkSize;
+  SizeType i                = blockIdx.x * (2 * BlkSize) + tid;
   volatile ValueType* vtmp2 = vtmp;
 
   // Reduce from n to NumBlk * BlkSize elements. Each thread // operates with
@@ -149,11 +149,11 @@ __global__ void DOT_D_ini(IndexType n, ValueType* x, ValueType* y,
   if (tid == 0) valpha[blockIdx.x] = vtmp[0] + vtmp[1] + vtmp[2];
 }
 
-template <typename ValueType, typename IndexType>
+template <typename ValueType, typename SizeType>
 __global__ void DOT_D_fin(ValueType* valpha) {
   extern __shared__ ValueType vtmp[];
   // Each thread loads one element from global to shared mem
-  IndexType tid             = threadIdx.x;
+  SizeType tid              = threadIdx.x;
   volatile ValueType* vtmp2 = vtmp;
   vtmp[tid]                 = valpha[tid];
   __syncthreads();

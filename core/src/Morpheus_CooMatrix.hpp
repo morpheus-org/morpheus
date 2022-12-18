@@ -102,7 +102,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
   using value_type = typename traits::value_type;
   /*! The non-constant type of the values held by the container */
   using non_const_value_type = typename traits::non_const_value_type;
-  using size_type            = typename traits::index_type;
+  using size_type            = typename traits::size_type;
   //!< The type of the indices held by the container - can be const
   using index_type = typename traits::index_type;
   /*! The non-constant type of the indices held by the container */
@@ -123,7 +123,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
 
   /*! The type of \p DenseVector that holds the index_type data */
   using index_array_type =
-      Morpheus::DenseVector<index_type, index_type, array_layout, backend,
+      Morpheus::DenseVector<index_type, size_type, array_layout, backend,
                             memory_traits>;
   using index_array_pointer = typename index_array_type::value_array_pointer;
   using index_array_reference =
@@ -131,7 +131,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
 
   /*! The type of \p DenseVector that holds the value_type data */
   using value_array_type =
-      Morpheus::DenseVector<value_type, index_type, array_layout, backend,
+      Morpheus::DenseVector<value_type, size_type, array_layout, backend,
                             memory_traits>;
   using value_array_pointer = typename value_array_type::value_array_pointer;
   using value_array_reference =
@@ -175,8 +175,8 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
    * @param num_cols Number of columns of the matrix.
    * @param num_entries Number of non-zero values in the matrix.
    */
-  inline CooMatrix(const index_type num_rows, const index_type num_cols,
-                   const index_type num_entries)
+  inline CooMatrix(const size_type num_rows, const size_type num_cols,
+                   const size_type num_entries)
       : base(num_rows, num_cols, num_entries),
         _row_indices(num_entries),
         _column_indices(num_entries),
@@ -185,8 +185,8 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
   // Construct from raw pointers
   template <typename ValuePtr, typename IndexPtr>
   explicit inline CooMatrix(
-      const index_type num_rows, const index_type num_cols,
-      const index_type num_entries, IndexPtr rind_ptr, IndexPtr cind_ptr,
+      const size_type num_rows, const size_type num_cols,
+      const size_type num_entries, IndexPtr rind_ptr, IndexPtr cind_ptr,
       ValuePtr vals_ptr,
       typename std::enable_if<
           (std::is_pointer<ValuePtr>::value &&
@@ -217,8 +217,8 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
    */
   template <typename ValueArray, typename IndexArray>
   explicit inline CooMatrix(
-      const index_type num_rows, const index_type num_cols,
-      const index_type num_entries, IndexArray rind, IndexArray cind,
+      const size_type num_rows, const size_type num_cols,
+      const size_type num_entries, IndexArray rind, IndexArray cind,
       ValueArray vals,
       typename std::enable_if<
           is_dense_vector_format_container<ValueArray>::value &&
@@ -360,8 +360,8 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
    * @param num_cols Number of columns of resized matrix.
    * @param num_entries Number of non-zero entries in resized matrix.
    */
-  inline void resize(const index_type num_rows, const index_type num_cols,
-                     const index_type num_entries) {
+  inline void resize(const size_type num_rows, const size_type num_cols,
+                     const size_type num_entries) {
     base::resize(num_rows, num_cols, num_entries);
     _row_indices.resize(num_entries);
     _column_indices.resize(num_entries);
@@ -446,8 +446,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
    * @param n Index of the value to extract
    * @return Row index at index \p n
    */
-  MORPHEUS_FORCEINLINE_FUNCTION index_array_reference
-  row_indices(index_type n) {
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_reference row_indices(size_type n) {
     return _row_indices(n);
   }
 
@@ -459,7 +458,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
    * @return Column index at index \p n
    */
   MORPHEUS_FORCEINLINE_FUNCTION index_array_reference
-  column_indices(index_type n) {
+  column_indices(size_type n) {
     return _column_indices(n);
   }
 
@@ -469,7 +468,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
    * @param n Index of the value to extract
    * @return Value of the element at index \p n
    */
-  MORPHEUS_FORCEINLINE_FUNCTION value_array_reference values(index_type n) {
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_reference values(size_type n) {
     return _values(n);
   }
 
@@ -481,7 +480,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
    * @return Row index at index \p n
    */
   MORPHEUS_FORCEINLINE_FUNCTION const index_array_reference
-  crow_indices(index_type n) const {
+  crow_indices(size_type n) const {
     return _row_indices(n);
   }
 
@@ -493,7 +492,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
    * @return Column index at index \p n
    */
   MORPHEUS_FORCEINLINE_FUNCTION const index_array_reference
-  ccolumn_indices(index_type n) const {
+  ccolumn_indices(size_type n) const {
     return _column_indices(n);
   }
 
@@ -504,7 +503,7 @@ class CooMatrix : public MatrixBase<CooMatrix, ValueType, Properties...> {
    * @return Value of the element at index \p n
    */
   MORPHEUS_FORCEINLINE_FUNCTION const value_array_reference
-  cvalues(index_type n) const {
+  cvalues(size_type n) const {
     return _values(n);
   }
 
