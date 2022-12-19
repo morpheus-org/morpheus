@@ -467,19 +467,11 @@ TEST(SpaceTraitsTest, IsOpenMPExecutionSpaceSerial) {
                          ref_results);
   }
 
-#if defined(MORPHEUS_ENABLE_SERIAL)
-  {
-    bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    MORPHEUS_CHECK_SPACE(is_openmp_execution_space, DefaultHostExecutionSpace,
-                         execution_space, ref_results);
-  }
-#else
   {
     bool ref_results[8] = {1, 0, 0, 0, 1, 1, 1, 1};
     MORPHEUS_CHECK_SPACE(is_openmp_execution_space, DefaultHostExecutionSpace,
                          execution_space, ref_results);
   }
-#endif
 }
 
 /**
@@ -495,19 +487,11 @@ TEST(SpaceTraitsTest, HasOpenMPExecutionSpaceSerial) {
                          ref_results);
   }
 
-#if defined(MORPHEUS_ENABLE_SERIAL)
-  {
-    bool ref_results[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    MORPHEUS_CHECK_SPACE(has_openmp_execution_space, DefaultHostExecutionSpace,
-                         execution_space, ref_results);
-  }
-#else
   {
     bool ref_results[8] = {1, 1, 1, 1, 1, 1, 1, 1};
     MORPHEUS_CHECK_SPACE(has_openmp_execution_space, DefaultHostExecutionSpace,
                          execution_space, ref_results);
   }
-#endif
 }
 #endif  // MORPHEUS_ENABLE_OPENMP
 
