@@ -53,7 +53,7 @@ void update_diagonal(
   using value_type = typename Matrix::value_type;
 
   const size_type BLOCK_SIZE = 256;
-  const size_type NUM_BLOCKS = (A.nnnz() + BLOCK_SIZE - 1) / BLOCK_SIZE;
+  const size_type NUM_BLOCKS = Impl::ceil_div<size_type>(A.nnnz(), BLOCK_SIZE);
 
   Kernels::update_coo_diagonal_kernel<value_type, index_type, size_type>
       <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nnnz(), A.row_indices().data(),

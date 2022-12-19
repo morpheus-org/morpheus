@@ -141,20 +141,26 @@ TYPED_TEST(DynamicMatrixOperationsTypesTest, DynamicUpdateDiagonalCustom) {
 
   for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
-
-    // Create a duplicate of A on host
-    auto Ah = Morpheus::create_mirror(c.A);
-    Morpheus::copy(c.A, Ah);
-
     for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Create a duplicate of A on host
+      auto Ah = Morpheus::create_mirror(c.A);
+      Morpheus::copy(c.A, Ah);
+
       // Convert to the new active state
-      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      Morpheus::conversion_error_e status =
+          Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      EXPECT_EQ(status, Morpheus::CONV_SUCCESS);
+
       auto A = Morpheus::create_mirror_container<backend>(Ah);
       Morpheus::copy(Ah, A);
 
-      vec_t new_diag(c.A.nrows(), 1);
+      vec_t new_diag(c.A.nrows(), 0);
+      unsigned long long seed = 5374857;
+      Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
+      new_diag.assign(new_diag.size(), rand_pool, -1.0, 1.0);
 
       Morpheus::update_diagonal<TEST_CUSTOM_SPACE>(A, new_diag);
+      Morpheus::copy(A, Ah);
 
       coo_mat_h_t Acoo;
       dense_mat_h_t Adense;
@@ -201,13 +207,20 @@ TYPED_TEST(DynamicMatrixOperationsTypesTest, DynamicUpdateDiagonalGeneric) {
 
     for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
       // Convert to the new active state
-      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      Morpheus::conversion_error_e status =
+          Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      EXPECT_EQ(status, Morpheus::CONV_SUCCESS);
+
       auto A = Morpheus::create_mirror_container<backend>(Ah);
       Morpheus::copy(Ah, A);
 
-      vec_t new_diag(c.A.nrows(), 1);
+      vec_t new_diag(c.A.nrows(), 0);
+      unsigned long long seed = 5374857;
+      Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
+      new_diag.assign(new_diag.size(), rand_pool, -1.0, 1.0);
 
       Morpheus::update_diagonal<TEST_GENERIC_SPACE>(A, new_diag);
+      Morpheus::copy(A, Ah);
 
       coo_mat_h_t Acoo;
       dense_mat_h_t Adense;

@@ -142,30 +142,42 @@ class MatrixOperationsTypesTest : public ::testing::Test {
 namespace Test {
 
 TYPED_TEST_SUITE(MatrixOperationsTypesTest, MatrixOperationsTypes);
-
+// TODO: Fix Cuda LayoutRight
 TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalCustom) {
   using vec_t     = typename TestFixture::vec_dev_t;
   using vec_h_t   = typename TestFixture::vec_host_t;
   using mat_t     = typename TestFixture::mat_dev_t;
   using mat_h_t   = typename TestFixture::mat_host_t;
+  using backend   = typename TestFixture::Backend;
   using size_type = typename TestFixture::SizeType;
   using dense_mat_h_t =
       typename TestFixture::ContainersClass::diag_generator::DenseMatrix;
+  using coo_mat_h_t =
+      typename TestFixture::ContainersClass::diag_generator::SparseMatrix;
 
   for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
-    vec_t new_diag(c.A.nrows(), 1);
-    mat_t A = Morpheus::create_mirror<TEST_CUSTOM_SPACE>(c.A);
-    Morpheus::copy(c.A, A);
+    // Create a duplicate of A on host
+    auto Ah = Morpheus::create_mirror(c.A);
+    Morpheus::copy(c.A, Ah);
+
+    auto A = Morpheus::create_mirror_container<backend>(Ah);
+    Morpheus::copy(Ah, A);
+
+    vec_t new_diag(c.A.nrows(), 0);
+    unsigned long long seed = 5374857;
+    Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
+    new_diag.assign(new_diag.size(), rand_pool, -1.0, 1.0);
 
     Morpheus::update_diagonal<TEST_CUSTOM_SPACE>(A, new_diag);
-
-    mat_h_t Ah = Morpheus::create_mirror_container<Morpheus::Serial>(A);
     Morpheus::copy(A, Ah);
 
+    coo_mat_h_t Acoo;
     dense_mat_h_t Adense;
-    Morpheus::convert<Morpheus::Serial>(Ah, Adense);
+    Morpheus::convert<Morpheus::Serial>(Ah, Acoo);
+    Morpheus::convert<Morpheus::Serial>(Acoo, Adense);
+
     vec_h_t diag(Adense.nrows(), 0);
 
     for (size_type row = 0; row < Adense.nrows(); row++) {
@@ -198,7 +210,11 @@ TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalGeneric) {
   for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
-    vec_t new_diag(c.A.nrows(), 1);
+    vec_t new_diag(c.A.nrows(), 0);
+    unsigned long long seed = 5374857;
+    Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
+    new_diag.assign(new_diag.size(), rand_pool, -1.0, 1.0);
+
     mat_t A = Morpheus::create_mirror<TEST_CUSTOM_SPACE>(c.A);
     Morpheus::copy(c.A, A);
 
