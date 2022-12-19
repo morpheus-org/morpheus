@@ -47,7 +47,7 @@ struct MatrixFormats {
 #endif
 
 // Enums should be in the same order as types in MatrixFormatsProxy
-enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT, NFORMATS };
+enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT, ELL_FORMAT, NFORMATS };
 
 #ifdef __cplusplus
 }  // namespace Morpheus
