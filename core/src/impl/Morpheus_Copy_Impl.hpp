@@ -30,5 +30,6 @@
 #include <impl/Coo/Morpheus_Copy_Impl.hpp>
 #include <impl/Csr/Morpheus_Copy_Impl.hpp>
 #include <impl/Dia/Morpheus_Copy_Impl.hpp>
+#include <impl/Ell/Morpheus_Copy_Impl.hpp>
 
 #endif  // MORPHEUS_COPY_IMPL_HPP

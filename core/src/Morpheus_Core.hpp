@@ -34,6 +34,7 @@
 #include <Morpheus_DenseMatrix.hpp>
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_DiaMatrix.hpp>
+#include <Morpheus_EllMatrix.hpp>
 #include <Morpheus_DynamicMatrix.hpp>
 
 // Algorithms

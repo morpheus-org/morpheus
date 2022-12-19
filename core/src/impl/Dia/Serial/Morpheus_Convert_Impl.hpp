@@ -109,7 +109,6 @@ void convert(
 
   if (!Impl::is_sorted<ExecSpace>(dst)) {
     Impl::sort_by_row_and_column<ExecSpace>(dst);
-    // dst.sort();
   }
 }
 

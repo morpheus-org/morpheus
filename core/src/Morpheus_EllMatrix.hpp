@@ -101,21 +101,25 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
   using reference       = typename traits::reference;
   using const_reference = typename traits::const_reference;
 
-  // /*! The type of \p DenseVector that holds the index_type data */
-  // using index_array_type =
-  //     Morpheus::DenseVector<index_type, size_type, array_layout, backend,
-  //                           memory_traits>;
-  // using index_array_pointer = typename index_array_type::value_array_pointer;
-  // using index_array_reference =
-  //     typename index_array_type::value_array_reference;
+  /*! The type of \p DenseMatrix that holds the index_type data */
+  using index_array_type =
+      Morpheus::DenseMatrix<index_type, size_type, array_layout, backend,
+                            memory_traits>;
+  using const_index_array_type = const index_array_type;
+  using index_array_pointer    = typename index_array_type::value_array_pointer;
+  using index_array_reference =
+      typename index_array_type::value_array_reference;
+  using const_index_array_reference = const index_array_reference;
 
-  // /*! The type of \p DenseVector that holds the value_type data */
-  // using value_array_type =
-  //     Morpheus::DenseVector<value_type, size_type, array_layout, backend,
-  //                           memory_traits>;
-  // using value_array_pointer = typename value_array_type::value_array_pointer;
-  // using value_array_reference =
-  //     typename value_array_type::value_array_reference;
+  /*! The type of \p DenseMatrix that holds the value_type data */
+  using value_array_type =
+      Morpheus::DenseMatrix<value_type, size_type, array_layout, backend,
+                            memory_traits>;
+  using const_value_array_type = const value_array_type;
+  using value_array_pointer    = typename value_array_type::value_array_pointer;
+  using value_array_reference =
+      typename value_array_type::value_array_reference;
+  using const_value_array_reference = const value_array_reference;
 
   /**
    * @brief The default destructor.
@@ -145,9 +149,12 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
   /**
    * @brief Construct an empty EllMatrix object
    */
-  inline EllMatrix() : base() {
-    throw Morpheus::NotImplementedException("TODO");
-  }
+  inline EllMatrix()
+      : base(),
+        _entries_per_row(),
+        _alignment(),
+        _column_indices(),
+        _values() {}
 
   /**
    * @brief Construct a EllMatrix object with shape (num_rows, num_cols) and
@@ -156,15 +163,63 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
    * @param num_rows  Number of rows of the matrix.
    * @param num_cols Number of columns of the matrix.
    * @param num_entries Number of non-zero values in the matrix.
+   * @param num_entries_per_row Maximum number of non-zeros per row
+   * @param alignment Amount of padding used to align the data (default=32)
    */
   inline EllMatrix(const size_type num_rows, const size_type num_cols,
-                   const size_type num_entries)
-      : base(num_rows, num_cols, num_entries) {
-    throw Morpheus::NotImplementedException("TODO");
+                   const size_type num_entries,
+                   const size_type num_entries_per_row,
+                   const size_type alignment = 32)
+      : base(num_rows, num_cols, num_entries),
+        _entries_per_row(num_entries_per_row),
+        _alignment(alignment),
+        _column_indices(),
+        _values() {
+    // _values.resize(Impl::get_pad_size<size_type>(num_rows, alignment),
+    //                num_entries_per_row);
+    _column_indices.resize(num_rows, Impl::get_pad_size<size_type>(
+                                         num_entries_per_row, alignment));
+    _values.resize(num_rows, Impl::get_pad_size<size_type>(num_entries_per_row,
+                                                           alignment));
   }
 
   // Construct from pointers
-  // Construct from vectors/matrices
+
+  /**
+   * @brief Construct a EllMatrix object with shape (num_rows, num_cols) and
+   * number of non-zeros equal to num_entries and assign the column indices
+   * and values from \p DenseMatrix arrays equivalently.
+   *
+   * @tparam ValueArray Value type DenseMatrix type.
+   * @tparam IndexArray Index type DenseMatrix type.
+   *
+   * @param num_rows  Number of rows of the matrix.
+   * @param num_cols Number of columns of the matrix.
+   * @param num_entries Number of non-zero values in the matrix.
+   * @param col_indices \p DenseMatrix containing the column indices of the
+   * matrix.
+   * @param vals \p DenseMatrix containing the values of the matrix.
+   */
+  template <typename ValueArray, typename IndexArray>
+  explicit inline EllMatrix(
+      const size_type num_rows, const size_type num_cols,
+      const size_type num_entries, const size_type num_entries_per_row,
+      const IndexArray &col_indices, const ValueArray &vals,
+      typename std::enable_if<
+          is_dense_matrix_format_container<ValueArray>::value &&
+          is_dense_matrix_format_container<IndexArray>::value &&
+          is_compatible<typename EllMatrix::value_array_type,
+                        ValueArray>::value &&
+          is_compatible<typename EllMatrix::index_array_type,
+                        IndexArray>::value &&
+          !ValueArray::memory_traits::is_unmanaged &&
+          !IndexArray::memory_traits::is_unmanaged>::type * = nullptr)
+      : base(num_rows, num_cols, num_entries),
+        _column_indices(col_indices),
+        _values(vals) {
+    _entries_per_row = num_entries_per_row;
+    _alignment       = _column_indices.ncols();
+  }
 
   /**
    * @brief Constructs a EllMatrix from another compatible EllMatrix
@@ -180,9 +235,11 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
   EllMatrix(const EllMatrix<VR, PR...> &src,
             typename std::enable_if<is_format_compatible<
                 EllMatrix, EllMatrix<VR, PR...>>::value>::type * = nullptr)
-      : base(src.nrows(), src.ncols(), src.nnnz()) {
-    throw Morpheus::NotImplementedException("TODO");
-  }
+      : base(src.nrows(), src.ncols(), src.nnnz()),
+        _entries_per_row(src.entries_per_row()),
+        _alignment(src.alignment()),
+        _column_indices(src.ccolumn_indices()),
+        _values(src.cvalues()) {}
 
   /**
    * @brief Assigns a EllMatrix from another compatible EllMatrix
@@ -204,7 +261,10 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
     this->set_ncols(src.ncols());
     this->set_nnnz(src.nnnz());
 
-    throw Morpheus::NotImplementedException("TODO");
+    _entries_per_row = src.entries_per_row();
+    _alignment       = src.alignment();
+    _column_indices  = src.ccolumn_indices();
+    _values          = src.cvalues();
 
     return *this;
   }
@@ -295,9 +355,18 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
    * @param num_entries Number of non-zero entries in resized matrix.
    */
   inline void resize(const size_type num_rows, const size_type num_cols,
-                     const size_type num_entries) {
+                     const size_type num_entries,
+                     const size_type num_entries_per_row,
+                     const size_type alignment = 32) {
     base::resize(num_rows, num_cols, num_entries);
-    throw Morpheus::NotImplementedException("TODO");
+
+    _entries_per_row = num_entries_per_row;
+    _alignment       = alignment;
+
+    _column_indices.resize(num_rows, Impl::get_pad_size<size_type>(
+                                         num_entries_per_row, alignment));
+    _values.resize(num_rows, Impl::get_pad_size<size_type>(num_entries_per_row,
+                                                           alignment));
   }
 
   /**
@@ -310,7 +379,8 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
    */
   template <class VR, class... PR>
   inline void resize(const EllMatrix<VR, PR...> &src) {
-    resize(src.nrows(), src.ncols(), src.nnnz());
+    resize(src.nrows(), src.ncols(), src.nnnz(), src.entries_per_row(),
+           src.alignment());
   }
 
   /**
@@ -323,7 +393,8 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
    */
   template <class VR, class... PR>
   inline EllMatrix &allocate(const EllMatrix<VR, PR...> &src) {
-    resize(src.nrows(), src.ncols(), src.nnnz());
+    resize(src.nrows(), src.ncols(), src.nnnz(), src.entries_per_row(),
+           src.alignment());
     return *this;
   }
 
@@ -342,8 +413,139 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
    */
   int format_index() const { return static_cast<int>(_id); }
 
+  /**
+   * @brief Returns a reference to the column indices of the matrix with indexes
+   * (i, j)
+   *
+   * @param i Row index of the value to extract
+   * @param j Column index of the value to extract
+   * @return Column index of the element at index (i, j)
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_reference
+  column_indices(size_type i, size_type j) {
+    return _column_indices(i, j);
+  }
+
+  /**
+   * @brief Returns a reference to the value of the matrix with indexes (i, j)
+   *
+   * @param i Row index of the value to extract
+   * @param j Column index of the value to extract
+   * @return Value of the element at index (i, j)
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_reference values(size_type i,
+                                                             size_type j) {
+    return _values(i, j);
+  }
+
+  /**
+   * @brief Returns a const-reference to the column indices of the matrix with
+   * indexes (i, j)
+   *
+   * @param i Row index of the value to extract
+   * @param j Column index of the value to extract
+   * @return Column index of the element at index (i, j)
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_reference
+  ccolumn_indices(size_type i, size_type j) const {
+    return _column_indices(i, j);
+  }
+
+  /**
+   * @brief Returns a const-reference to the value of the matrix with indexes
+   * (i, j)
+   *
+   * @param i Row index of the value to extract
+   * @param j Column index of the value to extract
+   * @return Value of the element at index (i, j)
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_reference
+  cvalues(size_type i, size_type j) const {
+    return _values(i, j);
+  }
+
+  /**
+   * @brief Returns a reference to the column indices of the matrix
+   *
+   * @return index_array_type& A reference to the column indices
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION index_array_type &column_indices() {
+    return _column_indices;
+  }
+
+  /**
+   * @brief Returns a reference to the values of the matrix
+   *
+   * @return value_array_type& A reference to the values
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION value_array_type &values() { return _values; }
+
+  /**
+   * @brief Returns a const-reference to the column indices of the matrix
+   *
+   * @return index_array_type& A const-reference to the column indices
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_type &ccolumn_indices()
+      const {
+    return _column_indices;
+  }
+
+  /**
+   * @brief Returns a const-reference to the values of the matrix
+   *
+   * @return const_value_array_type& A const-reference to the values
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_type &cvalues() const {
+    return _values;
+  }
+
+  /**
+   * @brief Returns the number maximum entries per row.
+   *
+   * @return size_type Number of max entries per row.
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION size_type entries_per_row() const {
+    return _entries_per_row;
+  }
+
+  /**
+   * @brief Returns the amount of padding used to align the data.
+   *
+   * @return size_type Amount of padding used to align the data
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION size_type alignment() const {
+    return _alignment;
+  }
+
+  MORPHEUS_FORCEINLINE_FUNCTION index_type invalid_index() const {
+    return _invalid_index;
+  }
+
+  /**
+   * @brief Sets the number of elements per row of the matrix.
+   *
+   * @param num_entries_per_row number of entries per row
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION void set_entries_per_row(
+      const size_type num_entries_per_row) {
+    _entries_per_row = num_entries_per_row;
+  }
+
+  /**
+   * @brief Sets amount of padding with which to align the data.
+   *
+   * @param alignment New amount of padding.
+   */
+  MORPHEUS_FORCEINLINE_FUNCTION void set_alignment(const size_type alignment) {
+    _alignment = alignment;
+  }
+
  private:
-  static constexpr formats_e _id = Morpheus::ELL_FORMAT;
+  size_type _entries_per_row, _alignment;
+  index_array_type _column_indices;
+  value_array_type _values;
+  static constexpr formats_e _id         = Morpheus::ELL_FORMAT;
+  const static index_type _invalid_index = static_cast<index_type>(-1);
 };
 /*! \}  // end of containers_2d group
  */
