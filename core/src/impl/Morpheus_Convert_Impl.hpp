@@ -59,6 +59,7 @@
 #include <impl/Dia/Kokkos/Morpheus_Convert_Impl.hpp>
 
 #include <impl/Ell/Serial/Morpheus_Convert_Impl.hpp>
+#include <impl/Ell/OpenMP/Morpheus_Convert_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {

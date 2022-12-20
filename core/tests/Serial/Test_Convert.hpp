@@ -25,6 +25,7 @@
 #define TEST_CORE_SERIAL_TEST_CONVERT_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
 #include <utils/Macros_CooMatrix.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
