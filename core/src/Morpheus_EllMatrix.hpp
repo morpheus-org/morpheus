@@ -295,33 +295,33 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
     std::visit(f, src.const_formats());
   }
 
-  // /**
-  //  * @brief Assigns a EllMatrix from a compatible DynamicMatrix
-  //  *
-  //  * @par Overview
-  //  * Assigns a EllMatrix from a compatible DynamicMatrix i.e a matrix that
-  //  * satisfies the \p is_dynamically_compatible check. Note that when the
-  //  active
-  //  * type of the dynamic matrix is different from the concrete type, this
-  //  will
-  //  * result in an exception thrown.
-  //  *
-  //  * @tparam VR Type of Values the Other Matrix holds.
-  //  * @tparam PR Properties of the Other Matrix.
-  //  * @param src The matrix we are assigning from.
-  //  */
-  // template <class VR, class... PR>
-  // typename std::enable_if<
-  //     is_dynamically_compatible<EllMatrix, DynamicMatrix<VR, PR...>>::value,
-  //     EllMatrix &>::type
-  // operator=(const DynamicMatrix<VR, PR...> &src) {
-  //   auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
-  //                      std::ref(*this));
+  /**
+   * @brief Assigns a EllMatrix from a compatible DynamicMatrix
+   *
+   * @par Overview
+   * Assigns a EllMatrix from a compatible DynamicMatrix i.e a matrix that
+   * satisfies the \p is_dynamically_compatible check. Note that when the
+   active
+   * type of the dynamic matrix is different from the concrete type, this
+   will
+   * result in an exception thrown.
+   *
+   * @tparam VR Type of Values the Other Matrix holds.
+   * @tparam PR Properties of the Other Matrix.
+   * @param src The matrix we are assigning from.
+   */
+  template <class VR, class... PR>
+  typename std::enable_if<
+      is_dynamically_compatible<EllMatrix, DynamicMatrix<VR, PR...>>::value,
+      EllMatrix &>::type
+  operator=(const DynamicMatrix<VR, PR...> &src) {
+    auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
+                       std::ref(*this));
 
-  //   std::visit(f, src.const_formats());
+    std::visit(f, src.const_formats());
 
-  //   return *this;
-  // }
+    return *this;
+  }
 
   /**
    * @brief Construct a EllMatrix object from another storage format. This

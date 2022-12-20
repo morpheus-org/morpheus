@@ -29,6 +29,7 @@
 #include <fwd/Morpheus_Fwd_CooMatrix.hpp>
 #include <fwd/Morpheus_Fwd_CsrMatrix.hpp>
 #include <fwd/Morpheus_Fwd_DiaMatrix.hpp>
+#include <fwd/Morpheus_Fwd_EllMatrix.hpp>
 
 #include <impl/Morpheus_MatrixProxy.hpp>
 
@@ -39,7 +40,8 @@ struct MatrixFormats {
   using formats_proxy = typename Impl::MatrixFormatsProxy<
       typename CooMatrix<ValueType, Properties...>::type,
       typename CsrMatrix<ValueType, Properties...>::type,
-      typename DiaMatrix<ValueType, Properties...>::type>::type;
+      typename DiaMatrix<ValueType, Properties...>::type,
+      typename EllMatrix<ValueType, Properties...>::type>::type;
   using variant   = typename formats_proxy::variant;
   using type_list = typename formats_proxy::type_list;
 };
