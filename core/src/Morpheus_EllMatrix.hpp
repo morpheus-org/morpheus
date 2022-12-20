@@ -269,32 +269,31 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
     return *this;
   }
 
-  // /**
-  //  * @brief Constructs a EllMatrix from a compatible DynamicMatrix
-  //  *
-  //  * @par Overview
-  //  * Constructs a EllMatrix from a compatible DynamicMatrix i.e a matrix that
-  //  * satisfies the \p is_dynamically_compatible check. Note that when the
-  //  active
-  //  * type of the dynamic matrix is different from the concrete type, this
-  //  will
-  //  * result in an exception thrown.
-  //  *
-  //  * @tparam VR Type of Values the Other Matrix holds.
-  //  * @tparam PR Properties of the Other Matrix.
-  //  * @param src The matrix we are constructing from.
-  //  */
-  // template <class VR, class... PR>
-  // EllMatrix(const DynamicMatrix<VR, PR...> &src,
-  //           typename std::enable_if<is_dynamically_compatible<
-  //               EllMatrix, DynamicMatrix<VR, PR...>>::value>::type * =
-  //               nullptr)
-  //     : base(src.nrows(), src.ncols(), src.nnnz()) {
-  //   auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
-  //                      std::ref(*this));
+  /**
+   * @brief Constructs a EllMatrix from a compatible DynamicMatrix
+   *
+   * @par Overview
+   * Constructs a EllMatrix from a compatible DynamicMatrix i.e a matrix that
+   * satisfies the \p is_dynamically_compatible check. Note that when the
+   active
+   * type of the dynamic matrix is different from the concrete type, this
+   will
+   * result in an exception thrown.
+   *
+   * @tparam VR Type of Values the Other Matrix holds.
+   * @tparam PR Properties of the Other Matrix.
+   * @param src The matrix we are constructing from.
+   */
+  template <class VR, class... PR>
+  EllMatrix(const DynamicMatrix<VR, PR...> &src,
+            typename std::enable_if<is_dynamically_compatible<
+                EllMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr)
+      : base(src.nrows(), src.ncols(), src.nnnz()) {
+    auto f = std::bind(Impl::any_type_assign(), std::placeholders::_1,
+                       std::ref(*this));
 
-  //   std::visit(f, src.const_formats());
-  // }
+    std::visit(f, src.const_formats());
+  }
 
   // /**
   //  * @brief Assigns a EllMatrix from a compatible DynamicMatrix

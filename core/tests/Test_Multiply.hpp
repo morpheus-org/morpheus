@@ -31,6 +31,7 @@
 #include <utils/Macros_CooMatrix.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
+#include <utils/Macros_EllMatrix.hpp>
 #include <utils/MatrixGenerator.hpp>
 
 using CooMatrixTypes =
@@ -43,6 +44,10 @@ using CsrMatrixTypes =
 
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
+                                               types::types_set>::type;
+
+using EllMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
                                                types::types_set>::type;
 
 using DenseVectorTypes =
@@ -60,9 +65,15 @@ using DiaMatrixPairs =
     generate_pair<generate_pair<DiaMatrixTypes, DenseVectorTypes>::type,
                   DenseVectorTypes>::type;
 
+using EllMatrixPairs =
+    generate_pair<generate_pair<EllMatrixTypes, DenseVectorTypes>::type,
+                  DenseVectorTypes>::type;
+
 using pairs = typename Morpheus::concat<
     CooMatrixPairs,
-    typename Morpheus::concat<CsrMatrixPairs, DiaMatrixPairs>::type>::type;
+    typename Morpheus::concat<
+        CsrMatrixPairs, typename Morpheus::concat<
+                            DiaMatrixPairs, EllMatrixPairs>::type>::type>::type;
 
 using MultiplyTypes = to_gtest_types<pairs>::type;
 

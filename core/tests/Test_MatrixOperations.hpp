@@ -31,6 +31,7 @@
 #include <utils/Macros_CooMatrix.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
+#include <utils/Macros_EllMatrix.hpp>
 #include <utils/MatrixGenerator.hpp>
 
 using CooMatrixTypes =
@@ -45,6 +46,10 @@ using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
                                                types::types_set>::type;
 
+using EllMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
+                                               types::types_set>::type;
+
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
                                                types::types_set>::type;
@@ -52,10 +57,13 @@ using DenseVectorTypes =
 using CooMatrixPairs = generate_pair<CooMatrixTypes, DenseVectorTypes>::type;
 using CsrMatrixPairs = generate_pair<CsrMatrixTypes, DenseVectorTypes>::type;
 using DiaMatrixPairs = generate_pair<DiaMatrixTypes, DenseVectorTypes>::type;
+using EllMatrixPairs = generate_pair<EllMatrixTypes, DenseVectorTypes>::type;
 
 using pairs = typename Morpheus::concat<
     CooMatrixPairs,
-    typename Morpheus::concat<CsrMatrixPairs, DiaMatrixPairs>::type>::type;
+    typename Morpheus::concat<
+        CsrMatrixPairs, typename Morpheus::concat<
+                            DiaMatrixPairs, EllMatrixPairs>::type>::type>::type;
 
 using MatrixOperationsTypes = to_gtest_types<pairs>::type;
 
@@ -142,12 +150,10 @@ class MatrixOperationsTypesTest : public ::testing::Test {
 namespace Test {
 
 TYPED_TEST_SUITE(MatrixOperationsTypesTest, MatrixOperationsTypes);
-// TODO: Fix Cuda LayoutRight
+// TODO: Fix Cuda LayoutRight for Dia
 TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalCustom) {
   using vec_t     = typename TestFixture::vec_dev_t;
   using vec_h_t   = typename TestFixture::vec_host_t;
-  using mat_t     = typename TestFixture::mat_dev_t;
-  using mat_h_t   = typename TestFixture::mat_host_t;
   using backend   = typename TestFixture::Backend;
   using size_type = typename TestFixture::SizeType;
   using dense_mat_h_t =
