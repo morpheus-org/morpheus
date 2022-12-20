@@ -51,11 +51,15 @@ void convert(
   using size_type = typename SourceType::size_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz(), src.entries_per_row());
+  dst.column_indices().assign(dst.column_indices().nrows(),
+                              dst.column_indices().ncols(),
+                              dst.invalid_index());
+  dst.values().assign(dst.values().nrows(), dst.values().ncols(), 0);
 
-  for (size_type i = 0; i < src.nrows(); i++) {
-    for (size_type n = 0; n < src.entries_per_row(); n++) {
-      dst.column_indices(i, n) = src.ccolumn_indices(i, n);
-      dst.values(i, n)         = src.cvalues(i, n);
+  for (size_type i = 0; i < src.cvalues().nrows(); i++) {
+    for (size_type j = 0; j < src.cvalues().ncols(); j++) {
+      dst.column_indices(i, j) = src.ccolumn_indices(i, j);
+      dst.values(i, j)         = src.cvalues(i, j);
     }
   }
 }
@@ -122,7 +126,7 @@ void convert(
     if (row_id != src.crow_indices(n)) {
       num_entries_per_row =
           entries_ctr > num_entries_per_row ? entries_ctr : num_entries_per_row;
-      entries_ctr = 1;  // should be 1;
+      entries_ctr = 0;  // should be 1;
       row_id      = src.crow_indices(n);
     } else {
       entries_ctr++;
@@ -130,18 +134,28 @@ void convert(
   }
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz(), num_entries_per_row);
+  dst.column_indices().assign(dst.column_indices().nrows(),
+                              dst.column_indices().ncols(),
+                              dst.invalid_index());
+  dst.values().assign(dst.values().nrows(), dst.values().ncols(), 0);
 
   const dst_size_type nnrows = dst.column_indices().nrows();
   const dst_size_type nncols = dst.column_indices().ncols();
   dst.column_indices().assign(nnrows, nncols, dst.invalid_index());
   dst.values().assign(nnrows, nncols, dst_value_type(0));
 
-  for (src_size_type i = 0; i < src.nnnz(); i++) {
+  row_id = 0;
+  for (src_size_type i = 0, n = 0; i < src.nnnz(); i++) {
     src_index_type row = src.crow_indices(i);
-    src_size_type n    = i % num_entries_per_row;
+
+    if (row_id != src.crow_indices(i)) {
+      n      = 0;
+      row_id = src.crow_indices(i);
+    }
 
     dst.column_indices(row, n) = src.ccolumn_indices(i);
     dst.values(row, n)         = src.cvalues(i);
+    n++;
   }
 }
 

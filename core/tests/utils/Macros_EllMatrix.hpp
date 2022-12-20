@@ -177,11 +177,19 @@ void update_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_ell_matrix_format_container_v<Container>>* = nullptr) {
+  using size_type  = typename Container::size_type;
   using value_type = typename Container::value_type;
   // New Matrix
   // [1.11 *    *    ]
   // [*    *    -3.33]
   // [2.22 4.44 *    ]
+
+  for (size_type i = 0; i < c.values().nrows(); i++) {
+    for (size_type j = 0; j < c.values().ncols(); j++) {
+      c.column_indices(i, j) = c.invalid_index();
+      c.values(i, j)         = value_type(0);
+    }
+  }
 
   // clang-format off
   c.column_indices(0,0) = 0; 

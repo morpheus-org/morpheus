@@ -27,6 +27,7 @@
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_MatrixBase.hpp>
+#include <Morpheus_DynamicMatrix.hpp>
 
 namespace Morpheus {
 
