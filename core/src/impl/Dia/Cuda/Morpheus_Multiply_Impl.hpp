@@ -55,8 +55,8 @@ inline void multiply(
   const size_type MAX_BLOCKS = max_active_blocks(
       Kernels::spmv_dia_kernel<size_type, index_type, value_type, BLOCK_SIZE>,
       BLOCK_SIZE, (size_type)sizeof(index_type) * BLOCK_SIZE);
-  const size_type NUM_BLOCKS =
-      std::min<size_type>(MAX_BLOCKS, DIVIDE_INTO(A.nrows(), BLOCK_SIZE));
+  const size_type NUM_BLOCKS = std::min<size_type>(
+      MAX_BLOCKS, Impl::ceil_div<size_type>(A.nrows(), BLOCK_SIZE));
 
   const index_type* D     = A.cdiagonal_offsets().data();
   const value_type* V     = A.cvalues().data();

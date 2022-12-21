@@ -61,7 +61,7 @@ inline void multiply(
       policy, KOKKOS_LAMBDA(const member_type& team_member) {
         const index_type row = team_member.league_rank();
 
-        value_type sum = init ? value_type(0) : y_view[row];
+        value_type sum = 0;
         Kokkos::parallel_reduce(
             Kokkos::TeamThreadRange(team_member, ndiag),
             [=](const size_type& n, value_type& lsum) {
@@ -72,7 +72,11 @@ inline void multiply(
               }
             },
             sum);
-        y_view[row] = init ? sum : sum + y_view[row];
+
+        team_member.team_barrier();
+        if (team_member.team_rank() == 0) {
+          y_view[row] = init ? sum : sum + y_view[row];
+        }
       });
 }
 
@@ -93,9 +97,9 @@ inline void multiply(
 //   using range_policy =
 //       Kokkos::RangePolicy<Kokkos::IndexType<size_type>, execution_space>;
 
-//   const value_array_type values                  = A.cvalues().const_view();
-//   const typename Vector::value_array_type x_view = x.const_view();
-//   const index_array_type diagonal_offsets =
+//   const value_array_type values                  =
+//   A.cvalues().const_view(); const typename Vector::value_array_type x_view
+//   = x.const_view(); const index_array_type diagonal_offsets =
 //   A.cdiagonal_offsets().const_view(); typename Vector2::value_array_type
 //   y_view = y.view(); size_type ndiag = A.cvalues().ncols(), ncols =
 //   A.ncols();

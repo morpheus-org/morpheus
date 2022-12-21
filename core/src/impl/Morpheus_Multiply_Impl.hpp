@@ -44,6 +44,7 @@
 
 #include <impl/Ell/Serial/Morpheus_Multiply_Impl.hpp>
 #include <impl/Ell/OpenMP/Morpheus_Multiply_Impl.hpp>
+#include <impl/Ell/Cuda/Morpheus_Multiply_Impl.hpp>
 #include <impl/Ell/Kokkos/Morpheus_Multiply_Impl.hpp>
 
 #endif  // MORPHEUS_IMPL_MULTIPLY_IMPL_HPP

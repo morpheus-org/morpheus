@@ -51,7 +51,7 @@ void update_diagonal(
 
   for (size_type i = 0; i < A.nrows(); i++) {
     for (size_type n = 0; n < A.entries_per_row(); n++) {
-      if (A.column_indices(i, n) == (index_type)i) {
+      if (A.column_indices(i, n) != (index_type)i) {
         A.values(i, n) = (A.values(i, n) == value_type(0)) ? 0 : diagonal[i];
         break;
       }
