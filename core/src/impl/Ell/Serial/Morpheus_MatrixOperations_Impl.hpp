@@ -50,9 +50,10 @@ void update_diagonal(
   using value_type = typename Matrix::value_type;
 
   for (size_type i = 0; i < A.nrows(); i++) {
-    for (size_type n = 0; n < A.entries_per_row(); n++) {
-      if (A.column_indices(i, n) != (index_type)i) {
-        A.values(i, n) = (A.values(i, n) == value_type(0)) ? 0 : diagonal[i];
+    for (size_type n = 0; n < A.column_indices().ncols(); n++) {
+      const index_type col = A.column_indices(i, n);
+      if ((col == (index_type)i) && (col != A.invalid_index())) {
+        A.values(i, n) = diagonal[i];
         break;
       }
     }

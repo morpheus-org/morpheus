@@ -55,15 +55,16 @@ void update_diagonal(
   value_array values                  = A.values().view();
   index_array column_indices          = A.column_indices().view();
   const diagonal_array diagonal_view  = diagonal.const_view();
-  const size_type num_entries_per_row = A.entries_per_row();
+  const size_type num_entries_per_row = A.column_indices().ncols();
+  const index_type invalid_index      = A.invalid_index();
   range_policy policy(0, A.nrows());
 
   Kokkos::parallel_for(
       policy, KOKKOS_LAMBDA(const size_type i) {
         for (size_type n = 0; n < num_entries_per_row; n++) {
-          if (column_indices(i, n) == (index_type)i) {
-            values(i, n) =
-                (values(i, n) == value_type(0)) ? 0 : diagonal_view[i];
+          const index_type col = column_indices(i, n);
+          if ((col == (index_type)i) && (col != invalid_index)) {
+            values(i, n) = diagonal_view[i];
             break;
           }
         }

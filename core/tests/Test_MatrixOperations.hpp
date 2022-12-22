@@ -154,6 +154,7 @@ TYPED_TEST_SUITE(MatrixOperationsTypesTest, MatrixOperationsTypes);
 TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalCustom) {
   using vec_t     = typename TestFixture::vec_dev_t;
   using vec_h_t   = typename TestFixture::vec_host_t;
+  using mat_h_t   = typename TestFixture::mat_host_t;
   using backend   = typename TestFixture::Backend;
   using size_type = typename TestFixture::SizeType;
   using dense_mat_h_t =

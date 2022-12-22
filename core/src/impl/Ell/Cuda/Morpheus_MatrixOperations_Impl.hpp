@@ -21,17 +21,20 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ELL_OPENMP_MATRIXOPERATIONS_IMPL_HPP
-#define MORPHEUS_ELL_OPENMP_MATRIXOPERATIONS_IMPL_HPP
+#ifndef MORPHEUS_ELL_CUDA_MATRIXOPERATIONS_IMPL_HPP
+#define MORPHEUS_ELL_CUDA_MATRIXOPERATIONS_IMPL_HPP
 
 #include <Morpheus_Macros.hpp>
-#if defined(MORPHEUS_ENABLE_OPENMP)
+#if defined(MORPHEUS_ENABLE_CUDA)
 
 #include <Morpheus_Exceptions.hpp>
 #include <Morpheus_SpaceTraits.hpp>
 #include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
+
+#include <impl/Morpheus_CudaUtils.hpp>
+#include <impl/Ell/Kernels/Morpheus_MatrixOperations_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -43,31 +46,39 @@ void update_diagonal(
         Morpheus::is_ell_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::has_custom_backend_v<ExecSpace> &&
-        Morpheus::has_openmp_execution_space_v<ExecSpace> &&
+        Morpheus::has_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using size_type  = typename Matrix::size_type;
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
 
-#pragma omp parallel for collapse(2)
-  for (size_type i = 0; i < A.nrows(); i++) {
-    for (size_type n = 0; n < A.column_indices().ncols(); n++) {
-      const index_type col = A.column_indices(i, n);
-      if ((col == (index_type)i) && (col != A.invalid_index())) {
-        A.values(i, n) = diagonal[i];
-      }
-    }
-  }
+  const size_type BLOCK_SIZE = 256;
+  const size_type MAX_BLOCKS = max_active_blocks(
+      Kernels::update_ell_diagonal_kernel<value_type, index_type, size_type>,
+      BLOCK_SIZE, 0);
+  const size_type NUM_BLOCKS = std::min<size_type>(
+      MAX_BLOCKS, Impl::ceil_div<size_type>(A.nrows(), BLOCK_SIZE));
+
+  const index_type num_entries_per_row = A.ccolumn_indices().ncols();
+  const index_type pitch               = A.ccolumn_indices().nrows();
+
+  Kernels::update_ell_diagonal_kernel<value_type, index_type, size_type>
+      <<<NUM_BLOCKS, BLOCK_SIZE, 0>>>(A.nrows(), A.ncols(), num_entries_per_row,
+                                      pitch, A.column_indices().data(),
+                                      A.values().data(), diagonal.data());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastCudaError("update_ell_diagonal_kernel: Kernel execution failed");
+#endif
 }
 
 template <typename ExecSpace, typename Matrix, typename Vector>
 void get_diagonal(
-    Matrix&, const Vector&,
+    Matrix& A, const Vector& diagonal,
     typename std::enable_if_t<
         Morpheus::is_ell_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::has_custom_backend_v<ExecSpace> &&
-        Morpheus::has_openmp_execution_space_v<ExecSpace> &&
+        Morpheus::has_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
 }
@@ -78,7 +89,7 @@ void set_value(Matrix&, SizeType, SizeType, ValueType,
                typename std::enable_if_t<
                    Morpheus::is_ell_matrix_format_container_v<Matrix> &&
                    Morpheus::has_custom_backend_v<ExecSpace> &&
-                   Morpheus::has_openmp_execution_space_v<ExecSpace> &&
+                   Morpheus::has_cuda_execution_space_v<ExecSpace> &&
                    Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
   throw Morpheus::NotImplementedException("set_value not implemented yet");
 }
@@ -93,7 +104,7 @@ void set_values(
         Morpheus::is_dense_vector_format_container_v<IndexVector> &&
         Morpheus::is_dense_vector_format_container_v<ValueVector> &&
         Morpheus::has_custom_backend_v<ExecSpace> &&
-        Morpheus::has_openmp_execution_space_v<ExecSpace> &&
+        Morpheus::has_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, IndexVector, ValueVector>>* =
         nullptr) {
   throw Morpheus::NotImplementedException("set_values not implemented yet");
@@ -106,7 +117,7 @@ void transpose(
         Morpheus::is_ell_matrix_format_container_v<Matrix> &&
         Morpheus::is_ell_matrix_format_container_v<TransposeMatrix> &&
         Morpheus::has_custom_backend_v<ExecSpace> &&
-        Morpheus::has_openmp_execution_space_v<ExecSpace> &&
+        Morpheus::has_cuda_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, TransposeMatrix>>* =
         nullptr) {
   throw Morpheus::NotImplementedException("transpose not implemented yet");
@@ -115,5 +126,5 @@ void transpose(
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ENABLE_OPENMP
-#endif  // MORPHEUS_ELL_OPENMP_MATRIXOPERATIONS_IMPL_HPP
+#endif  // MORPHEUS_ENABLE_CUDA
+#endif  // MORPHEUS_ELL_CUDA_MATRIXOPERATIONS_IMPL_HPP

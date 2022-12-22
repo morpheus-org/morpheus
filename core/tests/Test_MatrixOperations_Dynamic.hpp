@@ -200,12 +200,11 @@ TYPED_TEST(DynamicMatrixOperationsTypesTest, DynamicUpdateDiagonalGeneric) {
 
   for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
-
-    // Create a duplicate of A on host
-    auto Ah = Morpheus::create_mirror(c.A);
-    Morpheus::copy(c.A, Ah);
-
     for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Create a duplicate of A on host
+      auto Ah = Morpheus::create_mirror(c.A);
+      Morpheus::copy(c.A, Ah);
+
       // Convert to the new active state
       Morpheus::conversion_error_e status =
           Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);

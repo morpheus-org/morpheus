@@ -254,7 +254,7 @@ TYPED_TEST(MultiplyTypesTest, MultiplyGeneric) {
     for (size_type n = 0; n < cyh.size(); n++) {
       cyh(n) += 1;
     }
-    EXPECT_TRUE(Morpheus::Test::have_approx_same_data(yh, cyh));
+    EXPECT_TRUE(Morpheus::Test::have_approx_same_data(yh, cyh, true));
   }
 }
 
