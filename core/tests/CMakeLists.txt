@@ -43,6 +43,10 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       DynamicMatrix_CompatibleBinary
       DynamicMatrix_CompatibleConcreteBinary
       DynamicMatrix
+      EllMatrix_Binary
+      EllMatrix_CompatibleBinary
+      EllMatrix_CompatibleDynamicBinary
+      EllMatrix
       FormatTags
       FormatTraits
       GenericBackend

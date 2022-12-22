@@ -31,30 +31,31 @@
  * columns and non-zeros
  *
  */
-#define CHECK_ELL_SIZES(A, num_rows, num_cols, num_nnz, num_entries_per_row,  \
-                        align)                                                \
-  {                                                                           \
-    using container_size_type = decltype(A.nrows());                          \
-    EXPECT_EQ(A.nrows(), num_rows);                                           \
-    EXPECT_EQ(A.ncols(), num_cols);                                           \
-    EXPECT_EQ(A.nnnz(), num_nnz);                                             \
-    EXPECT_EQ(A.entries_per_row(), num_entries_per_row);                      \
-    EXPECT_EQ(A.alignment(), align);                                          \
-    EXPECT_EQ(A.column_indices().nrows(), num_rows);                          \
-    EXPECT_EQ(A.column_indices().view().extent(0), num_rows);                 \
-    EXPECT_EQ(                                                                \
-        A.column_indices().ncols(),                                           \
-        Impl::get_pad_size<container_size_type>(num_entries_per_row, align)); \
-    EXPECT_EQ(                                                                \
-        A.column_indices().view().extent(1),                                  \
-        Impl::get_pad_size<container_size_type>(num_entries_per_row, align)); \
-    EXPECT_EQ(A.values().nrows(), num_rows);                                  \
-    EXPECT_EQ(A.values().view().extent(0), num_rows);                         \
-    EXPECT_EQ(A.values().ncols(), Impl::get_pad_size<container_size_type>(    \
-                                      num_entries_per_row, align));           \
-    EXPECT_EQ(                                                                \
-        A.values().view().extent(1),                                          \
-        Impl::get_pad_size<container_size_type>(num_entries_per_row, align)); \
+#define CHECK_ELL_SIZES(A, num_rows, num_cols, num_nnz, num_entries_per_row, \
+                        align)                                               \
+  {                                                                          \
+    using container_size_type = decltype(A.nrows());                         \
+    EXPECT_EQ(A.nrows(), num_rows);                                          \
+    EXPECT_EQ(A.ncols(), num_cols);                                          \
+    EXPECT_EQ(A.nnnz(), num_nnz);                                            \
+    EXPECT_EQ(A.entries_per_row(), num_entries_per_row);                     \
+    EXPECT_EQ(A.alignment(), align);                                         \
+    EXPECT_EQ(A.column_indices().nrows(), num_rows);                         \
+    EXPECT_EQ(A.column_indices().view().extent(0), num_rows);                \
+    EXPECT_EQ(A.column_indices().ncols(),                                    \
+              Morpheus::Impl::get_pad_size<container_size_type>(             \
+                  num_entries_per_row, align));                              \
+    EXPECT_EQ(A.column_indices().view().extent(1),                           \
+              Morpheus::Impl::get_pad_size<container_size_type>(             \
+                  num_entries_per_row, align));                              \
+    EXPECT_EQ(A.values().nrows(), num_rows);                                 \
+    EXPECT_EQ(A.values().view().extent(0), num_rows);                        \
+    EXPECT_EQ(A.values().ncols(),                                            \
+              Morpheus::Impl::get_pad_size<container_size_type>(             \
+                  num_entries_per_row, align));                              \
+    EXPECT_EQ(A.values().view().extent(1),                                   \
+              Morpheus::Impl::get_pad_size<container_size_type>(             \
+                  num_entries_per_row, align));                              \
   }
 
 /**

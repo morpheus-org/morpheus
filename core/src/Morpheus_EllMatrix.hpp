@@ -176,15 +176,13 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
         _alignment(alignment),
         _column_indices(),
         _values() {
-    // _values.resize(Impl::get_pad_size<size_type>(num_rows, alignment),
-    //                num_entries_per_row);
     _column_indices.resize(num_rows, Impl::get_pad_size<size_type>(
                                          num_entries_per_row, alignment));
     _values.resize(num_rows, Impl::get_pad_size<size_type>(num_entries_per_row,
                                                            alignment));
   }
 
-  // Construct from pointers
+  // TODO: Construct from pointers
 
   /**
    * @brief Construct a EllMatrix object with shape (num_rows, num_cols) and
@@ -275,10 +273,8 @@ class EllMatrix : public MatrixBase<EllMatrix, ValueType, Properties...> {
    *
    * @par Overview
    * Constructs a EllMatrix from a compatible DynamicMatrix i.e a matrix that
-   * satisfies the \p is_dynamically_compatible check. Note that when the
-   active
-   * type of the dynamic matrix is different from the concrete type, this
-   will
+   * satisfies the \p is_dynamically_compatible check. Note that when the active
+   * type of the dynamic matrix is different from the concrete type, this will
    * result in an exception thrown.
    *
    * @tparam VR Type of Values the Other Matrix holds.
