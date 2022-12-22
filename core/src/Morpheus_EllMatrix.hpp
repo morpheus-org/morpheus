@@ -52,9 +52,11 @@ namespace Morpheus {
  * \par Overview
  * The EllMatrix container is a two-dimensional container that represents
  * a sparse matrix. This container is the implementation of the ELLPACK Format.
- * It is a polymorphic container in the sense that it can store scalar or
- * integer type values, on host or device depending how the template parameters
- * are selected.
+ * The ELLPACK representation assumes that there are at most
+ * \p num_entries_per_row non-zero elements per row, and for rows with a smaller
+ * number of non-zeros than that are padded. It is a polymorphic container in
+ * the sense that it can store scalar or integer type values, on host or device
+ * depending how the template parameters are selected.
  *
  * \par Example
  * \code
@@ -64,7 +66,24 @@ namespace Morpheus {
  * // [* * 3]
  * // [* 4 *]
  * int main(){
- *    TODO
+ *  using Matrix = Morpheus::EllMatrix<double, Kokkos::HostSpace>;
+ *  using index_array_type = typename Matrix::index_array_type;
+ *  using value_array_type = typename Matrix::value_array_type;
+ *  using size_type = typename Matrix::size_type;
+ *
+ *  index_array_type cind(2, 2, 0);
+ *  value_array_type vals(2, 2, 0);
+ *  size_type max_entries_per_row = 2;
+ *
+ *  cind(0,0) = 0; vals(0,0) = 1;
+ *  cind(0,1) = 2; vals(0,1) = 2;
+ *  cind(1,0) = 2; vals(1,0) = 3;
+ *  cind(2,0) = 1; vals(2,0) = 4;
+ *
+ *  // Construct the matrix from column_indices and values
+ *  Matrix A(3, 3, 4, max_entries_per_row, cind, vals);
+ *
+ *  Morpheus::print(A); // prints A
  * }
  * \endcode
  */
