@@ -198,8 +198,8 @@ class HybMatrix : public MatrixBase<HybMatrix, ValueType, Properties...> {
           !HybMatrix::coo_matrix_type::traits::memory_traits::is_unmanaged>::
           type * = nullptr)
       : base(ell.nrows(), ell.ncols(), ell.nnnz() + coo.nnnz()),
-        _ell(cell),
-        _coo(ccoo),
+        _ell(ell),
+        _coo(coo),
         _alignment(cell().alignment()) {}
 
   /**
