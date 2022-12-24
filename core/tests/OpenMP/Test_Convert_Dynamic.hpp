@@ -32,19 +32,18 @@
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
                                                types::types_set>::type;
-
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
                                                types::types_set>::type;
-
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
                                                types::types_set>::type;
-
 using EllMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
                                                types::types_set>::type;
-
+using HybMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
+                                               types::types_set>::type;
 using DynamicMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DynamicMatrix<double>,
                                                types::types_set>::type;
@@ -53,12 +52,16 @@ using CooMatrixPairs = generate_pair<DynamicMatrixTypes, CooMatrixTypes>::type;
 using CsrMatrixPairs = generate_pair<DynamicMatrixTypes, CsrMatrixTypes>::type;
 using DiaMatrixPairs = generate_pair<DynamicMatrixTypes, DiaMatrixTypes>::type;
 using EllMatrixPairs = generate_pair<DynamicMatrixTypes, EllMatrixTypes>::type;
+using HybMatrixPairs = generate_pair<DynamicMatrixTypes, HybMatrixTypes>::type;
 
 using pairs = typename Morpheus::concat<
     CooMatrixPairs,
     typename Morpheus::concat<
-        CsrMatrixPairs, typename Morpheus::concat<
-                            DiaMatrixPairs, EllMatrixPairs>::type>::type>::type;
+        CsrMatrixPairs,
+        typename Morpheus::concat<
+            DiaMatrixPairs,
+            typename Morpheus::concat<EllMatrixPairs, HybMatrixPairs>::type>::
+            type>::type>::type;
 
 using ConvertDynamicTypes = to_gtest_types<pairs>::type;
 
@@ -161,7 +164,8 @@ TYPED_TEST(ConvertDynamicTypesTest, SparseToDynamicOpenMP) {
   Morpheus::copy(this->con_ref_h, src_h);
 
   if (Morpheus::is_dia_matrix_format_container_v<src_host_t> ||
-      Morpheus::is_ell_matrix_format_container_v<src_host_t>) {
+      Morpheus::is_ell_matrix_format_container_v<src_host_t> ||
+      Morpheus::is_hyb_matrix_format_container_v<src_host_t>) {
     EXPECT_THROW(Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h),
                  Morpheus::NotImplementedException);
   } else {
@@ -243,7 +247,9 @@ TYPED_TEST(ConvertDynamicTypesTest, DynamicInPlaceOpenMP) {
       if (((state == Morpheus::DIA_FORMAT) &&
            (fmt_id != Morpheus::DIA_FORMAT)) ||
           ((state == Morpheus::ELL_FORMAT) &&
-           (fmt_id != Morpheus::ELL_FORMAT))) {
+           (fmt_id != Morpheus::ELL_FORMAT)) ||
+          ((state == Morpheus::HYB_FORMAT) &&
+           (fmt_id != Morpheus::HYB_FORMAT))) {
         EXPECT_EQ(status, Morpheus::DYNAMIC_TO_PROXY);
       } else {
         EXPECT_EQ(status, Morpheus::PROXY_TO_DYNAMIC);

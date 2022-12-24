@@ -50,6 +50,7 @@
 #include <impl/Ell/Kokkos/Morpheus_MatrixOperations_Impl.hpp>
 
 #include <impl/Hyb/Serial/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Hyb/OpenMP/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Hyb/Kokkos/Morpheus_MatrixOperations_Impl.hpp>
 
 #endif  // MORPHEUS_IMPL_MATRIXOPERATIONS_IMPL_HPP

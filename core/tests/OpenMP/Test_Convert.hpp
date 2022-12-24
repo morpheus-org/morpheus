@@ -25,54 +25,54 @@
 #define TEST_CORE_OPENMP_TEST_CONVERT_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
 #include <utils/Macros_CooMatrix.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
 #include <utils/Macros_EllMatrix.hpp>
+#include <utils/Macros_HybMatrix.hpp>
 #include <utils/Macros_DenseMatrix.hpp>
 #include <utils/Macros_DenseVector.hpp>
 
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
                                                types::convert_types_set>::type;
-
 using DenseMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseMatrix<double>,
                                                types::convert_types_set>::type;
-
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
                                                types::convert_types_set>::type;
-
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
                                                types::convert_types_set>::type;
-
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
                                                types::convert_types_set>::type;
-
 using EllMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
+                                               types::convert_types_set>::type;
+using HybMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
                                                types::convert_types_set>::type;
 
 using DenseMatrixCooMatrixPairs =
     generate_pair<DenseMatrixTypes, CooMatrixTypes>::type;
-
 using CsrMatrixCooMatrixPairs =
     generate_pair<CsrMatrixTypes, CooMatrixTypes>::type;
-
 using DiaMatrixCooMatrixPairs =
     generate_pair<DiaMatrixTypes, CooMatrixTypes>::type;
-
 using EllMatrixCooMatrixPairs =
     generate_pair<EllMatrixTypes, CooMatrixTypes>::type;
+using HybMatrixCooMatrixPairs =
+    generate_pair<HybMatrixTypes, CooMatrixTypes>::type;
 
 using CooMatrixPairs = generate_pair<CooMatrixTypes, CooMatrixTypes>::type;
 using CsrMatrixPairs = generate_pair<CsrMatrixTypes, CsrMatrixTypes>::type;
 using DiaMatrixPairs = generate_pair<DiaMatrixTypes, DiaMatrixTypes>::type;
 using EllMatrixPairs = generate_pair<EllMatrixTypes, EllMatrixTypes>::type;
+using HybMatrixPairs = generate_pair<HybMatrixTypes, HybMatrixTypes>::type;
 using DenseMatrixPairs =
     generate_pair<DenseMatrixTypes, DenseMatrixTypes>::type;
 using DenseVectorPairs =
@@ -87,17 +87,22 @@ using pairs = typename Morpheus::concat<
             typename Morpheus::concat<
                 EllMatrixCooMatrixPairs,
                 typename Morpheus::concat<
-                    CooMatrixPairs,
+                    HybMatrixCooMatrixPairs,
                     typename Morpheus::concat<
-                        CsrMatrixPairs,
+                        CooMatrixPairs,
                         typename Morpheus::concat<
-                            DiaMatrixPairs,
+                            CsrMatrixPairs,
                             typename Morpheus::concat<
-                                EllMatrixPairs,
+                                DiaMatrixPairs,
                                 typename Morpheus::concat<
-                                    DenseMatrixPairs, DenseVectorPairs>::type>::
-                                type>::type>::type>::type>::type>::type>::
-        type>::type;
+                                    EllMatrixPairs,
+                                    typename Morpheus::concat<
+                                        HybMatrixPairs,
+                                        typename Morpheus::concat<
+                                            DenseMatrixPairs,
+                                            DenseVectorPairs>::type>::type>::
+                                    type>::type>::type>::type>::type>::type>::
+            type>::type>::type;
 
 using ConvertTypes = to_gtest_types<pairs>::type;
 
