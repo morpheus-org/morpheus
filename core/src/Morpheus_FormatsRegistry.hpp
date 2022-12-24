@@ -30,6 +30,7 @@
 #include <fwd/Morpheus_Fwd_CsrMatrix.hpp>
 #include <fwd/Morpheus_Fwd_DiaMatrix.hpp>
 #include <fwd/Morpheus_Fwd_EllMatrix.hpp>
+#include <fwd/Morpheus_Fwd_HybMatrix.hpp>
 
 #include <impl/Morpheus_MatrixProxy.hpp>
 
@@ -41,7 +42,8 @@ struct MatrixFormats {
       typename CooMatrix<ValueType, Properties...>::type,
       typename CsrMatrix<ValueType, Properties...>::type,
       typename DiaMatrix<ValueType, Properties...>::type,
-      typename EllMatrix<ValueType, Properties...>::type>::type;
+      typename EllMatrix<ValueType, Properties...>::type,
+      typename HybMatrix<ValueType, Properties...>::type>::type;
   using variant   = typename formats_proxy::variant;
   using type_list = typename formats_proxy::type_list;
 };
@@ -49,7 +51,14 @@ struct MatrixFormats {
 #endif
 
 // Enums should be in the same order as types in MatrixFormatsProxy
-enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT, ELL_FORMAT, NFORMATS };
+enum formats_e {
+  COO_FORMAT = 0,
+  CSR_FORMAT,
+  DIA_FORMAT,
+  ELL_FORMAT,
+  HYB_FORMAT,
+  NFORMATS
+};
 
 #ifdef __cplusplus
 }  // namespace Morpheus

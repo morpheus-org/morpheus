@@ -42,6 +42,20 @@
   }
 
 /**
+ * @brief Checks the sizes of an empty CooMatrix container
+ *
+ */
+#define CHECK_COO_EMPTY(A)                   \
+  {                                          \
+    EXPECT_EQ(A.nrows(), 0);                 \
+    EXPECT_EQ(A.ncols(), 0);                 \
+    EXPECT_EQ(A.nnnz(), 0);                  \
+    EXPECT_EQ(A.row_indices().size(), 0);    \
+    EXPECT_EQ(A.column_indices().size(), 0); \
+    EXPECT_EQ(A.values().size(), 0);         \
+  }
+
+/**
  * @brief Checks the sizes of two CooMatrix containers if they match
  *
  */

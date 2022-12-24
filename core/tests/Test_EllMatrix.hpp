@@ -106,7 +106,7 @@ TYPED_TEST(EllMatrixUnaryTest, FormatEnum) {
 /**
  * @brief Testing the format index assigned to the container is what we
  expect
- * it to be i.e 2.
+ * it to be i.e 3.
  *
  */
 TYPED_TEST(EllMatrixUnaryTest, FormatIndex) {

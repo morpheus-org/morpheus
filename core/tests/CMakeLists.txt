@@ -50,6 +50,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       FormatTags
       FormatTraits
       GenericBackend
+      HybMatrix
       MatrixBase
       MatrixMarket
       MatrixOperations_Dynamic
@@ -62,8 +63,7 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       Spaces
       SpaceTraits
       TypeTraits
-      WAXPBY
-      )
+      WAXPBY)
       set(file ${testdir}/Test_${Tag}_${Name}.cpp)
       # Write to a temporary intermediate file and call configure_file to avoid
       # updating timestamps triggering unnecessary rebuilds on subsequent cmake
@@ -83,15 +83,8 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
   if(MORPHEUS_ENABLE_${DEVICE})
     set(testdir ${CMAKE_CURRENT_BINARY_DIR}/${dir})
 
-    foreach(
-      Name
-      Convert_Dynamic
-      Convert
-      CustomBackend
-      GenericBackend
-      Spaces
-      SpaceTraits
-      )
+    foreach(Name Convert_Dynamic Convert CustomBackend GenericBackend Spaces
+                 SpaceTraits)
       set(file ${testdir}/Test_${Tag}_${Name}.cpp)
       # Write to a temporary intermediate file and call configure_file to avoid
       # updating timestamps triggering unnecessary rebuilds on subsequent cmake

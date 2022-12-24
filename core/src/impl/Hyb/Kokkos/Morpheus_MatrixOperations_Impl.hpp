@@ -21,14 +21,16 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_ELL_KOKKOS_MATRIXOPERATIONS_IMPL_HPP
-#define MORPHEUS_ELL_KOKKOS_MATRIXOPERATIONS_IMPL_HPP
+#ifndef MORPHEUS_HYB_KOKKOS_MATRIXOPERATIONS_IMPL_HPP
+#define MORPHEUS_HYB_KOKKOS_MATRIXOPERATIONS_IMPL_HPP
 
-#include <Morpheus_Exceptions.hpp>
 #include <Morpheus_SpaceTraits.hpp>
 #include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
+
+#include <impl/Ell/Serial/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Coo/Serial/Morpheus_MatrixOperations_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -37,88 +39,68 @@ template <typename ExecSpace, typename Matrix, typename Vector>
 void update_diagonal(
     Matrix& A, const Vector& diagonal,
     typename std::enable_if_t<
-        Morpheus::is_ell_matrix_format_container_v<Matrix> &&
+        Morpheus::is_hyb_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
-  using execution_space = typename ExecSpace::execution_space;
-  using size_type       = typename Matrix::size_type;
-  using index_type      = typename Matrix::index_type;
-  using value_array     = typename Matrix::value_array_type::value_array_type;
-  using index_array     = typename Matrix::index_array_type::value_array_type;
-  using diagonal_array  = typename Vector::value_array_type;
-
-  using range_policy =
-      Kokkos::RangePolicy<Kokkos::IndexType<size_type>, execution_space>;
-
-  value_array values                  = A.values().view();
-  index_array column_indices          = A.column_indices().view();
-  const diagonal_array diagonal_view  = diagonal.const_view();
-  const size_type num_entries_per_row = A.column_indices().ncols();
-  const index_type invalid_index      = A.invalid_index();
-  range_policy policy(0, A.nrows());
-
-  Kokkos::parallel_for(
-      policy, KOKKOS_LAMBDA(const size_type i) {
-        for (size_type n = 0; n < num_entries_per_row; n++) {
-          const index_type col = column_indices(i, n);
-          if ((col == (index_type)i) && (col != invalid_index)) {
-            values(i, n) = diagonal_view[i];
-            break;
-          }
-        }
-      });
+  Impl::update_diagonal<ExecSpace>(A.ell(), diagonal);
+  Impl::update_diagonal<ExecSpace>(A.coo(), diagonal);
 }
 
 template <typename ExecSpace, typename Matrix, typename Vector>
 void get_diagonal(
-    Matrix&, const Vector&,
+    const Matrix& A, Vector& diagonal,
     typename std::enable_if_t<
-        Morpheus::is_ell_matrix_format_container_v<Matrix> &&
+        Morpheus::is_hyb_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
-  throw Morpheus::NotImplementedException("get_diagonal not implemented yet");
+  Impl::get_diagonal<ExecSpace>(A.cell(), diagonal);
+  Impl::get_diagonal<ExecSpace>(A.ccoo(), diagonal);
 }
 
 template <typename ExecSpace, typename Matrix, typename SizeType,
           typename ValueType>
-void set_value(Matrix&, SizeType, SizeType, ValueType,
+void set_value(Matrix& A, SizeType row, SizeType col, ValueType value,
                typename std::enable_if_t<
-                   Morpheus::is_ell_matrix_format_container_v<Matrix> &&
+                   Morpheus::is_hyb_matrix_format_container_v<Matrix> &&
                    Morpheus::has_generic_backend_v<ExecSpace> &&
                    Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
-  throw Morpheus::NotImplementedException("set_value not implemented yet");
+  Impl::set_value<ExecSpace>(A.ell(), row, col, value);
+  Impl::set_value<ExecSpace>(A.coo(), row, col, value);
 }
 
 template <typename ExecSpace, typename Matrix, typename IndexVector,
           typename ValueVector>
 void set_values(
-    Matrix&, typename IndexVector::value_type, const IndexVector,
-    typename IndexVector::value_type, const IndexVector, const ValueVector,
+    Matrix& A, const typename IndexVector::value_type m, const IndexVector idxm,
+    const typename IndexVector::value_type n, const IndexVector idxn,
+    const ValueVector values,
     typename std::enable_if_t<
-        Morpheus::is_ell_matrix_format_container_v<Matrix> &&
+        Morpheus::is_hyb_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<IndexVector> &&
         Morpheus::is_dense_vector_format_container_v<ValueVector> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, IndexVector, ValueVector>>* =
         nullptr) {
-  throw Morpheus::NotImplementedException("set_values not implemented yet");
+  Impl::set_values<ExecSpace>(A.ell(), m, idxm, n, idxn, values);
+  Impl::set_values<ExecSpace>(A.coo(), m, idxm, n, idxn, values);
 }
 
 template <typename ExecSpace, typename Matrix, typename TransposeMatrix>
 void transpose(
-    const Matrix&, TransposeMatrix&,
+    const Matrix& A, TransposeMatrix& At,
     typename std::enable_if_t<
-        Morpheus::is_ell_matrix_format_container_v<Matrix> &&
-        Morpheus::is_ell_matrix_format_container_v<TransposeMatrix> &&
+        Morpheus::is_hyb_matrix_format_container_v<Matrix> &&
+        Morpheus::is_hyb_matrix_format_container_v<TransposeMatrix> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, TransposeMatrix>>* =
         nullptr) {
-  throw Morpheus::NotImplementedException("transpose not implemented yet");
+  Impl::transpose<ExecSpace>(A.cell(), At.ell());
+  Impl::transpose<ExecSpace>(A.ccoo(), At.coo());
 }
 
 }  // namespace Impl
 }  // namespace Morpheus
 
-#endif  // MORPHEUS_ELL_KOKKOS_MATRIXOPERATIONS_IMPL_HPP
+#endif  // MORPHEUS_HYB_KOKKOS_MATRIXOPERATIONS_IMPL_HPP

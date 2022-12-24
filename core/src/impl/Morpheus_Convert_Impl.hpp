@@ -64,6 +64,9 @@
 #include <impl/Ell/HIP/Morpheus_Convert_Impl.hpp>
 #include <impl/Ell/Kokkos/Morpheus_Convert_Impl.hpp>
 
+#include <impl/Hyb/Serial/Morpheus_Convert_Impl.hpp>
+#include <impl/Hyb/Kokkos/Morpheus_Convert_Impl.hpp>
+
 namespace Morpheus {
 namespace Impl {
 

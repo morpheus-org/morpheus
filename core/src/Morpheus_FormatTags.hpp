@@ -63,6 +63,12 @@ struct DiaFormatTag : public Impl::SparseMatrixTag {};
  */
 struct EllFormatTag : public Impl::SparseMatrixTag {};
 /**
+ * @brief Tag used to mark containers as Matrix containers (Sparse) with
+ * HYBRID (HYB) Storage Format
+ *
+ */
+struct HybFormatTag : public Impl::SparseMatrixTag {};
+/**
  * @brief Tag used to mark containers as Matrix container with
  * Dynamic Storage Format.
  *
@@ -230,6 +236,41 @@ class is_ell_matrix_format_container {
 template <typename T>
 inline constexpr bool is_ell_matrix_format_container_v =
     is_ell_matrix_format_container<T>::value;
+
+/**
+ * @brief Checks if the given type \p T is a valid HYB Sparse Matrix Format
+ * Container i.e is valid matrix container and has \p HybFormatTag as \p tag
+ * member trait.
+ *
+ * @tparam T Type passed for check.
+ */
+template <class T>
+class is_hyb_matrix_format_container {
+  typedef char yes[1];
+  typedef char no[2];
+
+  template <class U>
+  static yes& test(
+      U*,
+      typename std::enable_if<
+          is_matrix_container<U>::value &&
+          std::is_same<HybFormatTag, typename U::tag>::value>::type* = nullptr);
+
+  template <class U>
+  static no& test(...);
+
+ public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+};
+
+/**
+ * @brief Short-hand to \p is_hyb_matrix_format_container.
+ *
+ * @tparam T Type passed for check.
+ */
+template <typename T>
+inline constexpr bool is_hyb_matrix_format_container_v =
+    is_hyb_matrix_format_container<T>::value;
 
 /**
  * @brief Checks if the given type \p T is a valid Dynamic Matrix Format

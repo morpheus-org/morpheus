@@ -1,9 +1,9 @@
 /**
- * Morpheus_Copy_Impl.hpp
+ * Morpheus_Fwd_HybMatrix.hpp
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -21,16 +21,12 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_COPY_IMPL_HPP
-#define MORPHEUS_COPY_IMPL_HPP
+#ifndef MORPHEUS_FWD_HYBMATRIX_HPP
+#define MORPHEUS_FWD_HYBMATRIX_HPP
 
-#include <impl/DenseVector/Morpheus_Copy_Impl.hpp>
-#include <impl/DenseMatrix/Morpheus_Copy_Impl.hpp>
+namespace Morpheus {
+template <class ValueType, typename... Properties>
+class HybMatrix;
+}  // namespace Morpheus
 
-#include <impl/Coo/Morpheus_Copy_Impl.hpp>
-#include <impl/Csr/Morpheus_Copy_Impl.hpp>
-#include <impl/Dia/Morpheus_Copy_Impl.hpp>
-#include <impl/Ell/Morpheus_Copy_Impl.hpp>
-#include <impl/Hyb/Morpheus_Copy_Impl.hpp>
-
-#endif  // MORPHEUS_COPY_IMPL_HPP
+#endif  // MORPHEUS_FWD_HYBMATRIX_HPP

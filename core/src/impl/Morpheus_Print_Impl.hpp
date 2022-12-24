@@ -31,5 +31,6 @@
 #include <impl/Csr/Morpheus_Print_Impl.hpp>
 #include <impl/Dia/Morpheus_Print_Impl.hpp>
 #include <impl/Ell/Morpheus_Print_Impl.hpp>
+#include <impl/Hyb/Morpheus_Print_Impl.hpp>
 
 #endif  // MORPHEUS_PRINT_IMPL_HPP

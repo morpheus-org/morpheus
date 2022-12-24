@@ -32,48 +32,51 @@
 #include <utils/Macros_CsrMatrix.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
 #include <utils/Macros_EllMatrix.hpp>
+#include <utils/Macros_HybMatrix.hpp>
 #include <utils/MatrixGenerator.hpp>
 
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
                                                types::types_set>::type;
-
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
                                                types::types_set>::type;
-
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
                                                types::types_set>::type;
-
 using EllMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
                                                types::types_set>::type;
-
+using HybMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
+                                               types::types_set>::type;
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
                                                types::types_set>::type;
 using CooMatrixPairs =
     generate_pair<generate_pair<CooMatrixTypes, DenseVectorTypes>::type,
                   DenseVectorTypes>::type;
-
 using CsrMatrixPairs =
     generate_pair<generate_pair<CsrMatrixTypes, DenseVectorTypes>::type,
                   DenseVectorTypes>::type;
-
 using DiaMatrixPairs =
     generate_pair<generate_pair<DiaMatrixTypes, DenseVectorTypes>::type,
                   DenseVectorTypes>::type;
-
 using EllMatrixPairs =
     generate_pair<generate_pair<EllMatrixTypes, DenseVectorTypes>::type,
+                  DenseVectorTypes>::type;
+using HybMatrixPairs =
+    generate_pair<generate_pair<HybMatrixTypes, DenseVectorTypes>::type,
                   DenseVectorTypes>::type;
 
 using pairs = typename Morpheus::concat<
     CooMatrixPairs,
     typename Morpheus::concat<
-        CsrMatrixPairs, typename Morpheus::concat<
-                            DiaMatrixPairs, EllMatrixPairs>::type>::type>::type;
+        CsrMatrixPairs,
+        typename Morpheus::concat<
+            DiaMatrixPairs,
+            typename Morpheus::concat<EllMatrixPairs, HybMatrixPairs>::type>::
+            type>::type>::type;
 
 using MultiplyTypes = to_gtest_types<pairs>::type;
 
