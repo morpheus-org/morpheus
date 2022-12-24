@@ -66,6 +66,8 @@
 
 #include <impl/Hyb/Serial/Morpheus_Convert_Impl.hpp>
 #include <impl/Hyb/OpenMP/Morpheus_Convert_Impl.hpp>
+#include <impl/Hyb/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/Hyb/HIP/Morpheus_Convert_Impl.hpp>
 #include <impl/Hyb/Kokkos/Morpheus_Convert_Impl.hpp>
 
 namespace Morpheus {

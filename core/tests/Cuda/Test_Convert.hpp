@@ -30,41 +30,49 @@
 #include <utils/Macros_CooMatrix.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
+#include <utils/Macros_EllMatrix.hpp>
+#include <utils/Macros_HybMatrix.hpp>
 #include <utils/Macros_DenseMatrix.hpp>
 #include <utils/Macros_DenseVector.hpp>
 
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
-                                               types::types_set>::type;
-
+                                               types::convert_types_set>::type;
 using DenseMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseMatrix<double>,
-                                               types::types_set>::type;
-
+                                               types::convert_types_set>::type;
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
-                                               types::types_set>::type;
-
+                                               types::convert_types_set>::type;
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
-                                               types::types_set>::type;
-
+                                               types::convert_types_set>::type;
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
-                                               types::types_set>::type;
+                                               types::convert_types_set>::type;
+using EllMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
+                                               types::convert_types_set>::type;
+using HybMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
+                                               types::convert_types_set>::type;
 
 using DenseMatrixCooMatrixPairs =
     generate_pair<DenseMatrixTypes, CooMatrixTypes>::type;
-
 using CsrMatrixCooMatrixPairs =
     generate_pair<CsrMatrixTypes, CooMatrixTypes>::type;
-
 using DiaMatrixCooMatrixPairs =
     generate_pair<DiaMatrixTypes, CooMatrixTypes>::type;
+using EllMatrixCooMatrixPairs =
+    generate_pair<EllMatrixTypes, CooMatrixTypes>::type;
+using HybMatrixCooMatrixPairs =
+    generate_pair<HybMatrixTypes, CooMatrixTypes>::type;
 
 using CooMatrixPairs = generate_pair<CooMatrixTypes, CooMatrixTypes>::type;
 using CsrMatrixPairs = generate_pair<CsrMatrixTypes, CsrMatrixTypes>::type;
 using DiaMatrixPairs = generate_pair<DiaMatrixTypes, DiaMatrixTypes>::type;
+using EllMatrixPairs = generate_pair<EllMatrixTypes, EllMatrixTypes>::type;
+using HybMatrixPairs = generate_pair<HybMatrixTypes, HybMatrixTypes>::type;
 using DenseMatrixPairs =
     generate_pair<DenseMatrixTypes, DenseMatrixTypes>::type;
 using DenseVectorPairs =
@@ -77,14 +85,25 @@ using pairs = typename Morpheus::concat<
         typename Morpheus::concat<
             DiaMatrixCooMatrixPairs,
             typename Morpheus::concat<
-                CooMatrixPairs,
+                EllMatrixCooMatrixPairs,
                 typename Morpheus::concat<
-                    CsrMatrixPairs,
+                    HybMatrixCooMatrixPairs,
                     typename Morpheus::concat<
-                        DiaMatrixPairs,
+                        CooMatrixPairs,
                         typename Morpheus::concat<
-                            DenseMatrixPairs, DenseVectorPairs>::type>::type>::
-                    type>::type>::type>::type>::type;
+                            CsrMatrixPairs,
+                            typename Morpheus::concat<
+                                DiaMatrixPairs,
+                                typename Morpheus::concat<
+                                    EllMatrixPairs,
+                                    typename Morpheus::concat<
+                                        HybMatrixPairs,
+                                        typename Morpheus::concat<
+                                            DenseMatrixPairs,
+                                            DenseVectorPairs>::type>::type>::
+                                    type>::type>::type>::type>::type>::type>::
+            type>::type>::type;
+
 using ConvertTypes = to_gtest_types<pairs>::type;
 
 template <typename Containers>

@@ -51,6 +51,8 @@
 
 #include <impl/Hyb/Serial/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Hyb/OpenMP/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Hyb/Cuda/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Hyb/HIP/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Hyb/Kokkos/Morpheus_MatrixOperations_Impl.hpp>
 
 #endif  // MORPHEUS_IMPL_MATRIXOPERATIONS_IMPL_HPP

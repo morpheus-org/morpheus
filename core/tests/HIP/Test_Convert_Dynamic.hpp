@@ -32,15 +32,18 @@
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
                                                types::types_set>::type;
-
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
                                                types::types_set>::type;
-
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
                                                types::types_set>::type;
-
+using EllMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
+                                               types::types_set>::type;
+using HybMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
+                                               types::types_set>::type;
 using DynamicMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DynamicMatrix<double>,
                                                types::types_set>::type;
@@ -48,10 +51,17 @@ using DynamicMatrixTypes =
 using CooMatrixPairs = generate_pair<DynamicMatrixTypes, CooMatrixTypes>::type;
 using CsrMatrixPairs = generate_pair<DynamicMatrixTypes, CsrMatrixTypes>::type;
 using DiaMatrixPairs = generate_pair<DynamicMatrixTypes, DiaMatrixTypes>::type;
+using EllMatrixPairs = generate_pair<DynamicMatrixTypes, EllMatrixTypes>::type;
+using HybMatrixPairs = generate_pair<DynamicMatrixTypes, HybMatrixTypes>::type;
 
 using pairs = typename Morpheus::concat<
     CooMatrixPairs,
-    typename Morpheus::concat<CsrMatrixPairs, DiaMatrixPairs>::type>::type;
+    typename Morpheus::concat<
+        CsrMatrixPairs,
+        typename Morpheus::concat<
+            DiaMatrixPairs,
+            typename Morpheus::concat<EllMatrixPairs, HybMatrixPairs>::type>::
+            type>::type>::type;
 
 using ConvertDynamicTypes = to_gtest_types<pairs>::type;
 
