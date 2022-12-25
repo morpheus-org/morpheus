@@ -50,6 +50,9 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       FormatTags
       FormatTraits
       GenericBackend
+      HybMatrix_Binary
+      HybMatrix_CompatibleBinary
+      HybMatrix_CompatibleDynamicBinary
       HybMatrix
       MatrixBase
       MatrixMarket
