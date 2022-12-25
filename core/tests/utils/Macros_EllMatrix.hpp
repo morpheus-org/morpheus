@@ -25,7 +25,7 @@
 #define TEST_CORE_UTILS_MACROS_ELLMATRIX_HPP
 
 #include <Morpheus_Core.hpp>
-
+#include <type_traits>
 /**
  * @brief Checks the sizes of a EllMatrix container against a number of rows,
  * columns and non-zeros
@@ -34,7 +34,8 @@
 #define CHECK_ELL_SIZES(A, num_rows, num_cols, num_nnz, num_entries_per_row, \
                         align)                                               \
   {                                                                          \
-    using container_size_type = decltype(A.nrows());                         \
+    using container_size_type =                                              \
+        typename std::remove_reference<decltype(A.nrows())>::type;           \
     EXPECT_EQ(A.nrows(), num_rows);                                          \
     EXPECT_EQ(A.ncols(), num_cols);                                          \
     EXPECT_EQ(A.nnnz(), num_nnz);                                            \
@@ -106,16 +107,16 @@
  * data.
  *
  */
-#define VALIDATE_ELL_CONTAINER(A, Aref)                               \
-  {                                                                   \
-    using container_type      = decltype(A);                          \
-    using container_size_type = typename container_type::size_type;   \
-    for (container_size_type i = 0; i < A.values().nrows(); i++) {    \
-      for (container_size_type j = 0; j < A.values().ncols(); j++) {  \
-        EXPECT_EQ(A.column_indices(i, j), Aref.column_indices(i, j)); \
-        EXPECT_EQ(A.values(i, j), Aref.values(i, j));                 \
-      }                                                               \
-    }                                                                 \
+#define VALIDATE_ELL_CONTAINER(A, Aref)                                       \
+  {                                                                           \
+    using container_type = typename std::remove_reference<decltype(A)>::type; \
+    using container_size_type = typename container_type::size_type;           \
+    for (container_size_type i = 0; i < A.values().nrows(); i++) {            \
+      for (container_size_type j = 0; j < A.values().ncols(); j++) {          \
+        EXPECT_EQ(A.column_indices(i, j), Aref.column_indices(i, j));         \
+        EXPECT_EQ(A.values(i, j), Aref.values(i, j));                         \
+      }                                                                       \
+    }                                                                         \
   }
 
 namespace Morpheus {

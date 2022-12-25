@@ -79,10 +79,10 @@
  * data.
  *
  */
-#define VALIDATE_HYB_CONTAINER(A, Aref)          \
-  {                                              \
-    VALIDATE_ELL_CONTAINER(A.ell(), Aref.ell()); \
-    VALIDATE_COO_CONTAINER(A.coo(), Aref.coo()); \
+#define VALIDATE_HYB_CONTAINER(A, Aref)                          \
+  {                                                              \
+    VALIDATE_ELL_CONTAINER(A.ell(), Aref.ell());                 \
+    VALIDATE_COO_CONTAINER(A.coo(), Aref.coo(), A.coo().nnnz()); \
   }
 
 namespace Morpheus {

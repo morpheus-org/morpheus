@@ -30,7 +30,7 @@
 
 using HybMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
-                                               types::test_types_set>::type;
+                                               types::types_set>::type;
 using HybMatrixUnary = to_gtest_types<HybMatrixTypes>::type;
 
 // Used for testing unary operations for same type container
@@ -123,511 +123,576 @@ TYPED_TEST(HybMatrixUnaryTest, FormatIndex) {
   EXPECT_EQ(4, A.format_index());
 }
 
-// TYPED_TEST(HybMatrixUnaryTest, ReferenceByIndex) {
-//   using Matrix     = typename TestFixture::device;
-//   using HostMatrix = typename TestFixture::host;
-//   using size_type  = typename Matrix::size_type;
+TYPED_TEST(HybMatrixUnaryTest, ReferenceByIndex) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
 
-//   // Build matrix from the device vectors
-//   Matrix A(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//            this->Aref.column_indices(), this->Aref.values());
-//   CHECK_HYB_CONTAINERS(A, this->Aref);
+  // Build matrix from the device vectors
+  Matrix A(this->Aref.ell(), this->Aref.coo());
+  CHECK_HYB_CONTAINERS(A, this->Aref);
 
-//   HostMatrix Ah(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 this->nalign);
-//   CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, this->nalign);
-//   Morpheus::copy(A, Ah);
+  HostMatrix Ah(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                this->nentries_per_row, this->nalign);
+  CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, this->nalign);
+  Morpheus::copy(A, Ah);
 
-//   VALIDATE_HYB_CONTAINER(Ah, this->Ahref);
+  VALIDATE_HYB_CONTAINER(Ah, this->Ahref);
 
-//   for (size_type i = 0; i < A.values().nrows(); i++) {
-//     for (size_type j = 0; j < A.values().ncols(); j++) {
-//       EXPECT_EQ(Ah.ccolumn_indices(i, j), this->Ahref.ccolumn_indices(i, j));
-//       EXPECT_EQ(Ah.cvalues(i, j), this->Ahref.values(i, j));
-//     }
-//   }
-// }
+  Morpheus::Test::have_same_data(Ah.ell(), this->Ahref.ell());
+  Morpheus::Test::have_same_data(Ah.coo(), this->Ahref.coo());
+}
 
-// TYPED_TEST(HybMatrixUnaryTest, Reference) {
-//   using Matrix                = typename TestFixture::device;
-//   using HostMatrix            = typename TestFixture::host;
-//   using size_type             = typename Matrix::size_type;
-//   using index_array_type      = typename Matrix::index_array_type;
-//   using value_array_type      = typename Matrix::value_array_type;
-//   using host_index_array_type = typename index_array_type::HostMirror;
-//   using host_value_array_type = typename value_array_type::HostMirror;
+TYPED_TEST(HybMatrixUnaryTest, Reference) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using size_type  = typename Matrix::size_type;
+  using ell_index_array_type =
+      typename Matrix::ell_matrix_type::index_array_type;
+  using ell_value_array_type =
+      typename Matrix::ell_matrix_type::value_array_type;
+  using ell_host_index_array_type = typename ell_index_array_type::HostMirror;
+  using ell_host_value_array_type = typename ell_value_array_type::HostMirror;
+  using coo_index_array_type =
+      typename Matrix::coo_matrix_type::index_array_type;
+  using coo_value_array_type =
+      typename Matrix::coo_matrix_type::value_array_type;
+  using coo_host_index_array_type = typename coo_index_array_type::HostMirror;
+  using coo_host_value_array_type = typename coo_value_array_type::HostMirror;
 
-//   // Build matrix from the device vectors
-//   Matrix A(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//            this->Aref.column_indices(), this->Aref.values());
-//   CHECK_HYB_CONTAINERS(A, this->Aref);
+  // Build matrix from the device vectors
+  Matrix A(this->Aref.ell(), this->Aref.coo());
+  CHECK_HYB_CONTAINERS(A, this->Aref);
 
-//   HostMatrix Ah(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 this->nalign);
-//   CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, this->nalign);
-//   Morpheus::copy(A, Ah);
+  HostMatrix Ah(this->Ahref.ell(), this->Ahref.coo());
+  CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, this->nalign);
+  Morpheus::copy(A, Ah);
 
-//   index_array_type cind = A.column_indices();
-//   value_array_type vals = A.values();
+  {
+    ell_index_array_type cind = A.ell().column_indices();
+    ell_value_array_type vals = A.ell().values();
 
-//   host_index_array_type cind_h(A.column_indices().nrows(),
-//                                A.column_indices().ncols(), 0);
-//   Morpheus::copy(cind, cind_h);
-//   host_value_array_type vals_h(A.values().nrows(), A.values().ncols(), 0);
-//   Morpheus::copy(vals, vals_h);
+    ell_host_index_array_type cind_h(A.ell().column_indices().nrows(),
+                                     A.ell().column_indices().ncols(), 0);
+    Morpheus::copy(cind, cind_h);
+    ell_host_value_array_type vals_h(A.ell().values().nrows(),
+                                     A.ell().values().ncols(), 0);
+    Morpheus::copy(vals, vals_h);
 
-//   for (size_type i = 0; i < A.values().nrows(); i++) {
-//     for (size_type j = 0; j < A.values().ncols(); j++) {
-//       EXPECT_EQ(cind_h(i, j), this->Ahref.column_indices(i, j));
-//       EXPECT_EQ(vals_h(i, j), this->Ahref.values(i, j));
-//     }
-//   }
-// }
+    for (size_type i = 0; i < A.ell().values().nrows(); i++) {
+      for (size_type j = 0; j < A.ell().values().ncols(); j++) {
+        EXPECT_EQ(cind_h(i, j), this->Ahref.ell().column_indices(i, j));
+        EXPECT_EQ(vals_h(i, j), this->Ahref.ell().values(i, j));
+      }
+    }
+  }
 
-// TYPED_TEST(HybMatrixUnaryTest, ConstReference) {
-//   using Matrix                = typename TestFixture::device;
-//   using HostMatrix            = typename TestFixture::host;
-//   using size_type             = typename Matrix::size_type;
-//   using index_array_type      = typename Matrix::index_array_type;
-//   using value_array_type      = typename Matrix::value_array_type;
-//   using host_index_array_type = typename index_array_type::HostMirror;
-//   using host_value_array_type = typename value_array_type::HostMirror;
+  {
+    coo_index_array_type rind = A.coo().row_indices();
+    coo_index_array_type cind = A.coo().column_indices();
+    coo_value_array_type vals = A.coo().values();
 
-//   // Build matrix from the device vectors
-//   Matrix A(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//            this->Aref.column_indices(), this->Aref.values());
-//   CHECK_HYB_CONTAINERS(A, this->Aref);
+    coo_host_index_array_type rind_h(A.coo().row_indices().size(), 0);
+    Morpheus::copy(rind, rind_h);
+    coo_host_index_array_type cind_h(A.coo().column_indices().size(), 0);
+    Morpheus::copy(cind, cind_h);
+    coo_host_value_array_type vals_h(A.coo().values().size(), 0);
+    Morpheus::copy(vals, vals_h);
 
-//   const index_array_type cind = A.ccolumn_indices();
-//   const value_array_type vals = A.cvalues();
-//   host_index_array_type cind_test(A.ccolumn_indices().nrows(),
-//                                   A.ccolumn_indices().ncols(), 0);
-//   Morpheus::copy(cind, cind_test);
-//   host_value_array_type vals_test(A.cvalues().nrows(), A.cvalues().ncols(),
-//   0); Morpheus::copy(vals, vals_test);
+    for (size_type i = 0; i < A.coo().values().size(); i++) {
+      EXPECT_EQ(rind_h(i), this->Ahref.coo().row_indices(i));
+      EXPECT_EQ(cind_h(i), this->Ahref.coo().column_indices(i));
+      EXPECT_EQ(vals_h(i), this->Ahref.coo().values(i));
+    }
+  }
+}
 
-//   for (size_type i = 0; i < A.cvalues().nrows(); i++) {
-//     for (size_type j = 0; j < A.cvalues().ncols(); j++) {
-//       EXPECT_EQ(cind_test(i, j), this->Ahref.ccolumn_indices(i, j));
-//       EXPECT_EQ(vals_test(i, j), this->Ahref.values(i, j));
-//     }
-//   }
+TYPED_TEST(HybMatrixUnaryTest, ConstReference) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using size_type  = typename Matrix::size_type;
+  using ell_index_array_type =
+      typename Matrix::ell_matrix_type::index_array_type;
+  using ell_value_array_type =
+      typename Matrix::ell_matrix_type::value_array_type;
+  using ell_host_index_array_type = typename ell_index_array_type::HostMirror;
+  using ell_host_value_array_type = typename ell_value_array_type::HostMirror;
+  using coo_index_array_type =
+      typename Matrix::coo_matrix_type::index_array_type;
+  using coo_value_array_type =
+      typename Matrix::coo_matrix_type::value_array_type;
+  using coo_host_index_array_type = typename coo_index_array_type::HostMirror;
+  using coo_host_value_array_type = typename coo_value_array_type::HostMirror;
 
-//   HostMatrix Ah(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 this->nalign);
-//   CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, this->nalign);
-//   Morpheus::copy(A, Ah);
+  // Build matrix from the device vectors
+  Matrix A(this->Aref.ell(), this->Aref.coo());
+  CHECK_HYB_CONTAINERS(A, this->Aref);
 
-//   const host_index_array_type cind_h = Ah.ccolumn_indices();
-//   const host_value_array_type vals_h = Ah.cvalues();
+  HostMatrix Ah(this->Ahref.ell(), this->Ahref.coo());
+  CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, this->nalign);
+  Morpheus::copy(A, Ah);
 
-//   for (size_type i = 0; i < Ah.values().nrows(); i++) {
-//     for (size_type j = 0; j < Ah.values().ncols(); j++) {
-//       EXPECT_EQ(cind_h(i, j), this->Ahref.column_indices(i, j));
-//       EXPECT_EQ(vals_h(i, j), this->Ahref.values(i, j));
-//     }
-//   }
-// }
+  {
+    ell_index_array_type cind = A.cell().ccolumn_indices();
+    ell_value_array_type vals = A.cell().cvalues();
+
+    ell_host_index_array_type cind_h(A.cell().ccolumn_indices().nrows(),
+                                     A.cell().ccolumn_indices().ncols(), 0);
+    Morpheus::copy(cind, cind_h);
+    ell_host_value_array_type vals_h(A.cell().cvalues().nrows(),
+                                     A.cell().cvalues().ncols(), 0);
+    Morpheus::copy(vals, vals_h);
+
+    for (size_type i = 0; i < A.cell().cvalues().nrows(); i++) {
+      for (size_type j = 0; j < A.cell().cvalues().ncols(); j++) {
+        EXPECT_EQ(cind_h(i, j), this->Ahref.cell().ccolumn_indices(i, j));
+        EXPECT_EQ(vals_h(i, j), this->Ahref.cell().cvalues(i, j));
+      }
+    }
+  }
+
+  {
+    coo_index_array_type rind = A.ccoo().crow_indices();
+    coo_index_array_type cind = A.ccoo().ccolumn_indices();
+    coo_value_array_type vals = A.ccoo().cvalues();
+
+    coo_host_index_array_type rind_h(A.ccoo().crow_indices().size(), 0);
+    Morpheus::copy(rind, rind_h);
+    coo_host_index_array_type cind_h(A.ccoo().ccolumn_indices().size(), 0);
+    Morpheus::copy(cind, cind_h);
+    coo_host_value_array_type vals_h(A.ccoo().cvalues().size(), 0);
+    Morpheus::copy(vals, vals_h);
+
+    for (size_type i = 0; i < A.coo().values().size(); i++) {
+      EXPECT_EQ(rind_h(i), this->Ahref.ccoo().crow_indices(i));
+      EXPECT_EQ(cind_h(i), this->Ahref.ccoo().ccolumn_indices(i));
+      EXPECT_EQ(vals_h(i), this->Ahref.ccoo().cvalues(i));
+    }
+  }
+}
+
+/**
+ * @brief Testing default copy assignment of HybMatrix container from another
+ * HybMatrix container with the same parameters. Resulting container should
+ be
+ * a shallow copy of the original.
+ *
+ */
+TYPED_TEST(HybMatrixUnaryTest, DefaultCopyAssignment) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using value_type = typename Matrix::value_type;
+
+  // Build matrix from the device vectors
+  Matrix A(this->Aref.ell(), this->Aref.coo());
+  CHECK_HYB_CONTAINERS(A, this->Aref);
+
+  HostMatrix Ah(this->Ahref.ell(), this->Ahref.coo());
+  CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, this->nalign);
+
+  Morpheus::copy(A, Ah);
+  VALIDATE_HYB_CONTAINER(Ah, this->Ahref);
+
+  // Default copy asssignment
+  HostMatrix Bh = Ah;
+  CHECK_HYB_CONTAINERS(Bh, Ah);
+
+  // Change values in one container
+  Ah.ell().column_indices(1, 0) = 3;
+  Ah.ell().values(1, 0)         = (value_type)-3.33;
+
+  Ah.coo().row_indices(0)    = 3;
+  Ah.coo().column_indices(0) = 3;
+  Ah.coo().values(0)         = (value_type)-3.33;
+
+  // Other container should reflect the same changes
+  VALIDATE_HYB_CONTAINER(Bh, Ah);
+
+  // Now check device Matrix
+  Matrix B = A;
+  CHECK_HYB_CONTAINERS(B, A);
+  Morpheus::copy(Ah, A);
+
+  // Send other vector back to host for check
+  HostMatrix Bt(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                this->nentries_per_row, this->nalign);
+  Morpheus::copy(B, Bt);
+  VALIDATE_HYB_CONTAINER(Bt, Ah);
+}
+
+/**
+ * @brief Testing default copy constructor of HybMatrix container from
+ another
+ * HybMatrix container with the same parameters. Resulting container should
+ be
+ * a shallow copy of the original.
+ *
+ */
+TYPED_TEST(HybMatrixUnaryTest, DefaultCopyConstructor) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using value_type = typename Matrix::value_type;
+
+  // Build matrix from the device vectors
+  Matrix A(this->Aref.ell(), this->Aref.coo());
+  CHECK_HYB_CONTAINERS(A, this->Aref);
+
+  HostMatrix Ah(this->Ahref.ell(), this->Ahref.coo());
+  CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, this->nalign);
+
+  Morpheus::copy(A, Ah);
+  VALIDATE_HYB_CONTAINER(Ah, this->Ahref);
+
+  // Default copy asssignment
+  HostMatrix Bh(Ah);
+  CHECK_HYB_CONTAINERS(Bh, Ah);
+
+  // Change values in one container
+  Ah.ell().column_indices(1, 0) = 3;
+  Ah.ell().values(1, 0)         = (value_type)-3.33;
+
+  Ah.coo().row_indices(0)    = 3;
+  Ah.coo().column_indices(0) = 3;
+  Ah.coo().values(0)         = (value_type)-3.33;
+
+  // Other container should reflect the same changes
+  VALIDATE_HYB_CONTAINER(Bh, Ah);
+
+  // Now check device Matrix
+  Matrix B(A);
+  CHECK_HYB_CONTAINERS(B, A);
+  Morpheus::copy(Ah, A);
+
+  // Send other vector back to host for check
+  HostMatrix Bt(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                this->nentries_per_row, this->nalign);
+  Morpheus::copy(B, Bt);
+  VALIDATE_HYB_CONTAINER(Bt, Ah);
+}
+
+/**
+ * @brief Testing default move assignment of HybMatrix container from another
+ * HybMatrix container with the same parameters. Resulting container should
+ be
+ * a shallow copy of the original.
+ *
+ */
+TYPED_TEST(HybMatrixUnaryTest, DefaultMoveAssignment) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using value_type = typename Matrix::value_type;
+
+  // Build matrix from the device vectors
+  Matrix A(this->Aref.ell(), this->Aref.coo());
+  CHECK_HYB_CONTAINERS(A, this->Aref);
+
+  HostMatrix Ah(this->Ahref.ell(), this->Ahref.coo());
+  CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, this->nalign);
+
+  Morpheus::copy(A, Ah);
+  VALIDATE_HYB_CONTAINER(Ah, this->Ahref);
+
+  // Default copy asssignment
+  HostMatrix Bh = std::move(Ah);
+  CHECK_HYB_CONTAINERS(Bh, Ah);
+
+  // Change values in one container
+  Ah.ell().column_indices(1, 0) = 3;
+  Ah.ell().values(1, 0)         = (value_type)-3.33;
+
+  Ah.coo().row_indices(0)    = 3;
+  Ah.coo().column_indices(0) = 3;
+  Ah.coo().values(0)         = (value_type)-3.33;
+
+  // Other container should reflect the same changes
+  VALIDATE_HYB_CONTAINER(Bh, Ah);
+
+  // Now check device Matrix
+  Matrix B = std::move(A);
+  CHECK_HYB_CONTAINERS(B, A);
+  Morpheus::copy(Ah, A);
+
+  // Send other vector back to host for check
+  HostMatrix Bt(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                this->nentries_per_row, this->nalign);
+  Morpheus::copy(B, Bt);
+  VALIDATE_HYB_CONTAINER(Bt, Ah);
+}
+
+/**
+ * @brief Testing default move construction of HybMatrix container from
+ * another HybMatrix container with the same parameters. Resulting container
+ * should be a shallow copy of the original.
+ *
+ */
+TYPED_TEST(HybMatrixUnaryTest, DefaultMoveConstructor) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using value_type = typename Matrix::value_type;
+
+  // Build matrix from the device vectors
+  Matrix A(this->Aref.ell(), this->Aref.coo());
+  CHECK_HYB_CONTAINERS(A, this->Aref);
+
+  HostMatrix Ah(this->Ahref.ell(), this->Ahref.coo());
+  CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, this->nalign);
+
+  Morpheus::copy(A, Ah);
+  VALIDATE_HYB_CONTAINER(Ah, this->Ahref);
+
+  // Default copy asssignment
+  HostMatrix Bh(std::move(Ah));
+  CHECK_HYB_CONTAINERS(Bh, Ah);
+
+  // Change values in one container
+  Ah.ell().column_indices(1, 0) = 3;
+  Ah.ell().values(1, 0)         = (value_type)-3.33;
+
+  Ah.coo().row_indices(0)    = 3;
+  Ah.coo().column_indices(0) = 3;
+  Ah.coo().values(0)         = (value_type)-3.33;
+
+  // Other container should reflect the same changes
+  VALIDATE_HYB_CONTAINER(Bh, Ah);
+
+  // Now check device Matrix
+  Matrix B(std::move(A));
+  CHECK_HYB_CONTAINERS(B, A);
+  Morpheus::copy(Ah, A);
+
+  // Send other vector back to host for check
+  HostMatrix Bt(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                this->nentries_per_row, this->nalign);
+  Morpheus::copy(B, Bt);
+  VALIDATE_HYB_CONTAINER(Bt, Ah);
+}
+
+TYPED_TEST(HybMatrixUnaryTest, ConstructionFromShapeDefault) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+
+  HostMatrix Ah(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                this->nentries_per_row);
+  CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, this->nalign);
+
+  Morpheus::Test::build_small_container(Ah);
+
+  Matrix A(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+           this->nentries_per_row);
+  CHECK_HYB_SIZES(A, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, this->nalign)
+  // Send to device
+  Morpheus::copy(Ah, A);
+
+  HostMatrix Ah_test(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                     this->nentries_per_row);
+  CHECK_HYB_SIZES(Ah_test, this->nrows, this->ncols, this->ell_nnz,
+                  this->coo_nnz, this->nentries_per_row, this->nalign)
+  Morpheus::copy(A, Ah_test);
+
+  VALIDATE_HYB_CONTAINER(Ah_test, Ah);
+}
+
+TYPED_TEST(HybMatrixUnaryTest, ConstructionFromShape) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using size_type  = typename Matrix::size_type;
+
+  size_type _nalign = 127;
+
+  HostMatrix Ah(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                this->nentries_per_row, _nalign);
+  CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, _nalign);
+  Matrix A(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+           this->nentries_per_row, _nalign);
+  CHECK_HYB_SIZES(A, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, _nalign)
+
+  size_type _nalign1 = 512;
+
+  HostMatrix Ah1(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                 this->nentries_per_row, _nalign1);
+  CHECK_HYB_SIZES(Ah1, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, _nalign1);
+  Matrix A1(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+            this->nentries_per_row, _nalign1);
+  CHECK_HYB_SIZES(A1, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, _nalign1)
+
+  size_type _nalign2 = 333;
+
+  HostMatrix Ah2(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                 this->nentries_per_row, _nalign2);
+  CHECK_HYB_SIZES(Ah2, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, _nalign2);
+  Matrix A2(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+            this->nentries_per_row, _nalign2);
+  CHECK_HYB_SIZES(A2, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, _nalign2)
+}
 
 // /**
-//  * @brief Testing default copy assignment of HybMatrix container from another
-//  * HybMatrix container with the same parameters. Resulting container should
-//  be
-//  * a shallow copy of the original.
+//  * @brief Testing construction of HybMatrix from a raw pointers
 //  *
 //  */
-// TYPED_TEST(HybMatrixUnaryTest, DefaultCopyAssignment) {
-//   using Matrix     = typename TestFixture::device;
-//   using HostMatrix = typename TestFixture::host;
-//   using value_type = typename Matrix::value_type;
-
-//   // Build matrix from the device vectors
-//   Matrix A(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//            this->Aref.column_indices(), this->Aref.values());
-//   CHECK_HYB_CONTAINERS(A, this->Aref);
-
-//   HostMatrix Ah(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 this->nalign);
-//   CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, this->nalign);
-
-//   Morpheus::copy(A, Ah);
-//   VALIDATE_HYB_CONTAINER(Ah, this->Ahref);
-
-//   // Default copy asssignment
-//   HostMatrix Bh = Ah;
-//   CHECK_HYB_CONTAINERS(Bh, Ah);
-
-//   // Change values in one container
-//   Ah.column_indices(1, 0) = 3;
-//   Ah.values(0, 1)         = (value_type)-3.33;
-
-//   // Other container should reflect the same changes
-//   VALIDATE_HYB_CONTAINER(Bh, Ah);
-
-//   // Now check device Matrix
-//   Matrix B = A;
-//   CHECK_HYB_CONTAINERS(B, A);
-//   Morpheus::copy(Ah, A);
-
-//   // Send other vector back to host for check
-//   HostMatrix Bt(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 this->nalign);
-//   Morpheus::copy(B, Bt);
-//   VALIDATE_HYB_CONTAINER(Bt, Ah);
+// TYPED_TEST(HybMatrixUnaryTest, ConstructionFromPointers) { EXPECT_EQ(1,0);
 // }
 
-// /**
-//  * @brief Testing default copy constructor of HybMatrix container from
-//  another
-//  * HybMatrix container with the same parameters. Resulting container should
-//  be
-//  * a shallow copy of the original.
-//  *
-//  */
-// TYPED_TEST(HybMatrixUnaryTest, DefaultCopyConstructor) {
-//   using Matrix     = typename TestFixture::device;
-//   using HostMatrix = typename TestFixture::host;
-//   using value_type = typename Matrix::value_type;
+TYPED_TEST(HybMatrixUnaryTest, ResizeDefault) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using size_type  = typename Matrix::size_type;
+  using value_type = typename Matrix::value_type;
 
-//   // Build matrix from the device vectors
-//   Matrix A(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//            this->Aref.column_indices(), this->Aref.values());
-//   CHECK_HYB_CONTAINERS(A, this->Aref);
+  size_type large_nrows = 500, large_ncols = 500, large_ell_nnnz = 640,
+            large_coo_nnnz = 340, large_nentries_per_row = 110;
+  size_type small_nrows = 2, small_ncols = 2, small_ell_nnnz = 2,
+            small_coo_nnnz = 1, small_nentries_per_row = 2;
 
-//   HostMatrix Ah(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 this->nalign);
-//   CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, this->nalign);
+  Matrix A(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+           this->nentries_per_row);
+  Morpheus::copy(this->Ahref, A);
 
-//   Morpheus::copy(A, Ah);
-//   VALIDATE_HYB_CONTAINER(Ah, this->Ahref);
+  // Resize to larger shape and non-zeros
+  A.resize(large_nrows, large_ncols, large_ell_nnnz, large_coo_nnnz,
+           large_nentries_per_row);
+  CHECK_HYB_SIZES(A, large_nrows, large_ncols, large_ell_nnnz, large_coo_nnnz,
+                  large_nentries_per_row, this->nalign);
 
-//   // Default copy asssignment
-//   HostMatrix Bh(Ah);
-//   CHECK_HYB_CONTAINERS(Bh, Ah);
+  HostMatrix Ah(large_nrows, large_ncols, large_ell_nnnz, large_coo_nnnz,
+                large_nentries_per_row);
+  CHECK_HYB_SIZES(Ah, large_nrows, large_ncols, large_ell_nnnz, large_coo_nnnz,
+                  large_nentries_per_row, this->nalign);
 
-//   // Change values in one container
-//   Ah.column_indices(1, 0) = 3;
-//   Ah.values(0, 1)         = (value_type)-3.33;
+  Morpheus::copy(A, Ah);
+  VALIDATE_HYB_CONTAINER(this->Ahref, Ah);
+  for (size_type i = this->Ahref.ell().values().nrows();
+       i < Ah.ell().values().nrows(); i++) {
+    for (size_type j = this->Ahref.ell().values().ncols();
+         j < Ah.ell().values().ncols(); j++) {
+      EXPECT_EQ(Ah.ell().column_indices(i, j), 0);
+      EXPECT_EQ(Ah.ell().values(i, j), 0);
+    }
+  }
 
-//   // Other container should reflect the same changes
-//   VALIDATE_HYB_CONTAINER(Bh, Ah);
+  for (size_type i = this->Ahref.coo().values().size();
+       i < Ah.coo().values().size(); i++) {
+    EXPECT_EQ(Ah.coo().row_indices(i), 0);
+    EXPECT_EQ(Ah.coo().column_indices(i), 0);
+    EXPECT_EQ(Ah.coo().values(i), 0);
+  }
 
-//   // Now check device Matrix
-//   Matrix B(A);
-//   CHECK_HYB_CONTAINERS(B, A);
-//   Morpheus::copy(Ah, A);
+  // Resizing to larger sizes should invoke a new allocation so changes in
+  // matrix should not be reflected in reference
+  Ah.ell().column_indices(1, 0) = 1;
+  Ah.ell().values(1, 0)         = (value_type)-1.11;
+  Ah.coo().row_indices(0)       = 1;
+  Ah.coo().column_indices(0)    = 1;
+  Ah.coo().values(0)            = (value_type)-1.11;
+  Morpheus::copy(Ah, A);
 
-//   // Send other vector back to host for check
-//   HostMatrix Bt(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 this->nalign);
-//   Morpheus::copy(B, Bt);
-//   VALIDATE_HYB_CONTAINER(Bt, Ah);
-// }
+  // Copy reference back to see if there are any changes
+  HostMatrix Ahref_test(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                        this->nentries_per_row);
+  Morpheus::copy(this->Ahref, Ahref_test);
+  EXPECT_NE(Ah.ell().column_indices(1, 0),
+            Ahref_test.ell().column_indices(1, 0));
+  EXPECT_NE(Ah.ell().values(1, 0), Ahref_test.ell().values(1, 0));
+  EXPECT_NE(Ah.coo().row_indices(0), Ahref_test.coo().row_indices(0));
+  EXPECT_NE(Ah.coo().column_indices(0), Ahref_test.coo().column_indices(0));
+  EXPECT_NE(Ah.coo().values(0), Ahref_test.coo().values(0));
 
-// /**
-//  * @brief Testing default move assignment of HybMatrix container from another
-//  * HybMatrix container with the same parameters. Resulting container should
-//  be
-//  * a shallow copy of the original.
-//  *
-//  */
-// TYPED_TEST(HybMatrixUnaryTest, DefaultMoveAssignment) {
-//   using Matrix     = typename TestFixture::device;
-//   using HostMatrix = typename TestFixture::host;
-//   using value_type = typename Matrix::value_type;
+  for (size_type i = this->Ahref.ell().values().nrows();
+       i < Ah.ell().values().nrows(); i++) {
+    for (size_type j = this->Ahref.ell().values().ncols();
+         j < Ah.ell().values().ncols(); j++) {
+      EXPECT_EQ(Ah.ell().column_indices(i, j), 0);
+      EXPECT_EQ(Ah.ell().values(i, j), 0);
+    }
+  }
 
-//   // Build matrix from the device vectors
-//   Matrix A(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//            this->Aref.column_indices(), this->Aref.values());
-//   CHECK_HYB_CONTAINERS(A, this->Aref);
+  for (size_type i = this->Ahref.coo().values().size();
+       i < Ah.coo().values().size(); i++) {
+    EXPECT_EQ(Ah.coo().row_indices(i), 0);
+    EXPECT_EQ(Ah.coo().column_indices(i), 0);
+    EXPECT_EQ(Ah.coo().values(i), 0);
+  }
 
-//   HostMatrix Ah(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 this->nalign);
-//   CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, this->nalign);
+  // Resize to smaller shape and non-zeros
+  A.resize(small_nrows, small_ncols, small_ell_nnnz, small_coo_nnnz,
+           small_nentries_per_row);
+  CHECK_HYB_SIZES(A, small_nrows, small_ncols, small_ell_nnnz, small_coo_nnnz,
+                  small_nentries_per_row, this->nalign);
+  Ah.resize(small_nrows, small_ncols, small_ell_nnnz, small_coo_nnnz,
+            small_nentries_per_row);
+  CHECK_HYB_SIZES(Ah, small_nrows, small_ncols, small_ell_nnnz, small_coo_nnnz,
+                  small_nentries_per_row, this->nalign);
 
-//   Morpheus::copy(A, Ah);
-//   VALIDATE_HYB_CONTAINER(Ah, this->Ahref);
+  // Set back to normal
+  Ah.ell().column_indices(1, 0) = 2;
+  Ah.ell().values(1, 0)         = (value_type)3.33;
+  Ah.coo().row_indices(0)       = 0;
+  Ah.coo().column_indices(0)    = 2;
+  Ah.coo().values(0)            = (value_type)2.22;
+  Morpheus::copy(Ah, A);
 
-//   // Default copy asssignment
-//   HostMatrix Bh = std::move(Ah);
-//   CHECK_HYB_CONTAINERS(Bh, Ah);
+  VALIDATE_HYB_CONTAINER(Ah, Ahref_test);
+}
 
-//   // Change values in one container
-//   Ah.column_indices(1, 0) = 3;
-//   Ah.values(0, 1)         = (value_type)-3.33;
+TYPED_TEST(HybMatrixUnaryTest, Resize) {
+  using Matrix     = typename TestFixture::device;
+  using HostMatrix = typename TestFixture::host;
+  using size_type  = typename Matrix::size_type;
 
-//   // Other container should reflect the same changes
-//   VALIDATE_HYB_CONTAINER(Bh, Ah);
+  size_type _nalign = 127;
+  HostMatrix Ah;
+  CHECK_HYB_EMPTY(Ah);
+  Ah.resize(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+            this->nentries_per_row, _nalign);
+  CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, _nalign);
 
-//   // Now check device Matrix
-//   Matrix B = std::move(A);
-//   CHECK_HYB_CONTAINERS(B, A);
-//   Morpheus::copy(Ah, A);
+  Matrix A;
+  CHECK_HYB_EMPTY(A);
+  A.resize(this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+           this->nentries_per_row, _nalign);
+  CHECK_HYB_SIZES(A, this->nrows, this->ncols, this->ell_nnz, this->coo_nnz,
+                  this->nentries_per_row, _nalign);
 
-//   // Send other vector back to host for check
-//   HostMatrix Bt(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 this->nalign);
-//   Morpheus::copy(B, Bt);
-//   VALIDATE_HYB_CONTAINER(Bt, Ah);
-// }
+  size_type large_nrows = 500, large_ncols = 500, large_ell_nnnz = 640,
+            large_coo_nnnz = 340, large_nentries_per_row = 110, _nalign1 = 512;
 
-// /**
-//  * @brief Testing default move construction of HybMatrix container from
-//  * another HybMatrix container with the same parameters. Resulting container
-//  * should be a shallow copy of the original.
-//  *
-//  */
-// TYPED_TEST(HybMatrixUnaryTest, DefaultMoveConstructor) {
-//   using Matrix     = typename TestFixture::device;
-//   using HostMatrix = typename TestFixture::host;
-//   using value_type = typename Matrix::value_type;
+  HostMatrix Ah1(large_nrows, large_ncols, large_ell_nnnz, large_coo_nnnz,
+                 large_nentries_per_row, _nalign1);
+  CHECK_HYB_SIZES(Ah1, large_nrows, large_ncols, large_ell_nnnz, large_coo_nnnz,
+                  large_nentries_per_row, _nalign1);
 
-//   // Build matrix from the device vectors
-//   Matrix A(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//            this->Aref.column_indices(), this->Aref.values());
-//   CHECK_HYB_CONTAINERS(A, this->Aref);
+  Matrix A1(large_nrows, large_ncols, large_ell_nnnz, large_coo_nnnz,
+            large_nentries_per_row, _nalign1);
+  CHECK_HYB_SIZES(A1, large_nrows, large_ncols, large_ell_nnnz, large_coo_nnnz,
+                  large_nentries_per_row, _nalign1);
 
-//   HostMatrix Ah(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 this->nalign);
-//   CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, this->nalign);
+  size_type small_nrows = 2, small_ncols = 2, small_ell_nnnz = 2,
+            small_coo_nnnz = 1, small_nentries_per_row = 2, _nalign2 = 333;
 
-//   Morpheus::copy(A, Ah);
-//   VALIDATE_HYB_CONTAINER(Ah, this->Ahref);
+  HostMatrix Ah2(small_nrows, small_ncols, small_ell_nnnz, small_coo_nnnz,
+                 small_nentries_per_row, _nalign2);
+  CHECK_HYB_SIZES(Ah2, small_nrows, small_ncols, small_ell_nnnz, small_coo_nnnz,
+                  small_nentries_per_row, _nalign2);
 
-//   // Default copy asssignment
-//   HostMatrix Bh(std::move(Ah));
-//   CHECK_HYB_CONTAINERS(Bh, Ah);
-
-//   // Change values in one container
-//   Ah.column_indices(1, 0) = 3;
-//   Ah.values(0, 1)         = (value_type)-3.33;
-
-//   // Other container should reflect the same changes
-//   VALIDATE_HYB_CONTAINER(Bh, Ah);
-
-//   // Now check device Matrix
-//   Matrix B(std::move(A));
-//   CHECK_HYB_CONTAINERS(B, A);
-//   Morpheus::copy(Ah, A);
-
-//   // Send other vector back to host for check
-//   HostMatrix Bt(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 this->nalign);
-//   Morpheus::copy(B, Bt);
-//   VALIDATE_HYB_CONTAINER(Bt, Ah);
-// }
-
-// TYPED_TEST(HybMatrixUnaryTest, ConstructionFromShapeDefault) {
-//   using Matrix     = typename TestFixture::device;
-//   using HostMatrix = typename TestFixture::host;
-//   using size_type  = typename Matrix::size_type;
-//   using value_type = typename Matrix::value_type;
-
-//   HostMatrix Ah(this->nrows, this->ncols, this->nnnz,
-//   this->nentries_per_row); CHECK_HYB_SIZES(Ah, this->nrows, this->ncols,
-//   this->nnnz,
-//                   this->nentries_per_row, this->nalign);
-
-//   for (size_type i = 0; i < Ah.values().nrows(); i++) {
-//     for (size_type j = 0; j < Ah.values().ncols(); j++) {
-//       EXPECT_EQ(Ah.column_indices(i, j), 0);
-//       EXPECT_EQ(Ah.values(i, j), (value_type)0);
-//     }
-//   }
-
-//   Morpheus::Test::build_small_container(Ah);
-
-//   Matrix A(this->nrows, this->ncols, this->nnnz, this->nentries_per_row);
-//   CHECK_HYB_SIZES(A, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, this->nalign)
-//   // Send to device
-//   Morpheus::copy(Ah, A);
-
-//   HostMatrix Ah_test(this->nrows, this->ncols, this->nnnz,
-//                      this->nentries_per_row);
-//   CHECK_HYB_SIZES(Ah_test, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, this->nalign)
-//   Morpheus::copy(A, Ah_test);
-
-//   VALIDATE_HYB_CONTAINER(Ah_test, Ah);
-// }
-
-// TYPED_TEST(HybMatrixUnaryTest, ConstructionFromShape) {
-//   using Matrix     = typename TestFixture::device;
-//   using HostMatrix = typename TestFixture::host;
-//   using size_type  = typename Matrix::size_type;
-
-//   size_type _nalign = 127;
-
-//   HostMatrix Ah(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//                 _nalign);
-//   CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, _nalign);
-//   Matrix A(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//            _nalign);
-//   CHECK_HYB_SIZES(A, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, _nalign)
-
-//   size_type _nalign1 = 512;
-
-//   HostMatrix Ah1(this->nrows, this->ncols, this->nnnz,
-//   this->nentries_per_row,
-//                  _nalign1);
-//   CHECK_HYB_SIZES(Ah1, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, _nalign1);
-//   Matrix A1(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//             _nalign1);
-//   CHECK_HYB_SIZES(A1, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, _nalign1)
-
-//   size_type _nalign2 = 333;
-
-//   HostMatrix Ah2(this->nrows, this->ncols, this->nnnz,
-//   this->nentries_per_row,
-//                  _nalign2);
-//   CHECK_HYB_SIZES(Ah2, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, _nalign2);
-//   Matrix A2(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//             _nalign2);
-//   CHECK_HYB_SIZES(A2, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, _nalign2)
-// }
-
-// // /**
-// //  * @brief Testing construction of HybMatrix from a raw pointers
-// //  *
-// //  */
-// // TYPED_TEST(HybMatrixUnaryTest, ConstructionFromPointers) { EXPECT_EQ(1,0);
-// }
-
-// TYPED_TEST(HybMatrixUnaryTest, ResizeDefault) {
-//   using Matrix     = typename TestFixture::device;
-//   using HostMatrix = typename TestFixture::host;
-//   using size_type  = typename Matrix::size_type;
-//   using value_type = typename Matrix::value_type;
-
-//   size_type large_nrows = 500, large_ncols = 500, large_nnnz = 640,
-//             large_nentries_per_row = 110;
-//   size_type small_nrows = 2, small_ncols = 2, small_nnnz = 2,
-//             small_nentries_per_row = 2;
-
-//   Matrix A(this->nrows, this->ncols, this->nnnz, this->nentries_per_row);
-//   Morpheus::copy(this->Ahref, A);
-
-//   // Resize to larger shape and non-zeros
-//   A.resize(large_nrows, large_ncols, large_nnnz, large_nentries_per_row);
-//   CHECK_HYB_SIZES(A, large_nrows, large_ncols, large_nnnz,
-//                   large_nentries_per_row, this->nalign);
-
-//   HostMatrix Ah(large_nrows, large_ncols, large_nnnz,
-//   large_nentries_per_row); CHECK_HYB_SIZES(Ah, large_nrows, large_ncols,
-//   large_nnnz,
-//                   large_nentries_per_row, this->nalign);
-
-//   Morpheus::copy(A, Ah);
-//   VALIDATE_HYB_CONTAINER(this->Ahref, Ah);
-//   for (size_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
-//        i++) {
-//     for (size_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
-//          j++) {
-//       EXPECT_EQ(Ah.column_indices(i, j), 0);
-//       EXPECT_EQ(Ah.values(i, j), 0);
-//     }
-//   }
-
-//   // Resizing to larger sizes should invoke a new allocation so changes in
-//   // matrix should not be reflected in reference
-//   Ah.column_indices(0, 1) = 1;
-//   Ah.values(0, 1)         = (value_type)-1.11;
-//   Morpheus::copy(Ah, A);
-
-//   // Copy reference back to see if there are any changes
-//   HostMatrix Ahref_test(this->nrows, this->ncols, this->nnnz,
-//                         this->nentries_per_row);
-//   Morpheus::copy(this->Ahref, Ahref_test);
-//   EXPECT_NE(Ah.column_indices(0, 1), Ahref_test.column_indices(0, 1));
-//   EXPECT_NE(Ah.values(0, 1), Ahref_test.values(0, 1));
-
-//   for (size_type i = this->Ahref.values().nrows(); i < Ah.values().nrows();
-//        i++) {
-//     for (size_type j = this->Ahref.values().ncols(); j < Ah.values().ncols();
-//          j++) {
-//       EXPECT_EQ(Ah.column_indices(i, j), 0);
-//       EXPECT_EQ(Ah.values(i, j), 0);
-//     }
-//   }
-
-//   // Resize to smaller shape and non-zeros
-//   A.resize(small_nrows, small_ncols, small_nnnz, small_nentries_per_row);
-//   CHECK_HYB_SIZES(A, small_nrows, small_ncols, small_nnnz,
-//                   small_nentries_per_row, this->nalign);
-//   Ah.resize(small_nrows, small_ncols, small_nnnz, small_nentries_per_row);
-//   CHECK_HYB_SIZES(Ah, small_nrows, small_ncols, small_nnnz,
-//                   small_nentries_per_row, this->nalign);
-
-//   // Set back to normal
-//   Ah.column_indices(0, 1) = 2;
-//   Ah.values(0, 1)         = (value_type)2.22;
-//   Morpheus::copy(Ah, A);
-
-//   VALIDATE_HYB_CONTAINER(Ah, Ahref_test);
-// }
-
-// TYPED_TEST(HybMatrixUnaryTest, Resize) {
-//   using Matrix     = typename TestFixture::device;
-//   using HostMatrix = typename TestFixture::host;
-//   using size_type  = typename Matrix::size_type;
-
-//   size_type _nalign = 127;
-//   HostMatrix Ah;
-//   CHECK_HYB_EMPTY(Ah);
-//   Ah.resize(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//             _nalign);
-//   CHECK_HYB_SIZES(Ah, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, _nalign);
-
-//   Matrix A;
-//   CHECK_HYB_EMPTY(A);
-//   A.resize(this->nrows, this->ncols, this->nnnz, this->nentries_per_row,
-//            _nalign);
-//   CHECK_HYB_SIZES(A, this->nrows, this->ncols, this->nnnz,
-//                   this->nentries_per_row, _nalign);
-
-//   size_type large_nrows = 500, large_ncols = 500, large_nnnz = 640,
-//             large_nentries_per_row = 110, _nalign1 = 512;
-
-//   HostMatrix Ah1(large_nrows, large_ncols, large_nnnz,
-//   large_nentries_per_row,
-//                  _nalign1);
-//   CHECK_HYB_SIZES(Ah1, large_nrows, large_ncols, large_nnnz,
-//                   large_nentries_per_row, _nalign1);
-
-//   Matrix A1(large_nrows, large_ncols, large_nnnz, large_nentries_per_row,
-//             _nalign1);
-//   CHECK_HYB_SIZES(A1, large_nrows, large_ncols, large_nnnz,
-//                   large_nentries_per_row, _nalign1);
-
-//   size_type small_nrows = 2, small_ncols = 2, small_nnnz = 2,
-//             small_nentries_per_row = 2, _nalign2 = 333;
-
-//   HostMatrix Ah2(small_nrows, small_ncols, small_nnnz,
-//   small_nentries_per_row,
-//                  _nalign2);
-//   CHECK_HYB_SIZES(Ah2, small_nrows, small_ncols, small_nnnz,
-//                   small_nentries_per_row, _nalign2);
-
-//   Matrix A2(small_nrows, small_ncols, small_nnnz, small_nentries_per_row,
-//             _nalign2);
-//   CHECK_HYB_SIZES(A2, small_nrows, small_ncols, small_nnnz,
-//                   small_nentries_per_row, _nalign2)
-// }
+  Matrix A2(small_nrows, small_ncols, small_ell_nnnz, small_coo_nnnz,
+            small_nentries_per_row, _nalign2);
+  CHECK_HYB_SIZES(A2, small_nrows, small_ncols, small_ell_nnnz, small_coo_nnnz,
+                  small_nentries_per_row, _nalign2)
+}
 
 // // TYPED_TEST(HybMatrixUnaryTest, ResizeTolerance) {
 // //   using Matrix    = typename TestFixture::device;

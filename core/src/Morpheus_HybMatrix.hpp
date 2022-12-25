@@ -335,35 +335,20 @@ class HybMatrix : public MatrixBase<HybMatrix, ValueType, Properties...> {
   inline void resize(const size_type num_rows, const size_type num_cols,
                      const size_type num_ell_entries,
                      const size_type num_coo_entries,
-                     const size_type num_entries_per_row,
-                     const size_type alignment = 32) {
+                     const size_type num_entries_per_row = 0,
+                     const size_type alignment           = 32) {
     base::resize(num_rows, num_cols, num_ell_entries + num_coo_entries);
 
-    _ell.resize(num_rows, num_cols, num_ell_entries, num_entries_per_row,
+    size_type avg_entries_per_row = num_entries_per_row;
+    if (num_entries_per_row == 0) {
+      avg_entries_per_row = (num_ell_entries + num_coo_entries) / num_rows;
+    }
+
+    _ell.resize(num_rows, num_cols, num_ell_entries, avg_entries_per_row,
                 alignment);
     _coo.resize(num_rows, num_cols, num_coo_entries);
 
     _alignment = alignment;
-  }
-
-  /**
-   * @brief Resizes HybMatrix from shape.
-   *
-   * @param num_rows Number of rows of resized matrix.
-   * @param num_cols Number of columns of resized matrix.
-   * @param num_ell_entries Number of non-zeros in the ELL part.
-   * @param num_coo_entries Number of non-zeros in the COO part.
-   * @param alignment Amount of padding used to align the data (default=32)
-   */
-  inline void resize(const size_type num_rows, const size_type num_cols,
-                     const size_type num_ell_entries,
-                     const size_type num_coo_entries,
-                     const size_type alignment = 32) {
-    size_type avg_entries_per_row =
-        (num_ell_entries + num_coo_entries) / num_rows;
-
-    resize(num_rows, num_cols, num_ell_entries, num_coo_entries,
-           avg_entries_per_row, alignment);
   }
 
   /**
