@@ -61,6 +61,9 @@ namespace Morpheus {
  * integer type values, on host or device depending how the template parameters
  * are selected.
  *
+ * \note HYB matrices are not intended to be used to construct the matrix
+ * directly. Instead, they are used to convert from/to another format.
+ *
  * \par Example
  * \code
  * #include <Morpheus_Core.hpp>
@@ -70,7 +73,28 @@ namespace Morpheus {
  * // [* 4 *]
  * int main(){
  *  using Matrix = Morpheus::HybMatrix<double, Kokkos::HostSpace>;
- *  // TODO
+ *  using coo_matrix_type = typename Matrix::coo_matrix_type;
+ *  using ell_matrix_type = typename Matrix::ell_matrix_type;
+ *  using size_type = typename Matrix::size_type;
+ *
+ *  coo_matrix_type coo(3, 3, 1);
+ *  ell_matrix_type ell(3, 3, 3, 1, 32);
+ *
+ *  ell.column_indices(0,0) = 0;
+ *  ell.column_indices(1,0) = 2;
+ *  ell.column_indices(2,0) = 1;
+ *  ell.values(0,0) = 1.11;
+ *  ell.values(1,0) = 3.33;
+ *  ell.values(2,0) = 4.44;
+ *
+ *  coo.row_indices(0) = 0;
+ *  coo.column_indices(0) = 2;
+ *  coo.values(0) = 2.22;
+ *
+ *  // Construct the matrix from ELL and COO parts
+ *  Matrix A(ell, coo);
+ *
+ *  Morpheus::print(A); // prints A
  * }
  * \endcode
  */
