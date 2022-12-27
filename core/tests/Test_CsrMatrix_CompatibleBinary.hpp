@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_CSRMATRIX_COMPATIBLEBINARY_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
 
 using CsrMatrixCompatibleTypes = typename Morpheus::generate_unary_typelist<
@@ -49,7 +51,9 @@ class CompatibleCsrMatrixBinaryTest : public ::testing::Test {
   using device2 = typename type2::type;  // CsrMatrix
   using host2   = typename type2::type::HostMirror;
 
-  CompatibleCsrMatrixBinaryTest() : Aref(3, 3, 4), Ahref(3, 3, 4) {}
+  CompatibleCsrMatrixBinaryTest()
+      : Aref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ),
+        Ahref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ) {}
 
   void SetUp() override {
     Morpheus::Test::build_small_container(Ahref);
@@ -78,7 +82,8 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromCsrMatrix) {
   using size_type   = typename Matrix1::size_type;
   using value_type2 = typename Matrix2::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix2 A(nrows, ncols, nnnz, this->Aref.row_offsets(),
             this->Aref.column_indices(), this->Aref.values());
@@ -95,7 +100,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromCsrMatrix) {
   CHECK_CSR_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.row_offsets(2)    = 2;
+  Ah.row_offsets(2)    = 6;
   Ah.column_indices(1) = 1;
   Ah.values(3)         = (value_type2)-3.33;
 
@@ -121,7 +126,8 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, CopyAssignmentFromCsrMatrix) {
   using size_type   = typename Matrix1::size_type;
   using value_type2 = typename Matrix2::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix2 A(nrows, ncols, nnnz, this->Aref.row_offsets(),
             this->Aref.column_indices(), this->Aref.values());
@@ -138,7 +144,7 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, CopyAssignmentFromCsrMatrix) {
   CHECK_CSR_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.row_offsets(2)    = 2;
+  Ah.row_offsets(2)    = 6;
   Ah.column_indices(1) = 1;
   Ah.values(3)         = (value_type2)-3.33;
 
@@ -166,7 +172,8 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromDenseVector) {
   using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_offsets(),
            this->Aref.column_indices(), this->Aref.values());
@@ -183,12 +190,13 @@ TYPED_TEST(CompatibleCsrMatrixBinaryTest, ConstructionFromDenseVector) {
 
   VALIDATE_CSR_CONTAINER(Ah, Ah_test, nrows, nnnz);
 
-  Ah.row_offsets(2) = 2;
-  EXPECT_NE(Ah.row_offsets(2), Ah_test.row_offsets(2));
+  Ah.row_offsets(2)    = 6;
   Ah.column_indices(1) = 1;
+  Ah.values(3)         = (value_type)-3.33;
+
+  EXPECT_NE(Ah.row_offsets(2), Ah_test.row_offsets(2));
   EXPECT_NE(Ah.column_indices(1), Ah_test.column_indices(1));
-  Ah.values(0) = (value_type)-1.11;
-  EXPECT_NE(Ah.values(0), Ah_test.values(0));
+  EXPECT_NE(Ah.values(3), Ah_test.values(3));
 }
 
 }  // namespace Test

@@ -26,6 +26,8 @@
 
 #include <Morpheus_Core.hpp>
 
+#include <utils/Macros_Definitions.hpp>
+
 /**
  * @brief Checks the sizes of a CsrMatrix container against a number of rows,
  * columns and non-zeros
@@ -95,21 +97,60 @@ void reset_small_container(
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Container>>* = nullptr) {
   using value_type = typename Container::value_type;
-  // Matrix
-  // [1.11 *    2.22]
-  // [*    *    3.33]
-  // [*    4.44 *   ]
-
   // clang-format off
-  c.row_offsets(0) = 0; 
-  c.row_offsets(1) = 2; 
-  c.row_offsets(2) = 3; 
-  c.row_offsets(3) = 4; 
+  c.row_offsets(0)  = 0; 
+  c.row_offsets(1)  = 4; 
+  c.row_offsets(2)  = 8; 
+  c.row_offsets(3)  = 10;
+  c.row_offsets(4)  = 13; 
+  c.row_offsets(5)  = 16; 
+  c.row_offsets(6)  = 19; 
+  c.row_offsets(7)  = 22;
+  c.row_offsets(8)  = 26; 
+  c.row_offsets(9)  = 29; 
+  c.row_offsets(10) = 32; 
 
-  c.column_indices(0) = 0; c.values(0) = (value_type)1.11;
-  c.column_indices(1) = 2; c.values(1) = (value_type)2.22;
-  c.column_indices(2) = 2; c.values(2) = (value_type)3.33;
-  c.column_indices(3) = 1; c.values(3) = (value_type)4.44;
+  c.column_indices(0)  = 0; c.values(0)  = (value_type)1.11;
+  c.column_indices(1)  = 3; c.values(1)  = (value_type)2.22;
+  c.column_indices(2)  = 7; c.values(2)  = (value_type)3.33;
+  c.column_indices(3)  = 8; c.values(3)  = (value_type)4.44;
+
+  c.column_indices(4)  = 1; c.values(4)  = (value_type)5.55;
+  c.column_indices(5)  = 4; c.values(5)  = (value_type)6.66;
+  c.column_indices(6)  = 7; c.values(6)  = (value_type)7.77;
+  c.column_indices(7)  = 9; c.values(7)  = (value_type)8.88;
+
+  c.column_indices(8)  = 2; c.values(8)  = (value_type)9.99;
+  c.column_indices(9)  = 5; c.values(9)  = (value_type)10.10;
+
+  c.column_indices(10) = 0; c.values(10) = (value_type)11.11;
+  c.column_indices(11) = 3; c.values(11) = (value_type)12.12;
+  c.column_indices(12) = 6; c.values(12) = (value_type)13.13;
+
+  c.column_indices(13) = 1; c.values(13) = (value_type)14.14;
+  c.column_indices(14) = 4; c.values(14) = (value_type)15.15;
+  c.column_indices(15) = 7; c.values(15) = (value_type)16.16;
+
+  c.column_indices(16) = 2; c.values(16) = (value_type)17.17;
+  c.column_indices(17) = 5; c.values(17) = (value_type)18.18;
+  c.column_indices(18) = 8; c.values(18) = (value_type)19.19;
+
+  c.column_indices(19) = 3; c.values(19) = (value_type)20.20;
+  c.column_indices(20) = 6; c.values(20) = (value_type)21.21;
+  c.column_indices(21) = 9; c.values(21) = (value_type)22.22;
+
+  c.column_indices(22) = 0; c.values(22) = (value_type)23.23;
+  c.column_indices(23) = 1; c.values(23) = (value_type)24.24;
+  c.column_indices(24) = 4; c.values(24) = (value_type)25.25;
+  c.column_indices(25) = 7; c.values(25) = (value_type)26.26;
+
+  c.column_indices(26) = 0; c.values(26) = (value_type)27.27;
+  c.column_indices(27) = 5; c.values(27) = (value_type)28.28;
+  c.column_indices(28) = 8; c.values(28) = (value_type)29.29;
+
+  c.column_indices(29) = 1; c.values(29) = (value_type)30.30;
+  c.column_indices(30) = 6; c.values(30) = (value_type)31.31;
+  c.column_indices(31) = 9; c.values(31) = (value_type)32.32;
   // clang-format on
 }
 
@@ -125,12 +166,7 @@ void build_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Container>>* = nullptr) {
-  // Matrix to Build
-  // [1.11 *    2.22]
-  // [*    *    3.33]
-  // [*    4.44 *   ]
-  CHECK_CSR_SIZES(c, 3, 3, 4);
-
+  CHECK_CSR_SIZES(c, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ);
   reset_small_container(c);
 }
 
@@ -140,21 +176,60 @@ void update_small_container(
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Container>>* = nullptr) {
   using value_type = typename Container::value_type;
-  // New Matrix
-  // [1.11 *    *    ]
-  // [*    *    -3.33]
-  // [2.22 4.44 *    ]
-
   // clang-format off
-  c.row_offsets(0) = 0; 
-  c.row_offsets(1) = 1; 
-  c.row_offsets(2) = 2; 
-  c.row_offsets(3) = 4; 
+  c.row_offsets(0)  = 0; 
+  c.row_offsets(1)  = 4; 
+  c.row_offsets(2)  = 8; 
+  c.row_offsets(3)  = 10;
+  c.row_offsets(4)  = 13; 
+  c.row_offsets(5)  = 16; 
+  c.row_offsets(6)  = 19; 
+  c.row_offsets(7)  = 22;
+  c.row_offsets(8)  = 26; 
+  c.row_offsets(9)  = 29; 
+  c.row_offsets(10) = 32; 
 
-  c.column_indices(0) = 0; c.values(0) = (value_type)1.11;
-  c.column_indices(1) = 2; c.values(1) = (value_type)-3.33;
-  c.column_indices(2) = 0; c.values(2) = (value_type)2.22;
-  c.column_indices(3) = 1; c.values(3) = (value_type)4.44;
+  c.column_indices(0)  = 0; c.values(0)  = (value_type)1.11;
+  c.column_indices(1)  = 3; c.values(1)  = (value_type)2.22;
+  c.column_indices(2)  = 7; c.values(2)  = (value_type)3.33;
+  c.column_indices(3)  = 8; c.values(3)  = (value_type)-4.44;
+
+  c.column_indices(4)  = 1; c.values(4)  = (value_type)5.55;
+  c.column_indices(5)  = 4; c.values(5)  = (value_type)6.66;
+  c.column_indices(6)  = 7; c.values(6)  = (value_type)7.77;
+  c.column_indices(7)  = 9; c.values(7)  = (value_type)-8.88;
+
+  c.column_indices(8)  = 2; c.values(8)  = (value_type)9.99;
+  c.column_indices(9)  = 5; c.values(9)  = (value_type)10.10;
+
+  c.column_indices(10) = 0; c.values(10) = (value_type)11.11;
+  c.column_indices(11) = 3; c.values(11) = (value_type)12.12;
+  c.column_indices(12) = 6; c.values(12) = (value_type)13.13;
+
+  c.column_indices(13) = 1; c.values(13) = (value_type)-14.14;
+  c.column_indices(14) = 4; c.values(14) = (value_type)-15.15;
+  c.column_indices(15) = 7; c.values(15) = (value_type)16.16;
+
+  c.column_indices(16) = 2; c.values(16) = (value_type)17.17;
+  c.column_indices(17) = 5; c.values(17) = (value_type)18.18;
+  c.column_indices(18) = 8; c.values(18) = (value_type)19.19;
+
+  c.column_indices(19) = 3; c.values(19) = (value_type)20.20;
+  c.column_indices(20) = 6; c.values(20) = (value_type)21.21;
+  c.column_indices(21) = 9; c.values(21) = (value_type)22.22;
+
+  c.column_indices(22) = 0; c.values(22) = (value_type)23.23;
+  c.column_indices(23) = 1; c.values(23) = (value_type)24.24;
+  c.column_indices(24) = 4; c.values(24) = (value_type)-25.25;
+  c.column_indices(25) = 7; c.values(25) = (value_type)26.26;
+
+  c.column_indices(26) = 0; c.values(26) = (value_type)27.27;
+  c.column_indices(27) = 5; c.values(27) = (value_type)28.28;
+  c.column_indices(28) = 8; c.values(28) = (value_type)29.29;
+
+  c.column_indices(29) = 1; c.values(29) = (value_type)30.30;
+  c.column_indices(30) = 6; c.values(30) = (value_type)31.31;
+  c.column_indices(31) = 9; c.values(31) = (value_type)32.32;
   // clang-format on
 }
 
@@ -163,7 +238,7 @@ void setup_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_csr_matrix_format_container_v<Container>>* = nullptr) {
-  c.resize(3, 3, 4);
+  c.resize(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ);
   build_small_container(c);
 }
 
