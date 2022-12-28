@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_ELLMATRIX_COMPATIBLEDYNAMICBINARY_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_EllMatrix.hpp>
 
 using EllMatrixCompatibleTypes = typename Morpheus::generate_unary_typelist<
@@ -56,13 +58,15 @@ class CompatibleEllMatrixDynamicTest : public ::testing::Test {
   using SizeType = typename device::size_type;
 
   CompatibleEllMatrixDynamicTest()
-      : nrows(3),
-        ncols(3),
-        nnnz(4),
-        nentries_per_row(2),
-        nalign(32),
-        Aref(3, 3, 4, 2),
-        Ahref(3, 3, 4, 2) {}
+      : nrows(SMALL_MATRIX_NROWS),
+        ncols(SMALL_MATRIX_NCOLS),
+        nnnz(SMALL_MATRIX_NNZ),
+        nentries_per_row(SMALL_ELL_ENTRIES_PER_ROW),
+        nalign(SMALL_MATRIX_ALIGNMENT),
+        Aref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ,
+             SMALL_ELL_ENTRIES_PER_ROW, SMALL_MATRIX_ALIGNMENT),
+        Ahref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ,
+              SMALL_ELL_ENTRIES_PER_ROW, SMALL_MATRIX_ALIGNMENT) {}
 
   void SetUp() override {
     Morpheus::Test::build_small_container(Ahref);

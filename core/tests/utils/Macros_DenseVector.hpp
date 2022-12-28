@@ -26,6 +26,8 @@
 
 #include <Morpheus_Core.hpp>
 
+#include <utils/Macros_Definitions.hpp>
+
 /**
  * @brief Checks the sizes of a DenseVector container against a size
  *
@@ -87,8 +89,7 @@ void build_small_container(
     Container& c,
     typename std::enable_if_t<Morpheus::is_vector_container_v<Container>>* =
         nullptr) {
-  CHECK_DENSE_VECTOR_SIZES(c, 3);
-
+  CHECK_DENSE_VECTOR_SIZES(c, SMALL_VECTOR_SIZE);
   reset_small_container(c);
 }
 
@@ -111,7 +112,7 @@ void setup_small_container(
     Container& c,
     typename std::enable_if_t<Morpheus::is_vector_container_v<Container>>* =
         nullptr) {
-  c.resize(3);
+  c.resize(SMALL_VECTOR_SIZE);
   build_small_container(c);
 }
 

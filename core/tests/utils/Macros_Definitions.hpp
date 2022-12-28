@@ -31,6 +31,8 @@ const size_t SMALL_MATRIX_ALIGNMENT = 32;
 
 const size_t SMALL_DIA_MATRIX_NDIAGS = 9;
 
+const size_t SMALL_ELL_ENTRIES_PER_ROW = 4;
+
 const size_t SMALL_VECTOR_SIZE = 10;
 
 // clang-format off

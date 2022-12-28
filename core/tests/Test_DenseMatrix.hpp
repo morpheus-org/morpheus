@@ -25,6 +25,7 @@
 #define TEST_CORE_TEST_DENSEMATRIX_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
 
 using DenseMatrixTypes =
