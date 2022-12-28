@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_DYNAMICMATRIX_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_DynamicMatrix.hpp>
 
 using DynamicMatrixTypes =
@@ -52,7 +54,10 @@ class DynamicMatrixUnaryTest : public ::testing::Test {
   using CsrDev = Morpheus::CsrMatrix<ValueType, IndexType, DevLayout, DevSpace>;
   using CsrHost = typename CsrDev::HostMirror;
 
-  DynamicMatrixUnaryTest() : nrows(3), ncols(3), nnnz(4) {}
+  DynamicMatrixUnaryTest()
+      : nrows(SMALL_MATRIX_NROWS),
+        ncols(SMALL_MATRIX_NCOLS),
+        nnnz(SMALL_MATRIX_NNZ) {}
 
   void SetUp() override { switch_coo(); }
 
@@ -66,10 +71,12 @@ class DynamicMatrixUnaryTest : public ::testing::Test {
     Morpheus::copy(Aref_coo_h, Aref_coo);
 
     Aref_dyn_h = Aref_coo_h;
-    CHECK_DYNAMIC_SIZES(Aref_dyn_h, 3, 3, 4, 0);
+    CHECK_DYNAMIC_SIZES(Aref_dyn_h, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS,
+                        SMALL_MATRIX_NNZ, 0);
 
     Aref_dyn = Aref_coo;
-    CHECK_DYNAMIC_SIZES(Aref_dyn, 3, 3, 4, 0);
+    CHECK_DYNAMIC_SIZES(Aref_dyn, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS,
+                        SMALL_MATRIX_NNZ, 0);
   }
 
   void switch_csr() {
@@ -82,10 +89,12 @@ class DynamicMatrixUnaryTest : public ::testing::Test {
     Morpheus::copy(Aref_csr_h, Aref_csr);
 
     Aref_dyn_h = Aref_csr_h;
-    CHECK_DYNAMIC_SIZES(Aref_dyn_h, 3, 3, 4, 1);
+    CHECK_DYNAMIC_SIZES(Aref_dyn_h, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS,
+                        SMALL_MATRIX_NNZ, 1);
 
     Aref_dyn = Aref_csr;
-    CHECK_DYNAMIC_SIZES(Aref_dyn, 3, 3, 4, 1);
+    CHECK_DYNAMIC_SIZES(Aref_dyn, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS,
+                        SMALL_MATRIX_NNZ, 1);
   }
 
   SizeType nrows, ncols, nnnz;
@@ -253,7 +262,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentHost) {
   CHECK_DYNAMIC_SIZES(A2_h, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = (value_type)-3.33;
 
@@ -304,7 +313,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyAssignmentDevice) {
   CHECK_DYNAMIC_SIZES(A2, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);
@@ -355,7 +364,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorHost) {
   CHECK_DYNAMIC_SIZES(B2_h, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = (value_type)-3.33;
 
@@ -406,7 +415,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultCopyConstructorDevice) {
   CHECK_DYNAMIC_SIZES(B2, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);
@@ -457,7 +466,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentHost) {
   CHECK_DYNAMIC_SIZES(A2_h, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = (value_type)-3.33;
 
@@ -508,7 +517,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveAssignmentDevice) {
   CHECK_DYNAMIC_SIZES(A2, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);
@@ -559,7 +568,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorHost) {
   CHECK_DYNAMIC_SIZES(B2_h, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = (value_type)-3.33;
 
@@ -610,7 +619,7 @@ TYPED_TEST(DynamicMatrixUnaryTest, DefaultMoveConstructorDevice) {
   CHECK_DYNAMIC_SIZES(B2, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = (value_type)-3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);
