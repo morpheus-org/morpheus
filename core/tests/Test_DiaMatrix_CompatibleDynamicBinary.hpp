@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_DIAMATRIX_COMPATIBLEDYNAMICBINARY_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
 
 using DiaMatrixCompatibleTypes = typename Morpheus::generate_unary_typelist<
@@ -56,13 +58,15 @@ class CompatibleDiaMatrixDynamicTest : public ::testing::Test {
   using SizeType = typename device::size_type;
 
   CompatibleDiaMatrixDynamicTest()
-      : nrows(3),
-        ncols(3),
-        nnnz(4),
-        ndiag(4),
-        nalign(32),
-        Aref(3, 3, 4, 4),
-        Ahref(3, 3, 4, 4) {}
+      : nrows(SMALL_MATRIX_NROWS),
+        ncols(SMALL_MATRIX_NCOLS),
+        nnnz(SMALL_MATRIX_NNZ),
+        ndiag(SMALL_DIA_MATRIX_NDIAGS),
+        nalign(SMALL_MATRIX_ALIGNMENT),
+        Aref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ,
+             SMALL_DIA_MATRIX_NDIAGS, SMALL_MATRIX_ALIGNMENT),
+        Ahref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ,
+              SMALL_DIA_MATRIX_NDIAGS, SMALL_MATRIX_ALIGNMENT) {}
 
   void SetUp() override {
     Morpheus::Test::build_small_container(Ahref);
@@ -116,8 +120,8 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
   HostMatrix Ch(Ah);
 
   // Change values in one container
-  Bh.diagonal_offsets(2) = 2;
-  Bh.values(1, 2)        = (value_type)-3.33;
+  Bh.diagonal_offsets(1) = 7;
+  Bh.values(8, 0)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   for (size_type n = 0; n < Bh.ndiags(); n++) {
@@ -204,8 +208,8 @@ TYPED_TEST(CompatibleDiaMatrixDynamicTest,
   HostMatrix Ch = Ah;
 
   // Change values in one container
-  Bh.diagonal_offsets(2) = 2;
-  Bh.values(1, 2)        = (value_type)-3.33;
+  Bh.diagonal_offsets(1) = 7;
+  Bh.values(8, 0)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   for (size_type n = 0; n < Bh.ndiags(); n++) {

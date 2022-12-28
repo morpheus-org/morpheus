@@ -49,8 +49,8 @@ void print(const Printable& p, Stream& s,
   for (size_type i = 0; i < ndiag; i++) {
     const index_type k = p.cdiagonal_offsets(i);
 
-    const size_type i_start = std::max<size_type>(0, -k);
-    const size_type j_start = std::max<size_type>(0, k);
+    const index_type i_start = std::max<index_type>(0, -k);
+    const index_type j_start = std::max<index_type>(0, k);
 
     // number of elements to process in this diagonal
     const size_type N = std::min(p.nrows() - i_start, p.ncols() - j_start);
@@ -58,7 +58,6 @@ void print(const Printable& p, Stream& s,
     for (size_type n = 0; n < N; n++) {
       value_type temp = p.cvalues(i_start + n, i);
       if (temp != value_type(0)) {
-        s << " " << std::setw(14) << i;
         s << " " << std::setw(14) << i_start + n;
         s << " " << std::setw(14) << j_start + n;
         s << " " << std::setprecision(4) << std::setw(8) << "(" << temp
