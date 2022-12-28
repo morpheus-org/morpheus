@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_HYBMATRIX_COMPATIBLEBINARY_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_HybMatrix.hpp>
 
 using HybMatrixCompatibleTypes = typename Morpheus::generate_unary_typelist<
@@ -52,14 +54,18 @@ class CompatibleHybMatrixBinaryTest : public ::testing::Test {
   using SizeType = typename device1::size_type;
 
   CompatibleHybMatrixBinaryTest()
-      : nrows(3),
-        ncols(3),
-        ell_nnnz(3),
-        coo_nnnz(1),
-        nentries_per_row(1),
-        nalign(32),
-        Aref(3, 3, 3, 1, 1),
-        Ahref(3, 3, 3, 1, 1) {}
+      : nrows(SMALL_MATRIX_NROWS),
+        ncols(SMALL_MATRIX_NCOLS),
+        ell_nnnz(SMALL_HYB_ELL_NNZ),
+        coo_nnnz(SMALL_HYB_COO_NNZ),
+        nentries_per_row(SMALL_HYB_ENTRIES_PER_ROW),
+        nalign(SMALL_MATRIX_ALIGNMENT),
+        Aref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_HYB_ELL_NNZ,
+             SMALL_HYB_COO_NNZ, SMALL_HYB_ENTRIES_PER_ROW,
+             SMALL_MATRIX_ALIGNMENT),
+        Ahref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_HYB_ELL_NNZ,
+              SMALL_HYB_COO_NNZ, SMALL_HYB_ENTRIES_PER_ROW,
+              SMALL_MATRIX_ALIGNMENT) {}
 
   void SetUp() override {
     Morpheus::Test::build_small_container(Ahref);

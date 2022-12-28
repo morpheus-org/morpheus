@@ -29,9 +29,12 @@ const size_t SMALL_MATRIX_NCOLS     = 10;
 const size_t SMALL_MATRIX_NNZ       = 32;
 const size_t SMALL_MATRIX_ALIGNMENT = 32;
 
-const size_t SMALL_DIA_MATRIX_NDIAGS = 9;
-
+const size_t SMALL_DIA_MATRIX_NDIAGS   = 9;
 const size_t SMALL_ELL_ENTRIES_PER_ROW = 4;
+
+const size_t SMALL_HYB_ELL_NNZ         = 29;
+const size_t SMALL_HYB_COO_NNZ         = 3;
+const size_t SMALL_HYB_ENTRIES_PER_ROW = 3;
 
 const size_t SMALL_VECTOR_SIZE = 10;
 

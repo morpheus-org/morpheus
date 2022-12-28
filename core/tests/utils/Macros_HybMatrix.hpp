@@ -24,10 +24,11 @@
 #ifndef TEST_CORE_UTILS_MACROS_HYBMATRIX_HPP
 #define TEST_CORE_UTILS_MACROS_HYBMATRIX_HPP
 
-#include <Morpheus_Core.hpp>
-
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_CooMatrix.hpp>
 #include <utils/Macros_EllMatrix.hpp>
+
+#include <Morpheus_Core.hpp>
 
 /**
  * @brief Checks the sizes of a HybMatrix container against a number of rows,
@@ -94,10 +95,7 @@ void reset_small_container(
         Morpheus::is_hyb_matrix_format_container_v<Container>>* = nullptr) {
   using size_type  = typename Container::size_type;
   using value_type = typename Container::value_type;
-  // Matrix
-  // [1.11 *    2.22]
-  // [*    *    3.33]
-  // [*    4.44 *   ]
+
   for (size_type i = 0; i < c.ell().values().nrows(); i++) {
     for (size_type j = 0; j < c.ell().values().ncols(); j++) {
       c.ell().column_indices(i, j) = c.ell().invalid_index();
@@ -113,17 +111,57 @@ void reset_small_container(
 
   // clang-format off
   // ELL Part
-  c.ell().column_indices(0,0) = 0; 
-  c.ell().column_indices(1,0) = 2; 
-  c.ell().column_indices(2,0) = 1; 
-  c.ell().values(0,0) = (value_type)1.11; 
-  c.ell().values(1,0) = (value_type)3.33; 
-  c.ell().values(2,0) = (value_type)4.44; 
+  c.ell().column_indices(0,0) = 0; c.ell().values(0,0) = (value_type)1.11; 
+  c.ell().column_indices(0,1) = 2; c.ell().values(0,1) = (value_type)2.22; 
+  c.ell().column_indices(0,2) = 2; c.ell().values(0,2) = (value_type)3.33; 
+
+  c.ell().column_indices(1,0) = 0; c.ell().values(1,0) = (value_type)5.55; 
+  c.ell().column_indices(1,1) = 2; c.ell().values(1,1) = (value_type)6.66; 
+  c.ell().column_indices(1,2) = 2; c.ell().values(1,2) = (value_type)7.77; 
+
+  c.ell().column_indices(2,0) = 0; c.ell().values(2,0) = (value_type)9.99; 
+  c.ell().column_indices(2,1) = 2; c.ell().values(2,1) = (value_type)10.10; 
+  
+  c.ell().column_indices(3,0) = 2; c.ell().values(3,0) = (value_type)11.11; 
+  c.ell().column_indices(3,1) = 1; c.ell().values(3,1) = (value_type)12.12;
+  c.ell().column_indices(3,2) = 0; c.ell().values(3,2) = (value_type)13.13; 
+  
+  c.ell().column_indices(4,0) = 2; c.ell().values(4,0) = (value_type)14.14; 
+  c.ell().column_indices(4,1) = 2; c.ell().values(4,1) = (value_type)15.15; 
+  c.ell().column_indices(4,2) = 1; c.ell().values(4,2) = (value_type)16.16;
+  
+  c.ell().column_indices(5,0) = 0; c.ell().values(5,0) = (value_type)17.17; 
+  c.ell().column_indices(5,1) = 2; c.ell().values(5,1) = (value_type)18.18; 
+  c.ell().column_indices(5,2) = 2; c.ell().values(5,2) = (value_type)19.19;
+  
+  c.ell().column_indices(6,0) = 1; c.ell().values(6,0) = (value_type)20.20;
+  c.ell().column_indices(6,1) = 0; c.ell().values(6,1) = (value_type)21.21; 
+  c.ell().column_indices(6,2) = 2; c.ell().values(6,2) = (value_type)22.22; 
+  
+  c.ell().column_indices(7,0) = 2; c.ell().values(7,0) = (value_type)23.23; 
+  c.ell().column_indices(7,1) = 1; c.ell().values(7,1) = (value_type)24.24;
+  c.ell().column_indices(7,2) = 0; c.ell().values(7,2) = (value_type)25.25; 
+  
+  c.ell().column_indices(8,0) = 2; c.ell().values(8,0) = (value_type)27.27; 
+  c.ell().column_indices(8,1) = 1; c.ell().values(8,1) = (value_type)28.28;
+  c.ell().column_indices(8,2) = 0; c.ell().values(8,2) = (value_type)29.29; 
+  
+  c.ell().column_indices(9,0) = 2; c.ell().values(9,0) = (value_type)30.30; 
+  c.ell().column_indices(9,1) = 2; c.ell().values(9,1) = (value_type)31.31; 
+  c.ell().column_indices(9,2) = 1; c.ell().values(9,2) = (value_type)32.32;
 
   // COO Part
-  c.coo().row_indices(0) = 0;
-  c.coo().column_indices(0) = 2;
-  c.coo().values(0) = (value_type)2.22;
+  c.coo().row_indices(0) = 0; 
+  c.coo().column_indices(0) = 3; 
+  c.coo().values(0) = (value_type)4.44;
+
+  c.coo().row_indices(1) = 1; 
+  c.coo().column_indices(1) = 3; 
+  c.coo().values(1) = (value_type)8.88;
+
+  c.coo().row_indices(2) = 7; 
+  c.coo().column_indices(2) = 3; 
+  c.coo().values(2) = (value_type)26.26;
   // clang-format on
 }
 
@@ -139,12 +177,9 @@ void build_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_hyb_matrix_format_container_v<Container>>* = nullptr) {
-  // Matrix to Build
-  // [1.11 *    2.22]
-  // [*    *    3.33]
-  // [*    4.44 *   ]
-  CHECK_HYB_SIZES(c, 3, 3, 3, 1, 1, 32);
-
+  CHECK_HYB_SIZES(c, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_HYB_ELL_NNZ,
+                  SMALL_HYB_COO_NNZ, SMALL_HYB_ENTRIES_PER_ROW,
+                  SMALL_MATRIX_ALIGNMENT);
   reset_small_container(c);
 }
 
@@ -155,10 +190,6 @@ void update_small_container(
         Morpheus::is_hyb_matrix_format_container_v<Container>>* = nullptr) {
   using size_type  = typename Container::size_type;
   using value_type = typename Container::value_type;
-  // New Matrix
-  // [1.11 *    *    ]
-  // [*    *    -3.33]
-  // [2.22 4.44 *    ]
 
   for (size_type i = 0; i < c.ell().values().nrows(); i++) {
     for (size_type j = 0; j < c.ell().values().ncols(); j++) {
@@ -175,18 +206,57 @@ void update_small_container(
 
   // clang-format off
   // ELL Part
-  c.ell().column_indices(0,0) = 0; 
-  c.ell().column_indices(1,0) = 2; 
-  c.ell().column_indices(2,0) = 0; 
+  c.ell().column_indices(0,0) = 0; c.ell().values(0,0) = (value_type)1.11; 
+  c.ell().column_indices(0,1) = 2; c.ell().values(0,1) = (value_type)2.22; 
+  c.ell().column_indices(0,2) = 2; c.ell().values(0,2) = (value_type)3.33; 
 
-  c.ell().values(0,0) = (value_type)1.11; 
-  c.ell().values(1,0) = (value_type)-3.33; 
-  c.ell().values(2,0) = (value_type)2.22; 
+  c.ell().column_indices(1,0) = 0; c.ell().values(1,0) = (value_type)5.55; 
+  c.ell().column_indices(1,1) = 2; c.ell().values(1,1) = (value_type)6.66; 
+  c.ell().column_indices(1,2) = 2; c.ell().values(1,2) = (value_type)7.77; 
+
+  c.ell().column_indices(2,0) = 0; c.ell().values(2,0) = (value_type)9.99; 
+  c.ell().column_indices(2,1) = 2; c.ell().values(2,1) = (value_type)10.10; 
+  
+  c.ell().column_indices(3,0) = 2; c.ell().values(3,0) = (value_type)11.11; 
+  c.ell().column_indices(3,1) = 1; c.ell().values(3,1) = (value_type)12.12;
+  c.ell().column_indices(3,2) = 0; c.ell().values(3,2) = (value_type)13.13; 
+  
+  c.ell().column_indices(4,0) = 2; c.ell().values(4,0) = (value_type)-14.14; 
+  c.ell().column_indices(4,1) = 2; c.ell().values(4,1) = (value_type)-15.15; 
+  c.ell().column_indices(4,2) = 1; c.ell().values(4,2) = (value_type)16.16;
+  
+  c.ell().column_indices(5,0) = 0; c.ell().values(5,0) = (value_type)17.17; 
+  c.ell().column_indices(5,1) = 2; c.ell().values(5,1) = (value_type)18.18; 
+  c.ell().column_indices(5,2) = 2; c.ell().values(5,2) = (value_type)19.19;
+  
+  c.ell().column_indices(6,0) = 1; c.ell().values(6,0) = (value_type)20.20;
+  c.ell().column_indices(6,1) = 0; c.ell().values(6,1) = (value_type)21.21; 
+  c.ell().column_indices(6,2) = 2; c.ell().values(6,2) = (value_type)22.22; 
+  
+  c.ell().column_indices(7,0) = 2; c.ell().values(7,0) = (value_type)23.23; 
+  c.ell().column_indices(7,1) = 1; c.ell().values(7,1) = (value_type)24.24;
+  c.ell().column_indices(7,2) = 0; c.ell().values(7,2) = (value_type)-25.25; 
+  
+  c.ell().column_indices(8,0) = 2; c.ell().values(8,0) = (value_type)27.27; 
+  c.ell().column_indices(8,1) = 1; c.ell().values(8,1) = (value_type)28.28;
+  c.ell().column_indices(8,2) = 0; c.ell().values(8,2) = (value_type)29.29; 
+  
+  c.ell().column_indices(9,0) = 2; c.ell().values(9,0) = (value_type)30.30; 
+  c.ell().column_indices(9,1) = 2; c.ell().values(9,1) = (value_type)31.31; 
+  c.ell().column_indices(9,2) = 1; c.ell().values(9,2) = (value_type)32.32;
 
   // COO Part
-  c.coo().row_indices(0) = 2;
-  c.coo().column_indices(0) = 1;
-  c.coo().values(0) = (value_type)4.44;
+  c.coo().row_indices(0) = 0; 
+  c.coo().column_indices(0) = 3; 
+  c.coo().values(0) = (value_type)-4.44;
+
+  c.coo().row_indices(1) = 1; 
+  c.coo().column_indices(1) = 3; 
+  c.coo().values(1) = (value_type)-8.88;
+
+  c.coo().row_indices(2) = 7; 
+  c.coo().column_indices(2) = 3; 
+  c.coo().values(2) = (value_type)26.26;
   // clang-format on
 }
 
@@ -195,7 +265,9 @@ void setup_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_hyb_matrix_format_container_v<Container>>* = nullptr) {
-  c.resize(3, 3, 3, 1, 1, 32);
+  c.resize(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_HYB_ELL_NNZ,
+           SMALL_HYB_COO_NNZ, SMALL_HYB_ENTRIES_PER_ROW,
+           SMALL_MATRIX_ALIGNMENT);
   build_small_container(c);
 }
 
