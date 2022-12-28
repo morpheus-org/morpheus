@@ -563,7 +563,7 @@ TYPED_TEST(EllMatrixUnaryTest, ResizeDefault) {
                   small_nentries_per_row, this->nalign);
 
   // Set back to normal
-  Ah.column_indices(0, 1) = 2;
+  Ah.column_indices(0, 1) = 3;
   Ah.values(0, 1)         = (value_type)2.22;
   Morpheus::copy(Ah, A);
 

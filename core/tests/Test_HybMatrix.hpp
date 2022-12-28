@@ -307,7 +307,7 @@ TYPED_TEST(HybMatrixUnaryTest, DefaultCopyAssignment) {
   CHECK_HYB_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.ell().column_indices(1, 0) = 3;
+  Ah.ell().column_indices(1, 0) = 2;
   Ah.ell().values(1, 0)         = (value_type)-3.33;
 
   Ah.coo().row_indices(0)    = 3;
@@ -358,7 +358,7 @@ TYPED_TEST(HybMatrixUnaryTest, DefaultCopyConstructor) {
   CHECK_HYB_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.ell().column_indices(1, 0) = 3;
+  Ah.ell().column_indices(1, 0) = 2;
   Ah.ell().values(1, 0)         = (value_type)-3.33;
 
   Ah.coo().row_indices(0)    = 3;
@@ -408,7 +408,7 @@ TYPED_TEST(HybMatrixUnaryTest, DefaultMoveAssignment) {
   CHECK_HYB_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.ell().column_indices(1, 0) = 3;
+  Ah.ell().column_indices(1, 0) = 2;
   Ah.ell().values(1, 0)         = (value_type)-3.33;
 
   Ah.coo().row_indices(0)    = 3;
@@ -457,7 +457,7 @@ TYPED_TEST(HybMatrixUnaryTest, DefaultMoveConstructor) {
   CHECK_HYB_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.ell().column_indices(1, 0) = 3;
+  Ah.ell().column_indices(1, 0) = 2;
   Ah.ell().values(1, 0)         = (value_type)-3.33;
 
   Ah.coo().row_indices(0)    = 3;
@@ -598,7 +598,7 @@ TYPED_TEST(HybMatrixUnaryTest, ResizeDefault) {
 
   // Resizing to larger sizes should invoke a new allocation so changes in
   // matrix should not be reflected in reference
-  Ah.ell().column_indices(1, 0) = 1;
+  Ah.ell().column_indices(1, 0) = 2;
   Ah.ell().values(1, 0)         = (value_type)-1.11;
   Ah.coo().row_indices(0)       = 1;
   Ah.coo().column_indices(0)    = 1;
@@ -643,10 +643,10 @@ TYPED_TEST(HybMatrixUnaryTest, ResizeDefault) {
                   small_nentries_per_row, this->nalign);
 
   // Set back to normal
-  Ah.ell().column_indices(1, 0) = 0;
+  Ah.ell().column_indices(1, 0) = 1;
   Ah.ell().values(1, 0)         = (value_type)5.55;
   Ah.coo().row_indices(0)       = 0;
-  Ah.coo().column_indices(0)    = 3;
+  Ah.coo().column_indices(0)    = 8;
   Ah.coo().values(0)            = (value_type)4.44;
   Morpheus::copy(Ah, A);
 

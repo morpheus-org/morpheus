@@ -111,7 +111,7 @@ TYPED_TEST(CompatibleHybMatrixBinaryTest, ConstructionFromHybMatrix) {
   CHECK_HYB_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.ell().column_indices(1, 0) = 1;
+  Ah.ell().column_indices(1, 0) = 2;
   Ah.ell().values(1, 0)         = (value_type)-1.11;
   Ah.coo().row_indices(0)       = 1;
   Ah.coo().column_indices(0)    = 1;
@@ -156,7 +156,7 @@ TYPED_TEST(CompatibleHybMatrixBinaryTest, CopyAssignmentFromHybMatrix) {
   CHECK_HYB_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.ell().column_indices(1, 0) = 1;
+  Ah.ell().column_indices(1, 0) = 2;
   Ah.ell().values(1, 0)         = (value_type)-1.11;
   Ah.coo().row_indices(0)       = 1;
   Ah.coo().column_indices(0)    = 1;
@@ -204,7 +204,7 @@ TYPED_TEST(CompatibleHybMatrixBinaryTest, ConstructionFromDenseMatrix) {
 
   VALIDATE_HYB_CONTAINER(Ah, Ah_test);
 
-  Ah.ell().column_indices(1, 0) = 1;
+  Ah.ell().column_indices(1, 0) = 2;
   Ah.ell().values(1, 0)         = (value_type)-1.11;
   Ah.coo().row_indices(0)       = 1;
   Ah.coo().column_indices(0)    = 1;

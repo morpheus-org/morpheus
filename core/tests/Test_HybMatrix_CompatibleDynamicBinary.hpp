@@ -123,7 +123,7 @@ TYPED_TEST(CompatibleHybMatrixDynamicTest,
   HostMatrix Ch(Ah);
 
   // Change values in one container
-  Bh.ell().column_indices(1, 0) = 1;
+  Bh.ell().column_indices(1, 0) = 2;
   Bh.ell().values(1, 0)         = (value_type)-1.11;
   Bh.coo().row_indices(0)       = 1;
   Bh.coo().column_indices(0)    = 1;
@@ -223,7 +223,7 @@ TYPED_TEST(CompatibleHybMatrixDynamicTest,
   HostMatrix Ch = Ah;
 
   // Change values in one container
-  Bh.ell().column_indices(1, 0) = 1;
+  Bh.ell().column_indices(1, 0) = 2;
   Bh.ell().values(1, 0)         = (value_type)-1.11;
   Bh.coo().row_indices(0)       = 1;
   Bh.coo().column_indices(0)    = 1;

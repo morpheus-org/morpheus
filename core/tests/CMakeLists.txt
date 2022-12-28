@@ -23,14 +23,14 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       CooMatrix_CompatibleDynamicBinary
       CooMatrix
       Copy
-      DenseMatrix_Binary
-      DenseMatrix_CompatibleBinary
-      DenseMatrix
       CsrMatrix_Binary
       CsrMatrix_CompatibleBinary
       CsrMatrix_CompatibleDynamicBinary
       CsrMatrix
       CustomBackend
+      DenseMatrix_Binary
+      DenseMatrix_CompatibleBinary
+      DenseMatrix
       DenseVector_Binary
       DenseVector_CompatibleBinary
       DenseVector

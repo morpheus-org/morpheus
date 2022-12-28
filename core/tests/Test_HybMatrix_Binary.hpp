@@ -147,7 +147,7 @@ TYPED_TEST(HybMatrixBinaryTest, ResizeFromHybMatrix) {
 
   // Resizing to larger sizes should invoke a new allocation so changes in
   // matrix should not be reflected in reference
-  Ah.ell().column_indices(1, 0) = 1;
+  Ah.ell().column_indices(1, 0) = 2;
   Ah.ell().values(1, 0)         = (value_type)-1.11;
   Ah.coo().row_indices(0)       = 1;
   Ah.coo().column_indices(0)    = 1;
@@ -192,10 +192,10 @@ TYPED_TEST(HybMatrixBinaryTest, ResizeFromHybMatrix) {
   CHECK_HYB_CONTAINERS(Asmall, Ah);
 
   // Set back to normal
-  Ah.ell().column_indices(1, 0) = 0;
+  Ah.ell().column_indices(1, 0) = 1;
   Ah.ell().values(1, 0)         = (value_type)5.55;
   Ah.coo().row_indices(0)       = 0;
-  Ah.coo().column_indices(0)    = 3;
+  Ah.coo().column_indices(0)    = 8;
   Ah.coo().values(0)            = (value_type)4.44;
   Morpheus::copy(Ah, A);
 
@@ -237,7 +237,7 @@ TYPED_TEST(HybMatrixBinaryTest, AllocateFromHybMatrix) {
   CHECK_HYB_CONTAINERS(Ah, Bh);
 
   // Change values in one container
-  Ah.ell().column_indices(1, 0) = 1;
+  Ah.ell().column_indices(1, 0) = 2;
   Ah.ell().values(1, 0)         = (value_type1)-1.11;
   Ah.coo().row_indices(0)       = 1;
   Ah.coo().column_indices(0)    = 1;
@@ -260,7 +260,7 @@ TYPED_TEST(HybMatrixBinaryTest, AllocateFromHybMatrix) {
   Matrix2 B;
   CHECK_HYB_EMPTY(B);
 
-  Bh.ell().column_indices(1, 0) = 1;
+  Bh.ell().column_indices(1, 0) = 2;
   Bh.ell().values(1, 0)         = (value_type2)-1.11;
   Bh.coo().row_indices(0)       = 1;
   Bh.coo().column_indices(0)    = 1;
