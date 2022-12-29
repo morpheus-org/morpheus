@@ -102,38 +102,30 @@ endforeach()
 
 set(ALL_SOURCES)
 
-if(Morpheus_ENABLE_SERIAL)
-  if(Morpheus_ENABLE_INDIVIDUAL_TESTS)
-    morpheus_add_executable_and_test(UnitTest_Serial SOURCES TestMain.cpp
-                                     ${Serial_SOURCES})
-  endif()
+if(Morpheus_ENABLE_SERIAL
+   AND NOT
+       (Morpheus_ENABLE_OPENMP
+        OR Morpheus_ENABLE_CUDA
+        OR Morpheus_ENABLE_HIP))
+  morpheus_add_executable_and_test(UnitTest_Serial SOURCES TestMain.cpp
+                                   ${Serial_SOURCES})
   list(APPEND ALL_SOURCES ${Serial_SOURCES})
 endif()
 
-if(Morpheus_ENABLE_OPENMP)
-  if(Morpheus_ENABLE_INDIVIDUAL_TESTS)
-    morpheus_add_executable_and_test(UnitTest_OpenMP SOURCES TestMain.cpp
-                                     ${OpenMP_SOURCES})
-  endif()
+if(Morpheus_ENABLE_OPENMP AND NOT (Morpheus_ENABLE_CUDA OR Morpheus_ENABLE_HIP))
+  morpheus_add_executable_and_test(UnitTest_OpenMP SOURCES TestMain.cpp
+                                   ${OpenMP_SOURCES})
   list(APPEND ALL_SOURCES ${OpenMP_SOURCES})
 endif()
 
 if(Morpheus_ENABLE_CUDA)
-  if(Morpheus_ENABLE_INDIVIDUAL_TESTS)
-    morpheus_add_executable_and_test(UnitTest_Cuda SOURCES TestMain.cpp
-                                     ${Cuda_SOURCES})
-  endif()
+  morpheus_add_executable_and_test(UnitTest_Cuda SOURCES TestMain.cpp
+                                   ${Cuda_SOURCES})
   list(APPEND ALL_SOURCES ${Cuda_SOURCES})
 endif()
 
 if(Morpheus_ENABLE_HIP)
-  if(Morpheus_ENABLE_INDIVIDUAL_TESTS)
-    morpheus_add_executable_and_test(UnitTest_HIP SOURCES TestMain.cpp
-                                     ${HIP_SOURCES})
-  endif()
+  morpheus_add_executable_and_test(UnitTest_HIP SOURCES TestMain.cpp
+                                   ${HIP_SOURCES})
   list(APPEND ALL_SOURCES ${HIP_SOURCES})
-endif()
-
-if(NOT Morpheus_ENABLE_INDIVIDUAL_TESTS)
-  morpheus_add_executable_and_test(UnitTest SOURCES TestMain.cpp ${ALL_SOURCES})
 endif()

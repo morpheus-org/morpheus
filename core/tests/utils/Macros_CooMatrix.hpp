@@ -76,15 +76,13 @@
  * data.
  *
  */
-#define VALIDATE_COO_CONTAINER(A, Aref, nnnz)                                 \
-  {                                                                           \
-    using container_type = typename std::remove_reference<decltype(A)>::type; \
-    using container_size_type = typename container_type::size_type;           \
-    for (container_size_type n = 0; n < nnnz; n++) {                          \
-      EXPECT_EQ(A.row_indices(n), Aref.row_indices(n));                       \
-      EXPECT_EQ(A.column_indices(n), Aref.column_indices(n));                 \
-      EXPECT_EQ(A.values(n), Aref.values(n));                                 \
-    }                                                                         \
+#define VALIDATE_COO_CONTAINER(A, Aref, nnnz)                 \
+  {                                                           \
+    for (size_t n = 0; n < nnnz; n++) {                       \
+      EXPECT_EQ(A.row_indices(n), Aref.row_indices(n));       \
+      EXPECT_EQ(A.column_indices(n), Aref.column_indices(n)); \
+      EXPECT_EQ(A.values(n), Aref.values(n));                 \
+    }                                                         \
   }
 
 namespace Morpheus {

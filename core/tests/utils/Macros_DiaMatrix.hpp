@@ -89,18 +89,16 @@
  * data.
  *
  */
-#define VALIDATE_DIA_CONTAINER(A, Aref)                              \
-  {                                                                  \
-    using container_type      = decltype(A);                         \
-    using container_size_type = typename container_type::size_type;  \
-    for (container_size_type n = 0; n < A.ndiags(); n++) {           \
-      EXPECT_EQ(A.diagonal_offsets(n), Aref.diagonal_offsets(n));    \
-    }                                                                \
-    for (container_size_type i = 0; i < A.values().nrows(); i++) {   \
-      for (container_size_type j = 0; j < A.values().ncols(); j++) { \
-        EXPECT_EQ(A.values(i, j), Aref.values(i, j));                \
-      }                                                              \
-    }                                                                \
+#define VALIDATE_DIA_CONTAINER(A, Aref)                           \
+  {                                                               \
+    for (size_t n = 0; n < A.ndiags(); n++) {                     \
+      EXPECT_EQ(A.diagonal_offsets(n), Aref.diagonal_offsets(n)); \
+    }                                                             \
+    for (size_t i = 0; i < A.values().nrows(); i++) {             \
+      for (size_t j = 0; j < A.values().ncols(); j++) {           \
+        EXPECT_EQ(A.values(i, j), Aref.values(i, j));             \
+      }                                                           \
+    }                                                             \
   }
 
 namespace Morpheus {

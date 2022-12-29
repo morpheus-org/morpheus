@@ -109,16 +109,14 @@
  * data.
  *
  */
-#define VALIDATE_ELL_CONTAINER(A, Aref)                                       \
-  {                                                                           \
-    using container_type = typename std::remove_reference<decltype(A)>::type; \
-    using container_size_type = typename container_type::size_type;           \
-    for (container_size_type i = 0; i < A.values().nrows(); i++) {            \
-      for (container_size_type j = 0; j < A.values().ncols(); j++) {          \
-        EXPECT_EQ(A.column_indices(i, j), Aref.column_indices(i, j));         \
-        EXPECT_EQ(A.values(i, j), Aref.values(i, j));                         \
-      }                                                                       \
-    }                                                                         \
+#define VALIDATE_ELL_CONTAINER(A, Aref)                               \
+  {                                                                   \
+    for (size_t i = 0; i < A.values().nrows(); i++) {                 \
+      for (size_t j = 0; j < A.values().ncols(); j++) {               \
+        EXPECT_EQ(A.column_indices(i, j), Aref.column_indices(i, j)); \
+        EXPECT_EQ(A.values(i, j), Aref.values(i, j));                 \
+      }                                                               \
+    }                                                                 \
   }
 
 namespace Morpheus {

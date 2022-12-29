@@ -58,15 +58,13 @@
  * same data.
  *
  */
-#define VALIDATE_DENSE_MATRIX_CONTAINER(A, Aref, nrows, ncols)      \
-  {                                                                 \
-    using container_type      = decltype(A);                        \
-    using container_size_type = typename container_type::size_type; \
-    for (container_size_type i = 0; i < nrows; i++) {               \
-      for (type j = 0; j < ncols; j++) {                            \
-        EXPECT_EQ(A(i, j), Aref(i, j));                             \
-      }                                                             \
-    }                                                               \
+#define VALIDATE_DENSE_MATRIX_CONTAINER(A, Aref, nrows, ncols) \
+  {                                                            \
+    for (size_t i = 0; i < nrows; i++) {                       \
+      for (type j = 0; j < ncols; j++) {                       \
+        EXPECT_EQ(A(i, j), Aref(i, j));                        \
+      }                                                        \
+    }                                                          \
   }
 
 namespace Morpheus {

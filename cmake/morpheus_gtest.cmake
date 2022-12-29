@@ -29,8 +29,4 @@ else()
   add_library(morpheus_gtest ALIAS GTest::gtest)
 endif()
 
-set(Morpheus_ENABLE_INDIVIDUAL_TESTS
-    OFF
-    CACHE INTERNAL "Whether to enable individual unit tests. Default is OFF.")
-
 message(STATUS "Morpheus_Gtest Library configured.")

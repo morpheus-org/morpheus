@@ -163,8 +163,7 @@ TYPED_TEST(ContainerTypesUnaryTest, MirrorContainer_SameSpace) {
 }
 
 TYPED_TEST(ContainerTypesUnaryTest, MirrorContainer_NewSpace) {
-  using Container     = typename TestFixture::device;
-  using HostContainer = typename TestFixture::host;
+  using Container = typename TestFixture::device;
 
   using space        = TEST_CUSTOM_SPACE;
   using value_type   = typename Container::non_const_value_type;

@@ -76,17 +76,15 @@
  * data.
  *
  */
-#define VALIDATE_CSR_CONTAINER(A, Aref, nrows, nnnz)                \
-  {                                                                 \
-    using container_type      = decltype(A);                        \
-    using container_size_type = typename container_type::size_type; \
-    for (container_size_type n = 0; n < nrows + 1; n++) {           \
-      EXPECT_EQ(A.row_offsets(n), Aref.row_offsets(n));             \
-    }                                                               \
-    for (container_size_type n = 0; n < nnnz; n++) {                \
-      EXPECT_EQ(A.column_indices(n), Aref.column_indices(n));       \
-      EXPECT_EQ(A.values(n), Aref.values(n));                       \
-    }                                                               \
+#define VALIDATE_CSR_CONTAINER(A, Aref, nrows, nnnz)          \
+  {                                                           \
+    for (size_t n = 0; n < nrows + 1; n++) {                  \
+      EXPECT_EQ(A.row_offsets(n), Aref.row_offsets(n));       \
+    }                                                         \
+    for (size_t n = 0; n < nnnz; n++) {                       \
+      EXPECT_EQ(A.column_indices(n), Aref.column_indices(n)); \
+      EXPECT_EQ(A.values(n), Aref.values(n));                 \
+    }                                                         \
   }
 
 namespace Morpheus {

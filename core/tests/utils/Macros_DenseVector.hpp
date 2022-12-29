@@ -53,13 +53,11 @@
  * same data.
  *
  */
-#define VALIDATE_DENSE_VECTOR_CONTAINER(v1, v2, size)               \
-  {                                                                 \
-    using container_type      = decltype(v1);                       \
-    using container_size_type = typename container_type::size_type; \
-    for (container_type n = 0; n < size; n++) {                     \
-      EXPECT_EQ(v1[n], v2[n]);                                      \
-    }                                                               \
+#define VALIDATE_DENSE_VECTOR_CONTAINER(v1, v2, size) \
+  {                                                   \
+    for (size_t n = 0; n < size; n++) {               \
+      EXPECT_EQ(v1[n], v2[n]);                        \
+    }                                                 \
   }
 
 namespace Morpheus {
