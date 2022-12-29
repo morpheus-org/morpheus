@@ -31,6 +31,7 @@
 #include <fwd/Morpheus_Fwd_DiaMatrix.hpp>
 #include <fwd/Morpheus_Fwd_EllMatrix.hpp>
 #include <fwd/Morpheus_Fwd_HybMatrix.hpp>
+#include <fwd/Morpheus_Fwd_HdcMatrix.hpp>
 
 #include <impl/Morpheus_MatrixProxy.hpp>
 
@@ -43,7 +44,8 @@ struct MatrixFormats {
       typename CsrMatrix<ValueType, Properties...>::type,
       typename DiaMatrix<ValueType, Properties...>::type,
       typename EllMatrix<ValueType, Properties...>::type,
-      typename HybMatrix<ValueType, Properties...>::type>::type;
+      typename HybMatrix<ValueType, Properties...>::type,
+      typename HdcMatrix<ValueType, Properties...>::type>::type;
   using variant   = typename formats_proxy::variant;
   using type_list = typename formats_proxy::type_list;
 };
@@ -57,6 +59,7 @@ enum formats_e {
   DIA_FORMAT,
   ELL_FORMAT,
   HYB_FORMAT,
+  HDC_FORMAT,
   NFORMATS
 };
 

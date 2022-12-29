@@ -36,6 +36,7 @@
 #include <Morpheus_DiaMatrix.hpp>
 #include <Morpheus_EllMatrix.hpp>
 #include <Morpheus_HybMatrix.hpp>
+#include <Morpheus_HdcMatrix.hpp>
 #include <Morpheus_DynamicMatrix.hpp>
 
 // Algorithms

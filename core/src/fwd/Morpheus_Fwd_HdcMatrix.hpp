@@ -1,9 +1,9 @@
 /**
- * Morpheus_Print_Impl.hpp
+ * Morpheus_Fwd_HdcMatrix.hpp
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -21,17 +21,12 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_PRINT_IMPL_HPP
-#define MORPHEUS_PRINT_IMPL_HPP
+#ifndef MORPHEUS_FWD_HDCMATRIX_HPP
+#define MORPHEUS_FWD_HDCMATRIX_HPP
 
-#include <impl/DenseVector/Morpheus_Print_Impl.hpp>
-#include <impl/DenseMatrix/Morpheus_Print_Impl.hpp>
+namespace Morpheus {
+template <class ValueType, typename... Properties>
+class HdcMatrix;
+}  // namespace Morpheus
 
-#include <impl/Coo/Morpheus_Print_Impl.hpp>
-#include <impl/Csr/Morpheus_Print_Impl.hpp>
-#include <impl/Dia/Morpheus_Print_Impl.hpp>
-#include <impl/Ell/Morpheus_Print_Impl.hpp>
-#include <impl/Hyb/Morpheus_Print_Impl.hpp>
-#include <impl/Hdc/Morpheus_Print_Impl.hpp>
-
-#endif  // MORPHEUS_PRINT_IMPL_HPP
+#endif  // MORPHEUS_FWD_HDCMATRIX_HPP
