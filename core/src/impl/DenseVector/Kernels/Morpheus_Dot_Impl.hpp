@@ -38,7 +38,7 @@ template <typename ValueType, typename SizeType>
 __global__ void dot_kernel(SizeType n, const ValueType* x, const ValueType* y,
                            SizeType* res) {
   const SizeType tid = blockDim.x * blockIdx.x + threadIdx.x;
-  if (tid > n) return;
+  if (tid >= n) return;
 
   res[tid] = x[tid] * y[tid];
 }

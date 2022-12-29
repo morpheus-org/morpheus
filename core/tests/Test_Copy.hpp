@@ -29,11 +29,13 @@
 #include <utils/Macros_CooMatrix.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
+#include <utils/Macros_EllMatrix.hpp>
+#include <utils/Macros_HybMatrix.hpp>
 #include <utils/Macros_DenseMatrix.hpp>
 #include <utils/Macros_DenseVector.hpp>
 #include <utils/Macros_DynamicMatrix.hpp>
 
-using value_tlist  = Morpheus::TypeList<double>;
+using value_tlist  = Morpheus::TypeList<double, int>;
 using index_tlist  = Morpheus::TypeList<Morpheus::Default>;
 using layout_tlist = Morpheus::TypeList<Morpheus::Default>;
 using space_tlist  = Morpheus::TypeList<TEST_CUSTOM_SPACE>;
@@ -48,21 +50,23 @@ using copy_types_set = typename Morpheus::cross_product<
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
                                                copy_types_set>::type;
-
 using DenseMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseMatrix<double>,
                                                copy_types_set>::type;
-
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
                                                copy_types_set>::type;
-
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
                                                copy_types_set>::type;
-
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
+                                               copy_types_set>::type;
+using EllMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
+                                               copy_types_set>::type;
+using HybMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
                                                copy_types_set>::type;
 using DynamicMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DynamicMatrix<double>,
@@ -72,12 +76,16 @@ using CopyTypes = Morpheus::concat<
     DenseVectorTypes,
     Morpheus::concat<
         DenseMatrixTypes,
-        Morpheus::concat<CooMatrixTypes,
-                         Morpheus::concat<CsrMatrixTypes,
-                                          Morpheus::concat<DiaMatrixTypes,
-                                                           DynamicMatrixTypes>::
-                                              type>::type>::type>::type>::type;
-// using CopyTypes = DenseVectorTypes;
+        Morpheus::concat<
+            CooMatrixTypes,
+            Morpheus::concat<
+                CsrMatrixTypes,
+                Morpheus::concat<
+                    DiaMatrixTypes,
+                    Morpheus::concat<
+                        EllMatrixTypes,
+                        Morpheus::concat<HybMatrixTypes, DynamicMatrixTypes>::
+                            type>::type>::type>::type>::type>::type>::type;
 
 using CopyTypesUnary       = to_gtest_types<CopyTypes>::type;
 using CopyVectorTypesUnary = to_gtest_types<DenseVectorTypes>::type;
@@ -133,6 +141,7 @@ TYPED_TEST(CopyTypesUnaryTest, DeepCopyHost) {
   Ah.resize(this->Aref);
 
   Morpheus::copy(this->Ahref, Ah);
+
   // Update Ah
   Morpheus::Test::update_small_container(Ah);
 
@@ -194,6 +203,7 @@ TYPED_TEST_SUITE(CopyVectorTypesUnaryTest, CopyVectorTypesUnary);
 TYPED_TEST(CopyVectorTypesUnaryTest, CopyByKey) {
   using DevContainer  = typename TestFixture::device;
   using HostContainer = typename TestFixture::host;
+  using size_type     = typename DevContainer::size_type;
   using value_type    = typename DevContainer::value_type;
   using index_type    = typename DevContainer::index_type;
   using array_layout  = typename DevContainer::array_layout;
@@ -206,12 +216,12 @@ TYPED_TEST(CopyVectorTypesUnaryTest, CopyByKey) {
 
   // Set src & keys on host
   auto src_h = Morpheus::create_mirror_container(src);
-  for (auto i = 0; i < (int)src.size(); i++) {
+  for (size_type i = 0; i < src.size(); i++) {
     src_h[i] = 1.11 * (value_type)i;
   }
 
   auto keys_h = Morpheus::create_mirror_container(keys);
-  for (auto kid = 0; kid < (int)keys.size(); kid++) {
+  for (size_type kid = 0; kid < keys.size(); kid++) {
     keys_h[kid] = kid * 2;
   }
 
@@ -224,7 +234,7 @@ TYPED_TEST(CopyVectorTypesUnaryTest, CopyByKey) {
 
   // Check result
   HostContainer dst_ref_h(20, 0);
-  for (auto i = 0; i < (int)keys.size(); i++) {
+  for (size_type i = 0; i < keys.size(); i++) {
     dst_ref_h[i] = 1.11 * (value_type)(i * 2);
   }
 

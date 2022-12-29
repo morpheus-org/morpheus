@@ -40,7 +40,7 @@ __global__ void waxpby_kernel(SizeType n, ValueType1 alpha, const ValueType1* x,
                               ValueType2 beta, const ValueType2* y,
                               ValueType3* w) {
   const SizeType tid = blockDim.x * blockIdx.x + threadIdx.x;
-  if (tid > n) return;
+  if (tid >= n) return;
 
   if (alpha == 1.0) {
     w[tid] = x[tid] + beta * y[tid];

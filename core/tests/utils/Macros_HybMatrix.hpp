@@ -198,7 +198,7 @@ void update_small_container(
     }
   }
 
-  for (size_type n = 0; c.coo().nnnz(); n++) {
+  for (size_type n = 0; n < c.coo().nnnz(); n++) {
     c.coo().row_indices(n)    = 0;
     c.coo().column_indices(n) = 0;
     c.coo().values(n)         = 0;
@@ -206,56 +206,56 @@ void update_small_container(
 
   // clang-format off
   // ELL Part
-  c.ell().column_indices(0,0) = 0; c.ell().values(0,0) = (value_type)1.11; 
-  c.ell().column_indices(0,1) = 3; c.ell().values(0,1) = (value_type)2.22; 
-  c.ell().column_indices(0,2) = 7; c.ell().values(0,2) = (value_type)3.33; 
+  c.ell().column_indices(0,0) = 0; c.ell().values(0,0) = (value_type)1.11;
+  c.ell().column_indices(0,1) = 3; c.ell().values(0,1) = (value_type)2.22;
+  c.ell().column_indices(0,2) = 7; c.ell().values(0,2) = (value_type)3.33;
 
-  c.ell().column_indices(1,0) = 1; c.ell().values(1,0) = (value_type)5.55; 
-  c.ell().column_indices(1,1) = 4; c.ell().values(1,1) = (value_type)6.66; 
-  c.ell().column_indices(1,2) = 7; c.ell().values(1,2) = (value_type)7.77; 
+  c.ell().column_indices(1,0) = 1; c.ell().values(1,0) = (value_type)5.55;
+  c.ell().column_indices(1,1) = 4; c.ell().values(1,1) = (value_type)6.66;
+  c.ell().column_indices(1,2) = 7; c.ell().values(1,2) = (value_type)7.77;
 
-  c.ell().column_indices(2,0) = 2; c.ell().values(2,0) = (value_type)9.99; 
-  c.ell().column_indices(2,1) = 5; c.ell().values(2,1) = (value_type)10.10; 
-  
-  c.ell().column_indices(3,0) = 0; c.ell().values(3,0) = (value_type)11.11; 
+  c.ell().column_indices(2,0) = 2; c.ell().values(2,0) = (value_type)9.99;
+  c.ell().column_indices(2,1) = 5; c.ell().values(2,1) = (value_type)10.10;
+
+  c.ell().column_indices(3,0) = 0; c.ell().values(3,0) = (value_type)11.11;
   c.ell().column_indices(3,1) = 3; c.ell().values(3,1) = (value_type)12.12;
-  c.ell().column_indices(3,2) = 6; c.ell().values(3,2) = (value_type)13.13; 
-  
-  c.ell().column_indices(4,0) = 1; c.ell().values(4,0) = (value_type)-14.14; 
-  c.ell().column_indices(4,1) = 4; c.ell().values(4,1) = (value_type)-15.15; 
+  c.ell().column_indices(3,2) = 6; c.ell().values(3,2) = (value_type)13.13;
+
+  c.ell().column_indices(4,0) = 1; c.ell().values(4,0) = (value_type)-14.14;
+  c.ell().column_indices(4,1) = 4; c.ell().values(4,1) = (value_type)-15.15;
   c.ell().column_indices(4,2) = 7; c.ell().values(4,2) = (value_type)16.16;
-  
-  c.ell().column_indices(5,0) = 2; c.ell().values(5,0) = (value_type)17.17; 
-  c.ell().column_indices(5,1) = 5; c.ell().values(5,1) = (value_type)18.18; 
+
+  c.ell().column_indices(5,0) = 2; c.ell().values(5,0) = (value_type)17.17;
+  c.ell().column_indices(5,1) = 5; c.ell().values(5,1) = (value_type)18.18;
   c.ell().column_indices(5,2) = 8; c.ell().values(5,2) = (value_type)19.19;
-  
+
   c.ell().column_indices(6,0) = 3; c.ell().values(6,0) = (value_type)20.20;
-  c.ell().column_indices(6,1) = 6; c.ell().values(6,1) = (value_type)21.21; 
-  c.ell().column_indices(6,2) = 9; c.ell().values(6,2) = (value_type)22.22; 
-  
-  c.ell().column_indices(7,0) = 0; c.ell().values(7,0) = (value_type)23.23; 
+  c.ell().column_indices(6,1) = 6; c.ell().values(6,1) = (value_type)21.21;
+  c.ell().column_indices(6,2) = 9; c.ell().values(6,2) = (value_type)22.22;
+
+  c.ell().column_indices(7,0) = 0; c.ell().values(7,0) = (value_type)23.23;
   c.ell().column_indices(7,1) = 1; c.ell().values(7,1) = (value_type)24.24;
-  c.ell().column_indices(7,2) = 4; c.ell().values(7,2) = (value_type)-25.25; 
-  
-  c.ell().column_indices(8,0) = 0; c.ell().values(8,0) = (value_type)27.27; 
+  c.ell().column_indices(7,2) = 4; c.ell().values(7,2) = (value_type)-25.25;
+
+  c.ell().column_indices(8,0) = 0; c.ell().values(8,0) = (value_type)27.27;
   c.ell().column_indices(8,1) = 5; c.ell().values(8,1) = (value_type)28.28;
-  c.ell().column_indices(8,2) = 8; c.ell().values(8,2) = (value_type)29.29; 
-  
-  c.ell().column_indices(9,0) = 1; c.ell().values(9,0) = (value_type)30.30; 
-  c.ell().column_indices(9,1) = 6; c.ell().values(9,1) = (value_type)31.31; 
+  c.ell().column_indices(8,2) = 8; c.ell().values(8,2) = (value_type)29.29;
+
+  c.ell().column_indices(9,0) = 1; c.ell().values(9,0) = (value_type)30.30;
+  c.ell().column_indices(9,1) = 6; c.ell().values(9,1) = (value_type)31.31;
   c.ell().column_indices(9,2) = 9; c.ell().values(9,2) = (value_type)32.32;
 
   // COO Part
-  c.coo().row_indices(0) = 0; 
-  c.coo().column_indices(0) = 8; 
+  c.coo().row_indices(0) = 0;
+  c.coo().column_indices(0) = 8;
   c.coo().values(0) = (value_type)-4.44;
 
-  c.coo().row_indices(1) = 1; 
-  c.coo().column_indices(1) = 9; 
+  c.coo().row_indices(1) = 1;
+  c.coo().column_indices(1) = 9;
   c.coo().values(1) = (value_type)-8.88;
 
-  c.coo().row_indices(2) = 7; 
-  c.coo().column_indices(2) = 7; 
+  c.coo().row_indices(2) = 7;
+  c.coo().column_indices(2) = 7;
   c.coo().values(2) = (value_type)26.26;
   // clang-format on
 }

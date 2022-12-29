@@ -38,7 +38,7 @@ template <typename ValueType, typename IndexType, typename SizeType>
 __global__ void copy_by_key_kernel(SizeType n, const IndexType* keys,
                                    const ValueType* src, ValueType* dst) {
   const SizeType tid = blockDim.x * blockIdx.x + threadIdx.x;
-  if (tid > n) return;
+  if (tid >= n) return;
 
   dst[tid] = src[keys[tid]];
 }

@@ -44,7 +44,7 @@ void print(const Printable& p, Stream& s,
 
   print_matrix_header(p, s);
 
-  size_type coo_nnz = 0, coo_ctr = 0, total_nnz = 0;
+  size_type coo_nnz = 0, coo_ctr = 0;
   for (size_type i = 0; i < p.cell().nrows(); i++) {
     for (size_type j = 0; j < p.cell().entries_per_row(); j++) {
       if (p.cell().ccolumn_indices(i, j) != p.cell().invalid_index()) {
@@ -58,13 +58,13 @@ void print(const Printable& p, Stream& s,
     coo_ctr = 0;
     for (size_type k = coo_nnz; k < p.ccoo().nnnz(); k++) {
       if (p.ccoo().crow_indices(k) == (index_type)i) {
-        s << " " << std::setw(14) << i;
+        s << " " << std::setw(14) << p.ccoo().crow_indices(k);
         s << " " << std::setw(14) << p.ccoo().ccolumn_indices(k);
         s << " " << std::setprecision(12) << std::setw(12) << "("
           << p.ccoo().cvalues(k) << ")\n";
-        total_nnz++;
+
+        coo_ctr++;
       }
-      coo_ctr++;
     }
     coo_nnz += coo_ctr;
   }
