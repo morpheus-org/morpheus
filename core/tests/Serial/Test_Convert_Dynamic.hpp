@@ -44,6 +44,9 @@ using EllMatrixTypes =
 using HybMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
                                                types::types_set>::type;
+using HdcMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HdcMatrix<double>,
+                                               types::types_set>::type;
 using DynamicMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DynamicMatrix<double>,
                                                types::types_set>::type;
@@ -53,6 +56,7 @@ using CsrMatrixPairs = generate_pair<DynamicMatrixTypes, CsrMatrixTypes>::type;
 using DiaMatrixPairs = generate_pair<DynamicMatrixTypes, DiaMatrixTypes>::type;
 using EllMatrixPairs = generate_pair<DynamicMatrixTypes, EllMatrixTypes>::type;
 using HybMatrixPairs = generate_pair<DynamicMatrixTypes, HybMatrixTypes>::type;
+using HdcMatrixPairs = generate_pair<DynamicMatrixTypes, HdcMatrixTypes>::type;
 
 using pairs = typename Morpheus::concat<
     CooMatrixPairs,
@@ -60,8 +64,10 @@ using pairs = typename Morpheus::concat<
         CsrMatrixPairs,
         typename Morpheus::concat<
             DiaMatrixPairs,
-            typename Morpheus::concat<EllMatrixPairs, HybMatrixPairs>::type>::
-            type>::type>::type;
+            typename Morpheus::concat<
+                EllMatrixPairs,
+                typename Morpheus::concat<HybMatrixPairs, HdcMatrixPairs>::
+                    type>::type>::type>::type>::type;
 
 using ConvertDynamicTypes = to_gtest_types<pairs>::type;
 

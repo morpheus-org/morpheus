@@ -29,6 +29,7 @@
 #include <utils/Macros_DiaMatrix.hpp>
 #include <utils/Macros_EllMatrix.hpp>
 #include <utils/Macros_HybMatrix.hpp>
+#include <utils/Macros_HdcMatrix.hpp>
 
 #include <Morpheus_Core.hpp>
 

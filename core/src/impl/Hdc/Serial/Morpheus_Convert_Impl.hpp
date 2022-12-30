@@ -38,6 +38,8 @@
 #include <impl/Coo/Serial/Morpheus_Convert_Impl.hpp>
 #include <impl/Coo/Serial/Morpheus_Sort_Impl.hpp>
 
+#include <Morpheus_Print.hpp>
+
 namespace Morpheus {
 namespace Impl {
 
@@ -134,7 +136,7 @@ void convert(
   using size_type  = typename SourceType::size_type;
   using index_type = typename SourceType::index_type;
 
-  size_type min_diag_elem = src.nrows() / 2;
+  index_type min_diag_elem = src.nrows() / 2;
   std::vector<index_type> diag_map(src.nnnz(), 0);
 
   // Find on which diagonal each entry sits on
@@ -147,14 +149,15 @@ void convert(
   std::set<index_type> diag_set(diag_map.begin(), diag_map.end());
 
   // Count non-zeros for each part and erase any diags from set that go into CSR
-  for (size_type key = 0; key <= diag_set.size(); key++) {
+  for (auto it = diag_set.begin(); it != diag_set.end();) {
     index_type diag_elements =
-        std::count(diag_map.begin(), diag_map.end(), diag_set(key));
+        std::count(diag_map.begin(), diag_map.end(), *it);
     if (diag_elements < min_diag_elem) {
       csr_nnz += diag_elements;
-      diag_set.erase(key);
+      it = diag_set.erase(it);
     } else {
       dia_nnz += diag_elements;
+      ++it;
     }
   }
 
@@ -168,17 +171,22 @@ void convert(
     dst.dia().diagonal_offsets(i) = *it;
   }
 
-  // Write the DIA and CSR parts
+  size_type csr_entries = 0;
   for (size_type n = 0; n < src.nnnz(); n++) {
+    bool dia_entry = false;
     for (size_type i = 0; i < ndiags; i++) {
       if (diag_map[n] == dst.dia().diagonal_offsets(i)) {
         dst.dia().values(src.crow_indices(n), i) = src.cvalues(n);
+        dia_entry                                = true;
         break;
-      } else {
-        dst.csr().row_offsets(src.crow_indices(n))++;
-        dst.csr().column_indices(n) = src.ccolumn_indices(n);
-        dst.csr().values(n)         = src.cvalues(n);
       }
+    }
+
+    if (!dia_entry) {
+      dst.csr().row_offsets(src.crow_indices(n))++;
+      dst.csr().column_indices(csr_entries) = src.ccolumn_indices(n);
+      dst.csr().values(csr_entries)         = src.cvalues(n);
+      csr_entries++;
     }
   }
 
@@ -189,7 +197,6 @@ void convert(
     dst.csr().row_offsets(i) = cumsum;
     cumsum += temp;
   }
-
   dst.csr().row_offsets(src.nrows()) = csr_nnz;
 }
 

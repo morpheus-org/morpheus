@@ -24,6 +24,8 @@
 #ifndef TEST_CORE_UTILS_MACROS_DEFINITIONS_HPP
 #define TEST_CORE_UTILS_MACROS_DEFINITIONS_HPP
 
+#include <cstddef>
+
 const size_t SMALL_MATRIX_NROWS     = 10;
 const size_t SMALL_MATRIX_NCOLS     = 10;
 const size_t SMALL_MATRIX_NNZ       = 32;

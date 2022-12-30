@@ -31,6 +31,7 @@
 #include <utils/Macros_DiaMatrix.hpp>
 #include <utils/Macros_EllMatrix.hpp>
 #include <utils/Macros_HybMatrix.hpp>
+#include <utils/Macros_HdcMatrix.hpp>
 #include <utils/Macros_DenseMatrix.hpp>
 #include <utils/Macros_DenseVector.hpp>
 #include <utils/Macros_DynamicMatrix.hpp>
@@ -68,6 +69,9 @@ using EllMatrixTypes =
 using HybMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
                                                copy_types_set>::type;
+using HdcMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HdcMatrix<double>,
+                                               copy_types_set>::type;
 using DynamicMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DynamicMatrix<double>,
                                                copy_types_set>::type;
@@ -84,8 +88,11 @@ using CopyTypes = Morpheus::concat<
                     DiaMatrixTypes,
                     Morpheus::concat<
                         EllMatrixTypes,
-                        Morpheus::concat<HybMatrixTypes, DynamicMatrixTypes>::
-                            type>::type>::type>::type>::type>::type>::type;
+                        Morpheus::concat<HybMatrixTypes,
+                                         Morpheus::concat<HdcMatrixTypes,
+                                                          DynamicMatrixTypes>::
+                                             type>::type>::type>::type>::type>::
+            type>::type>::type;
 
 using CopyTypesUnary       = to_gtest_types<CopyTypes>::type;
 using CopyVectorTypesUnary = to_gtest_types<DenseVectorTypes>::type;
