@@ -68,12 +68,39 @@ namespace Morpheus {
  * \code
  * #include <Morpheus_Core.hpp>
  * // Matrix to Build
- * // [1 * 2]
- * // [* * 3]
- * // [* 4 *]
+ * // [1 * * 2]
+ * // [* 3 4 *]
+ * // [* 5 6 *]
+ * // [7 * * 8]
  * int main(){
  *  using Matrix = Morpheus::HdcMatrix<double, Kokkos::HostSpace>;
- *  // TODO
+ *  using csr_matrix_type = typename Matrix::csr_matrix_type;
+ *  using dia_matrix_type = typename Matrix::dia_matrix_type;
+ *  using size_type = typename Matrix::size_type;
+ *
+ *  csr_matrix_type csr(4, 4, 4);
+ *  dia_matrix_type dia(4, 4, 4, 1, 32);
+ *
+ *  dia.diagonal_offsets(0) = 0; // Main Diagonal
+ *  dia.values(0,0) = 1;
+ *  dia.values(1,0) = 3;
+ *  dia.values(2,0) = 6;
+ *  dia.values(3,0) = 8;
+ *
+ *  csr.row_offsets(0) = 0;
+ *  csr.row_offsets(1) = 1;
+ *  csr.row_offsets(2) = 2;
+ *  csr.row_offsets(3) = 3;
+ *  csr.row_offsets(4) = 4;
+ *  csr.column_indices(0) = 3; csr.values(0) = 2;
+ *  csr.column_indices(1) = 2; csr.values(1) = 4;
+ *  csr.column_indices(2) = 1; csr.values(2) = 5;
+ *  csr.column_indices(3) = 0; csr.values(3) = 7;
+ *
+ *  // Construct the matrix from DIA and CSR parts
+ *  Matrix A(dia, csr);
+ *
+ *  Morpheus::print(A); // prints A
  * }
  * \endcode
  */
