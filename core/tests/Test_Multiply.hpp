@@ -33,6 +33,7 @@
 #include <utils/Macros_DiaMatrix.hpp>
 #include <utils/Macros_EllMatrix.hpp>
 #include <utils/Macros_HybMatrix.hpp>
+#include <utils/Macros_HdcMatrix.hpp>
 #include <utils/MatrixGenerator.hpp>
 
 using CooMatrixTypes =
@@ -49,6 +50,9 @@ using EllMatrixTypes =
                                                types::types_set>::type;
 using HybMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
+                                               types::types_set>::type;
+using HdcMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HdcMatrix<double>,
                                                types::types_set>::type;
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
@@ -68,6 +72,9 @@ using EllMatrixPairs =
 using HybMatrixPairs =
     generate_pair<generate_pair<HybMatrixTypes, DenseVectorTypes>::type,
                   DenseVectorTypes>::type;
+using HdcMatrixPairs =
+    generate_pair<generate_pair<HdcMatrixTypes, DenseVectorTypes>::type,
+                  DenseVectorTypes>::type;
 
 using pairs = typename Morpheus::concat<
     CooMatrixPairs,
@@ -75,8 +82,10 @@ using pairs = typename Morpheus::concat<
         CsrMatrixPairs,
         typename Morpheus::concat<
             DiaMatrixPairs,
-            typename Morpheus::concat<EllMatrixPairs, HybMatrixPairs>::type>::
-            type>::type>::type;
+            typename Morpheus::concat<
+                EllMatrixPairs,
+                typename Morpheus::concat<HybMatrixPairs, HdcMatrixPairs>::
+                    type>::type>::type>::type>::type;
 
 using MultiplyTypes = to_gtest_types<pairs>::type;
 

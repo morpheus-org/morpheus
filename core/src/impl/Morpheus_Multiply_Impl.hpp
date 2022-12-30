@@ -55,9 +55,9 @@
 #include <impl/Hyb/Kokkos/Morpheus_Multiply_Impl.hpp>
 
 #include <impl/Hdc/Serial/Morpheus_Multiply_Impl.hpp>
-// #include <impl/Hdc/OpenMP/Morpheus_Multiply_Impl.hpp>
-// #include <impl/Hdc/Cuda/Morpheus_Multiply_Impl.hpp>
-// #include <impl/Hdc/HIP/Morpheus_Multiply_Impl.hpp>
+#include <impl/Hdc/OpenMP/Morpheus_Multiply_Impl.hpp>
+#include <impl/Hdc/Cuda/Morpheus_Multiply_Impl.hpp>
+#include <impl/Hdc/HIP/Morpheus_Multiply_Impl.hpp>
 #include <impl/Hdc/Kokkos/Morpheus_Multiply_Impl.hpp>
 
 #endif  // MORPHEUS_IMPL_MULTIPLY_IMPL_HPP
