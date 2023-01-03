@@ -61,6 +61,19 @@ typename Vector::value_type min(
   return Impl::min<backend>(in, size);
 }
 
+template <typename ExecSpace, typename Vector>
+typename Vector::value_type std(
+    const Vector& in, typename Vector::size_type size,
+    typename Vector::value_type mean,
+    typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
+        Morpheus::has_openmp_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
+  using backend = Morpheus::GenericBackend<typename ExecSpace::execution_space>;
+  return Impl::std<backend>(in, size, mean);
+}
+
 }  // namespace Impl
 }  // namespace Morpheus
 

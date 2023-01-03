@@ -220,7 +220,7 @@ bool have_approx_same_data(
     }
   }
   return res;
-}  // namespace Test
+}
 }  // namespace Test
 }  // namespace Morpheus
 

@@ -100,12 +100,13 @@ class MatrixAnalyticsTypesTest : public ::testing::Test {
 
     mat_dev_t A;
     vec_dev_t nnz_per_row;
+    typename vec_dev_t::value_type min, max, std;
 
-    ContainersClass() : A(), nnz_per_row() {}
+    ContainersClass() : A(), nnz_per_row(), min(), max(), std() {}
 
     ContainersClass(SizeType nrows, SizeType ncols,
                     std::vector<int>& diag_indexes)
-        : A(), nnz_per_row(nrows, 0) {
+        : A(), nnz_per_row(nrows, 0), min(0), max(0), std(0) {
       // Generate the diagonal matrix
       diag_generator generator(nrows, ncols, diag_indexes);
       typename diag_generator::DenseMatrix Adense;
@@ -132,6 +133,10 @@ class MatrixAnalyticsTypesTest : public ::testing::Test {
         }
       }
       Morpheus::copy(nnz_per_row_h, nnz_per_row);
+      min = Morpheus::min<MirrorBackend>(nnz_per_row_h, nnz_per_row_h.size());
+      max = Morpheus::max<MirrorBackend>(nnz_per_row_h, nnz_per_row_h.size());
+      std = Morpheus::std<MirrorBackend>(nnz_per_row_h, nnz_per_row_h.size(),
+                                         A.nnnz() / A.nrows());
     }
   };
 
@@ -303,6 +308,66 @@ TYPED_TEST(MatrixAnalyticsTypesTest, NonZerosPerRowGeneric) {
     }
     EXPECT_TRUE(
         Morpheus::Test::have_approx_same_data(cnnz_per_row_h, nnz_per_row_h));
+  }
+}
+
+TYPED_TEST(MatrixAnalyticsTypesTest, MinNnnzCustom) {
+  using size_type = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c   = this->containers[i];
+    auto min = Morpheus::min_nnnz<TEST_CUSTOM_SPACE>(c.A);
+    EXPECT_EQ(min, c.min);
+  }
+}
+
+TYPED_TEST(MatrixAnalyticsTypesTest, MinNnnzGeneric) {
+  using size_type = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c   = this->containers[i];
+    auto min = Morpheus::min_nnnz<TEST_GENERIC_SPACE>(c.A);
+    EXPECT_EQ(min, c.min);
+  }
+}
+
+TYPED_TEST(MatrixAnalyticsTypesTest, MaxNnnzCustom) {
+  using size_type = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c   = this->containers[i];
+    auto max = Morpheus::max_nnnz<TEST_CUSTOM_SPACE>(c.A);
+    EXPECT_EQ(max, c.max);
+  }
+}
+
+TYPED_TEST(MatrixAnalyticsTypesTest, MaxNnnzGeneric) {
+  using size_type = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c   = this->containers[i];
+    auto max = Morpheus::max_nnnz<TEST_GENERIC_SPACE>(c.A);
+    EXPECT_EQ(max, c.max);
+  }
+}
+
+TYPED_TEST(MatrixAnalyticsTypesTest, StdNnnzCustom) {
+  using size_type = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c   = this->containers[i];
+    auto std = Morpheus::std_nnnz<TEST_CUSTOM_SPACE>(c.A);
+    EXPECT_EQ(std, c.std);
+  }
+}
+
+TYPED_TEST(MatrixAnalyticsTypesTest, StdNnnzGeneric) {
+  using size_type = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c   = this->containers[i];
+    auto std = Morpheus::std_nnnz<TEST_GENERIC_SPACE>(c.A);
+    EXPECT_EQ(std, c.std);
   }
 }
 

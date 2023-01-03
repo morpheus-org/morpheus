@@ -24,6 +24,9 @@
 #ifndef MORPHEUS_MATRIXANALYTICS_HPP
 #define MORPHEUS_MATRIXANALYTICS_HPP
 
+#include <Morpheus_FormatTraits.hpp>
+#include <Morpheus_VectorAnalytics.hpp>
+
 #include <impl/Morpheus_MatrixAnalytics_Impl.hpp>
 #include <impl/Dynamic/Morpheus_MatrixAnalytics_Impl.hpp>
 
@@ -110,6 +113,82 @@ template <typename ExecSpace, typename Matrix, typename Vector>
 void count_nnz_per_row(const Matrix& A, Vector& nnz_per_row,
                        const bool init = true) {
   Impl::count_nnz_per_row<ExecSpace>(A, nnz_per_row, init);
+}
+
+/**
+ * @brief Finds the maximum number of non-zeros in a row of the Matrix.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam Matrix The type of the input matrix
+ * @param A The input matrix
+ * @return Matrix::size_type The maximum number of non-zeros in a row
+ */
+template <typename ExecSpace, typename Matrix>
+typename Matrix::size_type max_nnnz(const Matrix& A) {
+  static_assert(Morpheus::is_matrix_container_v<Matrix>,
+                "The type Matrix must be a valid matrix container.");
+  using value_type   = typename Matrix::index_type;
+  using index_type   = typename Matrix::size_type;
+  using array_layout = typename Matrix::array_layout;
+  using backend      = typename Matrix::backend;
+  using Vector =
+      Morpheus::DenseVector<value_type, index_type, array_layout, backend>;
+
+  Vector nnnz_per_row(A.nrows(), 0);
+  Impl::count_nnz_per_row<ExecSpace>(A, nnnz_per_row, false);
+
+  return Morpheus::max<ExecSpace>(nnnz_per_row, nnnz_per_row.size());
+}
+
+/**
+ * @brief Finds the minimum number of non-zeros in a row of the Matrix.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam Matrix The type of the input matrix
+ * @param A The input matrix
+ * @return Matrix::size_type The minimum number of non-zeros in a row
+ */
+template <typename ExecSpace, typename Matrix>
+typename Matrix::size_type min_nnnz(const Matrix& A) {
+  static_assert(Morpheus::is_matrix_container_v<Matrix>,
+                "The type Matrix must be a valid matrix container.");
+  using value_type   = typename Matrix::index_type;
+  using index_type   = typename Matrix::size_type;
+  using array_layout = typename Matrix::array_layout;
+  using backend      = typename Matrix::backend;
+  using Vector =
+      Morpheus::DenseVector<value_type, index_type, array_layout, backend>;
+
+  Vector nnnz_per_row(A.nrows(), 0);
+  Impl::count_nnz_per_row<ExecSpace>(A, nnnz_per_row, false);
+
+  return Morpheus::min<ExecSpace>(nnnz_per_row, nnnz_per_row.size());
+}
+
+/**
+ * @brief Finds the standard deviation around a mean of non-zeros in the Matrix.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam Matrix The type of the input matrix
+ * @param A The input matrix
+ * @return Matrix::size_type The minimum number of non-zeros in a row
+ */
+template <typename ExecSpace, typename Matrix>
+typename Matrix::size_type std_nnnz(const Matrix& A) {
+  static_assert(Morpheus::is_matrix_container_v<Matrix>,
+                "The type Matrix must be a valid matrix container.");
+  using value_type   = typename Matrix::index_type;
+  using index_type   = typename Matrix::size_type;
+  using array_layout = typename Matrix::array_layout;
+  using backend      = typename Matrix::backend;
+  using Vector =
+      Morpheus::DenseVector<value_type, index_type, array_layout, backend>;
+
+  Vector nnnz_per_row(A.nrows(), 0);
+  Impl::count_nnz_per_row<ExecSpace>(A, nnnz_per_row, false);
+
+  return Morpheus::std<ExecSpace>(nnnz_per_row, nnnz_per_row.size(),
+                                  A.nnnz() / A.nrows());
 }
 
 /*! \}  // end of analytics group

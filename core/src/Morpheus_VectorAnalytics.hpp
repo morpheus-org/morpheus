@@ -70,6 +70,26 @@ typename Vector::value_type min(const Vector& vec,
   return Impl::min<ExecSpace>(vec, size);
 }
 
+/**
+ * @brief Finds the standard deviation of the elements in the vector around a
+ * mean value.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam Vector The type of the input vector
+ * @param vec The input vector
+ * @param size The size of the input vector
+ * @param mean The mean value
+ * @return Vector::value_type The minimum value in the vector
+ */
+template <typename ExecSpace, typename Vector>
+typename Vector::value_type std(const Vector& vec,
+                                typename Vector::size_type size,
+                                typename Vector::value_type mean) {
+  static_assert(Morpheus::is_vector_container_v<Vector>,
+                "The type Vector must be a valid Vector container.");
+  return Impl::std<ExecSpace>(vec, size, mean);
+}
+
 /*! \}  // end of analytics group
  */
 }  // namespace Morpheus

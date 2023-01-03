@@ -40,16 +40,21 @@ class VectorAnalyticsTypesTest : public ::testing::Test {
   using src_t      = typename Containers::type;
   using src_dev_t  = typename src_t::type;
   using src_host_t = typename src_t::type::HostMirror;
-  using IndexType  = size_t;
+  using SizeType   = typename src_t::size_type;
   using ValueType  = typename src_t::value_type;
+  using IndexType  = typename src_t::index_type;
 
   struct vectors {
     src_dev_t v;
-    IndexType size;
-    ValueType min, max;
+    SizeType size;
+    ValueType min, max, std;
 
-    vectors(IndexType _size)
-        : v(_size, 0), size(_size), min((ValueType)0), max((ValueType)0) {}
+    vectors(SizeType _size)
+        : v(_size, 0),
+          size(_size),
+          min((ValueType)0),
+          max((ValueType)0),
+          std((ValueType)0) {}
   };
 
   IndexType sizes[3] = {50, 5000, 50000};
@@ -58,7 +63,7 @@ class VectorAnalyticsTypesTest : public ::testing::Test {
                             vectors(sizes[2])};
 
   void SetUp() override {
-    for (size_t i = 0; i < 3; i++) {
+    for (SizeType i = 0; i < 3; i++) {
       local_setup(&vecs[i]);
     }
   }
@@ -69,20 +74,40 @@ class VectorAnalyticsTypesTest : public ::testing::Test {
 
     vec->min = 0;
     vec->max = 0;
+    vec->std = 0;
 
     unsigned long long seed = 5374857;
     Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
     vh_.assign(vh_.size(), rand_pool, -5.0, 5.0);
-    for (IndexType i = 0; i < vec->size; i++) {
+
+    ValueType mean =
+        Morpheus::reduce<TEST_CUSTOM_SPACE>(vh_, vec->size) / vec->size;
+
+    for (SizeType i = 0; i < vec->size; i++) {
       vec->min = vec->min < vh_(i) ? vec->min : vh_(i);
       vec->max = vec->max > vh_(i) ? vec->max : vh_(i);
+      vec->std += (vh_(i) - mean) * (vh_(i) - mean);
     }
-
+    vec->std = sqrt(vec->std / (ValueType)vec->size);
     Morpheus::copy(vh_, vec->v);
   }
 };
 
 namespace Test {
+
+template <typename T>
+bool have_approx_same_val(T v1, T v2) {
+  double epsilon = 1.0e-14;
+  if (std::is_same_v<T, double>) {
+    epsilon = 1.0e-14;
+  } else if (std::is_same_v<T, float>) {
+    epsilon = 1.0e-5;
+  } else {
+    epsilon = 0;
+  }
+
+  return (fabs(v1 - v2) > epsilon) ? false : true;
+}
 
 #define MORPHEUS_VALIDATE_MINMAX(_value_type, _res, _ref_res)                \
   {                                                                          \
@@ -101,9 +126,9 @@ TYPED_TEST_SUITE(VectorAnalyticsTypesTest, VectorAnalyticsTypes);
 
 TYPED_TEST(VectorAnalyticsTypesTest, MaxCustom) {
   using value_type = typename TestFixture::ValueType;
-  using index_type = typename TestFixture::IndexType;
+  using size_type  = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < 3; i++) {
     auto v = this->vecs[i];
 
     auto result = Morpheus::max<TEST_CUSTOM_SPACE>(v.v, v.size);
@@ -113,9 +138,9 @@ TYPED_TEST(VectorAnalyticsTypesTest, MaxCustom) {
 
 TYPED_TEST(VectorAnalyticsTypesTest, MaxGeneric) {
   using value_type = typename TestFixture::ValueType;
-  using index_type = typename TestFixture::IndexType;
+  using size_type  = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < 3; i++) {
     auto v = this->vecs[i];
 
     auto result = Morpheus::max<TEST_GENERIC_SPACE>(v.v, v.size);
@@ -125,9 +150,9 @@ TYPED_TEST(VectorAnalyticsTypesTest, MaxGeneric) {
 
 TYPED_TEST(VectorAnalyticsTypesTest, MinCustom) {
   using value_type = typename TestFixture::ValueType;
-  using index_type = typename TestFixture::IndexType;
+  using size_type  = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < 3; i++) {
     auto v = this->vecs[i];
 
     auto result = Morpheus::min<TEST_CUSTOM_SPACE>(v.v, v.size);
@@ -137,13 +162,40 @@ TYPED_TEST(VectorAnalyticsTypesTest, MinCustom) {
 
 TYPED_TEST(VectorAnalyticsTypesTest, MinGeneric) {
   using value_type = typename TestFixture::ValueType;
-  using index_type = typename TestFixture::IndexType;
+  using size_type  = typename TestFixture::SizeType;
 
-  for (index_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < 3; i++) {
     auto v = this->vecs[i];
 
     auto result = Morpheus::min<TEST_GENERIC_SPACE>(v.v, v.size);
     MORPHEUS_VALIDATE_MINMAX(value_type, result, v.min);
+  }
+}
+
+TYPED_TEST(VectorAnalyticsTypesTest, StdCustom) {
+  using value_type = typename TestFixture::ValueType;
+  using size_type  = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < 3; i++) {
+    auto v = this->vecs[i];
+
+    value_type mean = Morpheus::reduce<TEST_CUSTOM_SPACE>(v.v, v.size) / v.size;
+    value_type result = Morpheus::std<TEST_CUSTOM_SPACE>(v.v, v.size, mean);
+    EXPECT_TRUE(have_approx_same_val(result, v.std));
+  }
+}
+
+TYPED_TEST(VectorAnalyticsTypesTest, StdGeneric) {
+  using value_type = typename TestFixture::ValueType;
+  using size_type  = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < 3; i++) {
+    auto v = this->vecs[i];
+
+    value_type mean =
+        Morpheus::reduce<TEST_GENERIC_SPACE>(v.v, v.size) / v.size;
+    value_type result = Morpheus::std<TEST_GENERIC_SPACE>(v.v, v.size, mean);
+    EXPECT_TRUE(have_approx_same_val(result, v.std));
   }
 }
 
