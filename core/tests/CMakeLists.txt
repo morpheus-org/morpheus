@@ -58,6 +58,8 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       HybMatrix_CompatibleBinary
       HybMatrix_CompatibleDynamicBinary
       HybMatrix
+      MatrixAnalytics_Dynamic
+      MatrixAnalytics
       MatrixBase
       MatrixMarket
       MatrixOperations_Dynamic

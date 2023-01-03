@@ -34,6 +34,7 @@
 
 #include <impl/Morpheus_HIPUtils.hpp>
 #include <impl/Coo/Kernels/Morpheus_Multiply_Impl.hpp>
+#include <impl/DenseVector/Kernels/Morpheus_Segmented_Reduction_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -159,11 +160,11 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
   getLastHIPError("spmv_coo_flat_kernel: Kernel execution failed");
 #endif
 
-  Kernels::spmv_coo_reduce_update_kernel<size_type, index_type, value_type,
-                                         BLOCK_SIZE><<<1, BLOCK_SIZE, 0>>>(
-      active_warps, temp_rows.data(), temp_vals.data(), y.data());
+  Kernels::reduce_update_kernel<size_type, index_type, value_type, BLOCK_SIZE>
+      <<<1, BLOCK_SIZE, 0>>>(active_warps, temp_rows.data(), temp_vals.data(),
+                             y.data());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
-  getLastHIPError("spmv_coo_reduce_kernel: Kernel execution failed");
+  getLastHIPError("reduce_update_kernel: Kernel execution failed");
 #endif
 
   Kernels::spmv_coo_serial_kernel<size_type, index_type, value_type>

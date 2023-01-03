@@ -1,5 +1,5 @@
 /**
- * Morpheus_Multiply_Impl.hpp
+ * Morpheus_MatrixAnalytics_Impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_COO_OPENMP_MULTIPLY_IMPL_HPP
-#define MORPHEUS_COO_OPENMP_MULTIPLY_IMPL_HPP
+#ifndef MORPHEUS_COO_OPENMP_MATRIXANALYTICS_IMPL_HPP
+#define MORPHEUS_COO_OPENMP_MATRIXANALYTICS_IMPL_HPP
 
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_OPENMP)
@@ -32,6 +32,7 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 
+#include <impl/Morpheus_Utils.hpp>
 #include <impl/Morpheus_OpenMPUtils.hpp>
 
 #include <limits>
@@ -40,8 +41,8 @@ namespace Morpheus {
 namespace Impl {
 
 template <typename ExecSpace, typename Matrix, typename Vector>
-inline void multiply(
-    const Matrix& A, const Vector& x, Vector& y, const bool init,
+inline void count_nnz_per_row(
+    const Matrix& A, Vector& nnz_per_row, const bool init,
     typename std::enable_if_t<
         Morpheus::is_coo_matrix_format_container_v<Matrix> &&
         Morpheus::is_dense_vector_format_container_v<Vector> &&
@@ -49,11 +50,15 @@ inline void multiply(
         Morpheus::has_openmp_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using size_type  = typename Matrix::size_type;
-  using value_type = typename Vector::value_type;
   using index_type = typename Matrix::index_type;
+  using value_type = typename Vector::value_type;
+
+  MORPHEUS_ASSERT(nnz_per_row.size() == A.nrows(),
+                  "Destination vector must have equal size to the source "
+                  "matrix number of rows");
 
   if (init) {
-    y.assign(y.size(), 0);
+    nnz_per_row.assign(nnz_per_row.size(), 0);
   }
 
   const size_type nrows        = A.nrows();
@@ -61,10 +66,6 @@ inline void multiply(
   const size_type sentinel_row = nrows + 1;
 
   index_type* rind = A.crow_indices().data();
-  index_type* cind = A.ccolumn_indices().data();
-  value_type* Aval = A.cvalues().data();
-  value_type* xval = x.data();
-  value_type* yval = y.data();
 
 #pragma omp parallel
   {
@@ -84,23 +85,23 @@ inline void multiply(
       if (first != (index_type)sentinel_row) {
         value_type partial_sum = value_type(0);
         for (; n < end && rind[n] == first; n++) {
-          partial_sum += Aval[n] * xval[cind[n]];
+          partial_sum++;
         }
-        Impl::atomic_add(&yval[first], partial_sum);
+        Impl::atomic_add(&nnz_per_row.data()[first], partial_sum);
       }
 
       // handle non-overlapping rows
       for (; n < end && A.crow_indices(n) != last; n++) {
-        yval[rind[n]] += Aval[n] * xval[cind[n]];
+        nnz_per_row[rind[n]]++;
       }
 
       // handle row overlap with following thread
       if (last != (index_type)sentinel_row) {
         value_type partial_sum = value_type(0);
         for (; n < end; n++) {
-          partial_sum += Aval[n] * xval[cind[n]];
+          partial_sum++;
         }
-        Impl::atomic_add(&yval[last], partial_sum);
+        Impl::atomic_add(&nnz_per_row.data()[last], partial_sum);
       }
     }
   }
@@ -110,4 +111,4 @@ inline void multiply(
 }  // namespace Morpheus
 
 #endif  // MORPHEUS_ENABLE_OPENMP
-#endif  // MORPHEUS_COO_OPENMP_MULTIPLY_IMPL_HPP
+#endif  // MORPHEUS_COO_OPENMP_MATRIXANALYTICS_IMPL_HPP
