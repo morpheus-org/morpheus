@@ -45,6 +45,7 @@
 #include <Morpheus_Dot.hpp>
 #include <Morpheus_MatrixOperations.hpp>
 #include <Morpheus_MatrixAnalytics.hpp>
+#include <Morpheus_VectorAnalytics.hpp>
 #include <Morpheus_Multiply.hpp>
 #include <Morpheus_Print.hpp>
 #include <Morpheus_Reduction.hpp>
