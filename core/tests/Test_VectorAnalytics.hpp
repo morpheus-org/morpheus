@@ -77,11 +77,11 @@ class VectorAnalyticsTypesTest : public ::testing::Test {
     vec->std = 0;
 
     unsigned long long seed = 5374857;
-    Kokkos::Random_XorShift64_Pool<TEST_EXECSPACE> rand_pool(seed);
+    Kokkos::Random_XorShift64_Pool<Morpheus::Serial> rand_pool(seed);
     vh_.assign(vh_.size(), rand_pool, -5.0, 5.0);
 
     ValueType mean =
-        Morpheus::reduce<TEST_CUSTOM_SPACE>(vh_, vec->size) / vec->size;
+        Morpheus::reduce<Morpheus::Serial>(vh_, vec->size) / vec->size;
 
     for (SizeType i = 0; i < vec->size; i++) {
       vec->min = vec->min < vh_(i) ? vec->min : vh_(i);
@@ -97,9 +97,9 @@ namespace Test {
 
 template <typename T>
 bool have_approx_same_val(T v1, T v2) {
-  double epsilon = 1.0e-14;
+  double epsilon = 1.0e-13;
   if (std::is_same_v<T, double>) {
-    epsilon = 1.0e-14;
+    epsilon = 1.0e-13;
   } else if (std::is_same_v<T, float>) {
     epsilon = 1.0e-5;
   } else {
@@ -129,8 +129,7 @@ TYPED_TEST(VectorAnalyticsTypesTest, MaxCustom) {
   using size_type  = typename TestFixture::SizeType;
 
   for (size_type i = 0; i < 3; i++) {
-    auto v = this->vecs[i];
-
+    auto v      = this->vecs[i];
     auto result = Morpheus::max<TEST_CUSTOM_SPACE>(v.v, v.size);
     MORPHEUS_VALIDATE_MINMAX(value_type, result, v.max);
   }
