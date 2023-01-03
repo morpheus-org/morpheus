@@ -137,21 +137,21 @@ void __count_nnz_per_row_csr_vector(const Matrix& A, Vector& nnz_per_row,
                                     const bool init) {
   using size_type = typename Matrix::size_type;
 
-  const size_type nnz_per_row = A.nnnz() / A.nrows();
+  const size_type avg_nnz_per_row = A.nnnz() / A.nrows();
 
-  if (nnz_per_row <= 2) {
+  if (avg_nnz_per_row <= 2) {
     __count_nnz_per_row_csr_vector_dispatch<2>(A, nnz_per_row, init);
     return;
   }
-  if (nnz_per_row <= 4) {
+  if (avg_nnz_per_row <= 4) {
     __count_nnz_per_row_csr_vector_dispatch<4>(A, nnz_per_row, init);
     return;
   }
-  if (nnz_per_row <= 8) {
+  if (avg_nnz_per_row <= 8) {
     __count_nnz_per_row_csr_vector_dispatch<8>(A, nnz_per_row, init);
     return;
   }
-  if (nnz_per_row <= 16) {
+  if (avg_nnz_per_row <= 16) {
     __count_nnz_per_row_csr_vector_dispatch<16>(A, nnz_per_row, init);
     return;
   }

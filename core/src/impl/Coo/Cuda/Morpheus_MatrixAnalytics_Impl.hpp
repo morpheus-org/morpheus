@@ -34,7 +34,7 @@
 
 #include <impl/Morpheus_Utils.hpp>
 #include <impl/Morpheus_CudaUtils.hpp>
-#include <impl/Coo/Kernels/Morpheus_Multiply_Impl.hpp>
+#include <impl/Coo/Kernels/Morpheus_MatrixAnalytics_Impl.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_Segmented_Reduction_Impl.hpp>
 
 namespace Morpheus {
@@ -46,8 +46,8 @@ void __count_nnz_per_row_coo_flat(const Matrix& A, Vector& nnz_per_row,
                                   const bool init);
 
 template <typename Matrix, typename Vector>
-void __scount_nnz_per_row_coo_serial(const Matrix& A, Vector& nnz_per_row,
-                                     const bool init);
+void __count_nnz_per_row_coo_serial(const Matrix& A, Vector& nnz_per_row,
+                                    const bool init);
 
 template <typename ExecSpace, typename Matrix, typename Vector>
 inline void count_nnz_per_row(
@@ -81,7 +81,7 @@ void __count_nnz_per_row_coo_serial(const Matrix& A, Vector& nnz_per_row,
 
   Kernels::count_nnz_per_row_coo_serial_kernel<size_type, index_type,
                                                value_type>
-      <<<1, 1>>>(A.nnnz(), I, J, V, x_ptr, nnz_per_row_ptr);
+      <<<1, 1>>>(A.nnnz(), I, nnz_per_row_ptr);
 
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
   getLastCudaError(
@@ -141,7 +141,7 @@ void __count_nnz_per_row_coo_flat(const Matrix& A, Vector& nnz_per_row,
       (interval_size == 0) ? 0 : Impl::ceil_div<size_type>(tail, interval_size);
 
   typename Matrix::index_array_type temp_rows(active_warps, 0);
-  typename Vector::value_array_type temp_vals(active_warps, 0);
+  Vector temp_vals(active_warps, 0);
 
   Kernels::count_nnz_per_row_coo_flat_kernel<size_type, index_type, value_type,
                                              BLOCK_SIZE>
