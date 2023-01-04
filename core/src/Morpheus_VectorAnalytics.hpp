@@ -109,6 +109,23 @@ void count_occurences(const VectorIn& in, VectorOut& out) {
   Impl::count_occurences<ExecSpace>(in, out);
 }
 
+/**
+ * @brief Counts the number of non-zero entries in the vector.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam Vector The type of the input vector
+ * @param vec The input vector
+ * @param threshold The threshold above which a non-zero is counted
+ * @return Vector::size_type The number of non-zero entries
+ */
+template <typename ExecSpace, typename Vector>
+typename Vector::size_type count_nnz(
+    const Vector& vec, typename Vector::value_type threshold = 0) {
+  static_assert(Morpheus::is_vector_container_v<Vector>,
+                "The type VectorIn must be a valid Vector container.");
+  return Impl::count_nnz<ExecSpace>(vec, threshold);
+}
+
 /*! \}  // end of analytics group
  */
 }  // namespace Morpheus

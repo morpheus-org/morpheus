@@ -29,11 +29,6 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 
-#include <impl/DenseVector/Serial/Morpheus_VectorAnalytics_Impl.hpp>
-#include <impl/DenseVector/OpenMP/Morpheus_VectorAnalytics_Impl.hpp>
-#include <impl/DenseVector/Cuda/Morpheus_VectorAnalytics_Impl.hpp>
-#include <impl/DenseVector/HIP/Morpheus_VectorAnalytics_Impl.hpp>
-
 namespace Morpheus {
 namespace Impl {
 
@@ -135,6 +130,36 @@ void count_occurences(
         Morpheus::has_access_v<ExecSpace, VectorIn, VectorOut>>* = nullptr) {
   using backend = Morpheus::CustomBackend<typename ExecSpace::execution_space>;
   Impl::count_occurences<backend>(in, out);
+}
+
+template <typename ExecSpace, typename Vector>
+typename Vector::size_type count_nnz(
+    const Vector& vec, typename Vector::value_type threshold,
+    typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
+  using execution_space = typename ExecSpace::execution_space;
+  using size_type       = typename Vector::size_type;
+  using IndexType       = Kokkos::IndexType<size_type>;
+  using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
+  using ValueArray      = typename Vector::value_array_type;
+
+  const ValueArray in_view = vec.const_view();
+  range_policy policy(0, vec.size());
+
+  size_type result = 0;
+  Kokkos::parallel_reduce(
+      "count_nnz", policy,
+      KOKKOS_LAMBDA(const size_type& i, size_type& lsum) {
+        if (in_view[i] > threshold) {
+          lsum += 1;
+        }
+      },
+      result);
+  Kokkos::fence();
+
+  return result;
 }
 
 }  // namespace Impl

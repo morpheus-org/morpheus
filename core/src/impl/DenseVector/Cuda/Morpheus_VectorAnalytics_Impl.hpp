@@ -36,6 +36,8 @@
 #include <impl/DenseVector/Kernels/Morpheus_VectorAnalytics_Impl.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_Segmented_Reduction_Impl.hpp>
 
+#include <Kokkos_Sort.hpp>
+
 namespace Morpheus {
 namespace Impl {
 
@@ -155,6 +157,18 @@ void count_occurences(
   getLastCudaError(
       "count_occurences_dense_vector_serial_kernel: Kernel execution failed");
 #endif
+}
+
+template <typename ExecSpace, typename Vector>
+typename Vector::size_type count_nnz(
+    const Vector& vec, typename Vector::value_type threshold,
+    typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
+        Morpheus::has_cuda_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
+  using backend = Morpheus::GenericBackend<typename ExecSpace::execution_space>;
+  return Impl::count_nnz<backend>(vec, threshold);
 }
 
 }  // namespace Impl

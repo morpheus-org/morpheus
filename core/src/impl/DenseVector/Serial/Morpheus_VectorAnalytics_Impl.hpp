@@ -109,6 +109,18 @@ void count_occurences(
   }
 }
 
+template <typename ExecSpace, typename Vector>
+typename Vector::size_type count_nnz(
+    const Vector& vec, typename Vector::value_type threshold,
+    typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<Vector> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
+        Morpheus::has_serial_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
+  using backend = Morpheus::GenericBackend<typename ExecSpace::execution_space>;
+  return Impl::count_nnz<backend>(vec, threshold);
+}
+
 }  // namespace Impl
 }  // namespace Morpheus
 

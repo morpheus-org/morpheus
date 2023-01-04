@@ -199,17 +199,21 @@ TYPED_TEST(VectorAnalyticsTypesTest, StdGeneric) {
 }
 
 TEST(VectorOccurences, CountOccurencesCustom) {
-  using Vector = Morpheus::DenseVector<int, size_t, TEST_CUSTOM_SPACE>;
+  using Vector     = Morpheus::DenseVector<int, size_t, TEST_CUSTOM_SPACE>;
+  using value_type = typename Vector::value_type;
 
-  Vector keys(1000, 0), out(250, 0);
+  Vector keys(1000, 0), out(100, 0);
 
   unsigned long long seed = 5374857;
   Kokkos::Random_XorShift64_Pool<typename TEST_CUSTOM_SPACE::execution_space>
       rand_pool(seed);
-  keys.assign(keys.size(), rand_pool, 0, 250);
-  typename Vector::HostMirror ref_out_h(250, 0);
+  keys.assign(keys.size(), rand_pool, 0, 100);
+  typename Vector::HostMirror ref_out_h(100, 0);
 
   Morpheus::count_occurences<TEST_CUSTOM_SPACE>(keys, out);
+
+  auto ndiags     = Morpheus::count_nnz<TEST_CUSTOM_SPACE>(out);
+  auto real_diags = Morpheus::count_nnz<TEST_CUSTOM_SPACE>(out, out.size() / 2);
 
   auto keys_h = Morpheus::create_mirror_container(keys);
   Morpheus::copy(keys, keys_h);
@@ -217,11 +221,23 @@ TEST(VectorOccurences, CountOccurencesCustom) {
     ref_out_h[keys_h[i]]++;
   }
 
+  size_t ctr = 0;
+  for (size_t i = 0; i < ref_out_h.size(); i++) {
+    if (ref_out_h[i] > 0) ctr++;
+  }
+
+  size_t real_ctr = 0;
+  for (size_t i = 0; i < ref_out_h.size(); i++) {
+    if (ref_out_h[i] > (value_type)out.size() / 2) real_ctr++;
+  }
+
   auto out_h = Morpheus::create_mirror_container(out);
   Morpheus::copy(out, out_h);
 
   EXPECT_FALSE(Morpheus::Test::is_empty_container(out_h));
   EXPECT_TRUE(Morpheus::Test::have_same_data(ref_out_h, out_h));
+  EXPECT_EQ(ctr, ndiags);
+  EXPECT_EQ(real_ctr, real_diags);
 }
 
 }  // namespace Test
