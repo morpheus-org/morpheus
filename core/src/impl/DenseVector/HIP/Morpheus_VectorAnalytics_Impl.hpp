@@ -27,6 +27,8 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_HIP)
 
+#include <Morpheus_Exceptions.hpp>
+
 #include <Morpheus_SpaceTraits.hpp>
 #include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
@@ -72,6 +74,18 @@ typename Vector::value_type std(
         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using backend = Morpheus::GenericBackend<typename ExecSpace::execution_space>;
   return Impl::std<backend>(in, size, mean);
+}
+
+template <typename ExecSpace, typename VectorIn, typename VectorOut>
+void count_occurences(
+    const VectorIn& in, VectorOut& out,
+    typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<VectorIn> &&
+        Morpheus::is_dense_vector_format_container_v<VectorOut> &&
+        Morpheus::has_custom_backend_v<ExecSpace> &&
+        Morpheus::has_hip_execution_space_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, VectorIn, VectorOut>>* = nullptr) {
+  throw Morpheus::NotImplementedException("count_occurences<Serial>");
 }
 
 }  // namespace Impl

@@ -90,6 +90,25 @@ typename Vector::value_type std(const Vector& vec,
   return Impl::std<ExecSpace>(vec, size, mean);
 }
 
+/**
+ * @brief Counts the occurences of the elements in a vector.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam VectorIn The type of the input vector
+ * @tparam VectorOut The type of the output vector
+ * @param in The input vector
+ * @param out The output vector containing the counts each value in the input
+ * vector occurs
+ */
+template <typename ExecSpace, typename VectorIn, typename VectorOut>
+void count_occurences(const VectorIn& in, VectorOut& out) {
+  static_assert(Morpheus::is_vector_container_v<VectorIn>,
+                "The type VectorIn must be a valid Vector container.");
+  static_assert(Morpheus::is_vector_container_v<VectorOut>,
+                "The type VectorOut must be a valid Vector container.");
+  Impl::count_occurences<ExecSpace>(in, out);
+}
+
 /*! \}  // end of analytics group
  */
 }  // namespace Morpheus

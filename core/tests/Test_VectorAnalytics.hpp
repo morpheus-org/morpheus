@@ -198,6 +198,30 @@ TYPED_TEST(VectorAnalyticsTypesTest, StdGeneric) {
   }
 }
 
+TEST(VectorOccurences, CountOccurencesCustom) {
+  using Vector = Morpheus::DenseVector<int, size_t, TEST_CUSTOM_SPACE>;
+
+  Vector keys(1000, 0), out(250, 0);
+
+  unsigned long long seed = 5374857;
+  Kokkos::Random_XorShift64_Pool<Kokkos::Serial> rand_pool(seed);
+  keys.assign(keys.size(), rand_pool, 0, 250);
+  typename Vector::HostMirror ref_out_h(250, 0);
+  auto keys_h = Morpheus::create_mirror(keys);
+  Morpheus::count_occurences<TEST_CUSTOM_SPACE>(keys, out);
+
+  Morpheus::copy(keys, keys_h);
+  for (size_t i = 0; i < keys.size(); i++) {
+    ref_out_h[keys_h[i]]++;
+  }
+
+  auto out_h = Morpheus::create_mirror(out);
+  Morpheus::copy(out, out_h);
+
+  EXPECT_FALSE(Morpheus::Test::is_empty_container(out_h));
+  EXPECT_TRUE(Morpheus::Test::have_same_data(ref_out_h, out_h));
+}
+
 }  // namespace Test
 
 #endif  // TEST_CORE_TEST_VECTORANALYTICS_HPP
