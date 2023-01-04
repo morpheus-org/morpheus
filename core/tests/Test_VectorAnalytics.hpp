@@ -204,18 +204,20 @@ TEST(VectorOccurences, CountOccurencesCustom) {
   Vector keys(1000, 0), out(250, 0);
 
   unsigned long long seed = 5374857;
-  Kokkos::Random_XorShift64_Pool<Kokkos::Serial> rand_pool(seed);
+  Kokkos::Random_XorShift64_Pool<typename TEST_CUSTOM_SPACE::execution_space>
+      rand_pool(seed);
   keys.assign(keys.size(), rand_pool, 0, 250);
   typename Vector::HostMirror ref_out_h(250, 0);
-  auto keys_h = Morpheus::create_mirror(keys);
+
   Morpheus::count_occurences<TEST_CUSTOM_SPACE>(keys, out);
 
+  auto keys_h = Morpheus::create_mirror_container(keys);
   Morpheus::copy(keys, keys_h);
   for (size_t i = 0; i < keys.size(); i++) {
     ref_out_h[keys_h[i]]++;
   }
 
-  auto out_h = Morpheus::create_mirror(out);
+  auto out_h = Morpheus::create_mirror_container(out);
   Morpheus::copy(out, out_h);
 
   EXPECT_FALSE(Morpheus::Test::is_empty_container(out_h));

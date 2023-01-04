@@ -24,12 +24,15 @@
 #ifndef MORPHEUS_DENSEVECTOR_KOKKOS_VECTORANALYTICS_IMPL_HPP
 #define MORPHEUS_DENSEVECTOR_KOKKOS_VECTORANALYTICS_IMPL_HPP
 
-#include <Morpheus_Exceptions.hpp>
-
 #include <Morpheus_SpaceTraits.hpp>
 #include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
+
+#include <impl/DenseVector/Serial/Morpheus_VectorAnalytics_Impl.hpp>
+#include <impl/DenseVector/OpenMP/Morpheus_VectorAnalytics_Impl.hpp>
+#include <impl/DenseVector/Cuda/Morpheus_VectorAnalytics_Impl.hpp>
+#include <impl/DenseVector/HIP/Morpheus_VectorAnalytics_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -130,7 +133,8 @@ void count_occurences(
         Morpheus::is_dense_vector_format_container_v<VectorOut> &&
         Morpheus::has_generic_backend_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, VectorIn, VectorOut>>* = nullptr) {
-  throw Morpheus::NotImplementedException("count_occurences<Serial>");
+  using backend = Morpheus::CustomBackend<typename ExecSpace::execution_space>;
+  Impl::count_occurences<backend>(in, out);
 }
 
 }  // namespace Impl

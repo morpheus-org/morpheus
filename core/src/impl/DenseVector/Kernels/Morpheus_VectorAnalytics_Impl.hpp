@@ -38,7 +38,7 @@ __global__ void count_occurences_dense_vector_serial_kernel(
     const SizeType size, const IndexType* keys, const ValueType* vals,
     ValueType* out) {
   for (SizeType n = 0; n < size; n++) {
-    out[keys[n]] += keys[n];
+    out[keys[n]] += vals[n];
   }
 }
 
@@ -90,7 +90,7 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
       if (key == skeys[idx + LAST_LANE])
         val += ValueType(svals[threadIdx.x + LAST_LANE]);  // key continues
       else
-        y[skeys[idx + LAST_LANE]] +=
+        out[skeys[idx + LAST_LANE]] +=
             ValueType(svals[threadIdx.x + LAST_LANE]);  // key terminated
     }
 
@@ -98,7 +98,7 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
     svals[threadIdx.x] = val;
 
     if (key == skeys[idx - 1]) {
-      vals[threadIdx.x] = val += ValueType(svals[threadIdx.x - 1]);
+      svals[threadIdx.x] = val += ValueType(svals[threadIdx.x - 1]);
     }
     if (key == skeys[idx - 2]) {
       svals[threadIdx.x] = val += ValueType(svals[threadIdx.x - 2]);

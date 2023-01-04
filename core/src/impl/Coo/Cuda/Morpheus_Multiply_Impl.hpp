@@ -141,10 +141,8 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
   const size_type num_iters = Impl::ceil_div<size_type>(num_units, num_warps);
 
   const size_type interval_size = WARP_SIZE * num_iters;
-
-  const size_type tail =
-      num_units * WARP_SIZE;  // do the last few nonzeros separately (fewer
-                              // than WARP_SIZE elements)
+  // do the last few nonzeros separately (fewer than WARP_SIZE elements)
+  const size_type tail = num_units * WARP_SIZE;
 
   const size_type active_warps =
       (interval_size == 0) ? 0 : Impl::ceil_div<size_type>(tail, interval_size);

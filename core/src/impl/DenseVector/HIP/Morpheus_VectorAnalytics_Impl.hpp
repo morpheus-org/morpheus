@@ -35,6 +35,8 @@
 #include <Morpheus_Spaces.hpp>
 
 #include <impl/DenseVector/Kokkos/Morpheus_VectorAnalytics_Impl.hpp>
+#include <impl/DenseVector/Kernels/Morpheus_VectorAnalytics_Impl.hpp>
+#include <impl/DenseVector/Kokkos/Morpheus_VectorAnalytics_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -85,7 +87,76 @@ void count_occurences(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_hip_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, VectorIn, VectorOut>>* = nullptr) {
-  throw Morpheus::NotImplementedException("count_occurences<Serial>");
+  using size_type  = typename VectorIn::size_type;
+  using index_type = typename VectorIn::value_type;
+  using value_type = typename VectorOut::value_type;
+
+  Kokkos::sort(in.const_view());
+
+  VectorOut vals(in.size(), 1);
+
+  if (in.size() == 0) {
+    // empty vector
+    return;
+  } else if (in.size() < static_cast<size_type>(WARP_SIZE)) {
+    // small vector
+    Kernels::count_occurences_dense_vector_serial_kernel<size_type, index_type,
+                                                         value_type>
+        <<<1, 1, 0>>>(in.size(), in.data(), vals.data(), out.data());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+    getLastHIPError(
+        "count_occurences_dense_vector_serial_kernel: Kernel execution failed");
+#endif
+    return;
+  }
+
+  const size_type BLOCK_SIZE = 256;
+  const size_type MAX_BLOCKS =
+      max_active_blocks(Kernels::count_occurences_dense_vector_flat_kernel<
+                            size_type, index_type, value_type, BLOCK_SIZE>,
+                        BLOCK_SIZE, 0);
+  const size_type WARPS_PER_BLOCK = BLOCK_SIZE / WARP_SIZE;
+
+  const size_type num_units = in.size() / WARP_SIZE;
+  const size_type num_warps = std::min(num_units, WARPS_PER_BLOCK * MAX_BLOCKS);
+  const size_type num_blocks =
+      Impl::ceil_div<size_type>(num_warps, WARPS_PER_BLOCK);
+  const size_type num_iters = Impl::ceil_div<size_type>(num_units, num_warps);
+
+  const size_type interval_size = WARP_SIZE * num_iters;
+  // do the last few nonzeros separately (fewer than WARP_SIZE elements)
+  const size_type tail = num_units * WARP_SIZE;
+
+  const size_type active_warps =
+      (interval_size == 0) ? 0 : Impl::ceil_div<size_type>(tail, interval_size);
+
+  VectorIn temp_keys(active_warps, 0);
+  VectorOut temp_vals(active_warps, 0);
+
+  Kernels::count_occurences_dense_vector_flat_kernel<size_type, index_type,
+                                                     value_type, BLOCK_SIZE>
+      <<<num_blocks, BLOCK_SIZE, 0>>>(tail, interval_size, in.data(),
+                                      vals.data(), out.data(), temp_keys.data(),
+                                      temp_vals.data());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastHIPError(
+      "count_occurences_dense_vector_flat_kernel: Kernel execution failed");
+#endif
+
+  Kernels::reduce_update_kernel<size_type, index_type, value_type, BLOCK_SIZE>
+      <<<1, BLOCK_SIZE, 0>>>(active_warps, temp_keys.data(), temp_vals.data(),
+                             out.data());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastHIPError("reduce_update_kernel: Kernel execution failed");
+#endif
+
+  Kernels::count_occurences_dense_vector_serial_kernel<size_type, index_type,
+                                                       value_type><<<1, 1, 0>>>(
+      in.size() - tail, in.data() + tail, vals.data() + tail, out.data());
+#if defined(DEBUG) || defined(MORPHEUS_DEBUG)
+  getLastHIPError(
+      "count_occurences_dense_vector_serial_kernel: Kernel execution failed");
+#endif
 }
 
 }  // namespace Impl

@@ -27,8 +27,6 @@
 #include <Morpheus_Macros.hpp>
 #if defined(MORPHEUS_ENABLE_CUDA)
 
-#include <Morpheus_Exceptions.hpp>
-
 #include <Morpheus_SpaceTraits.hpp>
 #include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
@@ -36,6 +34,7 @@
 
 #include <impl/DenseVector/Kokkos/Morpheus_VectorAnalytics_Impl.hpp>
 #include <impl/DenseVector/Kernels/Morpheus_VectorAnalytics_Impl.hpp>
+#include <impl/DenseVector/Kernels/Morpheus_Segmented_Reduction_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -95,15 +94,16 @@ void count_occurences(
   VectorOut vals(in.size(), 1);
 
   if (in.size() == 0) {
-    // empty matrix
+    // empty vector
     return;
   } else if (in.size() < static_cast<size_type>(WARP_SIZE)) {
-    // small matrix
+    // small vector
     Kernels::count_occurences_dense_vector_serial_kernel<size_type, index_type,
                                                          value_type>
         <<<1, 1, 0>>>(in.size(), in.data(), vals.data(), out.data());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
-    getLastCudaError("spmv_coo_serial_kernel: Kernel execution failed");
+    getLastCudaError(
+        "count_occurences_dense_vector_serial_kernel: Kernel execution failed");
 #endif
     return;
   }
@@ -122,10 +122,8 @@ void count_occurences(
   const size_type num_iters = Impl::ceil_div<size_type>(num_units, num_warps);
 
   const size_type interval_size = WARP_SIZE * num_iters;
-
-  const size_type tail =
-      num_units * WARP_SIZE;  // do the last few nonzeros separately (fewer
-                              // than WARP_SIZE elements)
+  // do the last few nonzeros separately (fewer than WARP_SIZE elements)
+  const size_type tail = num_units * WARP_SIZE;
 
   const size_type active_warps =
       (interval_size == 0) ? 0 : Impl::ceil_div<size_type>(tail, interval_size);

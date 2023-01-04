@@ -41,15 +41,15 @@ template <typename SizeType, typename IndexType, typename ValueType,
           size_t BLOCK_SIZE>
 __launch_bounds__(BLOCK_SIZE, 1) __global__
     void reduce_update_kernel(const SizeType num_warps,
-                              const IndexType* temp_rows,
-                              const ValueType* temp_vals, ValueType* y) {
-  __shared__ IndexType rows[BLOCK_SIZE + 1];
+                              const IndexType* temp_keys,
+                              const ValueType* temp_vals, ValueType* out) {
+  __shared__ IndexType keys[BLOCK_SIZE + 1];
   __shared__ ValueType vals[BLOCK_SIZE + 1];
 
   const SizeType end = num_warps - (num_warps & (BLOCK_SIZE - 1));
 
   if (threadIdx.x == 0) {
-    rows[BLOCK_SIZE] = (IndexType)-1;
+    keys[BLOCK_SIZE] = (IndexType)-1;
     vals[BLOCK_SIZE] = (ValueType)0;
   }
 
@@ -59,15 +59,15 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
 
   while (i < end) {
     // do full blocks
-    rows[threadIdx.x] = temp_rows[i];
+    keys[threadIdx.x] = temp_keys[i];
     vals[threadIdx.x] = temp_vals[i];
 
     __syncthreads();
 
-    segreduce_block(rows, vals);
+    segreduce_block(keys, vals);
 
-    if (rows[threadIdx.x] != rows[threadIdx.x + 1])
-      y[rows[threadIdx.x]] += vals[threadIdx.x];
+    if (keys[threadIdx.x] != keys[threadIdx.x + 1])
+      out[keys[threadIdx.x]] += vals[threadIdx.x];
 
     __syncthreads();
 
@@ -76,20 +76,20 @@ __launch_bounds__(BLOCK_SIZE, 1) __global__
 
   if (end < num_warps) {
     if (i < num_warps) {
-      rows[threadIdx.x] = temp_rows[i];
+      keys[threadIdx.x] = temp_keys[i];
       vals[threadIdx.x] = temp_vals[i];
     } else {
-      rows[threadIdx.x] = (IndexType)-1;
+      keys[threadIdx.x] = (IndexType)-1;
       vals[threadIdx.x] = (ValueType)0;
     }
 
     __syncthreads();
 
-    segreduce_block(rows, vals);
+    segreduce_block(keys, vals);
 
     if (i < num_warps)
-      if (rows[threadIdx.x] != rows[threadIdx.x + 1])
-        y[rows[threadIdx.x]] += vals[threadIdx.x];
+      if (keys[threadIdx.x] != keys[threadIdx.x + 1])
+        out[keys[threadIdx.x]] += vals[threadIdx.x];
   }
 }
 
