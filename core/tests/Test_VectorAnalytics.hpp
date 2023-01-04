@@ -77,7 +77,7 @@ class VectorAnalyticsTypesTest : public ::testing::Test {
     vec->std = 0;
 
     unsigned long long seed = 5374857;
-    Kokkos::Random_XorShift64_Pool<Morpheus::Serial> rand_pool(seed);
+    Kokkos::Random_XorShift64_Pool<Kokkos::Serial> rand_pool(seed);
     vh_.assign(vh_.size(), rand_pool, -5.0, 5.0);
 
     ValueType mean =
