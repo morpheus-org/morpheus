@@ -99,6 +99,8 @@ typename Vector::value_type std(const Vector& vec,
  * @param in The input vector
  * @param out The output vector containing the counts each value in the input
  * vector occurs
+ *
+ * \note VectorIn must be a vector of unsigned integers.
  */
 template <typename ExecSpace, typename VectorIn, typename VectorOut>
 void count_occurences(const VectorIn& in, VectorOut& out) {
@@ -106,6 +108,8 @@ void count_occurences(const VectorIn& in, VectorOut& out) {
                 "The type VectorIn must be a valid Vector container.");
   static_assert(Morpheus::is_vector_container_v<VectorOut>,
                 "The type VectorOut must be a valid Vector container.");
+  static_assert(std::is_unsigned_v<typename VectorIn::value_type>,
+                "The type VectorIn must have unsigned integer values.");
   Impl::count_occurences<ExecSpace>(in, out);
 }
 

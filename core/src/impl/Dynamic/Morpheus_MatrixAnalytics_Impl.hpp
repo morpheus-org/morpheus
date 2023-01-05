@@ -46,6 +46,20 @@ inline void count_nnz_per_row(
       A.const_formats());
 }
 
+template <typename ExecSpace, typename Matrix, typename Vector>
+inline void count_nnz_per_diagonal(
+    const Matrix& A, Vector& nnz_per_diag, const bool init,
+    typename std::enable_if<
+        Morpheus::is_dynamic_matrix_format_container<Matrix>::value &&
+        Morpheus::is_dense_vector_format_container<Vector>::value>::type* =
+        nullptr) {
+  std::visit(
+      [&](auto&& arg) {
+        Impl::count_nnz_per_diagonal<ExecSpace>(arg, nnz_per_diag, init);
+      },
+      A.const_formats());
+}
+
 }  // namespace Impl
 }  // namespace Morpheus
 

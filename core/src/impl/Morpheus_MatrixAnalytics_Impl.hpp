@@ -25,40 +25,70 @@
 #define MORPHEUS_IMPL_MATRIXANALYTICS_IMPL_HPP
 
 // TODO: Let Cmake autogenerate those
-#include <impl/Coo/Serial/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Coo/OpenMP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Coo/Cuda/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Coo/HIP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Coo/Kokkos/Morpheus_MatrixAnalytics_Impl.hpp>
+#include <impl/Coo/Serial/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Coo/OpenMP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Coo/Cuda/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Coo/HIP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Coo/Kokkos/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Coo/Serial/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Coo/OpenMP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Coo/Cuda/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Coo/HIP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Coo/Kokkos/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
 
-#include <impl/Csr/Serial/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Csr/OpenMP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Csr/Cuda/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Csr/HIP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Csr/Kokkos/Morpheus_MatrixAnalytics_Impl.hpp>
+#include <impl/Csr/Serial/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Csr/OpenMP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Csr/Cuda/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Csr/HIP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Csr/Kokkos/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Csr/Serial/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Csr/OpenMP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Csr/Cuda/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Csr/HIP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Csr/Kokkos/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
 
-#include <impl/Dia/Serial/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Dia/OpenMP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Dia/Cuda/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Dia/HIP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Dia/Kokkos/Morpheus_MatrixAnalytics_Impl.hpp>
+#include <impl/Dia/Serial/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Dia/OpenMP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Dia/Cuda/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Dia/HIP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Dia/Kokkos/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Dia/Serial/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Dia/OpenMP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Dia/Cuda/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Dia/HIP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Dia/Kokkos/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
 
-#include <impl/Ell/Serial/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Ell/OpenMP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Ell/Cuda/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Ell/HIP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Ell/Kokkos/Morpheus_MatrixAnalytics_Impl.hpp>
+#include <impl/Ell/Serial/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Ell/OpenMP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Ell/Cuda/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Ell/HIP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Ell/Kokkos/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Ell/Serial/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Ell/OpenMP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Ell/Cuda/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Ell/HIP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Ell/Kokkos/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
 
-#include <impl/Hyb/Serial/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Hyb/OpenMP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Hyb/Cuda/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Hyb/HIP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Hyb/Kokkos/Morpheus_MatrixAnalytics_Impl.hpp>
+#include <impl/Hyb/Serial/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Hyb/OpenMP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Hyb/Cuda/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Hyb/HIP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Hyb/Kokkos/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Hyb/Serial/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Hyb/OpenMP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Hyb/Cuda/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Hyb/HIP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Hyb/Kokkos/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
 
-#include <impl/Hdc/Serial/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Hdc/OpenMP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Hdc/Cuda/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Hdc/HIP/Morpheus_MatrixAnalytics_Impl.hpp>
-#include <impl/Hdc/Kokkos/Morpheus_MatrixAnalytics_Impl.hpp>
+#include <impl/Hdc/Serial/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Hdc/OpenMP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Hdc/Cuda/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Hdc/HIP/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Hdc/Kokkos/Morpheus_NonZeros_Per_Row_Impl.hpp>
+#include <impl/Hdc/Serial/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Hdc/OpenMP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Hdc/Cuda/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Hdc/HIP/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
+#include <impl/Hdc/Kokkos/Morpheus_NonZeros_Per_Diagonal_Impl.hpp>
 
 #endif  // MORPHEUS_IMPL_MATRIXANALYTICS_IMPL_HPP

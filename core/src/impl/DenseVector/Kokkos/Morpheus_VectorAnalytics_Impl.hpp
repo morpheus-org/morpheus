@@ -120,18 +120,6 @@ typename Vector::value_type std(
   return sqrt(result / (value_type)size);
 }
 
-template <typename ExecSpace, typename VectorIn, typename VectorOut>
-void count_occurences(
-    const VectorIn& in, VectorOut& out,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<VectorIn> &&
-        Morpheus::is_dense_vector_format_container_v<VectorOut> &&
-        Morpheus::has_generic_backend_v<ExecSpace> &&
-        Morpheus::has_access_v<ExecSpace, VectorIn, VectorOut>>* = nullptr) {
-  using backend = Morpheus::CustomBackend<typename ExecSpace::execution_space>;
-  Impl::count_occurences<backend>(in, out);
-}
-
 template <typename ExecSpace, typename Vector>
 typename Vector::size_type count_nnz(
     const Vector& vec, typename Vector::value_type threshold,

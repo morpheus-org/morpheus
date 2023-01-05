@@ -191,6 +191,23 @@ typename Matrix::size_type std_nnnz(const Matrix& A) {
                                   A.nnnz() / A.nrows());
 }
 
+/**
+ * @brief Counts the number of the diagonals of the matrix with at least one
+ * non-zero.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam Matrix The type of the input matrix
+ * @param A The input matrix
+ * @param nnz_per_diagonal A vector containing the number of non-zeros per
+ * diagonal
+ * @param init Whether to initialize nnz_per_row to zero.
+ */
+template <typename ExecSpace, typename Matrix, typename Vector>
+void count_nnz_per_diagonal(const Matrix& A, Vector& nnz_per_diagonal,
+                            const bool init = true) {
+  Impl::count_nnz_per_diagonal<ExecSpace>(A, nnz_per_diagonal, init);
+}
+
 /*! \}  // end of analytics group
  */
 }  // namespace Morpheus

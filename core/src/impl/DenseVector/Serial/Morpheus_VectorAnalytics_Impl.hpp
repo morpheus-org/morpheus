@@ -33,9 +33,6 @@
 #include <Morpheus_Spaces.hpp>
 
 #include <impl/DenseVector/Kokkos/Morpheus_VectorAnalytics_Impl.hpp>
-#include <impl/DenseVector/Serial/Morpheus_Scan_Impl.hpp>
-
-#include <Kokkos_Sort.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -75,38 +72,6 @@ typename Vector::value_type std(
         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using backend = Morpheus::GenericBackend<typename ExecSpace::execution_space>;
   return Impl::std<backend>(in, size, mean);
-}
-
-template <typename ExecSpace, typename VectorIn, typename VectorOut>
-void count_occurences(
-    const VectorIn& in, VectorOut& out,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<VectorIn> &&
-        Morpheus::is_dense_vector_format_container_v<VectorOut> &&
-        Morpheus::has_custom_backend_v<ExecSpace> &&
-        Morpheus::has_serial_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<ExecSpace, VectorIn, VectorOut>>* = nullptr) {
-  using size_type  = typename VectorIn::size_type;
-  using value_type = typename VectorOut::value_type;
-  using index_type = typename VectorIn::value_type;
-
-  Kokkos::sort(in.const_view());
-
-  VectorOut vals(in.size(), 1);
-  index_type prev_key   = in[0];
-  value_type prev_value = vals[0];
-
-  out[in[0]] = vals[0];
-  for (size_type i = 1; i < in.size(); i++) {
-    index_type key = in[i];
-    if (prev_key == key) {
-      out[key] = prev_value = prev_value + vals[i];
-    } else {
-      out[key] = prev_value = vals[i];
-    }
-
-    prev_key = key;
-  }
 }
 
 template <typename ExecSpace, typename Vector>

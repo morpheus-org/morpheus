@@ -1,5 +1,5 @@
 /**
- * Morpheus_VectorAnalytics_Impl.hpp
+ * Morpheus_Count_Occurences_Impl.hpp
  *
  * EPCC, The University of Edinburgh
  *
@@ -21,19 +21,35 @@
  * limitations under the License.
  */
 
-#ifndef MORPHEUS_IMPL_VECTORANALYTICS_IMPL_HPP
-#define MORPHEUS_IMPL_VECTORANALYTICS_IMPL_HPP
+#ifndef MORPHEUS_DENSEVECTOR_KOKKOS_COUNT_OCCURENCES_IMPL_HPP
+#define MORPHEUS_DENSEVECTOR_KOKKOS_COUNT_OCCURENCES_IMPL_HPP
 
-#include <impl/DenseVector/Serial/Morpheus_VectorAnalytics_Impl.hpp>
-#include <impl/DenseVector/OpenMP/Morpheus_VectorAnalytics_Impl.hpp>
-#include <impl/DenseVector/Cuda/Morpheus_VectorAnalytics_Impl.hpp>
-#include <impl/DenseVector/HIP/Morpheus_VectorAnalytics_Impl.hpp>
-#include <impl/DenseVector/Kokkos/Morpheus_VectorAnalytics_Impl.hpp>
+#include <Morpheus_SpaceTraits.hpp>
+#include <Morpheus_FormatTraits.hpp>
+#include <Morpheus_FormatTags.hpp>
+#include <Morpheus_Spaces.hpp>
 
 #include <impl/DenseVector/Serial/Morpheus_Count_Occurences_Impl.hpp>
 #include <impl/DenseVector/OpenMP/Morpheus_Count_Occurences_Impl.hpp>
 #include <impl/DenseVector/Cuda/Morpheus_Count_Occurences_Impl.hpp>
 #include <impl/DenseVector/HIP/Morpheus_Count_Occurences_Impl.hpp>
-#include <impl/DenseVector/Kokkos/Morpheus_Count_Occurences_Impl.hpp>
 
-#endif  // MORPHEUS_IMPL_VECTORANALYTICS_IMPL_HPP
+namespace Morpheus {
+namespace Impl {
+
+template <typename ExecSpace, typename VectorIn, typename VectorOut>
+void count_occurences(
+    const VectorIn& in, VectorOut& out,
+    typename std::enable_if_t<
+        Morpheus::is_dense_vector_format_container_v<VectorIn> &&
+        Morpheus::is_dense_vector_format_container_v<VectorOut> &&
+        Morpheus::has_generic_backend_v<ExecSpace> &&
+        Morpheus::has_access_v<ExecSpace, VectorIn, VectorOut>>* = nullptr) {
+  using backend = Morpheus::CustomBackend<typename ExecSpace::execution_space>;
+  Impl::count_occurences<backend>(in, out);
+}
+
+}  // namespace Impl
+}  // namespace Morpheus
+
+#endif  // MORPHEUS_DENSEVECTOR_KOKKOS_COUNT_OCCURENCES_IMPL_HPP

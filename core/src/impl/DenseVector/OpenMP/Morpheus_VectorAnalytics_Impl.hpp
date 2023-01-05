@@ -34,8 +34,6 @@
 
 #include <impl/DenseVector/Kokkos/Morpheus_VectorAnalytics_Impl.hpp>
 
-#include <Kokkos_Sort.hpp>
-
 namespace Morpheus {
 namespace Impl {
 
@@ -74,66 +72,6 @@ typename Vector::value_type std(
         Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using backend = Morpheus::GenericBackend<typename ExecSpace::execution_space>;
   return Impl::std<backend>(in, size, mean);
-}
-
-template <typename ExecSpace, typename VectorIn, typename VectorOut>
-void count_occurences(
-    const VectorIn& in, VectorOut& out,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<VectorIn> &&
-        Morpheus::is_dense_vector_format_container_v<VectorOut> &&
-        Morpheus::has_custom_backend_v<ExecSpace> &&
-        Morpheus::has_openmp_execution_space_v<ExecSpace> &&
-        Morpheus::has_access_v<ExecSpace, VectorIn, VectorOut>>* = nullptr) {
-  using size_type  = typename VectorIn::size_type;
-  using value_type = typename VectorOut::value_type;
-  using index_type = typename VectorIn::value_type;
-
-  Kokkos::sort(in.const_view());
-
-  VectorOut vals(in.size(), 1);
-
-  const size_type keys         = in.size();
-  const size_type sentinel_key = keys + 1;
-
-#pragma omp parallel
-  {
-    const size_type num_threads = omp_get_num_threads();
-    const size_type work_per_thread =
-        Impl::ceil_div<size_type>(keys, num_threads);
-    const size_type thread_id = omp_get_thread_num();
-    const size_type begin     = work_per_thread * thread_id;
-    const size_type end       = std::min(begin + work_per_thread, keys);
-    size_type n               = begin;
-
-    if (begin < end) {
-      const index_type first = begin > 0 ? in[begin - 1] : sentinel_key;
-      const index_type last  = end < keys ? in[end] : sentinel_key;
-
-      // handle key overlap with previous thread
-      if (first != (index_type)sentinel_key) {
-        value_type partial_sum = value_type(0);
-        for (; n < end && in[n] == first; n++) {
-          partial_sum += vals[n];
-        }
-        Impl::atomic_add(&out[first], partial_sum);
-      }
-
-      // handle non-overlapping keys
-      for (; n < end && in[n] != last; n++) {
-        out[in[n]] += vals[n];
-      }
-
-      // handle key overlap with following thread
-      if (last != (index_type)sentinel_key) {
-        value_type partial_sum = value_type(0);
-        for (; n < end; n++) {
-          partial_sum += vals[n];
-        }
-        Impl::atomic_add(&out[last], partial_sum);
-      }
-    }
-  }
 }
 
 template <typename ExecSpace, typename Vector>
