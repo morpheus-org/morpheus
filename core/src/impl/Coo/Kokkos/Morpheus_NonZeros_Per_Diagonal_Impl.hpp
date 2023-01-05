@@ -56,8 +56,6 @@ void count_nnz_per_diagonal(
                   "Destination vector must have equal size to the source "
                   "matrix number of diagonals (i.e NROWS + NCOLS - 1)");
 
-  if (A.nnnz() == 0) return;
-
   const index_array column_indices = A.ccolumn_indices().const_view(),
                     row_indices    = A.crow_indices().const_view();
 

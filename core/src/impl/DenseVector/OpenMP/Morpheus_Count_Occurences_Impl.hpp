@@ -52,8 +52,6 @@ void count_occurences(
 
   Kokkos::sort(in.const_view());
 
-  VectorOut vals(in.size(), 1);
-
   const size_type keys         = in.size();
   const size_type sentinel_key = keys + 1;
 
@@ -75,21 +73,21 @@ void count_occurences(
       if (first != (index_type)sentinel_key) {
         value_type partial_sum = value_type(0);
         for (; n < end && in[n] == first; n++) {
-          partial_sum += vals[n];
+          partial_sum++;
         }
         Impl::atomic_add(&out[first], partial_sum);
       }
 
       // handle non-overlapping keys
       for (; n < end && in[n] != last; n++) {
-        out[in[n]] += vals[n];
+        out[in[n]]++;
       }
 
       // handle key overlap with following thread
       if (last != (index_type)sentinel_key) {
         value_type partial_sum = value_type(0);
         for (; n < end; n++) {
-          partial_sum += vals[n];
+          partial_sum++;
         }
         Impl::atomic_add(&out[last], partial_sum);
       }

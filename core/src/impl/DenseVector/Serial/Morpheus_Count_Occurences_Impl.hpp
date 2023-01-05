@@ -47,24 +47,20 @@ void count_occurences(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, VectorIn, VectorOut>>* = nullptr) {
   using size_type  = typename VectorIn::size_type;
-  using value_type = typename VectorOut::value_type;
   using index_type = typename VectorIn::value_type;
 
+  if (in.size() == 0) return;
+
   Kokkos::sort(in.const_view());
-
-  VectorOut vals(in.size(), 1);
   index_type prev_key = in[0];
-  // value_type prev_value = vals[0];
 
-  out[in[0]] += vals[0];
+  out[in[0]]++;
   for (size_type i = 1; i < in.size(); i++) {
     index_type key = in[i];
     if (prev_key == key) {
-      // out[key] = prev_value = prev_value + vals[i];
-      out[key] += vals[i];
+      out[key]++;
     } else {
-      // out[key] = prev_value = vals[i];
-      out[key] += vals[i];
+      out[key]++;
     }
 
     prev_key = key;
