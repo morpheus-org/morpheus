@@ -131,6 +131,98 @@ class DynamicMatrixAnalyticsTypesTest : public ::testing::Test {
   }
 };
 
+template <typename Containers>
+class DynamicDiagonalAnalyticsTypesTest : public ::testing::Test {
+ public:
+  using type            = Containers;
+  using mat_container_t = typename Containers::type;
+  using vec_container_t =
+      Morpheus::DenseVector<typename mat_container_t::index_type,
+                            typename mat_container_t::index_type,
+                            typename mat_container_t::array_layout,
+                            typename mat_container_t::backend>;
+  using mat_dev_t         = typename mat_container_t::type;
+  using mat_host_t        = typename mat_container_t::type::HostMirror;
+  using vec_dev_t         = typename vec_container_t::type;
+  using vec_host_t        = typename vec_container_t::type::HostMirror;
+  using SizeType          = typename mat_dev_t::size_type;
+  using ValueType         = typename mat_dev_t::value_type;
+  using IndexType         = typename mat_dev_t::index_type;
+  using ArrayLayout       = typename mat_dev_t::array_layout;
+  using Backend           = typename mat_dev_t::backend;
+  using MirrorArrayLayout = typename mat_host_t::array_layout;
+  using MirrorBackend     = typename mat_host_t::backend;
+
+  class ContainersClass {
+   public:
+    using diag_generator = Morpheus::Test::AntiDiagonalMatrixGenerator<
+        ValueType, IndexType, MirrorArrayLayout, MirrorBackend>;
+
+    mat_dev_t A;
+    vec_dev_t nnz_per_diag;
+
+    ContainersClass() : A(), nnz_per_diag() {}
+
+    ContainersClass(SizeType nrows, SizeType ncols,
+                    std::vector<int>& diag_indexes)
+        : A(), nnz_per_diag(nrows + ncols - 1, 0) {
+      // Generate the diagonal matrix
+      diag_generator generator(nrows, ncols, diag_indexes);
+      typename diag_generator::DenseMatrix Adense;
+      typename diag_generator::SparseMatrix Acoo;
+      Adense = generator.generate();
+      generator.generate(Acoo);
+
+      // Assign Coo Host matrix to Dynamic Host container
+      mat_host_t Ah = Acoo;
+
+      // Copy on device
+      A.resize(Ah);
+      Morpheus::copy(Ah, A);
+
+      auto nnz_per_diag_h = Morpheus::create_mirror_container(nnz_per_diag);
+      nnz_per_diag_h.assign(nnz_per_diag_h.size(), 0);
+
+      for (SizeType i = 0; i < nrows; i++) {
+        for (SizeType j = 0; j < ncols; j++) {
+          if (Adense(i, j) != 0) {
+            auto idx = j - i + nrows - 1;
+            nnz_per_diag_h(idx)++;
+          }
+        }
+      }
+      Morpheus::copy(nnz_per_diag_h, nnz_per_diag);
+    }
+  };
+
+  static const int samples = 3;
+  SizeType nrows[samples]  = {10, 100, 1000};
+  SizeType ncols[samples]  = {10, 100, 1000};
+
+  ContainersClass containers[samples];
+
+  void SetUp() override {
+    for (SizeType i = 0; i < samples; i++) {
+      int diag_freq = 3;
+      int ndiags    = ((nrows[i] - 1) / diag_freq) * 2 + 1;
+      std::vector<int> diags(ndiags, 0);
+
+      diags[0]            = 0;
+      SizeType diag_count = 1;
+      for (int nd = 1; nd < (int)nrows[i]; nd++) {
+        if (nd % diag_freq == 0) {
+          diags[diag_count]     = nd;
+          diags[diag_count + 1] = -nd;
+          diag_count += 2;
+        }
+      }
+
+      ContainersClass c(nrows[i], ncols[i], diags);
+      containers[i] = c;
+    }
+  }
+};
+
 namespace Test {
 
 TYPED_TEST_SUITE(DynamicMatrixAnalyticsTypesTest, DynamicMatrixAnalyticsTypes);
@@ -516,6 +608,141 @@ TYPED_TEST(DynamicMatrixAnalyticsTypesTest, StdNnnzGeneric) {
 
       auto std = Morpheus::std_nnnz<TEST_GENERIC_SPACE>(A);
       EXPECT_EQ(std, c.std);
+    }
+  }
+}
+
+TYPED_TEST_SUITE(DynamicDiagonalAnalyticsTypesTest,
+                 DynamicMatrixAnalyticsTypes);
+
+TYPED_TEST(DynamicDiagonalAnalyticsTypesTest, NonZerosPerDiagonalCustomInit) {
+  using vec_t     = typename TestFixture::vec_dev_t;
+  using size_type = typename TestFixture::SizeType;
+  using backend   = typename TestFixture::Backend;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->containers[i];
+
+    // Create a duplicate of A on host
+    auto Ah = Morpheus::create_mirror(c.A);
+    Morpheus::copy(c.A, Ah);
+
+    for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Convert to the new active state
+      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      auto A = Morpheus::create_mirror_container<backend>(Ah);
+      Morpheus::copy(Ah, A);
+
+      vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 1);
+      Morpheus::count_nnz_per_diagonal<TEST_CUSTOM_SPACE>(A, nnz_per_diag);
+
+      EXPECT_FALSE(Morpheus::Test::is_empty_container(nnz_per_diag));
+      EXPECT_TRUE(Morpheus::Test::have_same_data(c.nnz_per_diag, nnz_per_diag));
+    }
+  }
+}
+
+TYPED_TEST(DynamicDiagonalAnalyticsTypesTest, NonZerosPerDiagonalGenericInit) {
+  using vec_t     = typename TestFixture::vec_dev_t;
+  using size_type = typename TestFixture::SizeType;
+  using backend   = typename TestFixture::Backend;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->containers[i];
+
+    // Create a duplicate of A on host
+    auto Ah = Morpheus::create_mirror(c.A);
+    Morpheus::copy(c.A, Ah);
+
+    for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Convert to the new active state
+      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      auto A = Morpheus::create_mirror_container<backend>(Ah);
+      Morpheus::copy(Ah, A);
+
+      vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 1);
+      Morpheus::count_nnz_per_diagonal<TEST_GENERIC_SPACE>(A, nnz_per_diag);
+
+      EXPECT_FALSE(Morpheus::Test::is_empty_container(nnz_per_diag));
+      EXPECT_TRUE(Morpheus::Test::have_same_data(c.nnz_per_diag, nnz_per_diag));
+    }
+  }
+}
+
+TYPED_TEST(DynamicDiagonalAnalyticsTypesTest, NonZerosPerDiagonalCustom) {
+  using vec_t     = typename TestFixture::vec_dev_t;
+  using size_type = typename TestFixture::SizeType;
+  using backend   = typename TestFixture::Backend;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->containers[i];
+
+    // Create a duplicate of A on host
+    auto Ah = Morpheus::create_mirror(c.A);
+    Morpheus::copy(c.A, Ah);
+
+    for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Convert to the new active state
+      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      auto A = Morpheus::create_mirror_container<backend>(Ah);
+      Morpheus::copy(Ah, A);
+
+      vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 1);
+      Morpheus::count_nnz_per_diagonal<TEST_CUSTOM_SPACE>(A, nnz_per_diag,
+                                                          false);
+
+      EXPECT_FALSE(Morpheus::Test::is_empty_container(nnz_per_diag));
+      EXPECT_FALSE(
+          Morpheus::Test::have_same_data(c.nnz_per_diag, nnz_per_diag));
+
+      auto nnz_per_diag_h = Morpheus::create_mirror_container(nnz_per_diag);
+      Morpheus::copy(nnz_per_diag, nnz_per_diag_h);
+      auto cnnz_per_diag_h = Morpheus::create_mirror(c.nnz_per_diag);
+      Morpheus::copy(c.nnz_per_diag, cnnz_per_diag_h);
+      for (size_type n = 0; n < cnnz_per_diag_h.size(); n++) {
+        cnnz_per_diag_h(n) += 1;
+      }
+      EXPECT_TRUE(
+          Morpheus::Test::have_same_data(cnnz_per_diag_h, nnz_per_diag_h));
+    }
+  }
+}
+
+TYPED_TEST(DynamicDiagonalAnalyticsTypesTest, NonZerosPerDiagonalGeneric) {
+  using vec_t     = typename TestFixture::vec_dev_t;
+  using size_type = typename TestFixture::SizeType;
+  using backend   = typename TestFixture::Backend;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->containers[i];
+
+    // Create a duplicate of A on host
+    auto Ah = Morpheus::create_mirror(c.A);
+    Morpheus::copy(c.A, Ah);
+
+    for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Convert to the new active state
+      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      auto A = Morpheus::create_mirror_container<backend>(Ah);
+      Morpheus::copy(Ah, A);
+
+      vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 1);
+      Morpheus::count_nnz_per_diagonal<TEST_GENERIC_SPACE>(A, nnz_per_diag,
+                                                           false);
+
+      EXPECT_FALSE(Morpheus::Test::is_empty_container(nnz_per_diag));
+      EXPECT_FALSE(
+          Morpheus::Test::have_same_data(c.nnz_per_diag, nnz_per_diag));
+
+      auto nnz_per_diag_h = Morpheus::create_mirror_container(nnz_per_diag);
+      Morpheus::copy(nnz_per_diag, nnz_per_diag_h);
+      auto cnnz_per_diag_h = Morpheus::create_mirror(c.nnz_per_diag);
+      Morpheus::copy(c.nnz_per_diag, cnnz_per_diag_h);
+      for (size_type n = 0; n < cnnz_per_diag_h.size(); n++) {
+        cnnz_per_diag_h(n) += 1;
+      }
+      EXPECT_TRUE(
+          Morpheus::Test::have_same_data(cnnz_per_diag_h, nnz_per_diag_h));
     }
   }
 }

@@ -140,7 +140,7 @@ typename Vector::size_type count_nnz(
   Kokkos::parallel_reduce(
       "count_nnz", policy,
       KOKKOS_LAMBDA(const size_type& i, size_type& lsum) {
-        if (in_view[i] > threshold) {
+        if (in_view[i] > threshold && in_view[i] != 0) {
           lsum += 1;
         }
       },

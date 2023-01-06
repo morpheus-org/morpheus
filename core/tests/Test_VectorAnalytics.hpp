@@ -57,13 +57,14 @@ class VectorAnalyticsTypesTest : public ::testing::Test {
           std((ValueType)0) {}
   };
 
-  IndexType sizes[3] = {50, 5000, 50000};
+  static const SizeType samples = 3;
+  IndexType sizes[samples]      = {50, 5000, 50000};
 
-  struct vectors vecs[3] = {vectors(sizes[0]), vectors(sizes[1]),
-                            vectors(sizes[2])};
+  struct vectors vecs[samples] = {vectors(sizes[0]), vectors(sizes[1]),
+                                  vectors(sizes[2])};
 
   void SetUp() override {
-    for (SizeType i = 0; i < 3; i++) {
+    for (SizeType i = 0; i < samples; i++) {
       local_setup(&vecs[i]);
     }
   }
@@ -89,6 +90,59 @@ class VectorAnalyticsTypesTest : public ::testing::Test {
       vec->std += (vh_(i) - mean) * (vh_(i) - mean);
     }
     vec->std = sqrt(vec->std / (ValueType)vec->size);
+    Morpheus::copy(vh_, vec->v);
+  }
+};
+
+template <typename Containers>
+class SparseVectorTypesTest : public ::testing::Test {
+ public:
+  using type       = Containers;
+  using src_t      = typename Containers::type;
+  using src_dev_t  = typename src_t::type;
+  using src_host_t = typename src_t::type::HostMirror;
+  using SizeType   = typename src_t::size_type;
+  using ValueType  = typename src_t::value_type;
+  using IndexType  = typename src_t::index_type;
+
+  struct vectors {
+    src_dev_t v;
+    SizeType size;
+    SizeType ctr, threshold_ctr;
+
+    vectors(SizeType _size)
+        : v(_size, 0), size(_size), ctr(0), threshold_ctr(0) {}
+  };
+
+  static const SizeType samples = 3;
+  IndexType sizes[samples]      = {50, 5000, 50000};
+
+  struct vectors vecs[samples] = {vectors(sizes[0]), vectors(sizes[1]),
+                                  vectors(sizes[2])};
+
+  void SetUp() override {
+    for (SizeType i = 0; i < samples; i++) {
+      local_setup(&vecs[i]);
+    }
+  }
+
+ private:
+  void local_setup(struct vectors* vec) {
+    src_host_t vh_(vec->size, 0);
+    vh_.assign(vh_.size(), 0);
+
+    for (SizeType i = 0; i < vec->size; i += 10) {
+      vh_[i] = i * 1.11;
+    }
+
+    for (SizeType i = 0; i < vec->size; i++) {
+      if (vh_[i] > (ValueType)vh_.size() / 2) {
+        vec->threshold_ctr++;
+      }
+      if (vh_[i] != 0) {
+        vec->ctr++;
+      }
+    }
     Morpheus::copy(vh_, vec->v);
   }
 };
@@ -128,7 +182,7 @@ TYPED_TEST(VectorAnalyticsTypesTest, MaxCustom) {
   using value_type = typename TestFixture::ValueType;
   using size_type  = typename TestFixture::SizeType;
 
-  for (size_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto v      = this->vecs[i];
     auto result = Morpheus::max<TEST_CUSTOM_SPACE>(v.v, v.size);
     MORPHEUS_VALIDATE_MINMAX(value_type, result, v.max);
@@ -139,7 +193,7 @@ TYPED_TEST(VectorAnalyticsTypesTest, MaxGeneric) {
   using value_type = typename TestFixture::ValueType;
   using size_type  = typename TestFixture::SizeType;
 
-  for (size_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto v = this->vecs[i];
 
     auto result = Morpheus::max<TEST_GENERIC_SPACE>(v.v, v.size);
@@ -151,7 +205,7 @@ TYPED_TEST(VectorAnalyticsTypesTest, MinCustom) {
   using value_type = typename TestFixture::ValueType;
   using size_type  = typename TestFixture::SizeType;
 
-  for (size_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto v = this->vecs[i];
 
     auto result = Morpheus::min<TEST_CUSTOM_SPACE>(v.v, v.size);
@@ -163,7 +217,7 @@ TYPED_TEST(VectorAnalyticsTypesTest, MinGeneric) {
   using value_type = typename TestFixture::ValueType;
   using size_type  = typename TestFixture::SizeType;
 
-  for (size_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto v = this->vecs[i];
 
     auto result = Morpheus::min<TEST_GENERIC_SPACE>(v.v, v.size);
@@ -175,7 +229,7 @@ TYPED_TEST(VectorAnalyticsTypesTest, StdCustom) {
   using value_type = typename TestFixture::ValueType;
   using size_type  = typename TestFixture::SizeType;
 
-  for (size_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto v = this->vecs[i];
 
     value_type mean = Morpheus::reduce<TEST_CUSTOM_SPACE>(v.v, v.size) / v.size;
@@ -188,7 +242,7 @@ TYPED_TEST(VectorAnalyticsTypesTest, StdGeneric) {
   using value_type = typename TestFixture::ValueType;
   using size_type  = typename TestFixture::SizeType;
 
-  for (size_type i = 0; i < 3; i++) {
+  for (size_type i = 0; i < this->samples; i++) {
     auto v = this->vecs[i];
 
     value_type mean =
@@ -198,22 +252,66 @@ TYPED_TEST(VectorAnalyticsTypesTest, StdGeneric) {
   }
 }
 
-TEST(VectorOccurences, CountOccurencesCustom) {
-  using Vector     = Morpheus::DenseVector<int, size_t, TEST_CUSTOM_SPACE>;
-  using value_type = typename Vector::value_type;
+TYPED_TEST_SUITE(SparseVectorTypesTest, VectorAnalyticsTypes);
 
-  Vector keys(1000, 0), out(100, 0);
+TYPED_TEST(SparseVectorTypesTest, CountNnzCustom) {
+  using size_type = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->vecs[i];
+
+    auto nnnz = Morpheus::count_nnz<TEST_CUSTOM_SPACE>(c.v);
+    EXPECT_EQ(c.ctr, nnnz);
+  }
+}
+
+TYPED_TEST(SparseVectorTypesTest, CountNnzCustomThreshold) {
+  using size_type = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->vecs[i];
+
+    auto nnnz = Morpheus::count_nnz<TEST_CUSTOM_SPACE>(c.v, c.v.size() / 2);
+    EXPECT_EQ(c.threshold_ctr, nnnz);
+  }
+}
+
+TYPED_TEST(SparseVectorTypesTest, CountNnzGeneric) {
+  using size_type = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->vecs[i];
+
+    auto nnnz = Morpheus::count_nnz<TEST_GENERIC_SPACE>(c.v);
+    EXPECT_EQ(c.ctr, nnnz);
+  }
+}
+
+TYPED_TEST(SparseVectorTypesTest, CountNnzGenericThreshold) {
+  using size_type = typename TestFixture::SizeType;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->vecs[i];
+
+    auto nnnz = Morpheus::count_nnz<TEST_GENERIC_SPACE>(c.v, c.v.size() / 2);
+    EXPECT_EQ(c.threshold_ctr, nnnz);
+  }
+}
+
+TEST(VectorOccurences, CountOccurencesCustom) {
+  using Vector    = Morpheus::DenseVector<size_t, size_t, TEST_CUSTOM_SPACE>;
+  using size_type = typename Vector::size_type;
+
+  size_type total_keys = 1000, total_out = 100;
+  Vector keys(total_keys, 0), out(total_out, 0);
 
   unsigned long long seed = 5374857;
   Kokkos::Random_XorShift64_Pool<typename TEST_CUSTOM_SPACE::execution_space>
       rand_pool(seed);
-  keys.assign(keys.size(), rand_pool, 0, 100);
-  typename Vector::HostMirror ref_out_h(100, 0);
+  keys.assign(keys.size(), rand_pool, 0, total_out);
+  typename Vector::HostMirror ref_out_h(total_out, 0);
 
   Morpheus::count_occurences<TEST_CUSTOM_SPACE>(keys, out);
-
-  auto ndiags     = Morpheus::count_nnz<TEST_CUSTOM_SPACE>(out);
-  auto real_diags = Morpheus::count_nnz<TEST_CUSTOM_SPACE>(out, out.size() / 2);
 
   auto keys_h = Morpheus::create_mirror_container(keys);
   Morpheus::copy(keys, keys_h);
@@ -221,14 +319,32 @@ TEST(VectorOccurences, CountOccurencesCustom) {
     ref_out_h[keys_h[i]]++;
   }
 
-  size_t ctr = 0;
-  for (size_t i = 0; i < ref_out_h.size(); i++) {
-    if (ref_out_h[i] > 0) ctr++;
-  }
+  auto out_h = Morpheus::create_mirror_container(out);
+  Morpheus::copy(out, out_h);
 
-  size_t real_ctr = 0;
-  for (size_t i = 0; i < ref_out_h.size(); i++) {
-    if (ref_out_h[i] > (value_type)out.size() / 2) real_ctr++;
+  EXPECT_FALSE(Morpheus::Test::is_empty_container(out_h));
+  EXPECT_TRUE(Morpheus::Test::have_same_data(ref_out_h, out_h));
+}
+
+TEST(VectorOccurences, CountOccurencesGeneric) {
+  using Vector    = Morpheus::DenseVector<size_t, size_t, TEST_CUSTOM_SPACE>;
+  using size_type = typename Vector::size_type;
+
+  size_type total_keys = 1000, total_out = 100;
+  Vector keys(total_keys, 0), out(total_out, 0);
+
+  unsigned long long seed = 5374857;
+  Kokkos::Random_XorShift64_Pool<typename TEST_CUSTOM_SPACE::execution_space>
+      rand_pool(seed);
+  keys.assign(keys.size(), rand_pool, 0, total_out);
+  typename Vector::HostMirror ref_out_h(total_out, 0);
+
+  Morpheus::count_occurences<TEST_GENERIC_SPACE>(keys, out);
+
+  auto keys_h = Morpheus::create_mirror_container(keys);
+  Morpheus::copy(keys, keys_h);
+  for (size_t i = 0; i < keys.size(); i++) {
+    ref_out_h[keys_h[i]]++;
   }
 
   auto out_h = Morpheus::create_mirror_container(out);
@@ -236,8 +352,6 @@ TEST(VectorOccurences, CountOccurencesCustom) {
 
   EXPECT_FALSE(Morpheus::Test::is_empty_container(out_h));
   EXPECT_TRUE(Morpheus::Test::have_same_data(ref_out_h, out_h));
-  EXPECT_EQ(ctr, ndiags);
-  EXPECT_EQ(real_ctr, real_diags);
 }
 
 }  // namespace Test
