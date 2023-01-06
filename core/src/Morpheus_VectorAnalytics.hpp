@@ -108,7 +108,7 @@ void count_occurences(const VectorIn& in, VectorOut& out) {
                 "The type VectorIn must be a valid Vector container.");
   static_assert(Morpheus::is_vector_container_v<VectorOut>,
                 "The type VectorOut must be a valid Vector container.");
-  static_assert(std::is_unsigned_v<typename VectorIn::value_type>,
+  static_assert(std::is_integral_v<typename VectorIn::value_type>,
                 "The type VectorIn must have unsigned integer values.");
   Impl::count_occurences<ExecSpace>(in, out);
 }

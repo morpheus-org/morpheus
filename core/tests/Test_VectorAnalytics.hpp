@@ -298,8 +298,17 @@ TYPED_TEST(SparseVectorTypesTest, CountNnzGenericThreshold) {
   }
 }
 
-TEST(VectorOccurences, CountOccurencesCustom) {
-  using Vector    = Morpheus::DenseVector<size_t, size_t, TEST_CUSTOM_SPACE>;
+using IntegralTypes = ::testing::Types<int, long long>;
+template <typename T>
+class VectorIntegralOccurences : public testing::Test {
+ public:
+  using IndexType = T;
+};
+TYPED_TEST_SUITE(VectorIntegralOccurences, IntegralTypes);
+
+TYPED_TEST(VectorIntegralOccurences, CountOccurencesCustom) {
+  using Vector = Morpheus::DenseVector<typename TestFixture::IndexType, size_t,
+                                       TEST_CUSTOM_SPACE>;
   using size_type = typename Vector::size_type;
 
   size_type total_keys = 1000, total_out = 100;
@@ -326,15 +335,16 @@ TEST(VectorOccurences, CountOccurencesCustom) {
   EXPECT_TRUE(Morpheus::Test::have_same_data(ref_out_h, out_h));
 }
 
-TEST(VectorOccurences, CountOccurencesGeneric) {
-  using Vector    = Morpheus::DenseVector<size_t, size_t, TEST_CUSTOM_SPACE>;
+TYPED_TEST(VectorIntegralOccurences, CountOccurencesGeneric) {
+  using Vector = Morpheus::DenseVector<typename TestFixture::IndexType, size_t,
+                                       TEST_GENERIC_SPACE>;
   using size_type = typename Vector::size_type;
 
   size_type total_keys = 1000, total_out = 100;
   Vector keys(total_keys, 0), out(total_out, 0);
 
   unsigned long long seed = 5374857;
-  Kokkos::Random_XorShift64_Pool<typename TEST_CUSTOM_SPACE::execution_space>
+  Kokkos::Random_XorShift64_Pool<typename TEST_GENERIC_SPACE::execution_space>
       rand_pool(seed);
   keys.assign(keys.size(), rand_pool, 0, total_out);
   typename Vector::HostMirror ref_out_h(total_out, 0);

@@ -50,7 +50,7 @@ void count_nnz_per_diagonal(
   using value_array_type = typename Matrix::value_array_type::value_array_type;
   using index_array_type = typename Matrix::index_array_type::value_array_type;
   using IndexVector =
-      Morpheus::DenseVector<size_type, size_type, typename Matrix::backend>;
+      Morpheus::DenseVector<index_type, size_type, typename Matrix::backend>;
 
   MORPHEUS_ASSERT(nnz_per_diagonal.size() == A.nrows() + A.ncols() - 1,
                   "Destination vector must have equal size to the source "
@@ -106,6 +106,7 @@ void count_nnz_per_diagonal(
   // Kokkos::fence();
 
   // parallelize over rows to find the nnnz per diagonal
+  size_type nrows = A.nrows();
   IndexVector diag_idx(A.nnnz(), 0);
   typename IndexVector::value_array_type diag_view = diag_idx.view();
   range_policy range(0, A.nrows());
@@ -117,7 +118,7 @@ void count_nnz_per_diagonal(
           if (col != invalid_index &&
               values(i, jj - mirror_offsets_view[i]) != 0) {
             // Diagonal index is offseted by the number of rows
-            diag_view[jj] = col - i + A.nrows() - 1;
+            diag_view[jj] = col - i + nrows - 1;
           }
         }
       });

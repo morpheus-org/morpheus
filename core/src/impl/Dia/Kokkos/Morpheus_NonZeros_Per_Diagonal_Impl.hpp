@@ -62,12 +62,13 @@ void count_nnz_per_diagonal(
     nnz_per_diagonal.assign(nnz_per_diagonal.size(), 0);
   }
 
+  size_type nrows = A.nrows();
   range_policy policy(0, ndiag);
 
   Kokkos::parallel_for(
       policy, KOKKOS_LAMBDA(const size_type i) {
         for (size_type j = 0; j < values.extent(0); j++) {
-          auto diag_idx = diagonal_offsets[i] + A.nrows() - 1;
+          auto diag_idx = diagonal_offsets[i] + nrows - 1;
           if (values(j, i) != 0) {
             out_view[diag_idx] += 1;
           }
