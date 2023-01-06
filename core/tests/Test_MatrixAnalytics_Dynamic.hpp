@@ -747,6 +747,130 @@ TYPED_TEST(DynamicDiagonalAnalyticsTypesTest, NonZerosPerDiagonalGeneric) {
   }
 }
 
+TYPED_TEST(DynamicDiagonalAnalyticsTypesTest, CountDiagonalsCustom) {
+  using vec_t     = typename TestFixture::vec_dev_t;
+  using size_type = typename TestFixture::SizeType;
+  using backend   = typename TestFixture::Backend;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->containers[i];
+
+    // Create a duplicate of A on host
+    auto Ah = Morpheus::create_mirror(c.A);
+    Morpheus::copy(c.A, Ah);
+
+    vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 0);
+    Morpheus::count_nnz_per_diagonal<TEST_CUSTOM_SPACE>(c.A, nnz_per_diag);
+    auto ref_diag = Morpheus::count_nnz<TEST_CUSTOM_SPACE>(nnz_per_diag);
+
+    for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Convert to the new active state
+      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      auto A = Morpheus::create_mirror_container<backend>(Ah);
+      Morpheus::copy(Ah, A);
+
+      auto diagonals = Morpheus::count_diagonals<TEST_CUSTOM_SPACE>(A);
+
+      EXPECT_EQ(ref_diag, diagonals);
+      EXPECT_NE(ref_diag, 0);
+    }
+  }
+}
+
+TYPED_TEST(DynamicDiagonalAnalyticsTypesTest, CountDiagonalsGeneric) {
+  using vec_t     = typename TestFixture::vec_dev_t;
+  using size_type = typename TestFixture::SizeType;
+  using backend   = typename TestFixture::Backend;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->containers[i];
+
+    // Create a duplicate of A on host
+    auto Ah = Morpheus::create_mirror(c.A);
+    Morpheus::copy(c.A, Ah);
+
+    vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 0);
+    Morpheus::count_nnz_per_diagonal<TEST_GENERIC_SPACE>(c.A, nnz_per_diag);
+    auto ref_diag = Morpheus::count_nnz<TEST_GENERIC_SPACE>(nnz_per_diag);
+
+    for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Convert to the new active state
+      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      auto A = Morpheus::create_mirror_container<backend>(Ah);
+      Morpheus::copy(Ah, A);
+
+      auto diagonals = Morpheus::count_diagonals<TEST_GENERIC_SPACE>(A);
+
+      EXPECT_EQ(ref_diag, diagonals);
+      EXPECT_NE(ref_diag, 0);
+    }
+  }
+}
+
+TYPED_TEST(DynamicDiagonalAnalyticsTypesTest, CountTrueDiagonalsCustom) {
+  using vec_t     = typename TestFixture::vec_dev_t;
+  using size_type = typename TestFixture::SizeType;
+  using backend   = typename TestFixture::Backend;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->containers[i];
+
+    // Create a duplicate of A on host
+    auto Ah = Morpheus::create_mirror(c.A);
+    Morpheus::copy(c.A, Ah);
+
+    auto threshold = c.A.nrows() / 3;
+    vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 0);
+    Morpheus::count_nnz_per_diagonal<TEST_CUSTOM_SPACE>(c.A, nnz_per_diag);
+    auto ref_diag =
+        Morpheus::count_nnz<TEST_CUSTOM_SPACE>(nnz_per_diag, threshold);
+
+    for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Convert to the new active state
+      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      auto A = Morpheus::create_mirror_container<backend>(Ah);
+      Morpheus::copy(Ah, A);
+
+      auto diagonals = Morpheus::count_true_diagonals<TEST_CUSTOM_SPACE>(A);
+
+      EXPECT_EQ(ref_diag, diagonals);
+      EXPECT_NE(ref_diag, 0);
+    }
+  }
+}
+
+TYPED_TEST(DynamicDiagonalAnalyticsTypesTest, CountTrueDiagonalsGeneric) {
+  using vec_t     = typename TestFixture::vec_dev_t;
+  using size_type = typename TestFixture::SizeType;
+  using backend   = typename TestFixture::Backend;
+
+  for (size_type i = 0; i < this->samples; i++) {
+    auto c = this->containers[i];
+
+    // Create a duplicate of A on host
+    auto Ah = Morpheus::create_mirror(c.A);
+    Morpheus::copy(c.A, Ah);
+
+    auto threshold = c.A.nrows() / 3;
+    vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 0);
+    Morpheus::count_nnz_per_diagonal<TEST_GENERIC_SPACE>(c.A, nnz_per_diag);
+    auto ref_diag =
+        Morpheus::count_nnz<TEST_GENERIC_SPACE>(nnz_per_diag, threshold);
+
+    for (auto fmt_idx = 0; fmt_idx < Morpheus::NFORMATS; fmt_idx++) {
+      // Convert to the new active state
+      Morpheus::convert<Morpheus::Serial>(Ah, fmt_idx);
+      auto A = Morpheus::create_mirror_container<backend>(Ah);
+      Morpheus::copy(Ah, A);
+
+      auto diagonals = Morpheus::count_true_diagonals<TEST_GENERIC_SPACE>(A);
+
+      EXPECT_EQ(ref_diag, diagonals);
+      EXPECT_NE(ref_diag, 0);
+    }
+  }
+}
+
 }  // namespace Test
 
 #endif  // TEST_CORE_TEST_MATRIXANALYTICS_DYNAMIC_HPP

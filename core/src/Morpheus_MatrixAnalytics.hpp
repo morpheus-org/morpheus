@@ -208,6 +208,59 @@ void count_nnz_per_diagonal(const Matrix& A, Vector& nnz_per_diagonal,
   Impl::count_nnz_per_diagonal<ExecSpace>(A, nnz_per_diagonal, init);
 }
 
+/**
+ * @brief Counts the number of diagonals with at least one non-zero entry.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam Matrix The type of the input matrix
+ * @param A The input matrix
+ * @return Matrix::size_type The number of diagonals
+ */
+template <typename ExecSpace, typename Matrix>
+typename Matrix::size_type count_diagonals(const Matrix& A) {
+  static_assert(Morpheus::is_matrix_container_v<Matrix>,
+                "The type Matrix must be a valid matrix container.");
+  using value_type   = typename Matrix::index_type;
+  using index_type   = typename Matrix::size_type;
+  using array_layout = typename Matrix::array_layout;
+  using backend      = typename Matrix::backend;
+  using Vector =
+      Morpheus::DenseVector<value_type, index_type, array_layout, backend>;
+
+  Vector nnnz_per_diag(A.nrows() + A.ncols() - 1, 0);
+  Impl::count_nnz_per_diagonal<ExecSpace>(A, nnnz_per_diag, false);
+
+  return Morpheus::count_nnz<ExecSpace>(nnnz_per_diag);
+}
+
+/**
+ * @brief Counts the number of true diagonals.
+ *
+ * @tparam ExecSpace Execution space to run the algorithm
+ * @tparam Matrix The type of the input matrix
+ * @param A The input matrix
+ * @return Matrix::size_type The number of true diagonals
+ *
+ * \note A true diagonal is considered to be the one with at least Nrows / 3
+ * non-zeros.
+ */
+template <typename ExecSpace, typename Matrix>
+typename Matrix::size_type count_true_diagonals(const Matrix& A) {
+  static_assert(Morpheus::is_matrix_container_v<Matrix>,
+                "The type Matrix must be a valid matrix container.");
+  using value_type   = typename Matrix::index_type;
+  using index_type   = typename Matrix::size_type;
+  using array_layout = typename Matrix::array_layout;
+  using backend      = typename Matrix::backend;
+  using Vector =
+      Morpheus::DenseVector<value_type, index_type, array_layout, backend>;
+
+  Vector nnnz_per_diag(A.nrows() + A.ncols() - 1, 0);
+  Impl::count_nnz_per_diagonal<ExecSpace>(A, nnnz_per_diag, false);
+
+  return Morpheus::count_nnz<ExecSpace>(nnnz_per_diag, A.nrows() / 3);
+}
+
 /*! \}  // end of analytics group
  */
 }  // namespace Morpheus
