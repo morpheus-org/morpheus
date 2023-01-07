@@ -91,13 +91,12 @@ typename Vector::value_type min(
 }
 
 template <typename ExecSpace, typename Vector>
-typename Vector::value_type std(
-    const Vector& in, typename Vector::size_type size,
-    typename Vector::value_type mean,
-    typename std::enable_if_t<
-        Morpheus::is_dense_vector_format_container_v<Vector> &&
-        Morpheus::has_generic_backend_v<ExecSpace> &&
-        Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
+double std(const Vector& in, typename Vector::size_type size,
+           typename Vector::value_type mean,
+           typename std::enable_if_t<
+               Morpheus::is_dense_vector_format_container_v<Vector> &&
+               Morpheus::has_generic_backend_v<ExecSpace> &&
+               Morpheus::has_access_v<ExecSpace, Vector>>* = nullptr) {
   using execution_space = typename ExecSpace::execution_space;
   using size_type       = typename Vector::size_type;
   using IndexType       = Kokkos::IndexType<size_type>;
@@ -117,7 +116,7 @@ typename Vector::value_type std(
       result);
   Kokkos::fence();
 
-  return sqrt(result / (value_type)size);
+  return sqrt(result / (double)size);
 }
 
 template <typename ExecSpace, typename Vector>

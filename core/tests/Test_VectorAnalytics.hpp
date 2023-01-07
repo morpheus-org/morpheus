@@ -47,7 +47,8 @@ class VectorAnalyticsTypesTest : public ::testing::Test {
   struct vectors {
     src_dev_t v;
     SizeType size;
-    ValueType min, max, std;
+    ValueType min, max;
+    double std;
 
     vectors(SizeType _size)
         : v(_size, 0),
@@ -89,7 +90,7 @@ class VectorAnalyticsTypesTest : public ::testing::Test {
       vec->max = vec->max > vh_(i) ? vec->max : vh_(i);
       vec->std += (vh_(i) - mean) * (vh_(i) - mean);
     }
-    vec->std = sqrt(vec->std / (ValueType)vec->size);
+    vec->std = sqrt(vec->std / (double)vec->size);
     Morpheus::copy(vh_, vec->v);
   }
 };
@@ -232,7 +233,8 @@ TYPED_TEST(VectorAnalyticsTypesTest, StdCustom) {
   for (size_type i = 0; i < this->samples; i++) {
     auto v = this->vecs[i];
 
-    value_type mean = Morpheus::reduce<TEST_CUSTOM_SPACE>(v.v, v.size) / v.size;
+    double mean =
+        Morpheus::reduce<TEST_CUSTOM_SPACE>(v.v, v.size) / (double)v.size;
     value_type result = Morpheus::std<TEST_CUSTOM_SPACE>(v.v, v.size, mean);
     EXPECT_TRUE(have_approx_same_val(result, v.std));
   }
@@ -245,8 +247,8 @@ TYPED_TEST(VectorAnalyticsTypesTest, StdGeneric) {
   for (size_type i = 0; i < this->samples; i++) {
     auto v = this->vecs[i];
 
-    value_type mean =
-        Morpheus::reduce<TEST_GENERIC_SPACE>(v.v, v.size) / v.size;
+    double mean =
+        Morpheus::reduce<TEST_GENERIC_SPACE>(v.v, v.size) / (double)v.size;
     value_type result = Morpheus::std<TEST_GENERIC_SPACE>(v.v, v.size, mean);
     EXPECT_TRUE(have_approx_same_val(result, v.std));
   }

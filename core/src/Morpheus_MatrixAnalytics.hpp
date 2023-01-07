@@ -80,11 +80,11 @@ typename Matrix::size_type number_of_nnz(const Matrix& A) {
  *
  * @tparam Matrix The type of the input matrix
  * @param A The input matrix
- * @return Matrix::size_type The average number of non-zeros
+ * @return double The average number of non-zeros
  */
 template <typename Matrix>
-typename Matrix::size_type average_nnnz(const Matrix& A) {
-  return A.nnnz() / A.nrows();
+double average_nnnz(const Matrix& A) {
+  return A.nnnz() / (double)A.nrows();
 }
 
 /**
@@ -171,7 +171,8 @@ typename Matrix::size_type min_nnnz(const Matrix& A) {
  * @tparam ExecSpace Execution space to run the algorithm
  * @tparam Matrix The type of the input matrix
  * @param A The input matrix
- * @return Matrix::size_type The minimum number of non-zeros in a row
+ * @return double The standard deviation around a mean of non-zeros in the
+ * matrix
  */
 template <typename ExecSpace, typename Matrix>
 typename Matrix::size_type std_nnnz(const Matrix& A) {

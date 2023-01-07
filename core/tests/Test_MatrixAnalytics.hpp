@@ -96,7 +96,8 @@ class MatrixAnalyticsTypesTest : public ::testing::Test {
 
     mat_dev_t A;
     vec_dev_t nnz_per_row;
-    typename vec_dev_t::value_type min, max, std;
+    typename vec_dev_t::value_type min, max;
+    double std;
 
     ContainersClass() : A(), nnz_per_row(), min(), max(), std() {}
 
@@ -132,7 +133,7 @@ class MatrixAnalyticsTypesTest : public ::testing::Test {
       min = Morpheus::min<MirrorBackend>(nnz_per_row_h, nnz_per_row_h.size());
       max = Morpheus::max<MirrorBackend>(nnz_per_row_h, nnz_per_row_h.size());
       std = Morpheus::std<MirrorBackend>(nnz_per_row_h, nnz_per_row_h.size(),
-                                         A.nnnz() / A.nrows());
+                                         A.nnnz() / (double)A.nrows());
     }
   };
 
@@ -301,7 +302,7 @@ TYPED_TEST(MatrixAnalyticsTypesTest, AverageNonZeros) {
     auto c = this->containers[i];
 
     auto avg_nnnz = Morpheus::average_nnnz(c.A);
-    EXPECT_EQ(avg_nnnz, c.A.nnnz() / c.A.nrows());
+    EXPECT_EQ(avg_nnnz, c.A.nnnz() / (double)c.A.nrows());
   }
 }
 
