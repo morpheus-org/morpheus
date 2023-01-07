@@ -605,8 +605,8 @@ TYPED_TEST(DiagonalAnalyticsTypesTest, CountTrueDiagonalsCustom) {
 
     vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 0);
     Morpheus::count_nnz_per_diagonal<TEST_CUSTOM_SPACE>(c.A, nnz_per_diag);
-    auto ref_diag =
-        Morpheus::count_nnz<TEST_CUSTOM_SPACE>(nnz_per_diag, threshold);
+    auto ref_diag = Morpheus::count_nnz<TEST_CUSTOM_SPACE>(
+        nnz_per_diag, threshold, threshold);
 
     EXPECT_EQ(ref_diag, diagonals);
     EXPECT_NE(ref_diag, 0);
@@ -624,7 +624,8 @@ TYPED_TEST(DiagonalAnalyticsTypesTest, CountTrueDiagonalsGeneric) {
     auto c = this->containers[i];
 
     auto threshold = c.A.nrows() / 3;
-    auto diagonals = Morpheus::count_true_diagonals<TEST_GENERIC_SPACE>(c.A);
+    auto diagonals =
+        Morpheus::count_true_diagonals<TEST_GENERIC_SPACE>(c.A, threshold);
 
     vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 0);
     Morpheus::count_nnz_per_diagonal<TEST_GENERIC_SPACE>(c.A, nnz_per_diag);

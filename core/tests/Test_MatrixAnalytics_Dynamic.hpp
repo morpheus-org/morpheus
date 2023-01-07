@@ -831,7 +831,8 @@ TYPED_TEST(DynamicDiagonalAnalyticsTypesTest, CountTrueDiagonalsCustom) {
       auto A = Morpheus::create_mirror_container<backend>(Ah);
       Morpheus::copy(Ah, A);
 
-      auto diagonals = Morpheus::count_true_diagonals<TEST_CUSTOM_SPACE>(A);
+      auto diagonals =
+          Morpheus::count_true_diagonals<TEST_CUSTOM_SPACE>(A, threshold);
 
       EXPECT_EQ(ref_diag, diagonals);
       EXPECT_NE(ref_diag, 0);
@@ -863,7 +864,8 @@ TYPED_TEST(DynamicDiagonalAnalyticsTypesTest, CountTrueDiagonalsGeneric) {
       auto A = Morpheus::create_mirror_container<backend>(Ah);
       Morpheus::copy(Ah, A);
 
-      auto diagonals = Morpheus::count_true_diagonals<TEST_GENERIC_SPACE>(A);
+      auto diagonals =
+          Morpheus::count_true_diagonals<TEST_GENERIC_SPACE>(A, threshold);
 
       EXPECT_EQ(ref_diag, diagonals);
       EXPECT_NE(ref_diag, 0);
