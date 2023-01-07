@@ -312,7 +312,7 @@ TYPED_TEST(MatrixAnalyticsTypesTest, Density) {
     auto c = this->containers[i];
 
     auto matrix_density = Morpheus::density(c.A);
-    EXPECT_EQ(matrix_density, c.A.nnnz() / (c.A.nrows() * c.A.ncols()));
+    EXPECT_EQ(matrix_density, c.A.nnnz() / (double)(c.A.nrows() * c.A.ncols()));
   }
 }
 

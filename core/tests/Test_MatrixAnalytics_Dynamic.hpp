@@ -337,7 +337,8 @@ TYPED_TEST(DynamicMatrixAnalyticsTypesTest, Density) {
       Morpheus::copy(Ah, A);
 
       auto matrix_density = Morpheus::density(A);
-      EXPECT_EQ(matrix_density, c.A.nnnz() / (c.A.nrows() * c.A.ncols()));
+      EXPECT_EQ(matrix_density,
+                c.A.nnnz() / (double)(c.A.nrows() * c.A.ncols()));
     }
   }
 }

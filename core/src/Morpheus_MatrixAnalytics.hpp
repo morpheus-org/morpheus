@@ -96,7 +96,7 @@ typename Matrix::size_type average_nnnz(const Matrix& A) {
  */
 template <typename Matrix>
 double density(const Matrix& A) {
-  return A.nnnz() / (A.nrows() * A.ncols());
+  return A.nnnz() / (double)(A.nrows() * A.ncols());
 }
 
 /**
