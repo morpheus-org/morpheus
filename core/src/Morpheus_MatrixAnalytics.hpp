@@ -92,10 +92,10 @@ typename Matrix::size_type average_nnnz(const Matrix& A) {
  *
  * @tparam Matrix The type of the input matrix
  * @param A The input matrix
- * @return Matrix::size_type The density of the matrix
+ * @return double The density of the matrix
  */
 template <typename Matrix>
-typename Matrix::size_type density(const Matrix& A) {
+double density(const Matrix& A) {
   return A.nnnz() / (A.nrows() * A.ncols());
 }
 
