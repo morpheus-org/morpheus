@@ -316,7 +316,8 @@ TYPED_TEST(MatrixAnalyticsTypesTest, AverageNonZeros) {
     auto c = this->containers[i];
 
     double avg_nnnz = Morpheus::average_nnnz(c.A);
-    EXPECT_EQ(have_approx_same_val(avg_nnnz, c.A.nnnz() / (double)c.A.nrows()));
+    EXPECT_TRUE(
+        have_approx_same_val(avg_nnnz, c.A.nnnz() / (double)c.A.nrows()));
   }
 }
 
@@ -327,7 +328,7 @@ TYPED_TEST(MatrixAnalyticsTypesTest, Density) {
     auto c = this->containers[i];
 
     double matrix_density = Morpheus::density(c.A);
-    EXPECT_EQ(have_approx_same_val(
+    EXPECT_TRUE(have_approx_same_val(
         matrix_density, c.A.nnnz() / (double)(c.A.nrows() * c.A.ncols())));
   }
 }
@@ -456,7 +457,7 @@ TYPED_TEST(MatrixAnalyticsTypesTest, StdNnnzCustom) {
   for (size_type i = 0; i < this->samples; i++) {
     auto c     = this->containers[i];
     double std = Morpheus::std_nnnz<TEST_CUSTOM_SPACE>(c.A);
-    EXPECT_EQ(have_approx_same_val(std, c.std));
+    EXPECT_TRUE(have_approx_same_val(std, c.std));
   }
 }
 
@@ -466,7 +467,7 @@ TYPED_TEST(MatrixAnalyticsTypesTest, StdNnnzGeneric) {
   for (size_type i = 0; i < this->samples; i++) {
     auto c     = this->containers[i];
     double std = Morpheus::std_nnnz<TEST_GENERIC_SPACE>(c.A);
-    EXPECT_EQ(have_approx_same_val(std, c.std));
+    EXPECT_TRUE(have_approx_same_val(std, c.std));
   }
 }
 
