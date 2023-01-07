@@ -91,8 +91,7 @@ typename Vector::value_type min(
 }
 
 template <typename ExecSpace, typename Vector>
-double std(const Vector& in, typename Vector::size_type size,
-           typename Vector::value_type mean,
+double std(const Vector& in, typename Vector::size_type size, double mean,
            typename std::enable_if_t<
                Morpheus::is_dense_vector_format_container_v<Vector> &&
                Morpheus::has_generic_backend_v<ExecSpace> &&
@@ -102,15 +101,14 @@ double std(const Vector& in, typename Vector::size_type size,
   using IndexType       = Kokkos::IndexType<size_type>;
   using range_policy    = Kokkos::RangePolicy<IndexType, execution_space>;
   using ValueArray      = typename Vector::value_array_type;
-  using value_type      = typename Vector::non_const_value_type;
 
   const ValueArray in_view = in.const_view();
   range_policy policy(0, size);
 
-  value_type result = value_type(0);
+  double result = 0;
   Kokkos::parallel_reduce(
       "squared_sum", policy,
-      KOKKOS_LAMBDA(const size_type& i, value_type& lsum) {
+      KOKKOS_LAMBDA(const size_type& i, double& lsum) {
         lsum += (in_view[i] - mean) * (in_view[i] - mean);
       },
       result);

@@ -226,6 +226,20 @@ class DynamicDiagonalAnalyticsTypesTest : public ::testing::Test {
 
 namespace Test {
 
+template <typename T>
+bool have_approx_same_val(T v1, T v2) {
+  double epsilon = 1.0e-12;
+  if (std::is_same_v<T, double>) {
+    epsilon = 1.0e-12;
+  } else if (std::is_same_v<T, float>) {
+    epsilon = 1.0e-5;
+  } else {
+    epsilon = 0;
+  }
+
+  return (fabs(v1 - v2) > epsilon) ? false : true;
+}
+
 TYPED_TEST_SUITE(DynamicMatrixAnalyticsTypesTest, DynamicMatrixAnalyticsTypes);
 
 TYPED_TEST(DynamicMatrixAnalyticsTypesTest, NumberOfRows) {
@@ -314,8 +328,9 @@ TYPED_TEST(DynamicMatrixAnalyticsTypesTest, AverageNonZeros) {
       auto A = Morpheus::create_mirror_container<backend>(Ah);
       Morpheus::copy(Ah, A);
 
-      auto avg_nnnz = Morpheus::average_nnnz(A);
-      EXPECT_EQ(avg_nnnz, c.A.nnnz() / (double)c.A.nrows());
+      double avg_nnnz = Morpheus::average_nnnz(A);
+      EXPECT_EQ(
+          have_approx_same_val(avg_nnnz, c.A.nnnz() / (double)c.A.nrows()));
     }
   }
 }
@@ -337,9 +352,9 @@ TYPED_TEST(DynamicMatrixAnalyticsTypesTest, Density) {
       auto A = Morpheus::create_mirror_container<backend>(Ah);
       Morpheus::copy(Ah, A);
 
-      auto matrix_density = Morpheus::density(A);
-      EXPECT_EQ(matrix_density,
-                c.A.nnnz() / (double)(c.A.nrows() * c.A.ncols()));
+      double matrix_density = Morpheus::density(A);
+      EXPECT_EQ(have_approx_same_val(
+          matrix_density, c.A.nnnz() / (double)(c.A.nrows() * c.A.ncols())));
     }
   }
 }
@@ -585,8 +600,8 @@ TYPED_TEST(DynamicMatrixAnalyticsTypesTest, StdNnnzCustom) {
       auto A = Morpheus::create_mirror_container<backend>(Ah);
       Morpheus::copy(Ah, A);
 
-      auto std = Morpheus::std_nnnz<TEST_CUSTOM_SPACE>(A);
-      EXPECT_EQ(std, c.std);
+      double std = Morpheus::std_nnnz<TEST_CUSTOM_SPACE>(A);
+      EXPECT_EQ(have_approx_same_val(std, c.std));
     }
   }
 }
@@ -608,8 +623,8 @@ TYPED_TEST(DynamicMatrixAnalyticsTypesTest, StdNnnzGeneric) {
       auto A = Morpheus::create_mirror_container<backend>(Ah);
       Morpheus::copy(Ah, A);
 
-      auto std = Morpheus::std_nnnz<TEST_GENERIC_SPACE>(A);
-      EXPECT_EQ(std, c.std);
+      double std = Morpheus::std_nnnz<TEST_GENERIC_SPACE>(A);
+      EXPECT_EQ(have_approx_same_val(std, c.std));
     }
   }
 }

@@ -82,8 +82,7 @@ typename Vector::value_type min(const Vector& vec,
  * @return double The minimum value in the vector
  */
 template <typename ExecSpace, typename Vector>
-double std(const Vector& vec, typename Vector::size_type size,
-           typename Vector::value_type mean) {
+double std(const Vector& vec, typename Vector::size_type size, double mean) {
   static_assert(Morpheus::is_vector_container_v<Vector>,
                 "The type Vector must be a valid Vector container.");
   return Impl::std<ExecSpace>(vec, size, mean);

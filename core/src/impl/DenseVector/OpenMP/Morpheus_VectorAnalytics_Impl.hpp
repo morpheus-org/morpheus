@@ -62,8 +62,7 @@ typename Vector::value_type min(
 }
 
 template <typename ExecSpace, typename Vector>
-double std(const Vector& in, typename Vector::size_type size,
-           typename Vector::value_type mean,
+double std(const Vector& in, typename Vector::size_type size, double mean,
            typename std::enable_if_t<
                Morpheus::is_dense_vector_format_container_v<Vector> &&
                Morpheus::has_custom_backend_v<ExecSpace> &&

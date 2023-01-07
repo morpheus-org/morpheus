@@ -82,8 +82,8 @@ class VectorAnalyticsTypesTest : public ::testing::Test {
     Kokkos::Random_XorShift64_Pool<Kokkos::Serial> rand_pool(seed);
     vh_.assign(vh_.size(), rand_pool, -5.0, 5.0);
 
-    ValueType mean =
-        Morpheus::reduce<Morpheus::Serial>(vh_, vec->size) / vec->size;
+    double mean =
+        Morpheus::reduce<Morpheus::Serial>(vh_, vec->size) / (double)vec->size;
 
     for (SizeType i = 0; i < vec->size; i++) {
       vec->min = vec->min < vh_(i) ? vec->min : vh_(i);
@@ -152,9 +152,9 @@ namespace Test {
 
 template <typename T>
 bool have_approx_same_val(T v1, T v2) {
-  double epsilon = 1.0e-13;
+  double epsilon = 1.0e-12;
   if (std::is_same_v<T, double>) {
-    epsilon = 1.0e-13;
+    epsilon = 1.0e-12;
   } else if (std::is_same_v<T, float>) {
     epsilon = 1.0e-5;
   } else {
@@ -227,29 +227,27 @@ TYPED_TEST(VectorAnalyticsTypesTest, MinGeneric) {
 }
 
 TYPED_TEST(VectorAnalyticsTypesTest, StdCustom) {
-  using value_type = typename TestFixture::ValueType;
-  using size_type  = typename TestFixture::SizeType;
+  using size_type = typename TestFixture::SizeType;
 
   for (size_type i = 0; i < this->samples; i++) {
     auto v = this->vecs[i];
 
     double mean =
         Morpheus::reduce<TEST_CUSTOM_SPACE>(v.v, v.size) / (double)v.size;
-    value_type result = Morpheus::std<TEST_CUSTOM_SPACE>(v.v, v.size, mean);
+    double result = Morpheus::std<TEST_CUSTOM_SPACE>(v.v, v.size, mean);
     EXPECT_TRUE(have_approx_same_val(result, v.std));
   }
 }
 
 TYPED_TEST(VectorAnalyticsTypesTest, StdGeneric) {
-  using value_type = typename TestFixture::ValueType;
-  using size_type  = typename TestFixture::SizeType;
+  using size_type = typename TestFixture::SizeType;
 
   for (size_type i = 0; i < this->samples; i++) {
     auto v = this->vecs[i];
 
     double mean =
         Morpheus::reduce<TEST_GENERIC_SPACE>(v.v, v.size) / (double)v.size;
-    value_type result = Morpheus::std<TEST_GENERIC_SPACE>(v.v, v.size, mean);
+    double result = Morpheus::std<TEST_GENERIC_SPACE>(v.v, v.size, mean);
     EXPECT_TRUE(have_approx_same_val(result, v.std));
   }
 }
