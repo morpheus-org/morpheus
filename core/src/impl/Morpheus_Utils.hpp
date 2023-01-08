@@ -79,6 +79,31 @@ nextPow2(IndexType x,
   return ++x;
 }
 
+/**
+ * @brief Checks if the current matrix exceeds a tolerance level reflecting
+ * the performance of the sparse format.
+ *
+ * @param num_rows Number of rows
+ * @param num_entries Number of non-zeros
+ * @param num_columns Number of columns
+ * @return bool
+ */
+template <typename T>
+bool exceeds_tolerance(const T num_rows, const T num_entries,
+                       const T num_columns) {
+  const float max_fill   = 10.0;
+  const float threshold  = 100e6;  // 10M entries
+  const float size       = float(num_columns) * float(num_rows);
+  const float fill_ratio = size / std::max(1.0f, float(num_entries));
+
+  bool res = false;
+  if (fill_ratio > max_fill && size > threshold) {
+    res = true;
+  }
+
+  return res;
+}
+
 #ifndef NDEBUG
 #define MORPHEUS_ASSERT(condition, message)                              \
   do {                                                                   \

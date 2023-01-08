@@ -33,6 +33,7 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 
+#include <impl/Morpheus_Utils.hpp>
 #include <impl/Coo/Serial/Morpheus_Sort_Impl.hpp>
 
 // TODO: Remove use of set during Coo to Dia Conversion

@@ -33,6 +33,7 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 
+#include <impl/Morpheus_Utils.hpp>
 #include <impl/Coo/Serial/Morpheus_Sort_Impl.hpp>
 
 namespace Morpheus {
@@ -114,23 +115,37 @@ void convert(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using src_size_type  = typename SourceType::size_type;
-  using src_index_type = typename SourceType::index_type;
-  using dst_size_type  = typename DestinationType::size_type;
-  using dst_value_type = typename DestinationType::value_type;
+  using src_size_type        = typename SourceType::size_type;
+  using src_index_type       = typename SourceType::index_type;
+  using dst_size_type        = typename DestinationType::size_type;
+  using src_index_array_type = typename SourceType::index_array_type;
 
-  dst_size_type num_entries_per_row = 0;
-  dst_size_type entries_ctr         = 0;
-  src_index_type row_id             = 0;
+  src_index_array_type row_offsets(src.nrows() + 1, 0);
+  // compute number of non-zero entries per row of coo src
   for (src_size_type n = 0; n < src.nnnz(); n++) {
-    if (row_id != src.crow_indices(n)) {
-      num_entries_per_row =
-          entries_ctr > num_entries_per_row ? entries_ctr : num_entries_per_row;
-      entries_ctr = 0;  // should be 1;
-      row_id      = src.crow_indices(n);
-    } else {
-      entries_ctr++;
-    }
+    row_offsets(src.crow_indices(n))++;
+  }
+
+  // cumsum the nnz per row to get csr row_offsets
+  src_index_type cumsum = 0;
+  for (src_size_type i = 0; i < src.nrows(); i++) {
+    src_index_type temp = row_offsets(i);
+    row_offsets(i)      = cumsum;
+    cumsum += temp;
+  }
+
+  row_offsets(src.nrows())          = src.nnnz();
+  dst_size_type num_entries_per_row = 0;
+  for (src_size_type i = 0; i < src.nrows(); i++) {
+    src_size_type entries_per_row = row_offsets(i + 1) - row_offsets(i);
+    num_entries_per_row           = entries_per_row > num_entries_per_row
+                                        ? entries_per_row
+                                        : num_entries_per_row;
+  }
+
+  if (Impl::exceeds_tolerance(src.nrows(), src.nnnz(), num_entries_per_row)) {
+    throw Morpheus::FormatConversionException(
+        "EllMatrix fill-in would exceed maximum tolerance");
   }
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz(), num_entries_per_row);
@@ -139,12 +154,7 @@ void convert(
                               dst.invalid_index());
   dst.values().assign(dst.values().nrows(), dst.values().ncols(), 0);
 
-  const dst_size_type nnrows = dst.column_indices().nrows();
-  const dst_size_type nncols = dst.column_indices().ncols();
-  dst.column_indices().assign(nnrows, nncols, dst.invalid_index());
-  dst.values().assign(nnrows, nncols, dst_value_type(0));
-
-  row_id = 0;
+  src_index_type row_id = 0;
   for (src_size_type i = 0, n = 0; i < src.nnnz(); i++) {
     src_index_type row = src.crow_indices(i);
 

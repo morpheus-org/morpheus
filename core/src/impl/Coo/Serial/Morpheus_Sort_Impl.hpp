@@ -166,7 +166,7 @@ void sort_by_row_and_column(
 }
 
 template <typename ExecSpace, typename Matrix>
-bool is_sorted(Matrix& mat,
+bool is_sorted(const Matrix& mat,
                typename std::enable_if_t<
                    Morpheus::is_coo_matrix_format_container_v<Matrix> &&
                    Morpheus::has_custom_backend_v<ExecSpace> &&
@@ -174,15 +174,15 @@ bool is_sorted(Matrix& mat,
                    Morpheus::has_access_v<ExecSpace, Matrix>>* = nullptr) {
   using size_type = typename Matrix::size_type;
 
-  if (mat.row_indices().size() != mat.column_indices().size()) {
+  if (mat.crow_indices().size() != mat.ccolumn_indices().size()) {
     throw Morpheus::RuntimeException(
         "Sizes of row and column indeces do not match.");
   }
 
   for (size_type i = 0; i < mat.nnnz() - 1; i++) {
-    if ((mat.row_indices(i) > mat.row_indices(i + 1)) ||
-        (mat.row_indices(i) == mat.row_indices(i + 1) &&
-         mat.column_indices(i) > mat.column_indices(i + 1)))
+    if ((mat.crow_indices(i) > mat.crow_indices(i + 1)) ||
+        (mat.crow_indices(i) == mat.crow_indices(i + 1) &&
+         mat.ccolumn_indices(i) > mat.ccolumn_indices(i + 1)))
       return false;
   }
   return true;
