@@ -96,7 +96,8 @@ class MatrixAnalyticsTypesTest : public ::testing::Test {
 
     mat_dev_t A;
     vec_dev_t nnz_per_row;
-    typename vec_dev_t::value_type min, max, std;
+    typename vec_dev_t::value_type min, max;
+    double std;
 
     ContainersClass() : A(), nnz_per_row(), min(), max(), std() {}
 
@@ -132,7 +133,7 @@ class MatrixAnalyticsTypesTest : public ::testing::Test {
       min = Morpheus::min<MirrorBackend>(nnz_per_row_h, nnz_per_row_h.size());
       max = Morpheus::max<MirrorBackend>(nnz_per_row_h, nnz_per_row_h.size());
       std = Morpheus::std<MirrorBackend>(nnz_per_row_h, nnz_per_row_h.size(),
-                                         A.nnnz() / A.nrows());
+                                         A.nnnz() / (double)A.nrows());
     }
   };
 
@@ -259,6 +260,20 @@ class DiagonalAnalyticsTypesTest : public ::testing::Test {
 
 namespace Test {
 
+template <typename T>
+bool have_approx_same_val(T v1, T v2) {
+  double epsilon = 1.0e-12;
+  if (std::is_same_v<T, double>) {
+    epsilon = 1.0e-12;
+  } else if (std::is_same_v<T, float>) {
+    epsilon = 1.0e-5;
+  } else {
+    epsilon = 0;
+  }
+
+  return (fabs(v1 - v2) > epsilon) ? false : true;
+}
+
 TYPED_TEST_SUITE(MatrixAnalyticsTypesTest, MatrixAnalyticsTypes);
 
 TYPED_TEST(MatrixAnalyticsTypesTest, NumberOfRows) {
@@ -300,8 +315,9 @@ TYPED_TEST(MatrixAnalyticsTypesTest, AverageNonZeros) {
   for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
-    auto avg_nnnz = Morpheus::average_nnnz(c.A);
-    EXPECT_EQ(avg_nnnz, c.A.nnnz() / c.A.nrows());
+    double avg_nnnz = Morpheus::average_nnnz(c.A);
+    EXPECT_TRUE(
+        have_approx_same_val(avg_nnnz, c.A.nnnz() / (double)c.A.nrows()));
   }
 }
 
@@ -311,8 +327,9 @@ TYPED_TEST(MatrixAnalyticsTypesTest, Density) {
   for (size_type i = 0; i < this->samples; i++) {
     auto c = this->containers[i];
 
-    auto matrix_density = Morpheus::density(c.A);
-    EXPECT_EQ(matrix_density, c.A.nnnz() / (c.A.nrows() * c.A.ncols()));
+    double matrix_density = Morpheus::density(c.A);
+    EXPECT_TRUE(have_approx_same_val(
+        matrix_density, c.A.nnnz() / (double)(c.A.nrows() * c.A.ncols())));
   }
 }
 
@@ -438,9 +455,9 @@ TYPED_TEST(MatrixAnalyticsTypesTest, StdNnnzCustom) {
   using size_type = typename TestFixture::SizeType;
 
   for (size_type i = 0; i < this->samples; i++) {
-    auto c   = this->containers[i];
-    auto std = Morpheus::std_nnnz<TEST_CUSTOM_SPACE>(c.A);
-    EXPECT_EQ(std, c.std);
+    auto c     = this->containers[i];
+    double std = Morpheus::std_nnnz<TEST_CUSTOM_SPACE>(c.A);
+    EXPECT_TRUE(have_approx_same_val(std, c.std));
   }
 }
 
@@ -448,9 +465,9 @@ TYPED_TEST(MatrixAnalyticsTypesTest, StdNnnzGeneric) {
   using size_type = typename TestFixture::SizeType;
 
   for (size_type i = 0; i < this->samples; i++) {
-    auto c   = this->containers[i];
-    auto std = Morpheus::std_nnnz<TEST_GENERIC_SPACE>(c.A);
-    EXPECT_EQ(std, c.std);
+    auto c     = this->containers[i];
+    double std = Morpheus::std_nnnz<TEST_GENERIC_SPACE>(c.A);
+    EXPECT_TRUE(have_approx_same_val(std, c.std));
   }
 }
 
@@ -601,7 +618,8 @@ TYPED_TEST(DiagonalAnalyticsTypesTest, CountTrueDiagonalsCustom) {
     auto c = this->containers[i];
 
     auto threshold = c.A.nrows() / 3;
-    auto diagonals = Morpheus::count_true_diagonals<TEST_CUSTOM_SPACE>(c.A);
+    auto diagonals =
+        Morpheus::count_true_diagonals<TEST_CUSTOM_SPACE>(c.A, threshold);
 
     vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 0);
     Morpheus::count_nnz_per_diagonal<TEST_CUSTOM_SPACE>(c.A, nnz_per_diag);
@@ -624,7 +642,8 @@ TYPED_TEST(DiagonalAnalyticsTypesTest, CountTrueDiagonalsGeneric) {
     auto c = this->containers[i];
 
     auto threshold = c.A.nrows() / 3;
-    auto diagonals = Morpheus::count_true_diagonals<TEST_GENERIC_SPACE>(c.A);
+    auto diagonals =
+        Morpheus::count_true_diagonals<TEST_GENERIC_SPACE>(c.A, threshold);
 
     vec_t nnz_per_diag(c.A.nrows() + c.A.ncols() - 1, 0);
     Morpheus::count_nnz_per_diagonal<TEST_GENERIC_SPACE>(c.A, nnz_per_diag);

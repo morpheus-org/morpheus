@@ -80,11 +80,11 @@ typename Matrix::size_type number_of_nnz(const Matrix& A) {
  *
  * @tparam Matrix The type of the input matrix
  * @param A The input matrix
- * @return Matrix::size_type The average number of non-zeros
+ * @return double The average number of non-zeros
  */
 template <typename Matrix>
-typename Matrix::size_type average_nnnz(const Matrix& A) {
-  return A.nnnz() / A.nrows();
+double average_nnnz(const Matrix& A) {
+  return A.nnnz() / (double)A.nrows();
 }
 
 /**
@@ -92,11 +92,11 @@ typename Matrix::size_type average_nnnz(const Matrix& A) {
  *
  * @tparam Matrix The type of the input matrix
  * @param A The input matrix
- * @return Matrix::size_type The density of the matrix
+ * @return double The density of the matrix
  */
 template <typename Matrix>
-typename Matrix::size_type density(const Matrix& A) {
-  return A.nnnz() / (A.nrows() * A.ncols());
+double density(const Matrix& A) {
+  return A.nnnz() / (double)(A.nrows() * A.ncols());
 }
 
 /**
@@ -171,7 +171,8 @@ typename Matrix::size_type min_nnnz(const Matrix& A) {
  * @tparam ExecSpace Execution space to run the algorithm
  * @tparam Matrix The type of the input matrix
  * @param A The input matrix
- * @return Matrix::size_type The minimum number of non-zeros in a row
+ * @return double The standard deviation around a mean of non-zeros in the
+ * matrix
  */
 template <typename ExecSpace, typename Matrix>
 typename Matrix::size_type std_nnnz(const Matrix& A) {
@@ -240,12 +241,10 @@ typename Matrix::size_type count_diagonals(const Matrix& A) {
  * @tparam Matrix The type of the input matrix
  * @param A The input matrix
  * @return Matrix::size_type The number of true diagonals
- *
- * \note A true diagonal is considered to be the one with at least Nrows / 3
- * non-zeros.
  */
 template <typename ExecSpace, typename Matrix>
-typename Matrix::size_type count_true_diagonals(const Matrix& A) {
+typename Matrix::size_type count_true_diagonals(
+    const Matrix& A, typename Matrix::index_type threshold) {
   static_assert(Morpheus::is_matrix_container_v<Matrix>,
                 "The type Matrix must be a valid matrix container.");
   using value_type   = typename Matrix::index_type;
@@ -258,7 +257,7 @@ typename Matrix::size_type count_true_diagonals(const Matrix& A) {
   Vector nnnz_per_diag(A.nrows() + A.ncols() - 1, 0);
   Impl::count_nnz_per_diagonal<ExecSpace>(A, nnnz_per_diag, false);
 
-  return Morpheus::count_nnz<ExecSpace>(nnnz_per_diag, A.nrows() / 3);
+  return Morpheus::count_nnz<ExecSpace>(nnnz_per_diag, threshold);
 }
 
 /*! \}  // end of analytics group
