@@ -119,27 +119,41 @@ void convert(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using size_type  = typename SourceType::size_type;
-  using index_type = typename SourceType::index_type;
+  using size_type            = typename SourceType::size_type;
+  using index_type           = typename SourceType::index_type;
+  using src_index_array_type = typename SourceType::index_array_type;
 
   const size_type alignment = 32;
   const size_type num_entries_per_row =
       std::max<size_type>(1, src.nnnz() / src.nrows());
 
-  // compute number of nonzeros in the ELL and COO portions
-  size_type num_ell_entries = 0;
-  size_type entries_ctr     = 0;
-  index_type row_id         = 0;
+  src_index_array_type row_offsets(src.nrows() + 1, 0);
+  // compute number of non-zero entries per row of coo src
   for (size_type n = 0; n < src.nnnz(); n++) {
-    if (row_id != src.crow_indices(n)) {
-      entries_ctr = 0;
-      row_id      = src.crow_indices(n);
-    }
+    row_offsets(src.crow_indices(n))++;
+  }
 
-    if (entries_ctr < num_entries_per_row) {
-      num_ell_entries++;
-    }
-    entries_ctr++;
+  // cumsum the nnz per row to get csr row_offsets
+  index_type cumsum = 0;
+  for (size_type i = 0; i < src.nrows(); i++) {
+    index_type temp = row_offsets(i);
+    row_offsets(i)  = cumsum;
+    cumsum += temp;
+  }
+
+  row_offsets(src.nrows())  = src.nnnz();
+  size_type num_ell_entries = 0;
+  for (size_type i = 0; i < src.nrows(); i++) {
+    size_type entries_per_row = row_offsets(i + 1) - row_offsets(i);
+    num_ell_entries += entries_per_row > num_entries_per_row
+                           ? num_entries_per_row
+                           : entries_per_row;
+  }
+
+  if (Impl::exceeds_tolerance(src.nrows(), num_ell_entries,
+                              num_entries_per_row)) {
+    throw Morpheus::FormatConversionException(
+        "EllMatrix fill-in would exceed maximum tolerance");
   }
 
   size_type num_coo_entries = src.nnnz() - num_ell_entries;
@@ -154,7 +168,7 @@ void convert(
   dst.ell().values().assign(dst.ell().values().nrows(),
                             dst.ell().values().ncols(), 0);
 
-  row_id            = 0;
+  index_type row_id = 0;
   size_type coo_nnz = 0;
   for (size_type i = 0, n = 0; i < src.nnnz(); i++) {
     index_type row = src.crow_indices(i);

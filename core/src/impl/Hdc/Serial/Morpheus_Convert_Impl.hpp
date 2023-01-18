@@ -32,6 +32,7 @@
 #include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
+#include <Morpheus_MatrixAnalytics.hpp>
 
 #include <impl/Dia/Serial/Morpheus_Convert_Impl.hpp>
 #include <impl/Csr/Serial/Morpheus_Convert_Impl.hpp>
@@ -131,49 +132,71 @@ void convert(
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, SourceType, DestinationType>>::type* =
         nullptr) {
-  using size_type  = typename SourceType::size_type;
-  using index_type = typename SourceType::index_type;
+  using size_type            = typename SourceType::size_type;
+  using index_type           = typename SourceType::index_type;
+  using src_index_array_type = typename SourceType::index_array_type;
 
   index_type min_diag_elem = src.nrows() / 2;
-  std::vector<index_type> diag_map(src.nnnz(), 0);
+  src_index_array_type nnz_per_diag(src.nrows() + src.ncols() - 1, 0);
+  src_index_array_type bit_map(nnz_per_diag.size(), 0);
 
-  // Find on which diagonal each entry sits on
-  for (size_type n = 0; n < src.nnnz(); n++) {
-    diag_map[n] = src.ccolumn_indices(n) - src.crow_indices(n);
-  }
+  Morpheus::count_nnz_per_diagonal<ExecSpace>(src, nnz_per_diag, false);
 
-  size_type dia_nnz = 0, csr_nnz = 0;
-  // Create unique diagonal set
-  std::set<index_type> diag_set(diag_map.begin(), diag_map.end());
-
-  // Count non-zeros for each part and erase any diags from set that go into CSR
-  for (auto it = diag_set.begin(); it != diag_set.end();) {
-    index_type diag_elements =
-        std::count(diag_map.begin(), diag_map.end(), *it);
-    if (diag_elements < min_diag_elem) {
-      csr_nnz += diag_elements;
-      it = diag_set.erase(it);
-    } else {
-      dia_nnz += diag_elements;
-      ++it;
+  size_type ndiags = 0, dia_nnz = 0, csr_nnz = 0;
+  for (size_type i = 0; i < nnz_per_diag.size(); i++) {
+    if ((nnz_per_diag[i] >= min_diag_elem)) {
+      ndiags++;
+      dia_nnz += nnz_per_diag[i];
+      bit_map[i] = 1;
+    } else if ((nnz_per_diag[i] < min_diag_elem) && (nnz_per_diag[i] != 0)) {
+      csr_nnz += nnz_per_diag[i];
     }
   }
 
-  size_type ndiags          = diag_set.size();
-  const size_type alignment = 32;
-
-  dst.resize(src.nrows(), src.ncols(), dia_nnz, csr_nnz, ndiags, alignment);
-  dst.csr().row_offsets().assign(src.nrows() + 1, 0);
-  for (auto it = diag_set.cbegin(); it != diag_set.cend(); ++it) {
-    auto i                        = std::distance(diag_set.cbegin(), it);
-    dst.dia().diagonal_offsets(i) = *it;
+  if (Impl::exceeds_tolerance(src.nrows(), dia_nnz, ndiags)) {
+    throw Morpheus::FormatConversionException(
+        "DiaMatrix fill-in would exceed maximum tolerance");
   }
 
-  size_type csr_entries = 0;
+  const size_type alignment = 32;
+  dst.resize(src.nrows(), src.ncols(), dia_nnz, csr_nnz, ndiags, alignment);
+  dst.csr().row_offsets().assign(dst.csr().row_offsets().size(), 0);
+
+  int nnz_mid_point = (int)nnz_per_diag.size() / 2;
+  int dia_ctr       = 0;
+  // Traverse left
+  for (int i = nnz_mid_point - 1; i >= 0; i--) {
+    if (bit_map[i]) {
+      int diagonal                        = i - (int)src.nrows() + 1;
+      dst.dia().diagonal_offsets(dia_ctr) = diagonal;
+      dia_ctr++;
+    }
+  }
+  // Midpoint
+  if (bit_map[nnz_mid_point]) {
+    dst.dia().diagonal_offsets(dia_ctr) = 0;
+    dia_ctr++;
+  }
+  // Traverse Right
+  for (int i = nnz_mid_point + 1; i < (int)nnz_per_diag.size(); i++) {
+    if (bit_map[i]) {
+      int diagonal                        = i - (int)src.nrows() + 1;
+      dst.dia().diagonal_offsets(dia_ctr) = diagonal;
+      dia_ctr++;
+    }
+  }
+  // Sort diagonal offsets
+  std::sort(dst.dia().diagonal_offsets().data(),
+            dst.dia().diagonal_offsets().data() +
+                dst.dia().diagonal_offsets().size());
+
+  size_type csr_entries = 0, dia_entries = 0;
   for (size_type n = 0; n < src.nnnz(); n++) {
     bool dia_entry = false;
     for (size_type i = 0; i < ndiags; i++) {
-      if (diag_map[n] == dst.dia().diagonal_offsets(i)) {
+      if (src.ccolumn_indices(n) - src.crow_indices(n) ==
+          dst.dia().diagonal_offsets(i)) {
+        dia_entries++;
         dst.dia().values(src.crow_indices(n), i) = src.cvalues(n);
         dia_entry                                = true;
         break;

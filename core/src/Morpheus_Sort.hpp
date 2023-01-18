@@ -25,6 +25,7 @@
 #define MORPHEUS_SORT_HPP
 
 #include <impl/Morpheus_Sort_Impl.hpp>
+#include <impl/Dynamic/Morpheus_Sort_Impl.hpp>
 
 namespace Morpheus {
 
