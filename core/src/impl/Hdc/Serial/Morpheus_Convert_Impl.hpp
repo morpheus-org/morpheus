@@ -136,7 +136,7 @@ void convert(
   using index_type           = typename SourceType::index_type;
   using src_index_array_type = typename SourceType::index_array_type;
 
-  index_type min_diag_elem = src.nrows() / 2;
+  index_type min_diag_elem = src.nrows() / 5;
   src_index_array_type nnz_per_diag(src.nrows() + src.ncols() - 1, 0);
   src_index_array_type bit_map(nnz_per_diag.size(), 0);
 
