@@ -26,11 +26,8 @@ if(NOT GTest_FOUND)
   FetchContent_MakeAvailable(googletest)
   add_library(morpheus_gtest ALIAS gtest_main)
 else()
+  set_target_properties(GTest::gtest PROPERTIES IMPORTED_GLOBAL TRUE)
   add_library(morpheus_gtest ALIAS GTest::gtest)
 endif()
-
-set(Morpheus_ENABLE_INDIVIDUAL_TESTS
-    OFF
-    CACHE INTERNAL "Whether to enable individual unit tests. Default is OFF.")
 
 message(STATUS "Morpheus_Gtest Library configured.")

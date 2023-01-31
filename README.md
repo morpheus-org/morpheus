@@ -19,7 +19,7 @@ $ make
 $ make install
 ```
 
-which configures, builds and installs a default Morpheus. Note that `Morpheus` **REQUIRES** [Kokkos](https://github.com/kokkos/kokkos) to be installed. Note that `Morpheus` inherits the enabled devices and compiler optimization flags from `Kokkos`.
+which configures, builds and installs a default Morpheus. Note that `Morpheus` **REQUIRES** [Kokkos v.3.5.0](https://github.com/kokkos/kokkos/tree/3.5.00) to be installed. Note that `Morpheus` inherits the enabled devices and compiler optimization flags from `Kokkos`.
 
 Once Morpheus is installed In your `CMakeLists.txt` simply use:
 
@@ -52,7 +52,11 @@ To define a container we need to specify four template parameters:
 - `ValueType`: The type of the values the container will hold. Valid types must satisfy `std::is_arithmetic` i.e to be an arithmetic type.
 - `IndexType`: The type of the indices the container will hold. Valid types must satisfy `std::is_integral` i.e to be an integral type.
 - `Layout`: Orientation of data in memory. Valid layouts are either  `Kokkos::LayoutLeft` (Column-Major) or `Kokkos::LayoutRight` (Row-Major).
-- `Space`: A memory or execution space supported by Kokkos. Valid *Memory* Spaces are `Kokkos::HostSpace`, `Kokkos::CudaSpace` and `Kokkos::HipSpace`. Valid *Execution* Spaces are `Kokkos::Serial`, `Kokkos::OpenMP`, `Kokkos::Cuda` and `Kokkos::HIP`. Note that specifying the execution space will determine in which space each member function will be executed. By not providing a space parameter `Morpheus` will choose a default one for you.
+- `Space`: A memory or execution space supported by Morpheus. 
+  - Valid *Memory* Spaces are `HostSpace`, `CudaSpace` and `HIPSpace`. 
+  - Valid *Execution* Spaces are `Serial`, `OpenMP`, `Cuda` and `HIP`. 
+  - Spaces can be **Generic** or **Custom** by specifying the appropriate namespace eg: `Morpheus::Generic::HostSpace` and `Morpheus::Custom::HostSpace` represent the generic and custom Host Memory space respectively. 
+  - Note that specifying the execution space will determine in which space each member function will be executed. By not providing a space parameter `Morpheus` will choose a default one for you.
 
 Note that only `ValueType` is mandatory. For the rest of the arguments, if not provided, sensible defaults will be selected.
 
@@ -64,15 +68,15 @@ int main(){
      * ValueType        : double
      * IndexType        : long long
      * Layout           : Kokkos::LayoutRight
-     * MemorySpace      : Kokkos::HostSpace 
+     * MemorySpace      : Morpheus::HostSpace 
      */
-    Morpheus::CooMatirx<double, long long, Kokkos::LayoutRight, Kokkos::HostSpace> A;  
+    Morpheus::CooMatirx<double, long long, Kokkos::LayoutRight, Morpheus::HostSpace> A;  
 
     /* 
      * ValueType        : double
      * IndexType        : int (Default)
      * Layout           : Kokkos::LayoutRight (Default), 
-     * MemorySpace      : Kokkos::DefaultSpace (Default) 
+     * MemorySpace      : Morpheus::DefaultSpace (Default) 
      */
     Morpheus::CsrMatirx<double> B; 
 }
@@ -84,7 +88,10 @@ For each algorithm the same interface is used across different formats. Algorith
 - Multiply (Sparse Matrix-Vector Multiplication)
 - Copy
 - Convert
+- Copy by key
 - Print
+- Update diagonal
+- Read/Write matrix market
 
 ```cpp
 #include <Morpheus_Core.hpp>
@@ -96,19 +103,19 @@ int main(){
     Morpheus::DenseVector<double,  Kokkos::HostSpace> x(3, 0), y(2, 0); 
     
     // Initializing A
-    A.row_indices[0] = 0;
-    A.column_indices[0] = 0;
-    A.values[0] = 3.5;
+    A.row_indices(0) = 0;
+    A.column_indices(0) = 0;
+    A.values(0) = 3.5;
 
-    A.row_indices[1] = 1;
-    A.column_indices[1] = 1;
-    A.values[1] = 1.5;
+    A.row_indices(1) = 1;
+    A.column_indices(1) = 1;
+    A.values(1) = 1.5;
 
     // Initializing x
-    x[0] = 1; x[1] = 2; x[2] = 3;
+    x(0) = 1; x(1) = 2; x(2) = 3;
 
     // y = A * x
-    Morpheus::Multiply<Kokkos::Serial>(A, x, y);
+    Morpheus::Multiply<Morpheus::Serial>(A, x, y);
 }
 ```
 
@@ -144,12 +151,6 @@ $ ${srcdir}/core/tests/MorpheusCore_UnitTest_Serial
 ```
 Same process can be followed for `OpenMP`, `Cuda` and `HIP`.
 
-To build and run all the available tests then do:
-```sh
-$ cd  ${srcdir}
-$ make MorpheusCore_UnitTest
-$ ${srcdir}/core/tests/MorpheusCore_UnitTest
-```
 To build and run the examples add the `-DMorpheus_ENABLE_EXAMPLES=On` during configuration. Similar process is followed as building the tests.
 
 # License

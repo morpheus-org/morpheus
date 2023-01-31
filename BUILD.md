@@ -33,10 +33,6 @@ cmake ${srcdir} \
 ```
 which, e.g. activates the CUBLAS dependency. The full keyword listing is below.
 
-## Morpheus CMake Option Listing
-<!-- TODO -->
-
-
 ## Archer 
 
 ### Setup environment - Cray
@@ -123,7 +119,7 @@ $ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/cuda-11.0
 
 ## Local Machine
 ```sh
-$ CXX_COMPILER=/usr/local/bin/g++-11
+$ CXX_COMPILER=/usr/local/bin/g++-12
 $ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/gnu
 $ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/gnu
 ```

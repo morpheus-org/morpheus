@@ -41,7 +41,7 @@ get_directory_property(MORPHEUS_HAS_PARENT PARENT_DIRECTORY)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
                       "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
@@ -83,8 +83,8 @@ elseif(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
   )
 endif()
 
-set(Morpheus_VERSION_MAJOR 00)
-set(Morpheus_VERSION_MINOR 05)
+set(Morpheus_VERSION_MAJOR 10)
+set(Morpheus_VERSION_MINOR 00)
 set(Morpheus_VERSION_PATCH 00)
 set(Morpheus_VERSION
     "${Morpheus_VERSION_MAJOR}.${Morpheus_VERSION_MINOR}.${Morpheus_VERSION_PATCH}"
