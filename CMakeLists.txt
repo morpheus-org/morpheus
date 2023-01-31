@@ -83,7 +83,7 @@ elseif(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
   )
 endif()
 
-set(Morpheus_VERSION_MAJOR 10)
+set(Morpheus_VERSION_MAJOR 01)
 set(Morpheus_VERSION_MINOR 00)
 set(Morpheus_VERSION_PATCH 00)
 set(Morpheus_VERSION
