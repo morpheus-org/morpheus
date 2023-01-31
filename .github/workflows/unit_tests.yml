@@ -24,8 +24,8 @@ jobs:
     steps:
       - name: Install/Update Packages
         run: |
-          sudo apt-get update
-          sudo apt-get install googletest
+          sudo apt update
+          sudo apt install googletest
 
       - name: Install/Update Compilers
         run: |
