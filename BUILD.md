@@ -235,6 +235,9 @@ Options can be enabled by specifying `-DMorpheus_ENABLE_X`.
 * Morpheus_ENABLE_TESTS
     * Whether to enable building tests
     * BOOL Default: OFF
+* Morpheus_ENABLE_DOCS
+    * Whether to enable building documentation
+    * BOOL Default: OFF
 * Morpheus_ENABLE_BENCHMARKS
     * Whether to enable building benchmarks
     * BOOL Default: OFF

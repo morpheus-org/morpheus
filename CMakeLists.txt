@@ -110,9 +110,6 @@ include(cmake/morpheus_utils.cmake)
 # Place here variables we will append as we go
 global_set(MORPHEUS_TPL_EXPORTS)
 
-# The build environment setup goes in the following steps
-#
-# 1.
 morpheus_setup_build_environment() # TODO
 
 # Finish off the build

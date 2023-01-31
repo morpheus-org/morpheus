@@ -338,6 +338,10 @@ macro(MORPHEUS_SETUP_BUILD_ENVIRONMENT)
       OFF
       CACHE INTERNAL "Whether to build examples")
 
+  set(Morpheus_ENABLE_DOCS
+      OFF
+      CACHE INTERNAL "Whether to build documentation")
+
   set(Morpheus_ENABLE_BENCHMARKS
       OFF
       CACHE INTERNAL "Whether to build benchmarks")
@@ -351,6 +355,14 @@ macro(MORPHEUS_SETUP_BUILD_ENVIRONMENT)
     find_package(Morpheus REQUIRED)
     # Still need to figure out which backends
     include(cmake/morpheus_backends.cmake)
+
+    if(Morpheus_ENABLE_TESTS OR Morpheus_ENABLE_EXAMPLES)
+      include(cmake/morpheus_gtest.cmake)
+    endif()
+
+    if(Morpheus_ENABLE_DOCS)
+      include(cmake/morpheus_doxygen.cmake)
+    endif()
   else()
     # Regular build, not install testing
     if(NOT MORPHEUS_HAS_PARENT)
@@ -367,6 +379,10 @@ macro(MORPHEUS_SETUP_BUILD_ENVIRONMENT)
 
     if(Morpheus_ENABLE_TESTS OR Morpheus_ENABLE_EXAMPLES)
       include(cmake/morpheus_gtest.cmake)
+    endif()
+
+    if(Morpheus_ENABLE_DOCS)
+      include(cmake/morpheus_doxygen.cmake)
     endif()
 
     # ==================================================================
