@@ -46,24 +46,12 @@ void count_occurences(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, VectorIn, VectorOut>>* = nullptr) {
-  using size_type  = typename VectorIn::size_type;
-  using index_type = typename VectorIn::value_type;
+  using size_type = typename VectorIn::size_type;
 
   if (in.size() == 0) return;
 
-  Kokkos::sort(in.const_view());
-  index_type prev_key = in[0];
-
-  out[in[0]]++;
-  for (size_type i = 1; i < in.size(); i++) {
-    index_type key = in[i];
-    if (prev_key == key) {
-      out[key]++;
-    } else {
-      out[key]++;
-    }
-
-    prev_key = key;
+  for (size_type i = 0; i < in.size(); i++) {
+    out[in[i]]++;
   }
 }
 

@@ -92,7 +92,6 @@ void count_nnz_per_diagonal(
           offsets_view[row] = sum;
         };
       });
-  // Kokkos::fence();
 
   // generate cumulative nnnz per row
   size_type result;
@@ -103,13 +102,13 @@ void count_nnz_per_diagonal(
         partial_sum += offsets_view[i];
       },
       result);
-  // Kokkos::fence();
 
   // parallelize over rows to find the nnnz per diagonal
   size_type nrows = A.nrows();
-  IndexVector diag_idx(A.nnnz(), 0);
-  typename IndexVector::value_array_type diag_view = diag_idx.view();
+  typename Vector::value_array_type nnz_per_diagonal_view =
+      nnz_per_diagonal.view();
   range_policy range(0, A.nrows());
+
   Kokkos::parallel_for(
       range, KOKKOS_LAMBDA(const size_type i) {
         for (index_type jj = mirror_offsets_view[i];
@@ -118,12 +117,11 @@ void count_nnz_per_diagonal(
           if (col != invalid_index &&
               values(i, jj - mirror_offsets_view[i]) != 0) {
             // Diagonal index is offseted by the number of rows
-            diag_view[jj] = col - i + nrows - 1;
+            size_type idx = col - i + nrows - 1;
+            Kokkos::atomic_increment(&nnz_per_diagonal_view(idx));
           }
         }
       });
-
-  Impl::count_occurences<ExecSpace>(diag_idx, nnz_per_diagonal);
 }
 
 }  // namespace Impl

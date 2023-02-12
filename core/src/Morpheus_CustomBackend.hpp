@@ -133,11 +133,11 @@ using CudaSpace = Morpheus::CustomBackend<Kokkos::CudaSpace>;
 /*! @brief A Custom Space that launches kernels in parallel using the HIP
  * backend.
  */
-using HIP = Morpheus::CustomBackend<Kokkos::HIP>;
+using HIP = Morpheus::CustomBackend<Kokkos::Experimental::HIP>;
 
 /*! @brief The Custom HIP memory space
  */
-using HIPSpace = Morpheus::CustomBackend<Kokkos::HIPSpace>;
+using HIPSpace = Morpheus::CustomBackend<Kokkos::Experimental::HIPSpace>;
 #endif
 }  // namespace Custom
 

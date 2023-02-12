@@ -50,7 +50,7 @@ inline void count_nnz_per_row(
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using size_type  = typename Matrix::size_type;
   using index_type = typename Matrix::index_type;
-  using value_type = typename Matrix::value_type;
+  using value_type = typename Vector::value_type;
 
   MORPHEUS_ASSERT(nnz_per_row.size() == A.nrows(),
                   "Destination vector must have equal size to the source "

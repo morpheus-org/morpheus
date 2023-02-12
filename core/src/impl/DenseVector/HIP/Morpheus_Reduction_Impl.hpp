@@ -219,7 +219,7 @@ typename Vector::value_type reduce(
   }
 
   if (reduced_size > 1) {
-    typename Vector::HostMirror h_out(s, 0);
+    typename Vector::HostMirror h_out(reduced_size, 0);
     // copy result from device to host
     Impl::copy(out, h_out, 0, reduced_size, 0, reduced_size);
     result = reduce<Kokkos::Serial>(h_out, reduced_size);

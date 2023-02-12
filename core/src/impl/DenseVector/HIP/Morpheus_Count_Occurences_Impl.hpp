@@ -35,7 +35,7 @@
 #include <Morpheus_Spaces.hpp>
 
 #include <impl/DenseVector/Kernels/Morpheus_VectorAnalytics_Impl.hpp>
-#include <impl/DenseVector/Kokkos/Morpheus_VectorAnalytics_Impl.hpp>
+#include <impl/DenseVector/Kernels/Morpheus_Segmented_Reduction_Impl.hpp>
 
 #include <Kokkos_Sort.hpp>
 

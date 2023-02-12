@@ -53,7 +53,7 @@ class is_memory_space {
 #if defined(MORPHEUS_ENABLE_CUDA)
                                   std::is_same<U, Kokkos::CudaSpace>::value ||
 #elif defined(MORPHEUS_ENABLE_HIP)
-                                  std::is_same<U, Kokkos::HIPSpace>::value ||
+                                  std::is_same<U, Kokkos::Experimental::HIPSpace>::value ||
 #endif
                                   false>::type* = nullptr);
 
@@ -602,7 +602,7 @@ class is_hip_execution_space {
   template <class U>
   static yes& test(U*, typename std::enable_if<
 #if defined(MORPHEUS_ENABLE_HIP)
-                           std::is_same<U, Kokkos::HIP>::value ||
+                           std::is_same<U, Kokkos::Experimental::HIP>::value ||
 #endif  // MORPHEUS_ENABLE_HIP
                            false>::type* = nullptr);
 

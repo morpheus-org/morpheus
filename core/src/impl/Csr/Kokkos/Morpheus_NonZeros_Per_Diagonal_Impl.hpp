@@ -48,8 +48,6 @@ void count_nnz_per_diagonal(
   using policy_index_type = Kokkos::IndexType<size_type>;
   using range_policy = Kokkos::RangePolicy<policy_index_type, execution_space>;
   using index_array  = typename Matrix::index_array_type::value_array_type;
-  using IndexVector =
-      Morpheus::DenseVector<index_type, size_type, typename Matrix::backend>;
 
   MORPHEUS_ASSERT(nnz_per_diagonal.size() == A.nrows() + A.ncols() - 1,
                   "Destination vector must have equal size to the source "
@@ -63,8 +61,8 @@ void count_nnz_per_diagonal(
   }
 
   size_type nrows = A.nrows();
-  IndexVector diag_idx(A.nnnz(), 0);
-  typename IndexVector::value_array_type diag_view = diag_idx.view();
+  typename Vector::value_array_type nnz_per_diagonal_view =
+      nnz_per_diagonal.view();
   // Extract diagonal index of each nnz
   range_policy policy(0, A.nrows());
 
@@ -72,11 +70,10 @@ void count_nnz_per_diagonal(
       policy, KOKKOS_LAMBDA(const size_type i) {
         for (index_type jj = row_offsets[i]; jj < row_offsets[i + 1]; jj++) {
           // Diagonal index is offseted by the number of rows
-          diag_view[jj] = column_indices[jj] - i + nrows - 1;
+          size_type idx = column_indices[jj] - i + nrows - 1;
+          Kokkos::atomic_increment(&nnz_per_diagonal_view(idx));
         }
       });
-
-  Impl::count_occurences<ExecSpace>(diag_idx, nnz_per_diagonal);
 }
 
 }  // namespace Impl
