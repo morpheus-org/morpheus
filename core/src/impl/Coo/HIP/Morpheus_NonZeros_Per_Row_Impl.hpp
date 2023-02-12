@@ -47,7 +47,7 @@ void __count_nnz_per_row_coo_flat(const Matrix& A, Vector& nnz_per_row,
 
 template <typename Matrix, typename Vector>
 void __count_nnz_per_row_coo_serial(const Matrix& A, Vector& nnz_per_row,
-                                     const bool init);
+                                    const bool init);
 
 template <typename ExecSpace, typename Matrix, typename Vector>
 inline void count_nnz_per_row(

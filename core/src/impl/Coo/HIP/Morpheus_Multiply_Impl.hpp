@@ -129,16 +129,17 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
   }
 
   const size_type BLOCK_SIZE = 256;
-  const size_type MAX_BLOCKS = max_active_blocks(
-      Kernels::spmv_coo_flat_kernel<size_type, index_type,
+  const size_type MAX_BLOCKS =
+      max_active_blocks(Kernels::spmv_coo_flat_kernel<size_type, index_type,
                                                       value_type, BLOCK_SIZE>,
-      BLOCK_SIZE, 0);
+                        BLOCK_SIZE, 0);
   const size_type WARPS_PER_BLOCK = BLOCK_SIZE / WARP_SIZE;
 
   const size_type num_units = A.nnnz() / WARP_SIZE;
   const size_type num_warps = std::min(num_units, WARPS_PER_BLOCK * MAX_BLOCKS);
-  const size_type num_blocks =  Impl::ceil_div<size_type>(num_warps, WARPS_PER_BLOCK);
-  const size_type num_iters  =  Impl::ceil_div<size_type>(num_units, num_warps);
+  const size_type num_blocks =
+      Impl::ceil_div<size_type>(num_warps, WARPS_PER_BLOCK);
+  const size_type num_iters = Impl::ceil_div<size_type>(num_units, num_warps);
 
   const size_type interval_size = WARP_SIZE * num_iters;
 
@@ -147,7 +148,7 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
                               // than WARP_SIZE elements)
 
   const size_type active_warps =
-      (interval_size == 0) ? 0 :  Impl::ceil_div<size_type>(tail, interval_size);
+      (interval_size == 0) ? 0 : Impl::ceil_div<size_type>(tail, interval_size);
 
   typename Matrix::index_array_type temp_rows(active_warps, 0);
   typename Matrix::value_array_type temp_vals(active_warps, 0);

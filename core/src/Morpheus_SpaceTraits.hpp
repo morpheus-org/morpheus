@@ -53,7 +53,8 @@ class is_memory_space {
 #if defined(MORPHEUS_ENABLE_CUDA)
                                   std::is_same<U, Kokkos::CudaSpace>::value ||
 #elif defined(MORPHEUS_ENABLE_HIP)
-                                  std::is_same<U, Kokkos::Experimental::HIPSpace>::value ||
+                                  std::is_same<U, Kokkos::Experimental::
+                                                      HIPSpace>::value ||
 #endif
                                   false>::type* = nullptr);
 
