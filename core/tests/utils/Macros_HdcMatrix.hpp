@@ -97,46 +97,40 @@ void reset_small_container(
 
   // clang-format off
   // DIA Part
-  c.dia().diagonal_offsets(0) = -3; 
-  c.dia().diagonal_offsets(1) = 0; 
-  c.dia().diagonal_offsets(2) = 3; 
+  c.dia().diagonal_offsets(0) = -8; 
+  c.dia().diagonal_offsets(1) = -3; 
+  c.dia().diagonal_offsets(2) = 0; 
+  c.dia().diagonal_offsets(3) = 3;
+  c.dia().diagonal_offsets(4) = 8; 
 
-  c.dia().values(0, 0) = (value_type)0;     c.dia().values(0, 1) = (value_type)1.11;  c.dia().values(0, 2) = (value_type)2.22;
-  c.dia().values(1, 0) = (value_type)0;     c.dia().values(1, 1) = (value_type)5.55;  c.dia().values(1, 2) = (value_type)6.66;
-  c.dia().values(2, 0) = (value_type)0;     c.dia().values(2, 1) = (value_type)9.99;  c.dia().values(2, 2) = (value_type)10.10;
-  c.dia().values(3, 0) = (value_type)11.11; c.dia().values(3, 1) = (value_type)12.12; c.dia().values(3, 2) = (value_type)13.13;
-  c.dia().values(4, 0) = (value_type)14.14; c.dia().values(4, 1) = (value_type)15.15; c.dia().values(4, 2) = (value_type)16.16;
-  c.dia().values(5, 0) = (value_type)17.17; c.dia().values(5, 1) = (value_type)18.18; c.dia().values(5, 2) = (value_type)19.19;
-  c.dia().values(6, 0) = (value_type)20.20; c.dia().values(6, 1) = (value_type)21.21; c.dia().values(6, 2) = (value_type)22.22;
-  c.dia().values(7, 0) = (value_type)25.25; c.dia().values(7, 1) = (value_type)26.26; c.dia().values(7, 2) = (value_type)0;
-  c.dia().values(8, 0) = (value_type)28.28; c.dia().values(8, 1) = (value_type)29.29; c.dia().values(8, 2) = (value_type)0;
-  c.dia().values(9, 0) = (value_type)31.31; c.dia().values(9, 1) = (value_type)32.32; c.dia().values(9, 2) = (value_type)0;
+  c.dia().values(0, 0) = (value_type)0;     c.dia().values(0, 1) = (value_type)0;     c.dia().values(0, 2) = (value_type)1.11;  c.dia().values(0, 3) = (value_type)2.22;  c.dia().values(0, 4) = (value_type)4.44;  
+  c.dia().values(1, 0) = (value_type)0;     c.dia().values(1, 1) = (value_type)0;     c.dia().values(1, 2) = (value_type)5.55;  c.dia().values(1, 3) = (value_type)6.66;  c.dia().values(1, 4) = (value_type)8.88;  
+  c.dia().values(2, 0) = (value_type)0;     c.dia().values(2, 1) = (value_type)0;     c.dia().values(2, 2) = (value_type)9.99;  c.dia().values(2, 3) = (value_type)10.10; c.dia().values(2, 4) = (value_type)0;
+  c.dia().values(3, 0) = (value_type)0;     c.dia().values(3, 1) = (value_type)11.11; c.dia().values(3, 2) = (value_type)12.12; c.dia().values(3, 3) = (value_type)13.13; c.dia().values(3, 4) = (value_type)0;
+  c.dia().values(4, 0) = (value_type)0;     c.dia().values(4, 1) = (value_type)14.14; c.dia().values(4, 2) = (value_type)15.15; c.dia().values(4, 3) = (value_type)16.16; c.dia().values(4, 4) = (value_type)0;
+  c.dia().values(5, 0) = (value_type)0;     c.dia().values(5, 1) = (value_type)17.17; c.dia().values(5, 2) = (value_type)18.18; c.dia().values(5, 3) = (value_type)19.19; c.dia().values(5, 4) = (value_type)0;
+  c.dia().values(6, 0) = (value_type)0;     c.dia().values(6, 1) = (value_type)20.20; c.dia().values(6, 2) = (value_type)21.21; c.dia().values(6, 3) = (value_type)22.22; c.dia().values(6, 4) = (value_type)0;
+  c.dia().values(7, 0) = (value_type)0;     c.dia().values(7, 1) = (value_type)25.25; c.dia().values(7, 2) = (value_type)26.26; c.dia().values(7, 3) = (value_type)0;     c.dia().values(7, 4) = (value_type)0;    
+  c.dia().values(8, 0) = (value_type)27.27; c.dia().values(8, 1) = (value_type)28.28; c.dia().values(8, 2) = (value_type)29.29; c.dia().values(8, 3) = (value_type)0;     c.dia().values(8, 4) = (value_type)0;     
+  c.dia().values(9, 0) = (value_type)30.30; c.dia().values(9, 1) = (value_type)31.31; c.dia().values(9, 2) = (value_type)32.32; c.dia().values(9, 3) = (value_type)0;     c.dia().values(9, 4) = (value_type)0;    
 
   // CSR Part
   c.csr().row_offsets(0)  = 0; 
-  c.csr().row_offsets(1)  = 2; 
-  c.csr().row_offsets(2)  = 4; 
-  c.csr().row_offsets(3)  = 4;
-  c.csr().row_offsets(4)  = 4; 
-  c.csr().row_offsets(5)  = 4; 
-  c.csr().row_offsets(6)  = 4; 
-  c.csr().row_offsets(7)  = 4;
-  c.csr().row_offsets(8)  = 6; 
-  c.csr().row_offsets(9)  = 7; 
-  c.csr().row_offsets(10) = 8; 
+  c.csr().row_offsets(1)  = 1;
+  c.csr().row_offsets(2)  = 2;
+  c.csr().row_offsets(3)  = 2;
+  c.csr().row_offsets(4)  = 2;
+  c.csr().row_offsets(5)  = 2;
+  c.csr().row_offsets(6)  = 2;
+  c.csr().row_offsets(7)  = 2;
+  c.csr().row_offsets(8)  = 4;
+  c.csr().row_offsets(9)  = 4;
+  c.csr().row_offsets(10) = 4;
 
   c.csr().column_indices(0)  = 7; c.csr().values(0)  = (value_type)3.33;
-  c.csr().column_indices(1)  = 8; c.csr().values(1)  = (value_type)4.44;
-
-  c.csr().column_indices(2)  = 7; c.csr().values(2)  = (value_type)7.77;
-  c.csr().column_indices(3)  = 9; c.csr().values(3)  = (value_type)8.88;
-
-  c.csr().column_indices(4) = 0; c.csr().values(4) = (value_type)23.23;
-  c.csr().column_indices(5) = 1; c.csr().values(5) = (value_type)24.24;
-
-  c.csr().column_indices(6) = 0; c.csr().values(6) = (value_type)27.27;
-
-  c.csr().column_indices(7) = 1; c.csr().values(7) = (value_type)30.30;
+  c.csr().column_indices(1)  = 7; c.csr().values(1)  = (value_type)7.77;
+  c.csr().column_indices(2) = 0; c.csr().values(2) = (value_type)23.23;
+  c.csr().column_indices(3) = 1; c.csr().values(3) = (value_type)24.24;
   // clang-format on
 }
 
@@ -167,46 +161,40 @@ void update_small_container(
 
   // clang-format off
   // DIA Part
-  c.dia().diagonal_offsets(0) = -3; 
-  c.dia().diagonal_offsets(1) = 0; 
-  c.dia().diagonal_offsets(2) = 3; 
+  c.dia().diagonal_offsets(0) = -8; 
+  c.dia().diagonal_offsets(1) = -3; 
+  c.dia().diagonal_offsets(2) = 0; 
+  c.dia().diagonal_offsets(3) = 3; 
+  c.dia().diagonal_offsets(4) = 8; 
 
-  c.dia().values(0, 0) = (value_type)0;      c.dia().values(0, 1) = (value_type)1.11;   c.dia().values(0, 2) = (value_type)2.22;
-  c.dia().values(1, 0) = (value_type)0;      c.dia().values(1, 1) = (value_type)5.55;   c.dia().values(1, 2) = (value_type)6.66;
-  c.dia().values(2, 0) = (value_type)0;      c.dia().values(2, 1) = (value_type)9.99;   c.dia().values(2, 2) = (value_type)10.10;
-  c.dia().values(3, 0) = (value_type)11.11;  c.dia().values(3, 1) = (value_type)12.12;  c.dia().values(3, 2) = (value_type)13.13;
-  c.dia().values(4, 0) = (value_type)-14.14; c.dia().values(4, 1) = (value_type)-15.15; c.dia().values(4, 2) = (value_type)16.16;
-  c.dia().values(5, 0) = (value_type)17.17;  c.dia().values(5, 1) = (value_type)18.18;  c.dia().values(5, 2) = (value_type)19.19;
-  c.dia().values(6, 0) = (value_type)20.20;  c.dia().values(6, 1) = (value_type)21.21;  c.dia().values(6, 2) = (value_type)22.22;
-  c.dia().values(7, 0) = (value_type)-25.25; c.dia().values(7, 1) = (value_type)26.26;  c.dia().values(7, 2) = (value_type)0;
-  c.dia().values(8, 0) = (value_type)28.28;  c.dia().values(8, 1) = (value_type)29.29;  c.dia().values(8, 2) = (value_type)0;
-  c.dia().values(9, 0) = (value_type)31.31;  c.dia().values(9, 1) = (value_type)32.32;  c.dia().values(9, 2) = (value_type)0;
+  c.dia().values(0, 0) = (value_type)0;     c.dia().values(0, 1) = (value_type)0;      c.dia().values(0, 2) = (value_type)1.11;   c.dia().values(0, 3) = (value_type)2.22;  c.dia().values(0, 4) = (value_type)-4.44;   
+  c.dia().values(1, 0) = (value_type)0;     c.dia().values(1, 1) = (value_type)0;      c.dia().values(1, 2) = (value_type)5.55;   c.dia().values(1, 3) = (value_type)6.66;  c.dia().values(1, 4) = (value_type)-8.88;   
+  c.dia().values(2, 0) = (value_type)0;     c.dia().values(2, 1) = (value_type)0;      c.dia().values(2, 2) = (value_type)9.99;   c.dia().values(2, 3) = (value_type)10.10; c.dia().values(2, 4) = (value_type)0; 
+  c.dia().values(3, 0) = (value_type)0;     c.dia().values(3, 1) = (value_type)11.11;  c.dia().values(3, 2) = (value_type)12.12;  c.dia().values(3, 3) = (value_type)13.13; c.dia().values(3, 4) = (value_type)0; 
+  c.dia().values(4, 0) = (value_type)0;     c.dia().values(4, 1) = (value_type)-14.14; c.dia().values(4, 2) = (value_type)-15.15; c.dia().values(4, 3) = (value_type)16.16; c.dia().values(4, 4) = (value_type)0; 
+  c.dia().values(5, 0) = (value_type)0;     c.dia().values(5, 1) = (value_type)17.17;  c.dia().values(5, 2) = (value_type)18.18;  c.dia().values(5, 3) = (value_type)19.19; c.dia().values(5, 4) = (value_type)0; 
+  c.dia().values(6, 0) = (value_type)0;     c.dia().values(6, 1) = (value_type)20.20;  c.dia().values(6, 2) = (value_type)21.21;  c.dia().values(6, 3) = (value_type)22.22; c.dia().values(6, 4) = (value_type)0; 
+  c.dia().values(7, 0) = (value_type)0;     c.dia().values(7, 1) = (value_type)-25.25; c.dia().values(7, 2) = (value_type)26.26;  c.dia().values(7, 3) = (value_type)0;     c.dia().values(7, 4) = (value_type)0;     
+  c.dia().values(8, 0) = (value_type)27.27; c.dia().values(8, 1) = (value_type)28.28;  c.dia().values(8, 2) = (value_type)29.29;  c.dia().values(8, 3) = (value_type)0;     c.dia().values(8, 4) = (value_type)0;     
+  c.dia().values(9, 0) = (value_type)30.30; c.dia().values(9, 1) = (value_type)31.31;  c.dia().values(9, 2) = (value_type)32.32;  c.dia().values(9, 3) = (value_type)0;     c.dia().values(9, 4) = (value_type)0;     
 
   // CSR Part
   c.csr().row_offsets(0)  = 0; 
-  c.csr().row_offsets(1)  = 2; 
-  c.csr().row_offsets(2)  = 4; 
-  c.csr().row_offsets(3)  = 4;
-  c.csr().row_offsets(4)  = 4; 
-  c.csr().row_offsets(5)  = 4; 
-  c.csr().row_offsets(6)  = 4; 
-  c.csr().row_offsets(7)  = 4;
-  c.csr().row_offsets(8)  = 6; 
-  c.csr().row_offsets(9)  = 7; 
-  c.csr().row_offsets(10) = 8; 
+  c.csr().row_offsets(1)  = 1; 
+  c.csr().row_offsets(2)  = 2; 
+  c.csr().row_offsets(3)  = 2;
+  c.csr().row_offsets(4)  = 2; 
+  c.csr().row_offsets(5)  = 2; 
+  c.csr().row_offsets(6)  = 2; 
+  c.csr().row_offsets(7)  = 2;
+  c.csr().row_offsets(8)  = 4; 
+  c.csr().row_offsets(9)  = 4; 
+  c.csr().row_offsets(10) = 4; 
 
   c.csr().column_indices(0)  = 7; c.csr().values(0)  = (value_type)3.33;
-  c.csr().column_indices(1)  = 8; c.csr().values(1)  = (value_type)-4.44;
-
-  c.csr().column_indices(2)  = 7; c.csr().values(2)  = (value_type)7.77;
-  c.csr().column_indices(3)  = 9; c.csr().values(3)  = (value_type)-8.88;
-
-  c.csr().column_indices(4) = 0; c.csr().values(4) = (value_type)23.23;
-  c.csr().column_indices(5) = 1; c.csr().values(5) = (value_type)24.24;
-
-  c.csr().column_indices(6) = 0; c.csr().values(6) = (value_type)27.27;
-
-  c.csr().column_indices(7) = 1; c.csr().values(7) = (value_type)30.30;
+  c.csr().column_indices(1)  = 7; c.csr().values(1)  = (value_type)7.77;
+  c.csr().column_indices(2) = 0; c.csr().values(2) = (value_type)23.23;
+  c.csr().column_indices(3) = 1; c.csr().values(3) = (value_type)24.24;
   // clang-format on
 }
 

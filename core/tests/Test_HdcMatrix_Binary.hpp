@@ -211,7 +211,7 @@ TYPED_TEST(HdcMatrixBinaryTest, ResizeFromHdcMatrix) {
   CHECK_HDC_CONTAINERS(Asmall, Ah);
 
   // Set back to normal
-  Ah.dia().diagonal_offsets(1) = 0;
+  Ah.dia().diagonal_offsets(1) = -3;
   Ah.dia().values(1, 0)        = (value_type)0;
   Ah.csr().row_offsets(0)      = 0;
   Ah.csr().column_indices(0)   = 7;

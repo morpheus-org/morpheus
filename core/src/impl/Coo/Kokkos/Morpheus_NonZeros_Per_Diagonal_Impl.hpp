@@ -45,7 +45,6 @@ void count_nnz_per_diagonal(
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
   using execution_space   = typename ExecSpace::execution_space;
   using size_type         = typename Matrix::size_type;
-  using index_type        = typename Matrix::index_type;
   using policy_index_type = Kokkos::IndexType<size_type>;
   using range_policy = Kokkos::RangePolicy<policy_index_type, execution_space>;
   using index_array  = typename Matrix::index_array_type::value_array_type;

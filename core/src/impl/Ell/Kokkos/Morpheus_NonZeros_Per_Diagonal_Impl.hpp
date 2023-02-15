@@ -49,8 +49,6 @@ void count_nnz_per_diagonal(
   using member_type = typename Kokkos::TeamPolicy<execution_space>::member_type;
   using value_array_type = typename Matrix::value_array_type::value_array_type;
   using index_array_type = typename Matrix::index_array_type::value_array_type;
-  using IndexVector =
-      Morpheus::DenseVector<index_type, size_type, typename Matrix::backend>;
 
   MORPHEUS_ASSERT(nnz_per_diagonal.size() == A.nrows() + A.ncols() - 1,
                   "Destination vector must have equal size to the source "

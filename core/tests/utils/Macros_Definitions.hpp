@@ -38,9 +38,9 @@ const size_t SMALL_HYB_ELL_NNZ         = 29;
 const size_t SMALL_HYB_COO_NNZ         = 3;
 const size_t SMALL_HYB_ENTRIES_PER_ROW = 3;
 
-const size_t SMALL_HDC_DIA_NNZ   = 24;
-const size_t SMALL_HDC_CSR_NNZ   = 8;
-const size_t SMALL_HDC_DIA_NDIAG = 3;
+const size_t SMALL_HDC_DIA_NNZ   = 28;
+const size_t SMALL_HDC_CSR_NNZ   = 4;
+const size_t SMALL_HDC_DIA_NDIAG = 5;
 
 const size_t SMALL_VECTOR_SIZE = 10;
 

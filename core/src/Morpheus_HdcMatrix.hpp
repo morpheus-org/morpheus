@@ -145,6 +145,7 @@ class HdcMatrix : public MatrixBase<HdcMatrix, ValueType, Properties...> {
   using const_dia_matrix_type =
       const Morpheus::DiaMatrix<ValueType, Properties...>;
 
+  constexpr static double true_diagonal_ratio = 0.2;
   /**
    * @brief The default destructor.
    */

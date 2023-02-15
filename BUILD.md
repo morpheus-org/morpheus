@@ -94,7 +94,7 @@ $ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/intel
 ```sh
 $ module load cmake
 $ module load gcc/10.2.0
-$ CXX_COMPILER=/lustre/sw/gcc/10.2.0/bin/g++
+$ CXX_COMPILER=$(which g++)
 $ KOKKOS_INSTALL_DIR=/install/path/of/kokkos/with/gnu
 $ MORPHEUS_INSTALL_DIR=/install/path/of/morpheus/with/gnu
 ```
@@ -147,7 +147,7 @@ $ make install
 ```sh
 $ cmake .. -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_INSTALL_PREFIX=${MORPHEUS_INSTALL_DIR} \
            -DKokkos_ROOT=${KOKKOS_INSTALL_DIR} -DCMAKE_BUILD_TYPE=Release \
-           -DMorpheus_ENABLE_EXAMPLES=On -DMorpheus_ENABLE_TESTS=On
+           -DMorpheus_ENABLE_EXAMPLES=Off -DMorpheus_ENABLE_TESTS=Off
 $ make
 $ make install
 ```
@@ -238,6 +238,9 @@ Options can be enabled by specifying `-DMorpheus_ENABLE_X`.
     * BOOL Default: OFF
 * Morpheus_ENABLE_TESTS
     * Whether to enable building tests
+    * BOOL Default: OFF
+* Morpheus_ENABLE_RAPID_TESTING
+    * Whether to enable building a small portion of tests
     * BOOL Default: OFF
 * Morpheus_ENABLE_BENCHMARKS
     * Whether to enable building benchmarks
