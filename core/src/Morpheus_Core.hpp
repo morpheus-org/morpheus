@@ -86,6 +86,8 @@ void initialize(int& argc, char* argv[], InitArguments& args,
 void print_configuration(std::ostream& out, const bool detail = true);
 void initialize(InitArguments args = InitArguments(), bool banner = true);
 void finalize();
+bool is_initialized();
+bool is_finalized();
 
 }  // namespace Morpheus
 
