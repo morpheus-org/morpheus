@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -33,12 +33,39 @@ MORPHEUS_IMPL_HAS_TRAIT(traits)
 }  // namespace Morpheus
 
 namespace types {
+#ifdef MORPHEUS_RAPID_TESTING
+using value_tlist  = Morpheus::TypeList<double>;
+using index_tlist  = Morpheus::TypeList<int>;
+using layout_tlist = Morpheus::TypeList<typename TEST_EXECSPACE::array_layout>;
+using space_tlist  = Morpheus::TypeList<TEST_CUSTOM_SPACE>;
+
+using convert_value_tlist  = Morpheus::TypeList<double>;
+using convert_index_tlist  = Morpheus::TypeList<long long>;
+using convert_layout_tlist = Morpheus::TypeList<Kokkos::LayoutLeft>;
+using convert_space_tlist  = Morpheus::TypeList<TEST_CUSTOM_SPACE>;
+
+using compatible_value_tlist  = Morpheus::TypeList<double>;
+using compatible_index_tlist  = Morpheus::TypeList<int>;
+using compatible_layout_tlist = Morpheus::TypeList<Kokkos::LayoutLeft>;
+#else
 using value_tlist  = Morpheus::TypeList<double, int>;
 using index_tlist  = Morpheus::TypeList<long long, Morpheus::Default>;
 using layout_tlist = Morpheus::TypeList<Kokkos::LayoutRight, Kokkos::LayoutLeft,
                                         Morpheus::Default>;
-// using space_tlist  = Morpheus::TypeList<TEST_EXECSPACE>;
-using space_tlist = Morpheus::TypeList<TEST_CUSTOM_SPACE>;
+using space_tlist  = Morpheus::TypeList<TEST_CUSTOM_SPACE>;
+
+using convert_value_tlist = Morpheus::TypeList<double, int>;
+using convert_index_tlist = Morpheus::TypeList<long long>;
+using convert_layout_tlist =
+    Morpheus::TypeList<Kokkos::LayoutRight, Kokkos::LayoutLeft>;
+using convert_space_tlist = Morpheus::TypeList<TEST_CUSTOM_SPACE>;
+
+using compatible_value_tlist = Morpheus::TypeList<double>;
+using compatible_index_tlist = Morpheus::TypeList<int, Morpheus::Default>;
+using compatible_layout_tlist =
+    Morpheus::TypeList<typename TEST_EXECSPACE::array_layout,
+                       Morpheus::Default>;
+#endif
 // Generate all unary combinations
 using types_set = typename Morpheus::cross_product<
     value_tlist,
@@ -46,11 +73,6 @@ using types_set = typename Morpheus::cross_product<
         index_tlist, typename Morpheus::cross_product<
                          layout_tlist, space_tlist>::type>::type>::type;
 
-using convert_value_tlist = Morpheus::TypeList<double, int>;
-using convert_index_tlist = Morpheus::TypeList<long long>;
-using convert_layout_tlist =
-    Morpheus::TypeList<Kokkos::LayoutRight, Kokkos::LayoutLeft>;
-using convert_space_tlist = Morpheus::TypeList<TEST_CUSTOM_SPACE>;
 // Generate all unary combinations
 using convert_types_set = typename Morpheus::cross_product<
     convert_value_tlist,
@@ -59,13 +81,6 @@ using convert_types_set = typename Morpheus::cross_product<
         typename Morpheus::cross_product<
             convert_layout_tlist, convert_space_tlist>::type>::type>::type;
 
-// Generate compatible unary combinations
-using compatible_value_tlist = Morpheus::TypeList<double>;
-using compatible_index_tlist = Morpheus::TypeList<int, Morpheus::Default>;
-using compatible_layout_tlist =
-    Morpheus::TypeList<typename TEST_EXECSPACE::array_layout,
-                       Morpheus::Default>;
-
 // Generate all compatible unary combinations
 using compatible_types_set = typename Morpheus::cross_product<
     compatible_value_tlist,
@@ -73,24 +88,6 @@ using compatible_types_set = typename Morpheus::cross_product<
         compatible_index_tlist,
         typename Morpheus::cross_product<compatible_layout_tlist,
                                          space_tlist>::type>::type>::type;
-
-/**
- * Single type list for rapid testing
- *
- */
-using test_value_tlist = Morpheus::TypeList<double>;
-using test_index_tlist = Morpheus::TypeList<int>;
-using test_layout_tlist =
-    Morpheus::TypeList<typename TEST_EXECSPACE::array_layout>;
-
-// Generate all compatible unary combinations
-using test_types_set = typename Morpheus::cross_product<
-    test_value_tlist,
-    typename Morpheus::cross_product<
-        test_index_tlist,
-        typename Morpheus::cross_product<test_layout_tlist,
-                                         space_tlist>::type>::type>::type;
-
 }  // namespace types
 
 template <typename... Ts>

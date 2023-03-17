@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_DYNAMICMATRIX_COMPATIBLEBINARY_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_DynamicMatrix.hpp>
 
 using DynamicMatrixCompatibleTypes = typename Morpheus::generate_unary_typelist<
@@ -62,7 +64,10 @@ class CompatibleDynamicMatrixBinaryTest : public ::testing::Test {
   using CsrDev = Morpheus::CsrMatrix<ValueType, IndexType, DevLayout, DevSpace>;
   using CsrHost = typename CsrDev::HostMirror;
 
-  CompatibleDynamicMatrixBinaryTest() : nrows(3), ncols(3), nnnz(4) {}
+  CompatibleDynamicMatrixBinaryTest()
+      : nrows(SMALL_MATRIX_NROWS),
+        ncols(SMALL_MATRIX_NCOLS),
+        nnnz(SMALL_MATRIX_NNZ) {}
 
   void SetUp() override { switch_coo(); }
 
@@ -76,10 +81,12 @@ class CompatibleDynamicMatrixBinaryTest : public ::testing::Test {
     Morpheus::copy(Aref_coo_h, Aref_coo);
 
     Aref_dyn_h = Aref_coo_h;
-    CHECK_DYNAMIC_SIZES(Aref_dyn_h, 3, 3, 4, 0);
+    CHECK_DYNAMIC_SIZES(Aref_dyn_h, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS,
+                        SMALL_MATRIX_NNZ, 0);
 
     Aref_dyn = Aref_coo;
-    CHECK_DYNAMIC_SIZES(Aref_dyn, 3, 3, 4, 0);
+    CHECK_DYNAMIC_SIZES(Aref_dyn, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS,
+                        SMALL_MATRIX_NNZ, 0);
   }
 
   void switch_csr() {
@@ -92,10 +99,12 @@ class CompatibleDynamicMatrixBinaryTest : public ::testing::Test {
     Morpheus::copy(Aref_csr_h, Aref_csr);
 
     Aref_dyn_h = Aref_csr_h;
-    CHECK_DYNAMIC_SIZES(Aref_dyn_h, 3, 3, 4, 1);
+    CHECK_DYNAMIC_SIZES(Aref_dyn_h, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS,
+                        SMALL_MATRIX_NNZ, 1);
 
     Aref_dyn = Aref_csr;
-    CHECK_DYNAMIC_SIZES(Aref_dyn, 3, 3, 4, 1);
+    CHECK_DYNAMIC_SIZES(Aref_dyn, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS,
+                        SMALL_MATRIX_NNZ, 1);
   }
 
   SizeType nrows, ncols, nnnz;
@@ -159,7 +168,7 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
   CHECK_DYNAMIC_SIZES(C2_h, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = -3.33;
 
@@ -217,7 +226,7 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
   CHECK_DYNAMIC_SIZES(C2, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = -3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);
@@ -275,7 +284,7 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
   CHECK_DYNAMIC_SIZES(C2_h, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = -3.33;
 
@@ -333,7 +342,7 @@ TYPED_TEST(CompatibleDynamicMatrixBinaryTest,
   CHECK_DYNAMIC_SIZES(C2, this->nrows, this->ncols, this->nnnz, 1);
 
   // Change values in one container
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = -3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);

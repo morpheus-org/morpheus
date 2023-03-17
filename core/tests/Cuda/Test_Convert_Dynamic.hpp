@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -21,8 +21,8 @@
  * limitations under the License.
  */
 
-#ifndef TEST_CORE_CUDA_TEST_CONVERT_HPP
-#define TEST_CORE_CUDA_TEST_CONVERT_HPP
+#ifndef TEST_CORE_CUDA_TEST_CONVERT_DYNAMIC_HPP
+#define TEST_CORE_CUDA_TEST_CONVERT_DYNAMIC_HPP
 
 #include <Morpheus_Core.hpp>
 
@@ -32,15 +32,21 @@
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
                                                types::types_set>::type;
-
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
                                                types::types_set>::type;
-
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
                                                types::types_set>::type;
-
+using EllMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
+                                               types::types_set>::type;
+using HybMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
+                                               types::types_set>::type;
+using HdcMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HdcMatrix<double>,
+                                               types::types_set>::type;
 using DynamicMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DynamicMatrix<double>,
                                                types::types_set>::type;
@@ -48,10 +54,20 @@ using DynamicMatrixTypes =
 using CooMatrixPairs = generate_pair<DynamicMatrixTypes, CooMatrixTypes>::type;
 using CsrMatrixPairs = generate_pair<DynamicMatrixTypes, CsrMatrixTypes>::type;
 using DiaMatrixPairs = generate_pair<DynamicMatrixTypes, DiaMatrixTypes>::type;
+using EllMatrixPairs = generate_pair<DynamicMatrixTypes, EllMatrixTypes>::type;
+using HybMatrixPairs = generate_pair<DynamicMatrixTypes, HybMatrixTypes>::type;
+using HdcMatrixPairs = generate_pair<DynamicMatrixTypes, HdcMatrixTypes>::type;
 
 using pairs = typename Morpheus::concat<
     CooMatrixPairs,
-    typename Morpheus::concat<CsrMatrixPairs, DiaMatrixPairs>::type>::type;
+    typename Morpheus::concat<
+        CsrMatrixPairs,
+        typename Morpheus::concat<
+            DiaMatrixPairs,
+            typename Morpheus::concat<
+                EllMatrixPairs,
+                typename Morpheus::concat<HybMatrixPairs, HdcMatrixPairs>::
+                    type>::type>::type>::type>::type;
 
 using ConvertDynamicTypes = to_gtest_types<pairs>::type;
 

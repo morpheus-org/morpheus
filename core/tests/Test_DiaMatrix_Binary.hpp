@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_DIAMATRIX_BINARY_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
 
 using DiaMatrixTypes =
@@ -52,13 +54,15 @@ class DiaMatrixBinaryTest : public ::testing::Test {
   using IndexType = typename device1::size_type;
 
   DiaMatrixBinaryTest()
-      : nrows(3),
-        ncols(3),
-        nnnz(4),
-        ndiag(4),
-        nalign(32),
-        Aref(3, 3, 4, 4),
-        Ahref(3, 3, 4, 4) {}
+      : nrows(SMALL_MATRIX_NROWS),
+        ncols(SMALL_MATRIX_NCOLS),
+        nnnz(SMALL_MATRIX_NNZ),
+        ndiag(SMALL_DIA_MATRIX_NDIAGS),
+        nalign(SMALL_MATRIX_ALIGNMENT),
+        Aref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ,
+             SMALL_DIA_MATRIX_NDIAGS, SMALL_MATRIX_ALIGNMENT),
+        Ahref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ,
+              SMALL_DIA_MATRIX_NDIAGS, SMALL_MATRIX_ALIGNMENT) {}
 
   void SetUp() override {
     Morpheus::Test::build_small_container(Ahref);
@@ -126,15 +130,15 @@ TYPED_TEST(DiaMatrixBinaryTest, ResizeFromDiaMatrix) {
 
   // Resizing to larger sizes should invoke a new allocation so changes in
   // matrix should not be reflected in reference
-  Ah.diagonal_offsets(1) = 1;
-  Ah.values(0, 1)        = (value_type)-1.11;
+  Ah.diagonal_offsets(1) = 7;
+  Ah.values(1, 0)        = (value_type)-3.33;
   Morpheus::copy(Ah, A);
 
   // Copy reference back to see if there are any changes
   HostMatrix1 Ahref_test(this->nrows, this->ncols, this->nnnz, this->ndiag);
   Morpheus::copy(this->Ahref, Ahref_test);
   EXPECT_NE(Ah.diagonal_offsets(1), Ahref_test.diagonal_offsets(1));
-  EXPECT_NE(Ah.values(0, 1), Ahref_test.values(0, 1));
+  EXPECT_NE(Ah.values(1, 0), Ahref_test.values(1, 0));
 
   for (size_type n = this->ndiag; n < Ah.ndiags(); n++) {
     EXPECT_EQ(Ah.diagonal_offsets(n), 0);
@@ -156,8 +160,8 @@ TYPED_TEST(DiaMatrixBinaryTest, ResizeFromDiaMatrix) {
   CHECK_DIA_CONTAINERS(Asmall, Ah);
 
   // Set back to normal
-  Ah.diagonal_offsets(1) = 0;
-  Ah.values(0, 1)        = (value_type)1.11;
+  Ah.diagonal_offsets(1) = -7;
+  Ah.values(1, 0)        = (value_type)0;
   Morpheus::copy(Ah, A);
 
   VALIDATE_DIA_CONTAINER(Ah, Ahref_test);
@@ -195,8 +199,8 @@ TYPED_TEST(DiaMatrixBinaryTest, AllocateFromDiaMatrix) {
   CHECK_DIA_CONTAINERS(Ah, Bh);
 
   // Change values in one container
-  Ah.diagonal_offsets(1) = 1;
-  Ah.values(0, 1)        = (value_type1)-1.11;
+  Ah.diagonal_offsets(1) = 7;
+  Ah.values(1, 0)        = (value_type1)-3.33;
 
   for (size_type n = 0; n < Bh.ndiags(); n++) {
     EXPECT_EQ(Bh.diagonal_offsets(n), 0);
@@ -211,8 +215,8 @@ TYPED_TEST(DiaMatrixBinaryTest, AllocateFromDiaMatrix) {
   Matrix2 B;
   CHECK_DIA_EMPTY(B);
 
-  Bh.diagonal_offsets(1) = 1;
-  Bh.values(0, 1)        = (value_type2)-1.11;
+  Bh.diagonal_offsets(1) = 7;
+  Bh.values(1, 0)        = (value_type2)-3.33;
 
   B.allocate(A);
   CHECK_DIA_CONTAINERS(A, B);

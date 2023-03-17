@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -40,7 +40,7 @@ __global__ void waxpby_kernel(SizeType n, ValueType1 alpha, const ValueType1* x,
                               ValueType2 beta, const ValueType2* y,
                               ValueType3* w) {
   const SizeType tid = blockDim.x * blockIdx.x + threadIdx.x;
-  if (tid > n) return;
+  if (tid >= n) return;
 
   if (alpha == 1.0) {
     w[tid] = x[tid] + beta * y[tid];

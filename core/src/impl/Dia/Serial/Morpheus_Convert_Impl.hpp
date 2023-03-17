@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -33,6 +33,7 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 
+#include <impl/Morpheus_Utils.hpp>
 #include <impl/Coo/Serial/Morpheus_Sort_Impl.hpp>
 
 // TODO: Remove use of set during Coo to Dia Conversion
@@ -109,7 +110,6 @@ void convert(
 
   if (!Impl::is_sorted<ExecSpace>(dst)) {
     Impl::sort_by_row_and_column<ExecSpace>(dst);
-    // dst.sort();
   }
 }
 

@@ -23,14 +23,14 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       CooMatrix_CompatibleDynamicBinary
       CooMatrix
       Copy
-      DenseMatrix_Binary
-      DenseMatrix_CompatibleBinary
-      DenseMatrix
       CsrMatrix_Binary
       CsrMatrix_CompatibleBinary
       CsrMatrix_CompatibleDynamicBinary
       CsrMatrix
       CustomBackend
+      DenseMatrix_Binary
+      DenseMatrix_CompatibleBinary
+      DenseMatrix
       DenseVector_Binary
       DenseVector_CompatibleBinary
       DenseVector
@@ -43,9 +43,23 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       DynamicMatrix_CompatibleBinary
       DynamicMatrix_CompatibleConcreteBinary
       DynamicMatrix
+      EllMatrix_Binary
+      EllMatrix_CompatibleBinary
+      EllMatrix_CompatibleDynamicBinary
+      EllMatrix
       FormatTags
       FormatTraits
       GenericBackend
+      HdcMatrix_Binary
+      HdcMatrix_CompatibleBinary
+      HdcMatrix_CompatibleDynamicBinary
+      HdcMatrix
+      HybMatrix_Binary
+      HybMatrix_CompatibleBinary
+      HybMatrix_CompatibleDynamicBinary
+      HybMatrix
+      MatrixAnalytics_Dynamic
+      MatrixAnalytics
       MatrixBase
       MatrixMarket
       MatrixOperations_Dynamic
@@ -58,6 +72,10 @@ foreach(Tag Serial;OpenMP;Cuda;HIP)
       Spaces
       SpaceTraits
       TypeTraits
+<<<<<<< HEAD
+=======
+      VectorAnalytics
+>>>>>>> new-formats
       WAXPBY)
       set(file ${testdir}/Test_${Tag}_${Name}.cpp)
       # Write to a temporary intermediate file and call configure_file to avoid

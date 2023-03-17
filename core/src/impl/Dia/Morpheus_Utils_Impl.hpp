@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -33,31 +33,6 @@ namespace Impl {
 template <typename T>
 MORPHEUS_INLINE_FUNCTION const T get_pad_size(T len, T alignment) {
   return alignment * ((len + alignment - 1) / alignment);
-}
-
-/**
- * @brief Checks if the current matrix exceeds a tolerance level reflecting
- * the performance of the DIA format.
- *
- * @param num_rows Number of rows
- * @param num_entries Number of non-zeros
- * @param num_diagonals Number of diagonals
- * @return bool
- */
-template <typename T>
-bool exceeds_tolerance(const T num_rows, const T num_entries,
-                       const T num_diagonals) {
-  const float max_fill   = 10.0;
-  const float threshold  = 100e6;  // 10M entries
-  const float size       = float(num_diagonals) * float(num_rows);
-  const float fill_ratio = size / std::max(1.0f, float(num_entries));
-
-  bool res = false;
-  if (fill_ratio > max_fill && size > threshold) {
-    res = true;
-  }
-
-  return res;
 }
 
 }  // namespace Impl

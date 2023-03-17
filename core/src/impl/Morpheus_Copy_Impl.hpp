@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -30,5 +30,8 @@
 #include <impl/Coo/Morpheus_Copy_Impl.hpp>
 #include <impl/Csr/Morpheus_Copy_Impl.hpp>
 #include <impl/Dia/Morpheus_Copy_Impl.hpp>
+#include <impl/Ell/Morpheus_Copy_Impl.hpp>
+#include <impl/Hyb/Morpheus_Copy_Impl.hpp>
+#include <impl/Hdc/Morpheus_Copy_Impl.hpp>
 
 #endif  // MORPHEUS_COPY_IMPL_HPP

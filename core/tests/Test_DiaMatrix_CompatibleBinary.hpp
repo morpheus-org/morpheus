@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_DIAMATRIX_COMPATIBLEBINARY_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
 
 using DiaMatrixCompatibleTypes = typename Morpheus::generate_unary_typelist<
@@ -52,13 +54,15 @@ class CompatibleDiaMatrixBinaryTest : public ::testing::Test {
   using SizeType = typename device1::size_type;
 
   CompatibleDiaMatrixBinaryTest()
-      : nrows(3),
-        ncols(3),
-        nnnz(4),
-        ndiag(4),
-        nalign(32),
-        Aref(3, 3, 4, 4),
-        Ahref(3, 3, 4, 4) {}
+      : nrows(SMALL_MATRIX_NROWS),
+        ncols(SMALL_MATRIX_NCOLS),
+        nnnz(SMALL_MATRIX_NNZ),
+        ndiag(SMALL_DIA_MATRIX_NDIAGS),
+        nalign(SMALL_MATRIX_ALIGNMENT),
+        Aref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ,
+             SMALL_DIA_MATRIX_NDIAGS, SMALL_MATRIX_ALIGNMENT),
+        Ahref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ,
+              SMALL_DIA_MATRIX_NDIAGS, SMALL_MATRIX_ALIGNMENT) {}
 
   void SetUp() override {
     Morpheus::Test::build_small_container(Ahref);
@@ -105,8 +109,8 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDiaMatrix) {
   CHECK_DIA_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.diagonal_offsets(2) = 2;
-  Ah.values(1, 2)        = (value_type)-3.33;
+  Ah.diagonal_offsets(1) = 7;
+  Ah.values(8, 0)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_DIA_CONTAINER(Bh, Ah);
@@ -148,8 +152,8 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, CopyAssignmentFromDiaMatrix) {
   CHECK_DIA_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.diagonal_offsets(2) = 2;
-  Ah.values(1, 2)        = (value_type)-3.33;
+  Ah.diagonal_offsets(1) = 7;
+  Ah.values(8, 0)        = (value_type)-3.33;
 
   // Other container should reflect the same changes
   VALIDATE_DIA_CONTAINER(Bh, Ah);
@@ -195,10 +199,10 @@ TYPED_TEST(CompatibleDiaMatrixBinaryTest, ConstructionFromDenseVector) {
 
   VALIDATE_DIA_CONTAINER(Ah, Ah_test);
 
-  Ah.diagonal_offsets(2) = 2;
-  EXPECT_NE(Ah.diagonal_offsets(2), Ah_test.diagonal_offsets(2));
-  Ah.values(0, 1) = (value_type)-1.11;
-  EXPECT_NE(Ah.values(0, 1), Ah_test.values(0, 1));
+  Ah.diagonal_offsets(1) = 7;
+  Ah.values(8, 0)        = (value_type)-3.33;
+  EXPECT_NE(Ah.diagonal_offsets(1), Ah_test.diagonal_offsets(1));
+  EXPECT_NE(Ah.values(8, 0), Ah_test.values(8, 0));
 }
 
 }  // namespace Test

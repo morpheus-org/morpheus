@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -32,15 +32,21 @@
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
                                                types::types_set>::type;
-
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
                                                types::types_set>::type;
-
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
                                                types::types_set>::type;
-
+using EllMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
+                                               types::types_set>::type;
+using HybMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
+                                               types::types_set>::type;
+using HdcMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HdcMatrix<double>,
+                                               types::types_set>::type;
 using DynamicMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DynamicMatrix<double>,
                                                types::types_set>::type;
@@ -48,10 +54,20 @@ using DynamicMatrixTypes =
 using CooMatrixPairs = generate_pair<DynamicMatrixTypes, CooMatrixTypes>::type;
 using CsrMatrixPairs = generate_pair<DynamicMatrixTypes, CsrMatrixTypes>::type;
 using DiaMatrixPairs = generate_pair<DynamicMatrixTypes, DiaMatrixTypes>::type;
+using EllMatrixPairs = generate_pair<DynamicMatrixTypes, EllMatrixTypes>::type;
+using HybMatrixPairs = generate_pair<DynamicMatrixTypes, HybMatrixTypes>::type;
+using HdcMatrixPairs = generate_pair<DynamicMatrixTypes, HdcMatrixTypes>::type;
 
 using pairs = typename Morpheus::concat<
     CooMatrixPairs,
-    typename Morpheus::concat<CsrMatrixPairs, DiaMatrixPairs>::type>::type;
+    typename Morpheus::concat<
+        CsrMatrixPairs,
+        typename Morpheus::concat<
+            DiaMatrixPairs,
+            typename Morpheus::concat<
+                EllMatrixPairs,
+                typename Morpheus::concat<HybMatrixPairs, HdcMatrixPairs>::
+                    type>::type>::type>::type>::type;
 
 using ConvertDynamicTypes = to_gtest_types<pairs>::type;
 
@@ -161,15 +177,17 @@ TYPED_TEST(ConvertDynamicTypesTest, DynamicToDynamicSerial) {
 
   for (int fmt_id = 0; fmt_id < Morpheus::NFORMATS; fmt_id++) {
     dst_h.activate(fmt_id);
-    Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
 
+    Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, dst_h);
     EXPECT_TRUE(dst_h.active_index() == fmt_id);
     EXPECT_FALSE(Morpheus::Test::is_empty_container(dst_h));
     EXPECT_FALSE(Morpheus::Test::is_empty_container(src_h));
+
     // Convert back to COO to test correctness
     coo_h_t coo_src_h, coo_dst_h;
     Morpheus::convert<TEST_CUSTOM_SPACE>(src_h, coo_src_h);
     Morpheus::convert<TEST_CUSTOM_SPACE>(dst_h, coo_dst_h);
+
     EXPECT_TRUE(Morpheus::Test::have_same_data(coo_src_h, coo_dst_h));
   }
 }

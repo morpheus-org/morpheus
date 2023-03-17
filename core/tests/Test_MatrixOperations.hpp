@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -31,20 +31,29 @@
 #include <utils/Macros_CooMatrix.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
+#include <utils/Macros_EllMatrix.hpp>
+#include <utils/Macros_HybMatrix.hpp>
+#include <utils/Macros_HdcMatrix.hpp>
 #include <utils/MatrixGenerator.hpp>
 
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
                                                types::types_set>::type;
-
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
                                                types::types_set>::type;
-
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
                                                types::types_set>::type;
-
+using EllMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
+                                               types::types_set>::type;
+using HybMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
+                                               types::types_set>::type;
+using HdcMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HdcMatrix<double>,
+                                               types::types_set>::type;
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
                                                types::types_set>::type;
@@ -52,10 +61,20 @@ using DenseVectorTypes =
 using CooMatrixPairs = generate_pair<CooMatrixTypes, DenseVectorTypes>::type;
 using CsrMatrixPairs = generate_pair<CsrMatrixTypes, DenseVectorTypes>::type;
 using DiaMatrixPairs = generate_pair<DiaMatrixTypes, DenseVectorTypes>::type;
+using EllMatrixPairs = generate_pair<EllMatrixTypes, DenseVectorTypes>::type;
+using HybMatrixPairs = generate_pair<HybMatrixTypes, DenseVectorTypes>::type;
+using HdcMatrixPairs = generate_pair<HdcMatrixTypes, DenseVectorTypes>::type;
 
 using pairs = typename Morpheus::concat<
     CooMatrixPairs,
-    typename Morpheus::concat<CsrMatrixPairs, DiaMatrixPairs>::type>::type;
+    typename Morpheus::concat<
+        CsrMatrixPairs,
+        typename Morpheus::concat<
+            DiaMatrixPairs,
+            typename Morpheus::concat<
+                EllMatrixPairs,
+                typename Morpheus::concat<HybMatrixPairs, HdcMatrixPairs>::
+                    type>::type>::type>::type>::type;
 
 using MatrixOperationsTypes = to_gtest_types<pairs>::type;
 
@@ -142,12 +161,10 @@ class MatrixOperationsTypesTest : public ::testing::Test {
 namespace Test {
 
 TYPED_TEST_SUITE(MatrixOperationsTypesTest, MatrixOperationsTypes);
-// TODO: Fix Cuda LayoutRight
+// TODO: Fix Cuda LayoutRight for Dia
 TYPED_TEST(MatrixOperationsTypesTest, UpdateDiagonalCustom) {
   using vec_t     = typename TestFixture::vec_dev_t;
   using vec_h_t   = typename TestFixture::vec_host_t;
-  using mat_t     = typename TestFixture::mat_dev_t;
-  using mat_h_t   = typename TestFixture::mat_host_t;
   using backend   = typename TestFixture::Backend;
   using size_type = typename TestFixture::SizeType;
   using dense_mat_h_t =

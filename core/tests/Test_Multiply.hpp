@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -31,38 +31,61 @@
 #include <utils/Macros_CooMatrix.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
 #include <utils/Macros_DiaMatrix.hpp>
+#include <utils/Macros_EllMatrix.hpp>
+#include <utils/Macros_HybMatrix.hpp>
+#include <utils/Macros_HdcMatrix.hpp>
 #include <utils/MatrixGenerator.hpp>
 
 using CooMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CooMatrix<double>,
                                                types::types_set>::type;
-
 using CsrMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::CsrMatrix<double>,
                                                types::types_set>::type;
-
 using DiaMatrixTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DiaMatrix<double>,
                                                types::types_set>::type;
-
+using EllMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::EllMatrix<double>,
+                                               types::types_set>::type;
+using HybMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HybMatrix<double>,
+                                               types::types_set>::type;
+using HdcMatrixTypes =
+    typename Morpheus::generate_unary_typelist<Morpheus::HdcMatrix<double>,
+                                               types::types_set>::type;
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
                                                types::types_set>::type;
 using CooMatrixPairs =
     generate_pair<generate_pair<CooMatrixTypes, DenseVectorTypes>::type,
                   DenseVectorTypes>::type;
-
 using CsrMatrixPairs =
     generate_pair<generate_pair<CsrMatrixTypes, DenseVectorTypes>::type,
                   DenseVectorTypes>::type;
-
 using DiaMatrixPairs =
     generate_pair<generate_pair<DiaMatrixTypes, DenseVectorTypes>::type,
+                  DenseVectorTypes>::type;
+using EllMatrixPairs =
+    generate_pair<generate_pair<EllMatrixTypes, DenseVectorTypes>::type,
+                  DenseVectorTypes>::type;
+using HybMatrixPairs =
+    generate_pair<generate_pair<HybMatrixTypes, DenseVectorTypes>::type,
+                  DenseVectorTypes>::type;
+using HdcMatrixPairs =
+    generate_pair<generate_pair<HdcMatrixTypes, DenseVectorTypes>::type,
                   DenseVectorTypes>::type;
 
 using pairs = typename Morpheus::concat<
     CooMatrixPairs,
-    typename Morpheus::concat<CsrMatrixPairs, DiaMatrixPairs>::type>::type;
+    typename Morpheus::concat<
+        CsrMatrixPairs,
+        typename Morpheus::concat<
+            DiaMatrixPairs,
+            typename Morpheus::concat<
+                EllMatrixPairs,
+                typename Morpheus::concat<HybMatrixPairs, HdcMatrixPairs>::
+                    type>::type>::type>::type>::type;
 
 using MultiplyTypes = to_gtest_types<pairs>::type;
 
@@ -243,7 +266,7 @@ TYPED_TEST(MultiplyTypesTest, MultiplyGeneric) {
     for (size_type n = 0; n < cyh.size(); n++) {
       cyh(n) += 1;
     }
-    EXPECT_TRUE(Morpheus::Test::have_approx_same_data(yh, cyh));
+    EXPECT_TRUE(Morpheus::Test::have_approx_same_data(yh, cyh, true));
   }
 }
 

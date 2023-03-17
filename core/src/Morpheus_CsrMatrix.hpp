@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -125,21 +125,17 @@ class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
   using index_array_type =
       Morpheus::DenseVector<index_type, size_type, array_layout, backend,
                             memory_traits>;
-  using const_index_array_type = const index_array_type;
-  using index_array_pointer    = typename index_array_type::value_array_pointer;
+  using index_array_pointer = typename index_array_type::value_array_pointer;
   using index_array_reference =
       typename index_array_type::value_array_reference;
-  using const_index_array_reference = const index_array_reference;
 
   /*! The type of \p DenseVector that holds the value_type data */
   using value_array_type =
       Morpheus::DenseVector<value_type, size_type, array_layout, backend,
                             memory_traits>;
-  using const_value_array_type = const value_array_type;
-  using value_array_pointer    = typename value_array_type::value_array_pointer;
+  using value_array_pointer = typename value_array_type::value_array_pointer;
   using value_array_reference =
       typename value_array_type::value_array_reference;
-  using const_value_array_reference = const value_array_reference;
 
   /**
    * @brief The default destructor.
@@ -182,7 +178,7 @@ class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
   inline CsrMatrix(const size_type num_rows, const size_type num_cols,
                    const size_type num_entries)
       : base(num_rows, num_cols, num_entries),
-        _row_offsets(num_rows + 1),
+        _row_offsets((num_rows + (size_type)1)),
         _column_indices(num_entries),
         _values(num_entries) {}
 
@@ -453,7 +449,7 @@ class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
    * @param n Index of the value to extract
    * @return Row offset at index \p n
    */
-  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_reference
+  MORPHEUS_FORCEINLINE_FUNCTION const index_array_reference
   crow_offsets(size_type n) const {
     return _row_offsets(n);
   }
@@ -465,7 +461,7 @@ class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
    * @param n Index of the value to extract
    * @return Column index at index \p n
    */
-  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_reference
+  MORPHEUS_FORCEINLINE_FUNCTION const index_array_reference
   ccolumn_indices(size_type n) const {
     return _column_indices(n);
   }
@@ -476,7 +472,7 @@ class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
    * @param n Index of the value to extract
    * @return Value of the element at index \p n
    */
-  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_reference
+  MORPHEUS_FORCEINLINE_FUNCTION const value_array_reference
   cvalues(size_type n) const {
     return _values(n);
   }
@@ -511,7 +507,7 @@ class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
    *
    * @return const index_array_type&  A const reference to the row offsets.
    */
-  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_type &crow_offsets() const {
+  MORPHEUS_FORCEINLINE_FUNCTION const index_array_type &crow_offsets() const {
     return _row_offsets;
   }
 
@@ -520,7 +516,7 @@ class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
    *
    * @return index_array_type&  A const-reference to the column indices.
    */
-  MORPHEUS_FORCEINLINE_FUNCTION const_index_array_type &ccolumn_indices()
+  MORPHEUS_FORCEINLINE_FUNCTION const index_array_type &ccolumn_indices()
       const {
     return _column_indices;
   }
@@ -530,7 +526,7 @@ class CsrMatrix : public MatrixBase<CsrMatrix, ValueType, Properties...> {
    *
    * @return values_array_type&  A reference to the values.
    */
-  MORPHEUS_FORCEINLINE_FUNCTION const_value_array_type &cvalues() const {
+  MORPHEUS_FORCEINLINE_FUNCTION const value_array_type &cvalues() const {
     return _values;
   }
 

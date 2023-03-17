@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -42,5 +42,23 @@
 #include <impl/Dia/Cuda/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Dia/HIP/Morpheus_MatrixOperations_Impl.hpp>
 #include <impl/Dia/Kokkos/Morpheus_MatrixOperations_Impl.hpp>
+
+#include <impl/Ell/Serial/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Ell/OpenMP/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Ell/Cuda/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Ell/HIP/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Ell/Kokkos/Morpheus_MatrixOperations_Impl.hpp>
+
+#include <impl/Hyb/Serial/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Hyb/OpenMP/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Hyb/Cuda/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Hyb/HIP/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Hyb/Kokkos/Morpheus_MatrixOperations_Impl.hpp>
+
+#include <impl/Hdc/Serial/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Hdc/OpenMP/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Hdc/Cuda/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Hdc/HIP/Morpheus_MatrixOperations_Impl.hpp>
+#include <impl/Hdc/Kokkos/Morpheus_MatrixOperations_Impl.hpp>
 
 #endif  // MORPHEUS_IMPL_MATRIXOPERATIONS_IMPL_HPP

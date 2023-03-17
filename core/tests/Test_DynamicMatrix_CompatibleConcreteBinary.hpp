@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_DYNAMICMATRIX_COMPATIBLECONCRETEBINARY_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_DynamicMatrix.hpp>
 
 using DynamicMatrixTypes =
@@ -52,7 +54,10 @@ class CompatibleConcreteBinaryTest : public ::testing::Test {
   using CsrDev = Morpheus::CsrMatrix<ValueType, IndexType, DevLayout, DevSpace>;
   using CsrHost = typename CsrDev::HostMirror;
 
-  CompatibleConcreteBinaryTest() : nrows(3), ncols(3), nnnz(4) {}
+  CompatibleConcreteBinaryTest()
+      : nrows(SMALL_MATRIX_NROWS),
+        ncols(SMALL_MATRIX_NCOLS),
+        nnnz(SMALL_MATRIX_NNZ) {}
 
   void SetUp() override {
     build_coo();
@@ -111,7 +116,7 @@ TYPED_TEST(CompatibleConcreteBinaryTest, ConstructionFromConcreteHost) {
   this->Aref_coo_h.column_indices(1) = 1;
   this->Aref_coo_h.values(3)         = -3.33;
 
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = -3.33;
 
@@ -139,7 +144,7 @@ TYPED_TEST(CompatibleConcreteBinaryTest, ConstructionFromConcreteDevice) {
   this->Aref_coo_h.values(3)         = -3.33;
   Morpheus::copy(this->Aref_coo_h, this->Aref_coo);
 
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = -3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);
@@ -172,7 +177,7 @@ TYPED_TEST(CompatibleConcreteBinaryTest, CopyAssignmentFromConcreteHost) {
   this->Aref_coo_h.column_indices(1) = 1;
   this->Aref_coo_h.values(3)         = -3.33;
 
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = -3.33;
 
@@ -200,7 +205,7 @@ TYPED_TEST(CompatibleConcreteBinaryTest, CopyAssignmentFromConcreteDevice) {
   this->Aref_coo_h.values(3)         = -3.33;
   Morpheus::copy(this->Aref_coo_h, this->Aref_coo);
 
-  this->Aref_csr_h.row_offsets(2)    = 2;
+  this->Aref_csr_h.row_offsets(2)    = 6;
   this->Aref_csr_h.column_indices(1) = 1;
   this->Aref_csr_h.values(3)         = -3.33;
   Morpheus::copy(this->Aref_csr_h, this->Aref_csr);

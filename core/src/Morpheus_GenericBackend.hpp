@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -125,10 +125,10 @@ using CudaSpace = Morpheus::GenericBackend<Kokkos::CudaSpace>;
 /*! @brief A Generic Space that launches kernels in parallel using the HIP
  * backend.
  */
-using HIP = Morpheus::GenericBackend<Kokkos::HIP>;
+using HIP = Morpheus::GenericBackend<Kokkos::Experimental::HIP>;
 /*! @brief The Generic HIP memory space
  */
-using HIPSpace = Morpheus::GenericSpace<Kokkos::HIPSpace>;
+using HIPSpace = Morpheus::GenericBackend<Kokkos::Experimental::HIPSpace>;
 #endif
 }  // namespace Generic
 

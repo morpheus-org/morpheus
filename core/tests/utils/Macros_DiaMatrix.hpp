@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -23,6 +23,8 @@
 
 #ifndef TEST_CORE_UTILS_MACROS_DIAMATRIX_HPP
 #define TEST_CORE_UTILS_MACROS_DIAMATRIX_HPP
+
+#include <utils/Macros_Definitions.hpp>
 
 #include <Morpheus_Core.hpp>
 
@@ -87,18 +89,16 @@
  * data.
  *
  */
-#define VALIDATE_DIA_CONTAINER(A, Aref)                              \
-  {                                                                  \
-    using container_type      = decltype(A);                         \
-    using container_size_type = typename container_type::size_type;  \
-    for (container_size_type n = 0; n < A.ndiags(); n++) {           \
-      EXPECT_EQ(A.diagonal_offsets(n), Aref.diagonal_offsets(n));    \
-    }                                                                \
-    for (container_size_type i = 0; i < A.values().nrows(); i++) {   \
-      for (container_size_type j = 0; j < A.values().ncols(); j++) { \
-        EXPECT_EQ(A.values(i, j), Aref.values(i, j));                \
-      }                                                              \
-    }                                                                \
+#define VALIDATE_DIA_CONTAINER(A, Aref)                           \
+  {                                                               \
+    for (size_t n = 0; n < A.ndiags(); n++) {                     \
+      EXPECT_EQ(A.diagonal_offsets(n), Aref.diagonal_offsets(n)); \
+    }                                                             \
+    for (size_t i = 0; i < A.values().nrows(); i++) {             \
+      for (size_t j = 0; j < A.values().ncols(); j++) {           \
+        EXPECT_EQ(A.values(i, j), Aref.values(i, j));             \
+      }                                                           \
+    }                                                             \
   }
 
 namespace Morpheus {
@@ -109,24 +109,49 @@ void reset_small_container(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
   using value_type = typename Container::value_type;
-  // Matrix
-  // [1.11 *    2.22]
-  // [*    *    3.33]
-  // [*    4.44 *   ]
-
   // clang-format off
-  c.diagonal_offsets(0) = -1; 
-  c.diagonal_offsets(1) = 0; 
-  c.diagonal_offsets(2) = 1; 
-  c.diagonal_offsets(3) = 2; 
-  // values are:
-  // [*    1.11 0    2.22]
-  // [0    0    3.33 *]
-  // [4.44 0    *    *]
-  c.values(0,0) = (value_type)0;    c.values(1,0) = (value_type)0;    c.values(2,0) = (value_type)4.44;
-  c.values(0,1) = (value_type)1.11; c.values(1,1) = (value_type)0;    c.values(2,1) = (value_type)0;
-  c.values(0,2) = (value_type)0;    c.values(1,2) = (value_type)3.33; c.values(2,2) = (value_type)0;
-  c.values(0,3) = (value_type)2.22; c.values(1,3) = (value_type)0;    c.values(2,3) = (value_type)0;
+  c.diagonal_offsets(0) = -8; 
+  c.diagonal_offsets(1) = -7; 
+  c.diagonal_offsets(2) = -6; 
+  c.diagonal_offsets(3) = -3; 
+  c.diagonal_offsets(4) = 0; 
+  c.diagonal_offsets(5) = 3; 
+  c.diagonal_offsets(6) = 6; 
+  c.diagonal_offsets(7) = 7; 
+  c.diagonal_offsets(8) = 8; 
+
+  c.values(0, 0) = (value_type)0;     c.values(0, 1) = (value_type)0;     c.values(0, 2) = (value_type)0;
+  c.values(1, 0) = (value_type)0;     c.values(1, 1) = (value_type)0;     c.values(1, 2) = (value_type)0;
+  c.values(2, 0) = (value_type)0;     c.values(2, 1) = (value_type)0;     c.values(2, 2) = (value_type)0;
+  c.values(3, 0) = (value_type)0;     c.values(3, 1) = (value_type)0;     c.values(3, 2) = (value_type)0;
+  c.values(4, 0) = (value_type)0;     c.values(4, 1) = (value_type)0;     c.values(4, 2) = (value_type)0;
+  c.values(5, 0) = (value_type)0;     c.values(5, 1) = (value_type)0;     c.values(5, 2) = (value_type)0;
+  c.values(6, 0) = (value_type)0;     c.values(6, 1) = (value_type)0;     c.values(6, 2) = (value_type)0;
+  c.values(7, 0) = (value_type)0;     c.values(7, 1) = (value_type)23.23; c.values(7, 2) = (value_type)24.24;
+  c.values(8, 0) = (value_type)27.27; c.values(8, 1) = (value_type)0;     c.values(8, 2) = (value_type)0;
+  c.values(9, 0) = (value_type)30.30; c.values(9, 1) = (value_type)0;     c.values(9, 2) = (value_type)0;
+
+  c.values(0, 3) = (value_type)0;     c.values(0, 4) = (value_type)1.11;  c.values(0, 5) = (value_type)2.22;
+  c.values(1, 3) = (value_type)0;     c.values(1, 4) = (value_type)5.55;  c.values(1, 5) = (value_type)6.66;
+  c.values(2, 3) = (value_type)0;     c.values(2, 4) = (value_type)9.99;  c.values(2, 5) = (value_type)10.10;
+  c.values(3, 3) = (value_type)11.11; c.values(3, 4) = (value_type)12.12; c.values(3, 5) = (value_type)13.13;
+  c.values(4, 3) = (value_type)14.14; c.values(4, 4) = (value_type)15.15; c.values(4, 5) = (value_type)16.16;
+  c.values(5, 3) = (value_type)17.17; c.values(5, 4) = (value_type)18.18; c.values(5, 5) = (value_type)19.19;
+  c.values(6, 3) = (value_type)20.20; c.values(6, 4) = (value_type)21.21; c.values(6, 5) = (value_type)22.22;
+  c.values(7, 3) = (value_type)25.25; c.values(7, 4) = (value_type)26.26; c.values(7, 5) = (value_type)0;
+  c.values(8, 3) = (value_type)28.28; c.values(8, 4) = (value_type)29.29; c.values(8, 5) = (value_type)0;
+  c.values(9, 3) = (value_type)31.31; c.values(9, 4) = (value_type)32.32; c.values(9, 5) = (value_type)0;
+
+  c.values(0, 6) = (value_type)0;     c.values(0, 7) = (value_type)3.33;  c.values(0, 8) = (value_type)4.44;
+  c.values(1, 6) = (value_type)7.77;  c.values(1, 7) = (value_type)0;     c.values(1, 8) = (value_type)8.88;
+  c.values(2, 6) = (value_type)0;     c.values(2, 7) = (value_type)0;     c.values(2, 8) = (value_type)0;
+  c.values(3, 6) = (value_type)0;     c.values(3, 7) = (value_type)0;     c.values(3, 8) = (value_type)0;
+  c.values(4, 6) = (value_type)0;     c.values(4, 7) = (value_type)0;     c.values(4, 8) = (value_type)0;
+  c.values(5, 6) = (value_type)0;     c.values(5, 7) = (value_type)0;     c.values(5, 8) = (value_type)0;
+  c.values(6, 6) = (value_type)0;     c.values(6, 7) = (value_type)0;     c.values(6, 8) = (value_type)0;
+  c.values(7, 6) = (value_type)0;     c.values(7, 7) = (value_type)0;     c.values(7, 8) = (value_type)0;
+  c.values(8, 6) = (value_type)0;     c.values(8, 7) = (value_type)0;     c.values(8, 8) = (value_type)0;
+  c.values(9, 6) = (value_type)0;     c.values(9, 7) = (value_type)0;     c.values(9, 8) = (value_type)0;
   // clang-format on
 }
 
@@ -142,12 +167,8 @@ void build_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
-  // Matrix to Build
-  // [1.11 *    2.22]
-  // [*    *    3.33]
-  // [*    4.44 *   ]
-  CHECK_DIA_SIZES(c, 3, 3, 4, 4, 32);
-
+  CHECK_DIA_SIZES(c, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ,
+                  SMALL_DIA_MATRIX_NDIAGS, SMALL_MATRIX_ALIGNMENT);
   reset_small_container(c);
 }
 
@@ -157,25 +178,49 @@ void update_small_container(
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
   using value_type = typename Container::value_type;
-  // New Matrix
-  // [1.11 *    *    ]
-  // [*    *    -3.33]
-  // [2.22 4.44 *    ]
-
   // clang-format off
-  c.diagonal_offsets(0) = -2; 
-  c.diagonal_offsets(1) = -1; 
-  c.diagonal_offsets(2) = 0; 
-  c.diagonal_offsets(3) = 1; 
-  // values are:
-  // [*    *    1.11 0    ]
-  // [*    0    0    -3.33]
-  // [2.22 4.44 0    *    ]
+  c.diagonal_offsets(0) = -8; 
+  c.diagonal_offsets(1) = -7; 
+  c.diagonal_offsets(2) = -6; 
+  c.diagonal_offsets(3) = -3; 
+  c.diagonal_offsets(4) = 0; 
+  c.diagonal_offsets(5) = 3; 
+  c.diagonal_offsets(6) = 6; 
+  c.diagonal_offsets(7) = 7; 
+  c.diagonal_offsets(8) = 8; 
 
-  c.values(0,0) = (value_type)0;    c.values(1,0) = (value_type)0;    c.values(2,0) = (value_type)2.22;
-  c.values(0,1) = (value_type)0;    c.values(1,1) = (value_type)0;    c.values(2,1) = (value_type)4.44;
-  c.values(0,2) = (value_type)1.11; c.values(1,2) = (value_type)0;    c.values(2,2) = (value_type)0;
-  c.values(0,3) = (value_type)0;    c.values(1,3) = (value_type)3.33; c.values(2,3) = (value_type)0;
+  c.values(0, 0) = (value_type)0;      c.values(0, 1) = (value_type)0;      c.values(0, 2) = (value_type)0;
+  c.values(1, 0) = (value_type)0;      c.values(1, 1) = (value_type)0;      c.values(1, 2) = (value_type)0;
+  c.values(2, 0) = (value_type)0;      c.values(2, 1) = (value_type)0;      c.values(2, 2) = (value_type)0;
+  c.values(3, 0) = (value_type)0;      c.values(3, 1) = (value_type)0;      c.values(3, 2) = (value_type)0;
+  c.values(4, 0) = (value_type)0;      c.values(4, 1) = (value_type)0;      c.values(4, 2) = (value_type)0;
+  c.values(5, 0) = (value_type)0;      c.values(5, 1) = (value_type)0;      c.values(5, 2) = (value_type)0;
+  c.values(6, 0) = (value_type)0;      c.values(6, 1) = (value_type)0;      c.values(6, 2) = (value_type)0;
+  c.values(7, 0) = (value_type)0;      c.values(7, 1) = (value_type)23.23;  c.values(7, 2) = (value_type)24.24;
+  c.values(8, 0) = (value_type)27.27;  c.values(8, 1) = (value_type)0;      c.values(8, 2) = (value_type)0;
+  c.values(9, 0) = (value_type)30.30;  c.values(9, 1) = (value_type)0;      c.values(9, 2) = (value_type)0;
+  
+  c.values(0, 3) = (value_type)0;      c.values(0, 4) = (value_type)1.11;   c.values(0, 5) = (value_type)2.22;
+  c.values(1, 3) = (value_type)0;      c.values(1, 4) = (value_type)5.55;   c.values(1, 5) = (value_type)6.66;
+  c.values(2, 3) = (value_type)0;      c.values(2, 4) = (value_type)9.99;   c.values(2, 5) = (value_type)10.10;
+  c.values(3, 3) = (value_type)11.11;  c.values(3, 4) = (value_type)12.12;  c.values(3, 5) = (value_type)13.13;
+  c.values(4, 3) = (value_type)-14.14; c.values(4, 4) = (value_type)-15.15; c.values(4, 5) = (value_type)16.16;
+  c.values(5, 3) = (value_type)17.17;  c.values(5, 4) = (value_type)18.18;  c.values(5, 5) = (value_type)19.19;
+  c.values(6, 3) = (value_type)20.20;  c.values(6, 4) = (value_type)21.21;  c.values(6, 5) = (value_type)22.22;
+  c.values(7, 3) = (value_type)-25.25; c.values(7, 4) = (value_type)26.26;  c.values(7, 5) = (value_type)0;
+  c.values(8, 3) = (value_type)28.28;  c.values(8, 4) = (value_type)29.29;  c.values(8, 5) = (value_type)0;
+  c.values(9, 3) = (value_type)31.31;  c.values(9, 4) = (value_type)32.32;  c.values(9, 5) = (value_type)0;
+  
+  c.values(0, 6) = (value_type)0;      c.values(0, 7) = (value_type)3.33;   c.values(0, 8) = (value_type)-4.44;
+  c.values(1, 6) = (value_type)7.77;   c.values(1, 7) = (value_type)0;      c.values(1, 8) = (value_type)-8.88;
+  c.values(2, 6) = (value_type)0;      c.values(2, 7) = (value_type)0;      c.values(2, 8) = (value_type)0;
+  c.values(3, 6) = (value_type)0;      c.values(3, 7) = (value_type)0;      c.values(3, 8) = (value_type)0;
+  c.values(4, 6) = (value_type)0;      c.values(4, 7) = (value_type)0;      c.values(4, 8) = (value_type)0;
+  c.values(5, 6) = (value_type)0;      c.values(5, 7) = (value_type)0;      c.values(5, 8) = (value_type)0;
+  c.values(6, 6) = (value_type)0;      c.values(6, 7) = (value_type)0;      c.values(6, 8) = (value_type)0;
+  c.values(7, 6) = (value_type)0;      c.values(7, 7) = (value_type)0;      c.values(7, 8) = (value_type)0;
+  c.values(8, 6) = (value_type)0;      c.values(8, 7) = (value_type)0;      c.values(8, 8) = (value_type)0;
+  c.values(9, 6) = (value_type)0;      c.values(9, 7) = (value_type)0;      c.values(9, 8) = (value_type)0;
   // clang-format on
 }
 
@@ -184,7 +229,8 @@ void setup_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_dia_matrix_format_container_v<Container>>* = nullptr) {
-  c.resize(3, 3, 4, 4, 32);
+  c.resize(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ,
+           SMALL_DIA_MATRIX_NDIAGS, SMALL_MATRIX_ALIGNMENT);
   build_small_container(c);
 }
 

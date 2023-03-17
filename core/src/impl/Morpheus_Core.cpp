@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -165,18 +165,32 @@ void greeting_header() {
 
 }  // namespace Impl
 
+static bool morpheus_is_initialized = false;
+static bool morpheus_is_finalized   = true;
+static bool kokkos_finalize         = false;
+
 void initialize(int& argc, char* argv[], const bool banner) {
   InitArguments arguments;
   if (banner) Impl::greeting_header();
   Impl::parse_command_line_arguments(argc, argv, arguments);
-  Kokkos::initialize(argc, argv);
+  if (!Kokkos::is_initialized()) {
+    Kokkos::initialize(argc, argv);
+    kokkos_finalize = true;
+  }
+  morpheus_is_initialized = true;
+  morpheus_is_finalized   = false;
 }
 
 void initialize(int& argc, char* argv[], InitArguments& arguments,
                 const bool banner) {
   if (banner) Impl::greeting_header();
   Impl::parse_command_line_arguments(argc, argv, arguments);
-  Kokkos::initialize(argc, argv);
+  if (!Kokkos::is_initialized()) {
+    Kokkos::initialize(argc, argv);
+    kokkos_finalize = true;
+  }
+  morpheus_is_initialized = true;
+  morpheus_is_finalized   = false;
 }
 
 void print_configuration(std::ostream& out, const bool detail) {
@@ -199,9 +213,24 @@ void print_configuration(std::ostream& out, const bool detail) {
 }
 void initialize(InitArguments args, const bool banner) {
   if (banner) Impl::greeting_header();
-  Kokkos::initialize(args);
+  if (!Kokkos::is_initialized()) {
+    Kokkos::initialize(args);
+    kokkos_finalize = true;
+  }
+  morpheus_is_initialized = true;
+  morpheus_is_finalized   = false;
 }
 
-void finalize() { Kokkos::finalize(); }
+void finalize() {
+  if (kokkos_finalize) {
+    Kokkos::finalize();
+  }
+  morpheus_is_initialized = false;
+  morpheus_is_finalized   = true;
+}
+
+bool is_initialized() { return morpheus_is_initialized; }
+
+bool is_finalized() { return morpheus_is_finalized; }
 
 }  // namespace Morpheus

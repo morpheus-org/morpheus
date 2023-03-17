@@ -15,16 +15,10 @@ install(
 
 set(MORPHEUS_CORE_SOURCES)
 append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/*.cpp)
-# append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/spaces/*.cpp)
 
 set(MORPHEUS_CORE_HEADERS)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/*.hpp)
-# append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/spaces/*.hpp)
-append_glob(MORPHEUS_CORE_HEADERS
-            ${CMAKE_CURRENT_SOURCE_DIR}/fwd/algorithms/*.hpp)
-append_glob(MORPHEUS_CORE_HEADERS
-            ${CMAKE_CURRENT_SOURCE_DIR}/fwd/containers/*.hpp)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/fwd/*.hpp)
 
 foreach(Fmt DenseVector;DenseMatrix)

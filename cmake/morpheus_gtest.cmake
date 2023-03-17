@@ -30,4 +30,15 @@ else()
   add_library(morpheus_gtest ALIAS GTest::gtest)
 endif()
 
+<<<<<<< HEAD
+=======
+morpheus_add_option(
+  ENABLE_RAPID_TESTING OFF BOOL
+  "Whether rapid testing is enabled during unit tests. Default: OFF")
+if(Morpheus_ENABLE_RAPID_TESTING)
+  set(MORPHEUS_RAPID_TESTING ON)
+endif()
+global_set(Morpheus_ENABLE_RAPID_TESTING ${MORPHEUS_RAPID_TESTING})
+
+>>>>>>> new-formats
 message(STATUS "Morpheus_Gtest Library configured.")

@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,6 +25,7 @@
 #define MORPHEUS_SORT_HPP
 
 #include <impl/Morpheus_Sort_Impl.hpp>
+#include <impl/Dynamic/Morpheus_Sort_Impl.hpp>
 
 namespace Morpheus {
 

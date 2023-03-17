@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -34,6 +34,9 @@
 #include <Morpheus_DenseMatrix.hpp>
 #include <Morpheus_DenseVector.hpp>
 #include <Morpheus_DiaMatrix.hpp>
+#include <Morpheus_EllMatrix.hpp>
+#include <Morpheus_HybMatrix.hpp>
+#include <Morpheus_HdcMatrix.hpp>
 #include <Morpheus_DynamicMatrix.hpp>
 
 // Algorithms
@@ -41,6 +44,8 @@
 #include <Morpheus_Copy.hpp>
 #include <Morpheus_Dot.hpp>
 #include <Morpheus_MatrixOperations.hpp>
+#include <Morpheus_MatrixAnalytics.hpp>
+#include <Morpheus_VectorAnalytics.hpp>
 #include <Morpheus_Multiply.hpp>
 #include <Morpheus_Print.hpp>
 #include <Morpheus_Reduction.hpp>
@@ -81,6 +86,8 @@ void initialize(int& argc, char* argv[], InitArguments& args,
 void print_configuration(std::ostream& out, const bool detail = true);
 void initialize(InitArguments args = InitArguments(), bool banner = true);
 void finalize();
+bool is_initialized();
+bool is_finalized();
 
 }  // namespace Morpheus
 

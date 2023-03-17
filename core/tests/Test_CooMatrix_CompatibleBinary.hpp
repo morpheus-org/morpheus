@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_COOMATRIX_COMPATIBLEBINARY_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_CooMatrix.hpp>
 
 using CooMatrixCompatibleTypes = typename Morpheus::generate_unary_typelist<
@@ -49,7 +51,9 @@ class CompatibleCooMatrixBinaryTest : public ::testing::Test {
   using device2 = typename type2::type;  // CooMatrix
   using host2   = typename type2::type::HostMirror;
 
-  CompatibleCooMatrixBinaryTest() : Aref(3, 3, 4), Ahref(3, 3, 4) {}
+  CompatibleCooMatrixBinaryTest()
+      : Aref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ),
+        Ahref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ) {}
 
   void SetUp() override {
     Morpheus::Test::build_small_container(Ahref);
@@ -78,7 +82,8 @@ TYPED_TEST(CompatibleCooMatrixBinaryTest, ConstructionFromCooMatrix) {
   using size_type   = typename Matrix1::size_type;
   using value_type2 = typename Matrix2::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix2 A(nrows, ncols, nnnz, this->Aref.row_indices(),
             this->Aref.column_indices(), this->Aref.values());
@@ -121,7 +126,8 @@ TYPED_TEST(CompatibleCooMatrixBinaryTest, CopyAssignmentFromCooMatrix) {
   using size_type   = typename Matrix1::size_type;
   using value_type2 = typename Matrix2::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix2 A(nrows, ncols, nnnz, this->Aref.row_indices(),
             this->Aref.column_indices(), this->Aref.values());
@@ -165,7 +171,8 @@ TYPED_TEST(CompatibleCooMatrixBinaryTest, ConstructionFromDenseVector) {
   using HostMatrix = typename TestFixture::host2;
   using size_type  = typename Matrix::size_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_indices(),
            this->Aref.column_indices(), this->Aref.values());

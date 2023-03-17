@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -23,6 +23,8 @@
 
 #ifndef TEST_CORE_UTILS_MACROS_DENSEMATRIX_HPP
 #define TEST_CORE_UTILS_MACROS_DENSEMATRIX_HPP
+
+#include <utils/Macros_Definitions.hpp>
 
 #include <Morpheus_Core.hpp>
 
@@ -56,15 +58,13 @@
  * same data.
  *
  */
-#define VALIDATE_DENSE_MATRIX_CONTAINER(A, Aref, nrows, ncols)      \
-  {                                                                 \
-    using container_type      = decltype(A);                        \
-    using container_size_type = typename container_type::size_type; \
-    for (container_size_type i = 0; i < nrows; i++) {               \
-      for (type j = 0; j < ncols; j++) {                            \
-        EXPECT_EQ(A(i, j), Aref(i, j));                             \
-      }                                                             \
-    }                                                               \
+#define VALIDATE_DENSE_MATRIX_CONTAINER(A, Aref, nrows, ncols) \
+  {                                                            \
+    for (size_t i = 0; i < nrows; i++) {                       \
+      for (type j = 0; j < ncols; j++) {                       \
+        EXPECT_EQ(A(i, j), Aref(i, j));                        \
+      }                                                        \
+    }                                                          \
   }
 
 namespace Morpheus {
@@ -75,16 +75,39 @@ void reset_small_container(
     typename std::enable_if_t<
         Morpheus::is_dense_matrix_format_container_v<Container>>* = nullptr) {
   using value_type = typename Container::value_type;
-  // Matrix
-  // [1.11 *    2.22]
-  // [*    *    3.33]
-  // [*    4.44 *   ]
-
   // clang-format off
   c(0, 0) = (value_type)1.11;
-  c(0, 2) = (value_type)2.22;
-  c(1, 2) = (value_type)3.33;
-  c(2, 1) = (value_type)4.44;
+  c(0, 3) = (value_type)2.22;
+  c(0, 7) = (value_type)3.33;
+  c(0, 8) = (value_type)4.44;
+  c(1, 1) = (value_type)5.55;
+  c(1, 4) = (value_type)6.66;
+  c(1, 7) = (value_type)7.77;
+  c(1, 9) = (value_type)8.88;
+  c(2, 2) = (value_type)9.99;
+  c(2, 5) = (value_type)10.10;
+  c(3, 0) = (value_type)11.11;
+  c(3, 3) = (value_type)12.12;
+  c(3, 6) = (value_type)13.13;
+  c(4, 1) = (value_type)14.14;
+  c(4, 4) = (value_type)15.15;
+  c(4, 7) = (value_type)16.16;
+  c(5, 2) = (value_type)17.17;
+  c(5, 5) = (value_type)18.18;
+  c(5, 8) = (value_type)19.19;
+  c(6, 3) = (value_type)20.20;
+  c(6, 6) = (value_type)21.21;
+  c(6, 9) = (value_type)22.22;
+  c(7, 0) = (value_type)23.23;
+  c(7, 1) = (value_type)24.24;
+  c(7, 4) = (value_type)25.25;
+  c(7, 7) = (value_type)26.26;
+  c(8, 0) = (value_type)27.27;
+  c(8, 5) = (value_type)28.28;
+  c(8, 8) = (value_type)29.29;
+  c(9, 1) = (value_type)30.30;
+  c(9, 6) = (value_type)31.31;
+  c(9, 9) = (value_type)32.32;
   // clang-format on
 }
 
@@ -100,12 +123,8 @@ void build_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_dense_matrix_format_container_v<Container>>* = nullptr) {
-  // Matrix to Build
-  // [1.11 *    2.22]
-  // [*    *    3.33]
-  // [*    4.44 *   ]
-  CHECK_DENSE_MATRIX_SIZES(c, 3, 3, 3 * 3);
-
+  CHECK_DENSE_MATRIX_SIZES(c, SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS,
+                           SMALL_MATRIX_NROWS * SMALL_MATRIX_NCOLS);
   reset_small_container(c);
 }
 
@@ -115,16 +134,39 @@ void update_small_container(
     typename std::enable_if_t<
         Morpheus::is_dense_matrix_format_container_v<Container>>* = nullptr) {
   using value_type = typename Container::value_type;
-  // New Matrix
-  // [1.11 *    *    ]
-  // [*    *    -3.33]
-  // [2.22 4.44 *    ]
-
   // clang-format off
   c(0, 0) = (value_type)1.11;
-  c(1, 2) = (value_type)-3.33;
-  c(2, 0) = (value_type)2.22;
-  c(2, 1) = (value_type)4.44;
+  c(0, 3) = (value_type)2.22;
+  c(0, 7) = (value_type)3.33;
+  c(0, 8) = (value_type)-4.44;
+  c(1, 1) = (value_type)5.55;
+  c(1, 4) = (value_type)6.66;
+  c(1, 7) = (value_type)7.77;
+  c(1, 9) = (value_type)-8.88;
+  c(2, 2) = (value_type)9.99;
+  c(2, 5) = (value_type)10.10;
+  c(3, 0) = (value_type)11.11;
+  c(3, 3) = (value_type)12.12;
+  c(3, 6) = (value_type)13.13;
+  c(4, 1) = (value_type)-14.14;
+  c(4, 4) = (value_type)-15.15;
+  c(4, 7) = (value_type)16.16;
+  c(5, 2) = (value_type)17.17;
+  c(5, 5) = (value_type)18.18;
+  c(5, 8) = (value_type)19.19;
+  c(6, 3) = (value_type)20.20;
+  c(6, 6) = (value_type)21.21;
+  c(6, 9) = (value_type)22.22;
+  c(7, 0) = (value_type)23.23;
+  c(7, 1) = (value_type)24.24;
+  c(7, 4) = (value_type)-25.25;
+  c(7, 7) = (value_type)26.26;
+  c(8, 0) = (value_type)27.27;
+  c(8, 5) = (value_type)28.28;
+  c(8, 8) = (value_type)29.29;
+  c(9, 1) = (value_type)30.30;
+  c(9, 6) = (value_type)31.31;
+  c(9, 9) = (value_type)32.32;
   // clang-format on
 }
 
@@ -133,7 +175,7 @@ void setup_small_container(
     Container& c,
     typename std::enable_if_t<
         Morpheus::is_dense_matrix_format_container_v<Container>>* = nullptr) {
-  c.resize(3, 3);
+  c.resize(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS);
   build_small_container(c);
 }
 

@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -57,6 +57,24 @@
 #include <impl/Dia/Cuda/Morpheus_Convert_Impl.hpp>
 #include <impl/Dia/HIP/Morpheus_Convert_Impl.hpp>
 #include <impl/Dia/Kokkos/Morpheus_Convert_Impl.hpp>
+
+#include <impl/Ell/Serial/Morpheus_Convert_Impl.hpp>
+#include <impl/Ell/OpenMP/Morpheus_Convert_Impl.hpp>
+#include <impl/Ell/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/Ell/HIP/Morpheus_Convert_Impl.hpp>
+#include <impl/Ell/Kokkos/Morpheus_Convert_Impl.hpp>
+
+#include <impl/Hyb/Serial/Morpheus_Convert_Impl.hpp>
+#include <impl/Hyb/OpenMP/Morpheus_Convert_Impl.hpp>
+#include <impl/Hyb/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/Hyb/HIP/Morpheus_Convert_Impl.hpp>
+#include <impl/Hyb/Kokkos/Morpheus_Convert_Impl.hpp>
+
+#include <impl/Hdc/Serial/Morpheus_Convert_Impl.hpp>
+#include <impl/Hdc/OpenMP/Morpheus_Convert_Impl.hpp>
+#include <impl/Hdc/Cuda/Morpheus_Convert_Impl.hpp>
+#include <impl/Hdc/HIP/Morpheus_Convert_Impl.hpp>
+#include <impl/Hdc/Kokkos/Morpheus_Convert_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {

@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_CSRMATRIX_COMPATIBLEDYNAMICBINARY_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
 
 using CsrMatrixCompatibleTypes = typename Morpheus::generate_unary_typelist<
@@ -53,7 +55,9 @@ class CompatibleCsrMatrixDynamicTest : public ::testing::Test {
   using dynamic_device = typename dynamic::type;  // DynamicMatrix
   using dynamic_host   = typename dynamic::type::HostMirror;
 
-  CompatibleCsrMatrixDynamicTest() : Aref(3, 3, 4), Ahref(3, 3, 4) {}
+  CompatibleCsrMatrixDynamicTest()
+      : Aref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ),
+        Ahref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ) {}
 
   void SetUp() override {
     Morpheus::Test::build_small_container(Ahref);
@@ -91,7 +95,8 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   using size_type         = typename Matrix::size_type;
   using value_type        = typename Matrix::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the reference CsrMatrix
   DynamicMatrix A(this->Aref);
   DynamicHostMatrix Ah(this->Ahref);
@@ -107,7 +112,7 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   HostMatrix Ch(Ah);
 
   // Change values in one container
-  Bh.row_offsets(2)    = 2;
+  Bh.row_offsets(2)    = 6;
   Bh.column_indices(1) = 1;
   Bh.values(3)         = (value_type)-3.33;
 
@@ -179,7 +184,8 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   using size_type         = typename Matrix::size_type;
   using value_type        = typename Matrix::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the reference CsrMatrix
   DynamicMatrix A(this->Aref);
   DynamicHostMatrix Ah(this->Ahref);
@@ -195,7 +201,7 @@ TYPED_TEST(CompatibleCsrMatrixDynamicTest,
   HostMatrix Ch = Ah;
 
   // Change values in one container
-  Bh.row_offsets(2)    = 2;
+  Bh.row_offsets(2)    = 6;
   Bh.column_indices(1) = 1;
   Bh.values(3)         = (value_type)-3.33;
 

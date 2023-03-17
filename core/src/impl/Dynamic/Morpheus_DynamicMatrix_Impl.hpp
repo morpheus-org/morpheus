@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -69,6 +69,15 @@ struct any_type_resize
     mat.resize(nrows, ncols, nnnz, ndiag, alignment);
   }
 
+  // Specialization for Ell resize with five arguments
+  template <typename... Args>
+  result_type operator()(
+      typename EllMatrix<ValueType, Properties...>::type &mat,
+      const size_type nrows, const size_type ncols, const size_type nnnz,
+      const size_type num_entries_per_row, const size_type alignment = 32) {
+    mat.resize(nrows, ncols, nnnz, num_entries_per_row, alignment);
+  }
+
   // Constrains any other overloads for supporting formats
   // Unsupported formats won't compile
   template <typename... Args>
@@ -90,6 +99,14 @@ struct any_type_resize
   template <typename... Args>
   result_type operator()(
       typename DiaMatrix<ValueType, Properties...>::type &mat, Args &&...) {
+    throw Morpheus::RuntimeException(
+        "Invalid use of the dynamic resize interface for current format (" +
+        std::to_string(mat.format_index()) + ").");
+  }
+
+  template <typename... Args>
+  result_type operator()(
+      typename EllMatrix<ValueType, Properties...>::type &mat, Args &&...) {
     throw Morpheus::RuntimeException(
         "Invalid use of the dynamic resize interface for current format (" +
         std::to_string(mat.format_index()) + ").");

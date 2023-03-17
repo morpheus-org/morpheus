@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_CSRMATRIX_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_CsrMatrix.hpp>
 
 using CsrMatrixTypes =
@@ -41,7 +43,9 @@ class CsrMatrixUnaryTest : public ::testing::Test {
   using device = typename UnaryContainer::type;
   using host   = typename UnaryContainer::type::HostMirror;
 
-  CsrMatrixUnaryTest() : Aref(3, 3, 4), Ahref(3, 3, 4) {}
+  CsrMatrixUnaryTest()
+      : Aref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ),
+        Ahref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ) {}
 
   void SetUp() override {
     Morpheus::Test::build_small_container(Ahref);
@@ -112,7 +116,8 @@ TYPED_TEST(CsrMatrixUnaryTest, ReferenceByIndex) {
   using HostMatrix = typename TestFixture::host;
   using size_type  = typename Matrix::size_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_offsets(),
            this->Aref.column_indices(), this->Aref.values());
@@ -143,7 +148,8 @@ TYPED_TEST(CsrMatrixUnaryTest, Reference) {
   using host_index_array_type = typename index_array_type::HostMirror;
   using host_value_array_type = typename value_array_type::HostMirror;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_offsets(),
            this->Aref.column_indices(), this->Aref.values());
@@ -183,7 +189,8 @@ TYPED_TEST(CsrMatrixUnaryTest, ConstReference) {
   using host_index_array_type = typename index_array_type::HostMirror;
   using host_value_array_type = typename value_array_type::HostMirror;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_offsets(),
            this->Aref.column_indices(), this->Aref.values());
@@ -236,7 +243,8 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultCopyAssignment) {
   using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_offsets(),
            this->Aref.column_indices(), this->Aref.values());
@@ -253,7 +261,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultCopyAssignment) {
   CHECK_CSR_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.row_offsets(2)    = 2;
+  Ah.row_offsets(2)    = 6;
   Ah.column_indices(1) = 1;
   Ah.values(3)         = (value_type)-3.33;
 
@@ -283,7 +291,8 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultCopyConstructor) {
   using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_offsets(),
            this->Aref.column_indices(), this->Aref.values());
@@ -300,7 +309,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultCopyConstructor) {
   CHECK_CSR_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.row_offsets(2)    = 2;
+  Ah.row_offsets(2)    = 6;
   Ah.column_indices(1) = 1;
   Ah.values(3)         = (value_type)-3.33;
 
@@ -330,7 +339,8 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultMoveAssignment) {
   using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_offsets(),
            this->Aref.column_indices(), this->Aref.values());
@@ -347,7 +357,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultMoveAssignment) {
   CHECK_CSR_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.row_offsets(2)    = 2;
+  Ah.row_offsets(2)    = 6;
   Ah.column_indices(1) = 1;
   Ah.values(3)         = (value_type)-3.33;
 
@@ -377,7 +387,8 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultMoveConstructor) {
   using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   // Build matrix from the device vectors
   Matrix A(nrows, ncols, nnnz, this->Aref.row_offsets(),
            this->Aref.column_indices(), this->Aref.values());
@@ -394,7 +405,7 @@ TYPED_TEST(CsrMatrixUnaryTest, DefaultMoveConstructor) {
   CHECK_CSR_CONTAINERS(Bh, Ah);
 
   // Change values in one container
-  Ah.row_offsets(2)    = 2;
+  Ah.row_offsets(2)    = 6;
   Ah.column_indices(1) = 1;
   Ah.values(3)         = (value_type)-3.33;
 
@@ -418,7 +429,8 @@ TYPED_TEST(CsrMatrixUnaryTest, ConstructionFromShape) {
   using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
   HostMatrix Ah(nrows, ncols, nnnz);
   CHECK_CSR_SIZES(Ah, nrows, ncols, nnnz);
 
@@ -456,9 +468,10 @@ TYPED_TEST(CsrMatrixUnaryTest, Resize) {
   using size_type  = typename Matrix::size_type;
   using value_type = typename Matrix::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz        = SMALL_MATRIX_NNZ;
   size_type large_nrows = 500, large_ncols = 400, large_nnnz = 640;
-  size_type small_nrows = 2, small_ncols = 3, small_nnnz = 2;
+  size_type small_nrows = 2, small_ncols = 3, small_nnnz = 4;
 
   Matrix A(nrows, ncols, nnnz);
   Morpheus::copy(this->Ahref, A);
@@ -482,17 +495,17 @@ TYPED_TEST(CsrMatrixUnaryTest, Resize) {
 
   // Resizing to larger sizes should invoke a new allocation so changes in
   // matrix should not be reflected in reference
-  Ah.row_offsets(1)    = 1;
-  Ah.column_indices(1) = 10;
-  Ah.values(0)         = (value_type)-1.11;
+  Ah.row_offsets(2)    = 6;
+  Ah.column_indices(1) = 1;
+  Ah.values(3)         = (value_type)-3.33;
   Morpheus::copy(Ah, A);
 
   // Copy reference back to see if there are any changes
   HostMatrix Ahref_test(nrows, ncols, nnnz);
   Morpheus::copy(this->Ahref, Ahref_test);
-  EXPECT_NE(Ah.row_offsets(1), Ahref_test.row_offsets(1));
+  EXPECT_NE(Ah.row_offsets(2), Ahref_test.row_offsets(2));
   EXPECT_NE(Ah.column_indices(1), Ahref_test.column_indices(1));
-  EXPECT_NE(Ah.values(0), Ahref_test.values(0));
+  EXPECT_NE(Ah.values(3), Ahref_test.values(3));
 
   for (size_type n = nrows + 1; n < Ah.nrows() + 1; n++) {
     EXPECT_EQ(Ah.row_offsets(n), 0);
@@ -509,9 +522,9 @@ TYPED_TEST(CsrMatrixUnaryTest, Resize) {
   CHECK_CSR_SIZES(Ah, small_nrows, small_ncols, small_nnnz);
 
   // Set back to normal
-  Ah.row_offsets(1)    = 2;
-  Ah.column_indices(1) = 2;
-  Ah.values(0)         = (value_type)1.11;
+  Ah.row_offsets(2)    = 8;
+  Ah.column_indices(1) = 3;
+  Ah.values(3)         = (value_type)4.44;
   Morpheus::copy(Ah, A);
 
   VALIDATE_CSR_CONTAINER(Ah, Ahref_test, Ah.nrows(), Ah.nnnz());

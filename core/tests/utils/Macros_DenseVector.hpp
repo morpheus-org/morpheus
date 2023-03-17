@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,6 +25,8 @@
 #define TEST_CORE_UTILS_MACROS_DENSEVECTOR_HPP
 
 #include <Morpheus_Core.hpp>
+
+#include <utils/Macros_Definitions.hpp>
 
 /**
  * @brief Checks the sizes of a DenseVector container against a size
@@ -51,13 +53,11 @@
  * same data.
  *
  */
-#define VALIDATE_DENSE_VECTOR_CONTAINER(v1, v2, size)               \
-  {                                                                 \
-    using container_type      = decltype(v1);                       \
-    using container_size_type = typename container_type::size_type; \
-    for (container_type n = 0; n < size; n++) {                     \
-      EXPECT_EQ(v1[n], v2[n]);                                      \
-    }                                                               \
+#define VALIDATE_DENSE_VECTOR_CONTAINER(v1, v2, size) \
+  {                                                   \
+    for (size_t n = 0; n < size; n++) {               \
+      EXPECT_EQ(v1[n], v2[n]);                        \
+    }                                                 \
   }
 
 namespace Morpheus {
@@ -87,8 +87,7 @@ void build_small_container(
     Container& c,
     typename std::enable_if_t<Morpheus::is_vector_container_v<Container>>* =
         nullptr) {
-  CHECK_DENSE_VECTOR_SIZES(c, 3);
-
+  CHECK_DENSE_VECTOR_SIZES(c, SMALL_VECTOR_SIZE);
   reset_small_container(c);
 }
 
@@ -111,7 +110,7 @@ void setup_small_container(
     Container& c,
     typename std::enable_if_t<Morpheus::is_vector_container_v<Container>>* =
         nullptr) {
-  c.resize(3);
+  c.resize(SMALL_VECTOR_SIZE);
   build_small_container(c);
 }
 
@@ -221,7 +220,7 @@ bool have_approx_same_data(
     }
   }
   return res;
-}  // namespace Test
+}
 }  // namespace Test
 }  // namespace Morpheus
 

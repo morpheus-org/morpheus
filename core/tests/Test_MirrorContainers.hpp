@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -163,8 +163,7 @@ TYPED_TEST(ContainerTypesUnaryTest, MirrorContainer_SameSpace) {
 }
 
 TYPED_TEST(ContainerTypesUnaryTest, MirrorContainer_NewSpace) {
-  using Container     = typename TestFixture::device;
-  using HostContainer = typename TestFixture::host;
+  using Container = typename TestFixture::device;
 
   using space        = TEST_CUSTOM_SPACE;
   using value_type   = typename Container::non_const_value_type;

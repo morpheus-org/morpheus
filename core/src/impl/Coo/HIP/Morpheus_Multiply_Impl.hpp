@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -34,6 +34,7 @@
 
 #include <impl/Morpheus_HIPUtils.hpp>
 #include <impl/Coo/Kernels/Morpheus_Multiply_Impl.hpp>
+#include <impl/DenseVector/Kernels/Morpheus_Segmented_Reduction_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -128,15 +129,17 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
   }
 
   const size_type BLOCK_SIZE = 256;
-  const size_type MAX_BLOCKS = max_active_blocks(
-      Kernels::spmv_coo_flat_kernel<index_type, value_type, BLOCK_SIZE>,
-      BLOCK_SIZE, 0);
+  const size_type MAX_BLOCKS =
+      max_active_blocks(Kernels::spmv_coo_flat_kernel<size_type, index_type,
+                                                      value_type, BLOCK_SIZE>,
+                        BLOCK_SIZE, 0);
   const size_type WARPS_PER_BLOCK = BLOCK_SIZE / WARP_SIZE;
 
   const size_type num_units = A.nnnz() / WARP_SIZE;
   const size_type num_warps = std::min(num_units, WARPS_PER_BLOCK * MAX_BLOCKS);
-  const size_type num_blocks = DIVIDE_INTO(num_warps, WARPS_PER_BLOCK);
-  const size_type num_iters  = DIVIDE_INTO(num_units, num_warps);
+  const size_type num_blocks =
+      Impl::ceil_div<size_type>(num_warps, WARPS_PER_BLOCK);
+  const size_type num_iters = Impl::ceil_div<size_type>(num_units, num_warps);
 
   const size_type interval_size = WARP_SIZE * num_iters;
 
@@ -145,7 +148,7 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
                               // than WARP_SIZE elements)
 
   const size_type active_warps =
-      (interval_size == 0) ? 0 : DIVIDE_INTO(tail, interval_size);
+      (interval_size == 0) ? 0 : Impl::ceil_div<size_type>(tail, interval_size);
 
   typename Matrix::index_array_type temp_rows(active_warps, 0);
   typename Matrix::value_array_type temp_vals(active_warps, 0);
@@ -159,11 +162,11 @@ void __spmv_coo_flat(const Matrix& A, const Vector& x, Vector& y,
   getLastHIPError("spmv_coo_flat_kernel: Kernel execution failed");
 #endif
 
-  Kernels::spmv_coo_reduce_update_kernel<size_type, index_type, value_type,
-                                         BLOCK_SIZE><<<1, BLOCK_SIZE, 0>>>(
-      active_warps, temp_rows.data(), temp_vals.data(), y.data());
+  Kernels::reduce_update_kernel<size_type, index_type, value_type, BLOCK_SIZE>
+      <<<1, BLOCK_SIZE, 0>>>(active_warps, temp_rows.data(), temp_vals.data(),
+                             y.data());
 #if defined(DEBUG) || defined(MORPHEUS_DEBUG)
-  getLastHIPError("spmv_coo_reduce_kernel: Kernel execution failed");
+  getLastHIPError("reduce_update_kernel: Kernel execution failed");
 #endif
 
   Kernels::spmv_coo_serial_kernel<size_type, index_type, value_type>

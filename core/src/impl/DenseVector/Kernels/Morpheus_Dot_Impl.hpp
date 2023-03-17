@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -38,7 +38,7 @@ template <typename ValueType, typename SizeType>
 __global__ void dot_kernel(SizeType n, const ValueType* x, const ValueType* y,
                            SizeType* res) {
   const SizeType tid = blockDim.x * blockIdx.x + threadIdx.x;
-  if (tid > n) return;
+  if (tid >= n) return;
 
   res[tid] = x[tid] * y[tid];
 }

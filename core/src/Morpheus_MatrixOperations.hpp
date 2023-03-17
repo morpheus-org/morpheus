@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -108,9 +108,10 @@ void set_value(Matrix& A, SizeType row, SizeType col, ValueType value) {
  */
 template <typename ExecSpace, typename Matrix, typename IndexVector,
           typename ValueVector>
-void set_values(Matrix& A, typename IndexVector::value_type m,
-                const IndexVector idxm, typename IndexVector::value_type n,
-                const IndexVector idxn, ValueVector values) {
+void set_values(Matrix& A, const typename IndexVector::value_type m,
+                const IndexVector idxm,
+                const typename IndexVector::value_type n,
+                const IndexVector idxn, const ValueVector values) {
   Impl::set_values<ExecSpace>(A, m, idxm, n, idxn, values);
 }
 

@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -31,7 +31,6 @@
 #include <Morpheus_FormatTraits.hpp>
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
-#include <Morpheus_Scan.hpp>
 
 #include <impl/Morpheus_OpenMPUtils.hpp>
 
@@ -39,12 +38,6 @@
 
 namespace Morpheus {
 namespace Impl {
-
-template <typename T>
-int is_row_stop(T container, typename T::index_type start_idx,
-                typename T::index_type end_idx) {
-  return container[start_idx] != container[end_idx];
-}
 
 template <typename ExecSpace, typename Matrix, typename Vector>
 inline void multiply(

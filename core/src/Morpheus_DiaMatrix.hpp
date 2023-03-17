@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -461,7 +461,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
    *
    * @param i Row index of the value to extract
    * @param j Column index of the value to extract
-   * @return Value of the element at index \p n
+   * @return Value of the element at index (i, j)
    */
   MORPHEUS_FORCEINLINE_FUNCTION value_array_reference values(size_type i,
                                                              size_type j) {
@@ -512,7 +512,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
   /**
    * @brief Returns a const-reference to the diagonal offsets of the matrix.
    *
-   * @return index_array_type&  A reference to the diagonal offsets.
+   * @return const_index_array_type&  A reference to the diagonal offsets.
    */
   MORPHEUS_FORCEINLINE_FUNCTION const_index_array_type &cdiagonal_offsets()
       const {
@@ -522,7 +522,7 @@ class DiaMatrix : public MatrixBase<DiaMatrix, ValueType, Properties...> {
   /**
    * @brief Returns a const-reference to the values of the matrix.
    *
-   * @return value_array_type&  A reference to the values.
+   * @return const_value_array_type&  A reference to the values.
    */
   MORPHEUS_FORCEINLINE_FUNCTION const_value_array_type &cvalues() const {
     return _values;

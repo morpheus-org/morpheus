@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 - 2022 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -29,6 +29,9 @@
 #include <fwd/Morpheus_Fwd_CooMatrix.hpp>
 #include <fwd/Morpheus_Fwd_CsrMatrix.hpp>
 #include <fwd/Morpheus_Fwd_DiaMatrix.hpp>
+#include <fwd/Morpheus_Fwd_EllMatrix.hpp>
+#include <fwd/Morpheus_Fwd_HybMatrix.hpp>
+#include <fwd/Morpheus_Fwd_HdcMatrix.hpp>
 
 #include <impl/Morpheus_MatrixProxy.hpp>
 
@@ -39,7 +42,10 @@ struct MatrixFormats {
   using formats_proxy = typename Impl::MatrixFormatsProxy<
       typename CooMatrix<ValueType, Properties...>::type,
       typename CsrMatrix<ValueType, Properties...>::type,
-      typename DiaMatrix<ValueType, Properties...>::type>::type;
+      typename DiaMatrix<ValueType, Properties...>::type,
+      typename EllMatrix<ValueType, Properties...>::type,
+      typename HybMatrix<ValueType, Properties...>::type,
+      typename HdcMatrix<ValueType, Properties...>::type>::type;
   using variant   = typename formats_proxy::variant;
   using type_list = typename formats_proxy::type_list;
 };
@@ -47,7 +53,15 @@ struct MatrixFormats {
 #endif
 
 // Enums should be in the same order as types in MatrixFormatsProxy
-enum formats_e { COO_FORMAT = 0, CSR_FORMAT, DIA_FORMAT, NFORMATS };
+enum formats_e {
+  COO_FORMAT = 0,
+  CSR_FORMAT,
+  DIA_FORMAT,
+  ELL_FORMAT,
+  HYB_FORMAT,
+  HDC_FORMAT,
+  NFORMATS
+};
 
 #ifdef __cplusplus
 }  // namespace Morpheus

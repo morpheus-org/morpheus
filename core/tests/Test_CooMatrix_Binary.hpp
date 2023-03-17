@@ -3,7 +3,7 @@
  *
  * EPCC, The University of Edinburgh
  *
- * (c) 2021 The University of Edinburgh
+ * (c) 2021 - 2023 The University of Edinburgh
  *
  * Contributing Authors:
  * Christodoulos Stylianou (c.stylianou@ed.ac.uk)
@@ -25,7 +25,9 @@
 #define TEST_CORE_TEST_COOMATRIX_BINARY_HPP
 
 #include <Morpheus_Core.hpp>
+
 #include <utils/Utils.hpp>
+#include <utils/Macros_Definitions.hpp>
 #include <utils/Macros_CooMatrix.hpp>
 
 using CooMatrixTypes =
@@ -49,7 +51,9 @@ class CooMatrixBinaryTest : public ::testing::Test {
   using device2 = typename type2::type;  // CooMatrix
   using host2   = typename type2::type::HostMirror;
 
-  CooMatrixBinaryTest() : Aref(3, 3, 4), Ahref(3, 3, 4) {}
+  CooMatrixBinaryTest()
+      : Aref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ),
+        Ahref(SMALL_MATRIX_NROWS, SMALL_MATRIX_NCOLS, SMALL_MATRIX_NNZ) {}
 
   void SetUp() override {
     Morpheus::Test::build_small_container(Ahref);
@@ -77,7 +81,8 @@ TYPED_TEST(CooMatrixBinaryTest, ResizeFromCooMatrix) {
   using size_type   = typename Matrix1::size_type;
   using value_type  = typename Matrix1::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz        = SMALL_MATRIX_NNZ;
   size_type large_nrows = 500, large_ncols = 400, large_nnnz = 640;
   size_type small_nrows = 2, small_ncols = 3, small_nnnz = 2;
 
@@ -134,10 +139,10 @@ TYPED_TEST(CooMatrixBinaryTest, ResizeFromCooMatrix) {
 
   // Set back to normal
   Ah.row_indices(1)    = 0;
-  Ah.column_indices(1) = 2;
+  Ah.column_indices(1) = 3;
   Ah.values(0)         = (value_type)1.11;
-
   Morpheus::copy(Ah, A);
+
   for (size_type n = 0; n < Ah.nnnz(); n++) {
     EXPECT_EQ(Ah.row_indices(n), Ahref_test.row_indices(n));
     EXPECT_EQ(Ah.column_indices(n), Ahref_test.column_indices(n));
@@ -160,7 +165,8 @@ TYPED_TEST(CooMatrixBinaryTest, AllocateFromCooMatrix) {
   using value_type1 = typename Matrix1::value_type;
   using value_type2 = typename Matrix2::value_type;
 
-  size_type nrows = 3, ncols = 3, nnnz = 4;
+  size_type nrows = SMALL_MATRIX_NROWS, ncols = SMALL_MATRIX_NCOLS,
+            nnnz = SMALL_MATRIX_NNZ;
 
   HostMatrix1 Ah(nrows, ncols, nnnz);
   CHECK_COO_SIZES(Ah, nrows, ncols, nnnz);
