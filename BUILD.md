@@ -235,13 +235,10 @@ Options can be enabled by specifying `-DMorpheus_ENABLE_X`.
 * Morpheus_ENABLE_TESTS
     * Whether to enable building tests
     * BOOL Default: OFF
-<<<<<<< HEAD
 * Morpheus_ENABLE_DOCS
     * Whether to enable building documentation
-=======
 * Morpheus_ENABLE_RAPID_TESTING
     * Whether to enable building a small portion of tests
->>>>>>> new-formats
     * BOOL Default: OFF
 * Morpheus_ENABLE_BENCHMARKS
     * Whether to enable building benchmarks
