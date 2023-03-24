@@ -57,6 +57,7 @@ using HdcMatrixTypes =
 using DenseVectorTypes =
     typename Morpheus::generate_unary_typelist<Morpheus::DenseVector<double>,
                                                types::types_set>::type;
+
 using CooMatrixPairs =
     generate_pair<generate_pair<CooMatrixTypes, DenseVectorTypes>::type,
                   DenseVectorTypes>::type;

@@ -346,6 +346,14 @@ macro(MORPHEUS_SETUP_BUILD_ENVIRONMENT)
       OFF
       CACHE INTERNAL "Whether to build benchmarks")
 
+  morpheus_add_option(
+    ENABLE_ARM_SVE OFF BOOL
+    "Whether ARM SVE Intrinsics are enabled. Default: OFF")
+  # if(Morpheus_ENABLE_ARM_SVE)
+  #   set(MORPHEUS_ENABLE_ARM_SVE ON)
+  # endif()
+  # global_set(Morpheus_ENABLE_ARM_SVE ${MORPHEUS_ENABLE_ARM_SVE})
+
   if(Morpheus_INSTALL_TESTING)
     set(Morpheus_ENABLE_TESTS ON)
     set(Morpheus_ENABLE_EXAMPLES ON)

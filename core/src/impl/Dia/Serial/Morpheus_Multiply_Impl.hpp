@@ -32,6 +32,8 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 
+#include <impl/Dia/Serial/Arm/Morpheus_Multiply_ArmSVE_Impl.hpp>
+
 namespace Morpheus {
 namespace Impl {
 
@@ -44,6 +46,13 @@ inline void multiply(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
+#if defined(MORPHEUS_ENABLE_ARM_SVE)
+  using value_type = typename Matrix::value_type;
+  static_assert(std::is_floating_point_v<value_type>,
+                "Only floating point types are supported as value_type for SVE "
+                "extensions.");
+  multiply_arm_sve<ExecSpace>(A, x, y, init);
+#else
   using size_type       = typename Matrix::size_type;
   using index_type      = typename Matrix::index_type;
   using value_type      = typename Matrix::value_type;
@@ -61,6 +70,7 @@ inline void multiply(
     }
     y[row] = sum;
   }
+#endif
 }
 
 }  // namespace Impl

@@ -27,6 +27,10 @@
  */
 #cmakedefine MORPHEUS_ENABLE_TPL_MPARK_VARIANT  /* Mpark::variant */
 #cmakedefine MORPHEUS_ENABLE_TPL_CUBLAS  /* CUBLAS */
+#cmakedefine MORPHEUS_ENABLE_TPL_ARMPL  /* ARMPL */
 
 /* Testing */
 #cmakedefine MORPHEUS_RAPID_TESTING
+
+/* Other Options */
+#cmakedefine MORPHEUS_ENABLE_ARM_SVE  /* ARM SVE intrinsics */

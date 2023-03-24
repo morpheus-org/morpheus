@@ -32,6 +32,8 @@
 #include <Morpheus_FormatTags.hpp>
 #include <Morpheus_Spaces.hpp>
 
+#include <impl/Csr/Serial/Arm/Morpheus_Multiply_ArmPL_Impl.hpp>
+
 namespace Morpheus {
 namespace Impl {
 
@@ -44,6 +46,16 @@ inline void multiply(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
+#if defined(MORPHEUS_ENABLE_TPL_ARMPL)
+  using value_type = typename Matrix::value_type;
+  static_assert(
+      std::is_floating_point_v<value_type>,
+      "Only floating point types are supported as value_type for ARMPL "
+      "extensions.");
+  multiply_armpl_csr_serial(A.nrows(), A.ncols(), A.crow_offsets().data(),
+                            A.ccolumn_indices().data(), A.cvalues().data(),
+                            x.const_view().data(), y.data(), init);
+#else
   using size_type  = typename Matrix::size_type;
   using index_type = typename Matrix::index_type;
   using value_type = typename Matrix::value_type;
@@ -55,6 +67,7 @@ inline void multiply(
     }
     y[i] = sum;
   }
+#endif  // MORPHEUS_ENABLE_TPL_ARMPL
 }
 
 }  // namespace Impl

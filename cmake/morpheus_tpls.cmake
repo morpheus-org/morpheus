@@ -297,6 +297,7 @@ macro(morpheus_find_imported NAME)
     if(TPL_INTERFACE)
       set(IMPORT_TYPE "INTERFACE")
     endif()
+    message(STATUS "CREATING IMPORTED TPL")
     morpheus_create_imported_tpl(
       ${NAME}
       ${IMPORT_TYPE}
@@ -473,7 +474,12 @@ endif()
 morpheus_add_tpl_option(
   CUBLAS ${CUBLAS_DEFAULT} "Whether to enable CUBLAS" DEFAULT_DOCSTRING
   "ON if CUDA-enabled Kokkos, otherwise OFF")
-  morpheus_import_tpl(CUBLAS)
+morpheus_import_tpl(CUBLAS)
+
+morpheus_add_tpl_option(
+  ARMPL OFF "Whether to enable ARMPL" DEFAULT_DOCSTRING
+  "OFF by default")
+morpheus_import_tpl(ARMPL)
 # morpheus_add_option(
 #   NO_DEFAULT_HIP_TPLS OFF BOOL
 #   "Whether HIP TPLs should be enabled by default. Default: OFF")

@@ -19,6 +19,7 @@ append_glob(MORPHEUS_CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/impl/*.cpp)
 set(MORPHEUS_CORE_HEADERS)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/*.hpp)
+append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/impl/Arm/*.hpp)
 append_glob(MORPHEUS_CORE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/fwd/*.hpp)
 
 foreach(Fmt DenseVector;DenseMatrix)
@@ -124,3 +125,4 @@ target_include_directories(
 
 morpheus_link_tpl(morpheus-core PUBLIC MPARK_VARIANT)
 morpheus_link_tpl(morpheus-core PUBLIC CUBLAS)
+morpheus_link_tpl(morpheus-core PUBLIC ARMPL)
