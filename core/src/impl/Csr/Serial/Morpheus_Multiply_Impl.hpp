@@ -33,6 +33,7 @@
 #include <Morpheus_Spaces.hpp>
 
 #include <impl/Csr/Serial/Arm/Morpheus_Multiply_ArmPL_Impl.hpp>
+#include <impl/Csr/Serial/Arm/Morpheus_Multiply_ArmSVE_Impl.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -46,7 +47,13 @@ inline void multiply(
         Morpheus::has_custom_backend_v<ExecSpace> &&
         Morpheus::has_serial_execution_space_v<ExecSpace> &&
         Morpheus::has_access_v<ExecSpace, Matrix, Vector>>* = nullptr) {
-#if defined(MORPHEUS_ENABLE_TPL_ARMPL)
+#if defined(MORPHEUS_ENABLE_ARM_SVE)
+  using value_type = typename Matrix::value_type;
+  static_assert(std::is_floating_point_v<value_type>,
+                "Only floating point types are supported as value_type for SVE "
+                "extensions.");
+  multiply_arm_sve<ExecSpace>(A, x, y, init);
+#elif defined(MORPHEUS_ENABLE_TPL_ARMPL)
   using value_type = typename Matrix::value_type;
   static_assert(
       std::is_floating_point_v<value_type>,
