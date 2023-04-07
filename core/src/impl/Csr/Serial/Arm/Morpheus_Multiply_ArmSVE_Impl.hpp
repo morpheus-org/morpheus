@@ -87,6 +87,7 @@ inline void multiply_arm_sve(
   // }
   for (size_type i = 0; i < A.nrows(); i++) {
     vtype_t<SZ> vsum = vdup<SZ>((value_type)0);
+    // vtype_t<SZ> vsum = init ? vdup<SZ>((value_type)0) : svld1(pg, yval + i);
     for (index_type jj = Aroff[i]; jj < Aroff[i + 1]; jj += vl) {
       vbool_t const pg = vwhilelt<SZ>((uint_t<SZ>)jj, (uint_t<SZ>)Aroff[i + 1]);
       auto vAval       = svld1(pg, Aval + jj);
@@ -94,7 +95,8 @@ inline void multiply_arm_sve(
       auto vxval       = svld1_gather_index(pg, xval, vAcind);
       vsum             = svmla_m(pg, vsum, vAval, vxval);
     }
-    yval[i] = svaddv(vptrue<SZ>(), vsum);
+    yval[i] = init ? svaddv(vptrue<SZ>(), vsum)
+                   : yval[i] + svaddv(vptrue<SZ>(), vsum);
   }
 }
 

@@ -63,9 +63,10 @@ inline void multiply_arm_sve(
   svuint_t<SZ> const vidx = vindex<SZ>(0, (uint_t<SZ>)A.ndiags());
 
   for (index_type row = 0; row < (index_type)A.nrows(); row += vl) {
-    vtype_t<SZ> vsum = vdup<SZ>((value_type)0);
+    // vtype_t<SZ> vsum = vdup<SZ>((value_type)0);
     // NOTE: Could be replaced with a ptrue + drain loop with a bit more effort
     vbool_t const pg = vwhilelt<SZ>((uint_t<SZ>)row, (uint_t<SZ>)A.nrows());
+    vtype_t<SZ> vsum = init ? vdup<SZ>((value_type)0) : svld1(pg, yval + row);
 
     for (size_type n = 0; n < A.ndiags(); n++) {
       index_type const col = row + Adoff[n];
