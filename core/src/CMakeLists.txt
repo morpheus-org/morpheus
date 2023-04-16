@@ -50,7 +50,7 @@ if(Morpheus_ENABLE_CUDA OR MORPHEUS_ENABLE_HIP)
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/DenseVector/Kernels/*.hpp)
 endif()
 
-foreach(Fmt Coo;Csr;Dia)
+foreach(Fmt Coo;Csr;Dia;Ell;Hdc;Hyb)
   append_glob(MORPHEUS_CORE_SOURCES
               ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/*.cpp)
   append_glob(MORPHEUS_CORE_HEADERS
@@ -91,6 +91,15 @@ foreach(Fmt Coo;Csr;Dia)
                 ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Kernels/*.hpp)
   endif()
 endforeach()
+
+if(Morpheus_ENABLE_SERIAL AND Morpheus_ENABLE_TPL_ARMPL)
+  foreach(Fmt Coo;Csr)
+    append_glob(MORPHEUS_CORE_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Serial/Arm/*.cpp)
+    append_glob(MORPHEUS_CORE_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/impl/${Fmt}/Serial/Arm/*.hpp)
+  endforeach()
+endif()
 
 append_glob(MORPHEUS_CORE_HEADERS
             ${CMAKE_CURRENT_BINARY_DIR}/MorpheusCore_config.hpp)

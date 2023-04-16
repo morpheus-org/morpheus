@@ -30,6 +30,7 @@
 
 #include <impl/Arm/Morpheus_ArmPL_Impl.hpp>
 #include <impl/Morpheus_ArmUtils.hpp>
+#include <impl/Csr/Serial/Arm/Morpheus_Workspace.hpp>
 
 namespace Morpheus {
 namespace Impl {
@@ -41,16 +42,11 @@ void multiply_armpl_csr_serial(
     ValueType* y, bool init,
     typename std::enable_if_t<std::is_floating_point_v<ValueType> &&
                               std::is_same_v<IndexType, int>>* = nullptr) {
-  armpl_spmat_t armpl_mat;
-  double beta = init ? 0.0 : 1.0;
-
-  CHECK_ARMPL_ERROR(armpl_spmat_create_csr<ValueType>(
-      &armpl_mat, M, N, roff, cind, vals, ARMPL_SPARSE_CREATE_NOCOPY));
-
+  double beta             = init ? 0.0 : 1.0;
+  armpl_spmat_t armpl_mat = armplcsrspace_serial.handle(
+      M, N, roff, cind, vals, ARMPL_SPARSE_CREATE_NOCOPY);
   CHECK_ARMPL_ERROR(armpl_spmv_exec<ValueType>(ARMPL_SPARSE_OPERATION_NOTRANS,
                                                1.0, armpl_mat, x, beta, y));
-
-  CHECK_ARMPL_ERROR(armpl_spmat_destroy(armpl_mat));
 }
 
 }  // namespace Impl
