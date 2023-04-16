@@ -37,7 +37,7 @@ namespace Impl {
 
 class ArmPLCooWorkspace_Serial {
  public:
-  ArmPLCooWorkspace_Serial() : _handles_map(), _init(false) {}
+  ArmPLCooWorkspace_Serial() : _handles_map() {}
 
   ~ArmPLCooWorkspace_Serial() {
     for (auto p = _handles_map.begin(); p != _handles_map.end(); p++)
@@ -70,7 +70,6 @@ class ArmPLCooWorkspace_Serial {
 
  private:
   std::unordered_map<armpl_int_t *, armpl_spmat_t> _handles_map;
-  bool _init;
 };
 
 extern ArmPLCooWorkspace_Serial armplcoospace_serial;
