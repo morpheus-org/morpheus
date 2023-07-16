@@ -233,6 +233,16 @@ struct generate_binary_typelist_proxy<TypeList<List1...>, TypeList<List2...>> {
           TypeList<List1...>, TypeList<List2...>>::type>::type;
 };
 
+template <typename... Ts>
+struct mirror_params;
+
+template <template <typename V1, typename... PS1> typename Src, typename V1,
+          typename... PS1, template <typename V2, typename... PS2> typename Dst,
+          typename V2, typename... PS2>
+struct mirror_params<Src<V1, PS1...>, Dst<V2, PS2...>> {
+  using type = Dst<V1, PS1...>;
+};
+
 }  // namespace Impl
 }  // namespace Morpheus
 /*! \endcond */

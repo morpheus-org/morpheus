@@ -199,6 +199,18 @@ struct generate_binary_typelist {
   using type =
       typename Impl::generate_binary_typelist_proxy<List1, List2>::type;
 };
+
+/**
+ * @brief Generates a \p Dst container with the same template parameters as
+ * \p Src
+ *
+ * @tparam Src The type of source container.
+ * @tparam Dst The type of the Dst to be adapted.
+ */
+template <typename Src, typename Dst>
+struct mirror_params {
+  using type = typename Impl::mirror_params<Src, Dst>::type;
+};
 /*! \} // end of metaprogramming group
  */
 

@@ -73,6 +73,9 @@ void convert(
   using index_type = typename SourceType::index_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
+  if (src.nnnz() == 0) {
+    return;
+  }
 
   const index_type invalid_index      = src.cell().invalid_index();
   const size_type num_entries_per_row = src.cell().ccolumn_indices().ncols();

@@ -80,6 +80,9 @@ void convert(
   using value_type = typename SourceType::value_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
+  if (src.nnnz() == 0) {
+    return;
+  }
 
   size_type num_entries = 0;
 

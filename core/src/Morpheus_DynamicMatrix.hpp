@@ -188,7 +188,10 @@ class DynamicMatrix
       typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
           * = nullptr) {
     this->activate(src.format_enum());
-    base::resize(src.nrows(), src.ncols(), src.nnnz());
+    this->set_nrows(src.nrows());
+    this->set_ncols(src.ncols());
+    this->set_nnnz(src.nnnz());
+    // base::resize(src.nrows(), src.ncols(), src.nnnz());
 
     auto f = std::bind(Impl::any_type_assign(), std::cref(src),
                        std::placeholders::_1);
@@ -214,7 +217,10 @@ class DynamicMatrix
                           DynamicMatrix &>::type
   operator=(const Matrix &matrix) {
     this->activate(matrix.format_enum());
-    base::resize(matrix.nrows(), matrix.ncols(), matrix.nnnz());
+    // base::resize(matrix.nrows(), matrix.ncols(), matrix.nnnz());
+    this->set_nrows(matrix.nrows());
+    this->set_ncols(matrix.ncols());
+    this->set_nnnz(matrix.nnnz());
 
     auto f = std::bind(Impl::any_type_assign(), std::cref(matrix),
                        std::placeholders::_1);
@@ -241,7 +247,10 @@ class DynamicMatrix
       typename std::enable_if<is_format_compatible<
           DynamicMatrix, DynamicMatrix<VR, PR...>>::value>::type * = nullptr) {
     this->activate(src.active_index());  // switch to src format
-    base::resize(src.nrows(), src.ncols(), src.nnnz());
+    // base::resize(src.nrows(), src.ncols(), src.nnnz());
+    this->set_nrows(src.nrows());
+    this->set_ncols(src.ncols());
+    this->set_nnnz(src.nnnz());
 
     Morpheus::Impl::Variant::visit(Impl::any_type_assign(), src.const_formats(),
                                    _formats);
@@ -266,7 +275,10 @@ class DynamicMatrix
       DynamicMatrix &>::type
   operator=(const DynamicMatrix<VR, PR...> &src) {
     this->activate(src.active_index());  // switch to src format
-    base::resize(src.nrows(), src.ncols(), src.nnnz());
+    // base::resize(src.nrows(), src.ncols(), src.nnnz());
+    this->set_nrows(src.nrows());
+    this->set_ncols(src.ncols());
+    this->set_nnnz(src.nnnz());
 
     Morpheus::Impl::Variant::visit(Impl::any_type_assign(), src.const_formats(),
                                    _formats);
@@ -295,7 +307,10 @@ class DynamicMatrix
   template <class VR, class... PR>
   inline void resize(const DynamicMatrix<VR, PR...> &src) {
     this->activate(src.format_enum());
-    base::resize(src.nrows(), src.ncols(), src.nnnz());
+    // base::resize(src.nrows(), src.ncols(), src.nnnz());
+    this->set_nrows(src.nrows());
+    this->set_ncols(src.ncols());
+    this->set_nnnz(src.nnnz());
 
     Morpheus::Impl::Variant::visit(Impl::any_type_resize_from_mat(),
                                    src.const_formats(), _formats);
@@ -317,7 +332,10 @@ class DynamicMatrix
       typename std::enable_if<is_variant_member_v<Matrix, variant_type>>::type
           * = nullptr) {
     this->activate(src.format_enum());
-    base::resize(src.nrows(), src.ncols(), src.nnnz());
+    // base::resize(src.nrows(), src.ncols(), src.nnnz());
+    this->set_nrows(src.nrows());
+    this->set_ncols(src.ncols());
+    this->set_nnnz(src.nnnz());
 
     auto f = std::bind(Impl::any_type_resize_from_mat(), std::cref(src),
                        std::placeholders::_1);
@@ -338,7 +356,10 @@ class DynamicMatrix
   template <class VR, class... PR>
   inline DynamicMatrix &allocate(const DynamicMatrix<VR, PR...> &src) {
     this->activate(src.active_index());  // switch to src format
-    base::resize(src.nrows(), src.ncols(), src.nnnz());
+    // base::resize(src.nrows(), src.ncols(), src.nnnz());
+    this->set_nrows(src.nrows());
+    this->set_ncols(src.ncols());
+    this->set_nnnz(src.nnnz());
 
     Morpheus::Impl::Variant::visit(Impl::any_type_allocate(),
                                    src.const_formats(), _formats);
@@ -402,7 +423,10 @@ class DynamicMatrix
     }
 
     // Set metadata to 0
-    base::resize(0, 0, 0);
+    // base::resize(0, 0, 0);
+    this->set_nrows(0);
+    this->set_ncols(0);
+    this->set_nnnz(0);
     Impl::activate_impl<size, ValueType, Properties...>::activate(_formats,
                                                                   idx);
   }

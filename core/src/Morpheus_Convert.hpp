@@ -26,6 +26,7 @@
 
 #include <Morpheus_Print.hpp>
 #include <Morpheus_FormatTags.hpp>
+#include <Morpheus_ContainerFactory.hpp>
 #include <fwd/Morpheus_Fwd_CooMatrix.hpp>
 
 #include <impl/Morpheus_Convert_Impl.hpp>
@@ -88,10 +89,12 @@ template <typename ExecSpace, typename SourceType>
 conversion_error_e convert(SourceType& src, const formats_e index) {
   static_assert(Morpheus::is_dynamic_matrix_format_container<SourceType>::value,
                 "Container must be a DynamicMatrix.");
-  Morpheus::CooMatrix<
-      typename SourceType::value_type, typename SourceType::index_type,
-      typename SourceType::array_layout, typename SourceType::memory_space>
-      temp;
+  using value_type = typename SourceType::value_type;
+  using CooMatrix =
+      typename Morpheus::mirror_params<SourceType,
+                                       Morpheus::CooMatrix<value_type>>::type;
+
+  CooMatrix temp;
 
   // No conversion needed
   if (src.active_index() == index) {
@@ -102,9 +105,6 @@ conversion_error_e convert(SourceType& src, const formats_e index) {
     try {
       Impl::convert<ExecSpace>(src, temp);
     } catch (...) {
-      std::cout << "Warning: Conversion failed! Active state set to: "
-                << src.active_index() << std::endl;
-
       return DYNAMIC_TO_PROXY;
     }
   } else {
@@ -118,9 +118,6 @@ conversion_error_e convert(SourceType& src, const formats_e index) {
   try {
     Impl::convert<ExecSpace>(temp, dynamic_temp);
   } catch (...) {
-    std::cout << "Warning: Conversion failed! Active state set to: "
-              << src.active_index() << std::endl;
-
     return PROXY_TO_DYNAMIC;
   }
   src = dynamic_temp;

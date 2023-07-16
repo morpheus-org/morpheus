@@ -84,8 +84,12 @@ void convert(
   using value_type = typename SourceType::value_type;
 
   dst.resize(src.nrows(), src.ncols(), src.nnnz());
+  if (src.nnnz() == 0) {
+    return;
+  }
 
-  const size_type ndiag = src.cvalues().ncols();
+  // const size_type ndiag = src.cvalues().ncols();
+  const size_type ndiag = src.cdiagonal_offsets().size();
 
   for (size_type i = 0, nnzid = 0; i < ndiag; i++) {
     const index_type k = src.cdiagonal_offsets(i);
